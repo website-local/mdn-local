@@ -23,8 +23,11 @@ const process = async (html) => {
     for (let index = 0; index < elements.length; index++) {
       const elem = elements.eq(index);
       const link = elem.attr(attr);
-      if (!link || link[0] === '#' || link.startsWith('data:')) {
+      if (!link || link[0] === '#' ||
+        link.startsWith('data:') ||
+        link.toLowerCase().startsWith('mailto:')) {
         // skip empty, in-page hash jump, and data-uri links
+        // skip mail links
         continue;
       }
       if (type === 'html') {

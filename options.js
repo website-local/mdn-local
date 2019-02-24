@@ -27,13 +27,13 @@ const defaultOptions = {
    */
   requestRedirectFunc: null,
   /**
-   * @type * | function(string, Resource): boolean
+   * @type * | function(Resource): boolean
    */
   dropResourceFunc: null,
   /**
    * @type number
    */
-  concurrency: 64,
+  concurrency: 32,
   /**
    * @type number
    */

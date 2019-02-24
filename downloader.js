@@ -33,6 +33,8 @@ class Downloader {
 
     this.queue.push(callback => {
       const errHandler = error => {
+        // eslint-disable-next-line no-console
+        console.error(error, resource);
         if (error && error.statusCode === 404) {
           callback();
         } else {

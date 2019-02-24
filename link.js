@@ -3,7 +3,7 @@ const path = require('path');
 const got = require('got');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const mkdirs = require('mkdirp');
+const mkdirP = require('mkdirp');
 const defaultOptions = require('./options');
 
 const cacheUri = {};
@@ -34,7 +34,7 @@ const uriOf = (url, enabled = false) => {
 const writeFile = (buffer, filePath) => {
   const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
-    mkdirs.sync(dir);
+    mkdirP.sync(dir);
   }
   return new Promise(resolve =>
     fs.writeFile(filePath, buffer, resolve));
@@ -43,7 +43,7 @@ const writeFile = (buffer, filePath) => {
 const writeStr = (str, filePath, encoding = 'utf8') => {
   const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
-    mkdirs.sync(dir);
+    mkdirP.sync(dir);
   }
   return new Promise(resolve =>
     fs.writeFile(filePath, str, {encoding}, resolve));
@@ -58,7 +58,11 @@ class Link {
     }
     this.refUri = uriOf(refUrl, this.options.cacheUri);
     if (url.startsWith('//')) {
-      url += this.refUri.protocol() + ':';
+      // url with the same protocol
+      url = this.refUri.protocol() + ':' + url;
+    } else if (url[0] === '/') {
+      // absolute path
+      url = this.refUri.protocol() + '://' + this.refUri.host() + url;
     }
     this.uri = uriOf(url, this.options.cacheUri);
     this.savePath = '';
@@ -74,7 +78,6 @@ class Link {
      */
     this.url = url;
     this.body = null;
-    this.encoding = null;
   }
   equals(link) {
     return link && link.url === this.url;
@@ -124,7 +127,13 @@ class Resource extends Link{
       this.uri = this.uri.absoluteTo(this.refUri);
       this._url = this.uri.toString();
     } else {
-      this.replacePath = this.uri.relativeTo(this.refUri);
+      try {
+        this.replacePath = this.uri.relativeTo(this.refUri);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e, this);
+        throw e;
+      }
     }
     this.host = this.uri.hostname();
     this.serverPath = this.uri.path();
