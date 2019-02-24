@@ -1,0 +1,17 @@
+CHANGELOG.md
+node.exe
+node_etw_provider.man
+node_modules
+node_perfctr_provider.man
+node-*.zip
+nodevars.bat
+npm
+npm.cmd
+npx
+npx.cmd
+.idea/*
+*.iml
+eslint
+eslint.cmd
+/mkdirp.cmd
+/mkdirp
