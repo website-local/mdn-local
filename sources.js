@@ -12,6 +12,7 @@ const sources = [
   {selector: 'script', attr: 'src'},
   {selector: 'link[rel="stylesheet"]', attr: 'href', type: 'css'},
   {selector: 'link[rel*="icon"]', attr: 'href'},
+  {selector: 'link[rel*="preload"]', attr: 'href'},
   {selector: 'svg *[xlink\\:href]', attr: 'xlink:href'},
   {selector: 'svg *[href]', attr: 'href'},
   {selector: 'picture source', attr: 'srcset'},

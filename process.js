@@ -22,18 +22,19 @@ const process = async (html) => {
     for (let index = 0; index < elements.length; index++) {
       const elem = elements.eq(index);
       const link = elem.attr(attr);
-      if (!link || link[0] === '#') {
+      if (!link || link[0] === '#' || link.startsWith('data:')) {
+        // skip empty, in-page hash jump, and data-uri links
         continue;
       }
       if (type === 'html') {
         const res = new HtmlResource(link, html.localRoot, html.url, html.options);
         htmlArr.push(res);
-        elem.attr(attr, res.replacePath);
+        elem.attr(attr, res.replacePath.toString());
         continue;
       }
       const res = new Resource(link, html.localRoot, html.url, html.options);
       resArr.push(res);
-      elem.attr(attr, res.replacePath);
+      elem.attr(attr, res.replacePath.toString());
     }
   }
   if (typeof html.options.postProcessHtml === 'function') {

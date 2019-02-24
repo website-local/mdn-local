@@ -23,8 +23,12 @@ const defaultOptions = {
    */
   postProcessHtml: null,
   /**
+   * @type * | function(string, HtmlResource): string
+   */
+  requestRedirectFunc: null,
+  /**
    * @type number
    */
-  concurrency: 600
+  concurrency: 64
 };
 module.exports = defaultOptions;

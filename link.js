@@ -31,22 +31,22 @@ const uriOf = (url, enabled = false) => {
   return uri;
 };
 
-const writeFile = (buffer, path) => {
-  const dir = path.dirname(path);
+const writeFile = (buffer, filePath) => {
+  const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
     mkdirs.sync(dir);
   }
   return new Promise(resolve =>
-    fs.writeFile(path, buffer, resolve));
+    fs.writeFile(filePath, buffer, resolve));
 };
 
-const writeStr = (str, path, encoding = 'utf8') => {
-  const dir = path.dirname(path);
+const writeStr = (str, filePath, encoding = 'utf8') => {
+  const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
     mkdirs.sync(dir);
   }
   return new Promise(resolve =>
-    fs.writeFile(path, str, {encoding}, resolve));
+    fs.writeFile(filePath, str, {encoding}, resolve));
 };
 
 class Link {
@@ -56,10 +56,14 @@ class Link {
     if (typeof this.options.urlFilter === 'function') {
       url = this.options.urlFilter(url);
     }
-    this.uri = uriOf(url, this.options.cacheUri);
     this.refUri = uriOf(refUrl, this.options.cacheUri);
+    if (url.startsWith('//')) {
+      url += this.refUri.protocol() + ':';
+    }
+    this.uri = uriOf(url, this.options.cacheUri);
     this.savePath = '';
     this.localRoot = localRoot;
+    this._downloadLink = url;
     /**
      * 远程路径
      * @type string
@@ -76,7 +80,11 @@ class Link {
   }
   async fetch() {
     if (this.body) return this.body;
-    const res = await get(this.url,
+    if (typeof this.options.requestRedirectFunc === 'function') {
+      this._downloadLink =
+        this.options.requestRedirectFunc(this._downloadLink, this);
+    }
+    const res = await get(this._downloadLink,
       Object.assign(this.options.req, {encoding: this.encoding}));
     if (res && res.body) {
       return this.body = res.body;
@@ -117,6 +125,7 @@ class Resource extends Link{
     this.host = this.uri.hostname();
     this.serverPath = this.uri.path();
     this.savePath = path.join(this.localRoot, this.host, this.serverPath);
+    this._downloadLink = this.uri.clone().hash('').toString();
   }
   get url() {
     return this._url;
