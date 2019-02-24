@@ -51,7 +51,7 @@ const writeStr = (str, filePath, encoding = 'utf8') => {
 
 class Link {
   constructor(url, localRoot, refUrl, options = {}) {
-    this.options = Object.assign(options, defaultOptions);
+    this.options = Object.assign({}, defaultOptions, options);
     this.encoding = this.options.encoding.buffer;
     if (typeof this.options.urlFilter === 'function') {
       url = this.options.urlFilter(url);
@@ -64,6 +64,10 @@ class Link {
     this.savePath = '';
     this.localRoot = localRoot;
     this._downloadLink = url;
+    /**
+     * @type {number}
+     */
+    this.depth = 0;
     /**
      * 远程路径
      * @type string
@@ -85,7 +89,7 @@ class Link {
         this.options.requestRedirectFunc(this._downloadLink, this);
     }
     const res = await get(this._downloadLink,
-      Object.assign(this.options.req, {encoding: this.encoding}));
+      Object.assign({encoding: this.encoding}, this.options.req));
     if (res && res.body) {
       return this.body = res.body;
     } else {
@@ -147,7 +151,7 @@ class HtmlResource extends Resource {
   set url(url) {
     super.url = url;
     if (!this.savePath.endsWith('.html')) {
-      if (this.savePath.endsWith('/')) {
+      if (this.savePath.endsWith('/') || this.savePath.endsWith('\\')) {
         this._appendSuffix('index.html');
       } else if (this.savePath.endsWith('.htm')) {
         this._appendSuffix('l');

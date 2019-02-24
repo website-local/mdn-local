@@ -27,8 +27,26 @@ const defaultOptions = {
    */
   requestRedirectFunc: null,
   /**
+   * @type * | function(string, Resource): boolean
+   */
+  dropResourceFunc: null,
+  /**
    * @type number
    */
-  concurrency: 64
+  concurrency: 64,
+  /**
+   * @type number
+   */
+  depth: 5,
+  beginUrl: '',
+  localRoot: '',
+  /**
+   * @type * | function
+   */
+  onSuccess: null,
+  /**
+   * @type * | function
+   */
+  onError: null
 };
 module.exports = defaultOptions;

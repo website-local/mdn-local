@@ -12,6 +12,7 @@ const process = async (html) => {
   if (!html.doc) {
     await html.fetch();
   }
+  const depth = (+html.depth || 0) + 1;
   const htmlArr = [];
   const resArr = [];
   if (typeof html.options.preProcessHtml === 'function') {
@@ -28,12 +29,20 @@ const process = async (html) => {
       }
       if (type === 'html') {
         const res = new HtmlResource(link, html.localRoot, html.url, html.options);
-        htmlArr.push(res);
+        res.depth = depth;
+        if (!(typeof html.options.dropResourceFunc === 'function' &&
+          html.options.dropResourceFunc(res))) {
+          htmlArr.push(res);
+        }
         elem.attr(attr, res.replacePath.toString());
         continue;
       }
       const res = new Resource(link, html.localRoot, html.url, html.options);
-      resArr.push(res);
+      res.depth = depth;
+      if (!(typeof html.options.dropResourceFunc === 'function' &&
+        html.options.dropResourceFunc(res))) {
+        resArr.push(res);
+      }
       elem.attr(attr, res.replacePath.toString());
     }
   }
