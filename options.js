@@ -23,7 +23,11 @@ const defaultOptions = {
    */
   postProcessHtml: null,
   /**
-   * @type * | function(string, HtmlResource): string
+   * @type * | function(string, Cheerio, HtmlResource): string
+   */
+  linkRedirectFunc: null,
+  /**
+   * @type * | function(string, Link): string
    */
   requestRedirectFunc: null,
   /**

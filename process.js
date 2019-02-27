@@ -22,7 +22,9 @@ const process = async (html) => {
     const elements = html.doc(selector);
     for (let index = 0; index < elements.length; index++) {
       const elem = elements.eq(index);
-      const link = elem.attr(attr);
+      const originalLink = elem.attr(attr);
+      const link = html.options.linkRedirectFunc ?
+        html.options.linkRedirectFunc(originalLink, elem, html) : originalLink;
       if (!link || link[0] === '#' ||
         link.startsWith('data:') ||
         link.toLowerCase().startsWith('mailto:')) {
