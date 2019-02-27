@@ -79,12 +79,15 @@ class Link {
     this.url = url;
     this.body = null;
   }
+
   equals(link) {
     return link && link.url === this.url;
   }
+
   toString() {
     return this.url;
   }
+
   async fetch() {
     if (this.body) return this.body;
     if (typeof this.options.requestRedirectFunc === 'function') {
@@ -99,6 +102,7 @@ class Link {
       throw new Error(res.body);
     }
   }
+
   async save() {
     if (!this.savePath) {
       return false;
@@ -113,19 +117,32 @@ class Link {
   }
 }
 
-class Resource extends Link{
+class Resource extends Link {
   constructor(url, localRoot, refUrl, options = {}) {
     super(url, localRoot, refUrl, options);
     if (this.refUri.is('relative')) {
       throw new TypeError('refUrl必须是绝对路径');
     }
   }
+
   set url(url) {
     this._url = url;
     if (this.uri.is('relative')) {
       this.replacePath = this.uri.clone();
       this.uri = this.uri.absoluteTo(this.refUri);
       this._url = this.uri.toString();
+    } else if (this.uri.host() !== this.refUri.host()) {
+      const crossOrigin = this.uri.host();
+      const crossUri = this.uri.clone().host(this.refUri.host());
+      crossUri.path(crossOrigin + '/' + crossUri.path());
+      try {
+        this.replacePath = crossUri.relativeTo(this.refUri);
+        this.replacePath.path('../' + this.replacePath.path());
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e, this);
+        throw e;
+      }
     } else {
       try {
         this.replacePath = this.uri.relativeTo(this.refUri);
@@ -140,9 +157,11 @@ class Resource extends Link{
     this.savePath = path.join(this.localRoot, this.host, this.serverPath);
     this._downloadLink = this.uri.clone().hash('').toString();
   }
+
   get url() {
     return this._url;
   }
+
   get replaceStr() {
     return this.replacePath.toString();
   }
@@ -154,7 +173,7 @@ class HtmlResource extends Resource {
     /**
      * @type {string|null}
      */
-    this.encoding =this.options.encoding.html;
+    this.encoding = this.options.encoding.html;
   }
 
   set url(url) {
