@@ -1,5 +1,5 @@
 const {Resource, HtmlResource} = require('./link');
-const Queue = require('queue');
+const Queue = require('p-queue');
 const process = require('./process');
 const defaultOptions = require('./options');
 
@@ -13,6 +13,7 @@ class Downloader {
     this.queue = new Queue(options);
     this.queuedLinks = {};
     this.downloadedLinks = {};
+    this.failedLinks = {};
     if (options.beginUrl && options.localRoot) {
       this.add(new HtmlResource(
         options.beginUrl, options.localRoot, options.beginUrl, options));
@@ -30,54 +31,54 @@ class Downloader {
       return false;
     }
     const self = this;
-
-    this.queue.push(callback => {
-      const errHandler = error => {
-        // eslint-disable-next-line no-console
-        console.error(error, resource);
-        if (error && error.statusCode === 404) {
-          callback();
-        } else {
-          callback(error);
-        }
-      };
-      if (resource instanceof HtmlResource) {
-        process(resource).then(({htmlArr, resArr}) => {
+    if (resource instanceof HtmlResource) {
+      this.queue.add(async () => {
+        try {
+          const {htmlArr, resArr} = await process(resource);
           for (const html of htmlArr) {
             self.add(html);
           }
           for (const res of resArr) {
             self.add(res);
           }
-        }).then(() => callback(null, resource.save())).then(()=>{
+          await resource.save();
           self.downloadedLinks[url] = 1;
-        })
-          .catch(errHandler);
-      } else {
-        resource.save().then(() => {
+        } catch (e) {
+          self.handleError(e, url);
+        }
+      });
+    } else {
+      this.queue.add(async () => {
+        try {
+          await resource.save();
           self.downloadedLinks[url] = 1;
-        })
-          .catch(errHandler);
-      }
-    });
+        } catch (e) {
+          self.handleError(e, url);
+        }
+      });
+    }
+
     this.queuedLinks[url] = 1;
     return true;
   }
+  handleError(error, url) {
+    if (error && typeof this.options.onError === 'function') {
+      this.options.onError(this);
+    }
+    this.failedLinks[url] = 1;
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
   start() {
     this.finished = 0;
-    return this.queue.start(error => {
-      this.error = error;
+    this.queue.onIdle().then(() => {
       this.finished = 1;
-      if (!error && typeof this.options.onSuccess === 'function') {
-        this.options.onSuccess(this);
-      } else if (error && typeof this.options.onError === 'function') {
-        this.options.onError(this);
-      }
     });
+    return this.queue.start();
   }
 
   stop() {
-    this.queue.stop();
+    this.queue.pause();
   }
 }
 module.exports = Downloader;
