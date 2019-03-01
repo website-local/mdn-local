@@ -49,9 +49,20 @@ const writeStr = (str, filePath, encoding = 'utf8') => {
     fs.writeFile(filePath, str, {encoding}, resolve));
 };
 
+const defaultOpt = (opt, defaultOpt) => {
+  if (!opt) opt = {};
+  if (!defaultOpt) return opt;
+  for (const key of Object.keys(defaultOpt)) {
+    if (!(key in opt)) {
+      opt[key] = defaultOptions[key];
+    }
+  }
+  return opt;
+};
+
 class Link {
   constructor(url, localRoot, refUrl, options = {}) {
-    this.options = Object.assign({}, defaultOptions, options);
+    this.options = defaultOpt(options, defaultOptions);
     this.encoding = this.options.encoding.buffer;
     if (typeof this.options.urlFilter === 'function') {
       url = this.options.urlFilter(url);

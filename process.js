@@ -32,6 +32,10 @@ const process = async (html) => {
         // skip mail links
         continue;
       }
+      if (html.options.skipProcessFunc &&
+        html.options.skipProcessFunc(link, elem, html)) {
+        continue;
+      }
       if (type === 'html') {
         const res = new HtmlResource(link, html.localRoot, html.url, html.options);
         res.depth = depth;

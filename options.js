@@ -27,6 +27,10 @@ const defaultOptions = {
    */
   linkRedirectFunc: null,
   /**
+   * @type * | function(string, Cheerio, HtmlResource): boolean
+   */
+  skipProcessFunc: null,
+  /**
    * @type * | function(string, Link): string
    */
   requestRedirectFunc: null,

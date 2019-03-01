@@ -15,6 +15,7 @@ interface Options {
     preProcessHtml?: HtmlProcessFunc;
     postProcessHtml?: HtmlProcessFunc;
     linkRedirectFunc?: LinkRedirectFunc;
+    skipProcessFunc?: SkipProcessFunc;
     requestRedirectFunc?: RequestRedirectFunc;
     dropResourceFunc?: DropResourceFunc;
     onSuccess?: Function;
@@ -41,6 +42,10 @@ interface LinkRedirectFunc {
     (url: string, element: Cheerio, parent: HtmlResource): string;
 }
 
+interface SkipProcessFunc {
+    (url: string, element: Cheerio, parent: HtmlResource): boolean;
+}
+
 interface DropResourceFunc {
     (res: Resource): boolean;
 }
@@ -56,7 +61,7 @@ declare class Link {
     savePath: string;
     localRoot: string;
     private _downloadLink: string;
-    depth: number;
+    public depth: number;
     url: string;
     body: null | Body;
     equals(link: Link) : boolean;
