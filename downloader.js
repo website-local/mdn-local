@@ -73,6 +73,9 @@ class Downloader {
     this.finished = 0;
     this.queue.onIdle().then(() => {
       this.finished = 1;
+      if (typeof this.options.onSuccess === 'function') {
+        this.options.onSuccess(this, this.finished);
+      }
     });
     return this.queue.start();
   }
