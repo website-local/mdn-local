@@ -42,6 +42,8 @@ class Downloader {
             self.add(res);
           }
           await resource.save();
+          // eslint-disable-next-line no-console
+          console.debug(url);
           self.downloadedLinks[url] = 1;
         } catch (e) {
           self.handleError(e, url);
@@ -51,9 +53,11 @@ class Downloader {
       this.queue.add(async () => {
         try {
           await resource.save();
+          // eslint-disable-next-line no-console
+          console.debug(url);
           self.downloadedLinks[url] = 1;
         } catch (e) {
-          self.handleError(e, url);
+          self.handleError(e, url, resource);
         }
       });
     }
@@ -61,13 +65,13 @@ class Downloader {
     this.queuedLinks[url] = 1;
     return true;
   }
-  handleError(error, url) {
+  handleError(error, url, resource) {
     if (error && typeof this.options.onError === 'function') {
-      this.options.onError(this);
+      this.options.onError(this, error, url, resource);
     }
     this.failedLinks[url] = 1;
     // eslint-disable-next-line no-console
-    console.error(error);
+    console.error(error, url, resource);
   }
   start() {
     this.finished = 0;

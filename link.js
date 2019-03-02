@@ -146,22 +146,10 @@ class Resource extends Link {
       const crossOrigin = this.uri.host();
       const crossUri = this.uri.clone().host(this.refUri.host());
       crossUri.path(crossOrigin + '/' + crossUri.path());
-      try {
-        this.replacePath = crossUri.relativeTo(this.refUri);
-        this.replacePath.path('../' + this.replacePath.path());
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e, this);
-        throw e;
-      }
+      this.replacePath = crossUri.relativeTo(this.refUri);
+      this.replacePath.path('../' + this.replacePath.path());
     } else {
-      try {
-        this.replacePath = this.uri.relativeTo(this.refUri);
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e, this);
-        throw e;
-      }
+      this.replacePath = this.uri.relativeTo(this.refUri);
     }
     this.host = this.uri.hostname();
     this.serverPath = this.uri.path();
