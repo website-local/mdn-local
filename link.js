@@ -121,10 +121,11 @@ class Link {
     if (!this.body) {
       await this.fetch();
     }
+    const savePathUnEncoded = decodeURI(this.savePath);
     if (this.encoding) {
-      return await writeStr(this.body, this.savePath, this.encoding);
+      return await writeStr(this.body, savePathUnEncoded, this.encoding);
     }
-    return await writeFile(this.body, this.savePath);
+    return await writeFile(this.body, savePathUnEncoded);
   }
 }
 
@@ -235,7 +236,8 @@ class HtmlResource extends Resource {
     if (!this.doc) {
       await this.fetch();
     }
-    return await writeStr(this.html, this.savePath, this.encoding);
+    const savePathUnEncoded = decodeURI(this.savePath);
+    return await writeStr(this.html, savePathUnEncoded, this.encoding);
   }
 }
 
