@@ -32,6 +32,18 @@ const appendLocalePath = {
   'docs': 1
 };
 
+const preProcessHtml = ($) => {
+  $('.global-notice').remove();
+  $('#nav-footer').remove();
+  $('.newsletter-box').remove();
+  $('#toolbox').remove();
+  $('.document-actions').remove();
+  $('#nav-main-search').remove();
+  $('link[rel="alternate"]').remove();
+  $('script[src*="newsletter"]').remove();
+  return $;
+};
+
 const downloadMdn = (localRoot, locale = 'zh-CN') => {
   if (!localesMap[locale]) {
     throw new TypeError('locale not exists');
@@ -78,6 +90,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN') => {
     localRoot,
     beginUrl: `https://developer.mozilla.org/${locale}/docs/Web`,
     dropResourceFunc,
+    preProcessHtml,
     linkRedirectFunc
   });
   d.start();
