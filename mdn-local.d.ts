@@ -1,6 +1,6 @@
 import URI from 'urijs'
 import * as got from "got";
-import {CheerioStatic, Cheerio} from "cheerio";
+import {Cheerio, CheerioStatic} from "cheerio";
 
 
 interface Options {
@@ -26,8 +26,9 @@ interface Encoding {
     buffer: null;
     html: string;
 }
+
 interface UrlFilterFunc {
-    (url: string):string;
+    (url: string): string;
 }
 
 interface HtmlProcessFunc {
@@ -50,10 +51,12 @@ interface DropResourceFunc {
     (res: Resource): boolean;
 }
 
-interface Body {}
+interface Body {
+}
 
 declare class Link {
-    constructor(url: string, localRoot: string, refUrl:string, options: Options);
+    constructor(url: string, localRoot: string, refUrl: string, options: Options);
+
     options: Options;
     encoding: string | null;
     refUri: URI;
@@ -64,14 +67,19 @@ declare class Link {
     public depth: number;
     url: string;
     body: null | Body;
-    equals(link: Link) : boolean;
+
+    equals(link: Link): boolean;
+
     toString(): string;
+
     fetch(): Promise<Body>;
+
     save(): Promise<any>;
 }
 
-declare class Resource extends Link{
+declare class Resource extends Link {
     constructor(url: string, localRoot: string, refUrl: string, options: Options);
+
     readonly replaceStr: string;
     private _url: string;
     public replacePath: URI;
@@ -80,7 +88,9 @@ declare class Resource extends Link{
 
 declare class HtmlResource extends Resource {
     constructor(url: string, localRoot: string, refUrl: string, options: Options);
-    private __appendSuffix(suffix: string) : void;
+
+    private __appendSuffix(suffix: string): void;
+
     private doc?: CheerioStatic;
     readonly html?: string;
 }

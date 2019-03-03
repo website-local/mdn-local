@@ -32,19 +32,46 @@ const appendLocalePath = {
   'docs': 1
 };
 
+/**
+ *
+ * @param {CheerioStatic} $
+ * @return {CheerioStatic}
+ */
 const preProcessHtml = ($) => {
+  // 顶部提示
   $('.global-notice').remove();
+  // 页脚
   $('#nav-footer').remove();
+  // 新闻盒子
   $('.newsletter-box').remove();
+  // 顶部登录
   $('#toolbox').remove();
+  // 顶部语言、编辑、历史记录
   $('.document-actions').remove();
+  // 顶部搜索
   $('#nav-main-search').remove();
+  // head 中可选替代语言
   $('link[rel="alternate"]').remove();
+  // 新闻脚本
   $('script[src*="newsletter"]').remove();
+  // 加入社区盒子
+  $('.communitybox').remove();
+  // 底部弹出
+  $('#contribution-popover-container').remove();
+  // TODO: 处理iframe
+  $('iframe').remove();
   return $;
 };
+/**
+ *
+ * @param {string} url
+ * @param {Cheerio} element
+ */
+const skipProcessFunc = (url, element) => {
+  return element.is('a.external-icon');
+};
 
-const downloadMdn = (localRoot, locale = 'zh-CN') => {
+const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   if (!localesMap[locale]) {
     throw new TypeError('locale not exists');
   }
@@ -85,14 +112,15 @@ const downloadMdn = (localRoot, locale = 'zh-CN') => {
     return url;
   };
 
-  const d = new Downloader({
-    depth: 1,
+  const d = new Downloader(Object.assign({
+    depth: 3,
     localRoot,
     beginUrl: `https://developer.mozilla.org/${locale}/docs/Web`,
     dropResourceFunc,
     preProcessHtml,
-    linkRedirectFunc
-  });
+    linkRedirectFunc,
+    skipProcessFunc
+  }, options));
   d.start();
 
   return d;
