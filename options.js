@@ -1,6 +1,15 @@
 const defaultOptions = {
   req: {
-    retry : 100
+    retry : 20,
+    headers: {
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+        '(KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'
+    },
+    timeout: {
+      lookup: 1000,
+      connect: 600,
+      secureConnect: 1000
+    }
   },
   encoding: {
     buffer: null,
@@ -41,7 +50,7 @@ const defaultOptions = {
   /**
    * @type number
    */
-  concurrency: 32,
+  concurrency: 16,
   /**
    * @type number
    */
