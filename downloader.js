@@ -44,26 +44,26 @@ class Downloader {
     }
     const self = this;
     if (resource instanceof HtmlResource) {
-      this.queue.add(async () => {
+      this.queue.add(() => new Promise((resolve) => setImmediate(async () => {
         try {
-          {
-            const {htmlArr, resArr} = await process(resource);
-            for (const html of htmlArr) {
-              self.add(html);
-            }
-            for (const res of resArr) {
-              self.add(res);
-            }
+          const {htmlArr, resArr} = await process(resource);
+          for (const html of htmlArr) {
+            self.add(html);
+          }
+          for (const res of resArr) {
+            self.add(res);
           }
           await resource.save();
           // eslint-disable-next-line no-console
           console.debug(url);
           self.downloadedLinks[url] = 1;
           resource = null;
+          resolve();
         } catch (e) {
           self.handleError(e, url, resource);
+          resolve(e);
         }
-      });
+      })));
     } else {
       this.queue.add(async () => {
         try {
