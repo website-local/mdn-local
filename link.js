@@ -110,7 +110,7 @@ class Link {
     if (res && res.body) {
       return this.body = res.body;
     } else {
-      throw new Error(res.body);
+      throw new Error(res);
     }
   }
 
@@ -233,11 +233,18 @@ class HtmlResource extends Resource {
     if (!this.savePath) {
       return false;
     }
+    if (this.saved) {
+      return true;
+    }
     if (!this.doc) {
       await this.fetch();
     }
     const savePathUnEncoded = decodeURI(this.savePath);
-    return await writeStr(this.html, savePathUnEncoded, this.encoding);
+    const ret = await writeStr(this.html, savePathUnEncoded, this.encoding);
+    this.saved = 1;
+    this.doc = null;
+    this.body = null;
+    return ret;
   }
 }
 
