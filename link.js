@@ -105,7 +105,8 @@ class Link {
       this._downloadLink =
         this.options.requestRedirectFunc(this._downloadLink, this);
     }
-    const res = await get(this._downloadLink,
+    const downloadLink = encodeURI(decodeURI(this._downloadLink));
+    const res = await get(downloadLink,
       Object.assign({encoding: this.encoding}, this.options.req));
     if (res && res.body) {
       return this.body = res.body;
