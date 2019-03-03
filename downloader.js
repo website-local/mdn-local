@@ -14,6 +14,18 @@ class Downloader {
     this.queuedLinks = {};
     this.downloadedLinks = {};
     this.failedLinks = {};
+    const dropResourceFunc = options.dropResourceFunc;
+    const self = this;
+    /**
+     * @param {Resource} res
+     * @return {boolean}
+     */
+    options.dropResourceFunc = (res) => {
+      if (dropResourceFunc && dropResourceFunc(res)) {
+        return true;
+      }
+      return self.queuedLinks[res._downloadLink];
+    };
     if (options.beginUrl && options.localRoot) {
       this.add(new HtmlResource(
         options.beginUrl, options.localRoot, options.beginUrl, options));
@@ -34,19 +46,22 @@ class Downloader {
     if (resource instanceof HtmlResource) {
       this.queue.add(async () => {
         try {
-          const {htmlArr, resArr} = await process(resource);
-          for (const html of htmlArr) {
-            self.add(html);
-          }
-          for (const res of resArr) {
-            self.add(res);
+          {
+            const {htmlArr, resArr} = await process(resource);
+            for (const html of htmlArr) {
+              self.add(html);
+            }
+            for (const res of resArr) {
+              self.add(res);
+            }
           }
           await resource.save();
           // eslint-disable-next-line no-console
           console.debug(url);
           self.downloadedLinks[url] = 1;
+          resource = null;
         } catch (e) {
-          self.handleError(e, url);
+          self.handleError(e, url, resource);
         }
       });
     } else {
@@ -56,6 +71,7 @@ class Downloader {
           // eslint-disable-next-line no-console
           console.debug(url);
           self.downloadedLinks[url] = 1;
+          resource = null;
         } catch (e) {
           self.handleError(e, url, resource);
         }
