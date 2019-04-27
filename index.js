@@ -68,7 +68,21 @@ const preProcessHtml = ($) => {
  * @param {Cheerio} element
  */
 const skipProcessFunc = (url, element) => {
-  return element.is('a.external-icon');
+  return url.startsWith('#') || element.is('a.external-icon') || element.hasClass('external');
+};
+
+/**
+ *
+ * @param {string} url
+ * @param {Cheerio} elem
+ */
+const detectLinkType = (url, elem) => {
+  if (elem.is('a') || elem.is('iframe')) {
+    const paths = url.split('/');
+    if (paths && !paths[paths.length - 1].includes('.')) {
+      return 'html';
+    }
+  }
 };
 
 const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
@@ -116,6 +130,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     depth: 3,
     localRoot,
     beginUrl: `https://developer.mozilla.org/${locale}/docs/Web`,
+    detectLinkType,
     dropResourceFunc,
     preProcessHtml,
     linkRedirectFunc,

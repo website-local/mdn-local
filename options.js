@@ -24,6 +24,10 @@ const defaultOptions = {
    */
   cacheUri: false,
   /**
+   * @type null | void | function(string, Cheerio, HtmlResource): string | Promise<string>
+   */
+  detectLinkType: null,
+  /**
    * @type null | void | function(CheerioStatic, HtmlResource): CheerioStatic
    */
   preProcessHtml: null,

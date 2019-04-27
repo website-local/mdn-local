@@ -12,6 +12,7 @@ interface Options {
     encoding?: Encoding;
     urlFilter?: UrlFilterFunc;
     cacheUri?: boolean;
+    detectLinkType?: DetectTypeFunc,
     preProcessHtml?: HtmlProcessFunc;
     postProcessHtml?: HtmlProcessFunc;
     linkRedirectFunc?: LinkRedirectFunc;
@@ -29,6 +30,10 @@ interface Encoding {
 
 interface UrlFilterFunc {
     (url: string): string;
+}
+
+interface DetectTypeFunc {
+    (link: string, elem: Cheerio, res: HtmlResource): 'html' | 'css' | Promise<string>;
 }
 
 interface HtmlProcessFunc {
@@ -91,6 +96,6 @@ declare class HtmlResource extends Resource {
 
     private __appendSuffix(suffix: string): void;
 
-    private doc?: CheerioStatic;
+    doc?: CheerioStatic;
     readonly html?: string;
 }

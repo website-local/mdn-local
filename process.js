@@ -36,7 +36,9 @@ const process = async (html) => {
         html.options.skipProcessFunc(link, elem, html)) {
         continue;
       }
-      if (type === 'html') {
+      const linkType = html.options.detectLinkType ?
+        await html.options.detectLinkType(link, elem, html) : type;
+      if (linkType === 'html') {
         const res = new HtmlResource(link, html.localRoot, html.url, html.options);
         res.depth = depth;
         if (!(typeof html.options.dropResourceFunc === 'function' &&
