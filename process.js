@@ -45,7 +45,9 @@ const process = async (html) => {
           html.options.dropResourceFunc(res))) {
           htmlArr.push(res);
         }
-        elem.attr(attr, res.replacePath.toString());
+        if (res.replacePath !== '.html') {
+          elem.attr(attr, res.replacePath.toString());
+        }
         continue;
       }
       const res = new Resource(link, html.localRoot, html.url, html.options);
