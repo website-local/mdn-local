@@ -32,6 +32,24 @@ const appendLocalePath = {
   'docs': 1
 };
 
+const appendDocsWebPath = {
+  'JavaScript': 1,
+  'MathML': 1,
+  'API': 1,
+  'Guide': 1,
+  'CSS': 1,
+  'HTML': 1,
+  'Accessibility': 1,
+  'XPath': 1
+};
+
+const appendDocsPath = {
+  'Web': 1,
+  'Mozilla': 1,
+  'Core_JavaScript_1.5_Reference': 1,
+  'nsIXMLHttpRequest': 1
+};
+
 /**
  *
  * @param {CheerioStatic} $
@@ -92,6 +110,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
 
   const testLocaleRegExp =
     new RegExp(`/(${localeArr.filter(l => l !== locale).join('|')})/`);
+  const localeLowerCase = locale.toLocaleLowerCase();
 
   const dropResourceFunc = (res) => {
     // const url = res.uri.toString();
@@ -118,6 +137,14 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     } else if (appendLocalePath[dirs[1]]) {
       dirs.splice(1, 0, 'zh-CN');
       return u.directory(dirs.join('/')).toString();
+    } else if (typeof dirs[1] === 'string' && localeLowerCase === dirs[1].toLocaleLowerCase()) {
+      if (appendDocsWebPath[dirs[2]]) {
+        dirs.splice(2, 0, 'docs', 'Web');
+        return u.directory(dirs.join('/')).toString();
+      } else if (appendDocsPath[dirs[2]]) {
+        dirs.splice(2, 0, 'docs');
+        return u.directory(dirs.join('/')).toString();
+      }
     }
     if (url.match('en-US')) {
       // eslint-disable-next-line no-console
@@ -127,7 +154,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   };
 
   const d = new Downloader(Object.assign({
-    depth: 3,
+    depth: 4,
     localRoot,
     beginUrl: `https://developer.mozilla.org/${locale}/docs/Web`,
     detectLinkType,
