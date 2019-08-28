@@ -72,6 +72,15 @@ const preProcessHtml = ($) => {
   $('link[rel="alternate"]').remove();
   // 新闻脚本
   $('script[src*="newsletter"]').remove();
+  $('script[src*="speedcurve.com"]').remove();
+  // google-analytics
+  $('script').each((index, elem) => {
+    let text;
+    elem = $(elem);
+    if ((text = elem.html()) && text.includes('google-analytics')) {
+      elem.remove();
+    }
+  });
   // 加入社区盒子
   $('.communitybox').remove();
   // 底部弹出
