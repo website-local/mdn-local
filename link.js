@@ -14,6 +14,27 @@ const cacheUri = {};
  * @return {got.GotPromise<any>}
  */
 const get = (url, opts = {}) => got(url, opts);
+
+const mkdirRetry = (dir) => {
+  try {
+    if (!fs.existsSync(dir)) {
+      mkdirP.sync(dir);
+    }
+  } catch (e) {
+    // in case of concurrent dir creation
+    try {
+      if (!fs.existsSync(dir)) {
+        mkdirP.sync(dir);
+      }
+    } catch (e) {
+      // try again, 3 times seeming pretty enough
+      if (!fs.existsSync(dir)) {
+        mkdirP.sync(dir);
+      }
+    }
+  }
+};
+
 /**
  * 缓存的URI
  * @param {string} url
@@ -34,7 +55,7 @@ const uriOf = (url, enabled = false) => {
 const writeFile = (buffer, filePath) => {
   const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
-    mkdirP.sync(dir);
+    mkdirRetry(dir);
   }
   return new Promise(resolve =>
     fs.writeFile(filePath, buffer, resolve));
@@ -43,7 +64,7 @@ const writeFile = (buffer, filePath) => {
 const writeStr = (str, filePath, encoding = 'utf8') => {
   const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
-    mkdirP.sync(dir);
+    mkdirRetry(dir);
   }
   return new Promise(resolve =>
     fs.writeFile(filePath, str, {encoding}, resolve));
