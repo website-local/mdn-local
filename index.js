@@ -25,7 +25,10 @@ const localesMap = (() => {
 
 const redirectLocale = {
   'en': 1,
-  'en-US': 1
+  'en-US': 1,
+  'zh': 1,
+  'Ja': 1,
+  'zh_CN': 1
 };
 
 const appendLocalePath = {
@@ -141,23 +144,29 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   const linkRedirectFunc = (url) => {
     const u = new URI(url);
     const dirs = u.directory().split('/');
+    let needToRebuildPath = false;
     if (!dirs || !dirs[1]) {
       return url;
     }
     if (redirectLocale[dirs[1]]) {
       dirs[1] = locale;
-      return u.directory(dirs.join('/')).toString();
-    } else if (appendLocalePath[dirs[1]]) {
+      needToRebuildPath = true;
+    }
+    if (appendLocalePath[dirs[1]]) {
       dirs.splice(1, 0, 'zh-CN');
-      return u.directory(dirs.join('/')).toString();
-    } else if (typeof dirs[1] === 'string' && localeLowerCase === dirs[1].toLocaleLowerCase()) {
+      needToRebuildPath = true;
+    }
+    if (typeof dirs[1] === 'string' && localeLowerCase === dirs[1].toLocaleLowerCase()) {
       if (appendDocsWebPath[dirs[2]]) {
         dirs.splice(2, 0, 'docs', 'Web');
-        return u.directory(dirs.join('/')).toString();
+        needToRebuildPath = true;
       } else if (appendDocsPath[dirs[2]]) {
         dirs.splice(2, 0, 'docs');
-        return u.directory(dirs.join('/')).toString();
+        needToRebuildPath = true;
       }
+    }
+    if (needToRebuildPath) {
+      url = u.directory(dirs.join('/')).toString();
     }
     if (url.match('en-US')) {
       // eslint-disable-next-line no-console
