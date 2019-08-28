@@ -76,6 +76,10 @@ const preProcessHtml = ($) => {
   $('.communitybox').remove();
   // 底部弹出
   $('#contribution-popover-container').remove();
+  // 正在翻译
+  $('.overheadIndicator.translationInProgress').remove();
+  // 我们的志愿者还没有将这篇文章翻译
+  $('#doc-pending-fallback').remove();
   // TODO: 处理iframe
   $('iframe').remove();
   return $;
