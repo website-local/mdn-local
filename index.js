@@ -25,9 +25,12 @@ const localesMap = (() => {
 
 const redirectLocale = {
   'en': 1,
+  'En': 1,
   'en-US': 1,
   'zh': 1,
+  'Zh': 1,
   'Ja': 1,
+  'ja': 1,
   'zh_CN': 1
 };
 
@@ -137,13 +140,17 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     const dir = res.uri.directory(), path = res.uri.path();
     return res.uri.host() !== 'developer.mozilla.org' ||
       testLocaleRegExp.test(path) || path.endsWith('$history') ||
+      path.endsWith('$edit') ||
+      path.endsWith('$translate') ||
       path.match('/users/github/login') || path.match('/users/signin') ||
       dir.endsWith('/profiles');
   };
 
   const linkRedirectFunc = (url) => {
     const u = new URI(url);
-    const dirs = u.directory().split('/');
+    const dirs = u.directory()
+      .replace('en-\n\nUS', 'en-US')
+      .split('/');
     let needToRebuildPath = false;
     if (!dirs || !dirs[1]) {
       return url;
