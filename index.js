@@ -125,7 +125,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   }
 
   const testLocaleRegExp =
-    new RegExp(`/(${localeArr.filter(l => l !== locale).join('|')})/`);
+    new RegExp(`/(${localeArr.filter(l => l !== locale).join('|')})/`, 'i');
   const localeLowerCase = locale.toLocaleLowerCase();
 
   const dropResourceFunc = (res) => {
@@ -176,7 +176,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   };
 
   const d = new Downloader(Object.assign({
-    depth: 4,
+    depth: 5,
     localRoot,
     beginUrl: `https://developer.mozilla.org/${locale}/docs/Web`,
     detectLinkType,

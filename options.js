@@ -6,9 +6,9 @@ const defaultOptions = {
         '(KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'
     },
     timeout: {
-      lookup: 1000,
+      lookup: 500,
       connect: 600,
-      secureConnect: 1000
+      secureConnect: 800
     }
   },
   encoding: {
@@ -54,7 +54,7 @@ const defaultOptions = {
   /**
    * @type number
    */
-  concurrency: 16,
+  concurrency: 24,
   /**
    * @type number
    */
