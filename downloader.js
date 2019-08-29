@@ -10,7 +10,7 @@ class Downloader {
     /**
      * @type Queue
      */
-    this.queue = new Queue(options);
+    this.queue = new Queue.default(options);
     this.queuedLinks = {};
     this.downloadedLinks = {};
     this.failedLinks = {};

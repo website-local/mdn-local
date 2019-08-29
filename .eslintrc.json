@@ -28,6 +28,7 @@
         "semi": [
             "error",
             "always"
-        ]
+        ],
+        "require-atomic-updates": [1]
     }
 }

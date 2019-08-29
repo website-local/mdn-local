@@ -4,14 +4,14 @@
   "description": "create offline mozilla developer network documents",
   "main": "index.js",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
     "got": "^9.6.0",
-    "p-queue": "^3.1.0",
-    "cheerio": "^1.0.0-rc.2",
-    "urijs": "^1.19.1",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "p-queue": "^6.1.1",
+    "urijs": "^1.19.1"
   },
   "devDependencies": {
-    "eslint": "^5.14.1"
+    "eslint": "^6.2.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
