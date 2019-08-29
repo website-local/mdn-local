@@ -5,6 +5,7 @@ const fs = require('fs');
 const cheerio = require('cheerio');
 const mkdirP = require('mkdirp');
 const defaultOptions = require('./options');
+const forbiddenChar = /:\*\?"<>\|/g;
 
 const cacheUri = {};
 /**
@@ -176,7 +177,11 @@ class Resource extends Link {
     }
     this.host = this.uri.hostname();
     this.serverPath = this.uri.path();
-    this.savePath = path.join(this.localRoot, this.host, this.serverPath);
+    // escape char for windows path
+    const replacePathStr = this.replacePath.path();
+    this.replacePath.path(replacePathStr.replace(forbiddenChar, '_'));
+    this.savePath = path.join(this.localRoot, this.host,
+      this.serverPath.replace(forbiddenChar, '_'));
     this._downloadLink = this.uri.clone().hash('').toString();
   }
 
