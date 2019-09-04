@@ -34,6 +34,8 @@ const redirectLocale = {
   'cn': 1,
   'us': 1,
   'zh-cn': 1,
+  'xh-CN': 1,
+  'zh_tw': 1,
   'en-us': 1,
   'Zh-cn': 1,
   'zh_CN': 1
@@ -100,6 +102,8 @@ const preProcessHtml = ($) => {
   $('.document-actions').remove();
   // 顶部搜索
   $('#nav-main-search').remove();
+  // 此页面上有脚本错误。虽然这条信息是写给网站编辑的，但您也可以在下面查看部分内容。
+  $('#kserrors').remove();
   // head 中可选替代语言
   $('link[rel="alternate"]').remove();
   // 新闻脚本
