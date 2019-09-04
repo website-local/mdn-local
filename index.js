@@ -63,6 +63,24 @@ const appendDocsPath = {
   'Learn': 1
 };
 
+// manually collected
+const validExtensionName = {
+  'css': 1,
+  'gif': 1,
+  'jpg': 1,
+  'jpeg': 1,
+  'js': 1,
+  'jsm': 1,
+  'json': 1,
+  'jar': 1,
+  'png': 1,
+  'svg': 1,
+  'txt': 1,
+  'woff2': 1,
+  'xul': 1,
+  'zip': 1
+};
+
 
 /**
  *
@@ -124,8 +142,12 @@ const skipProcessFunc = (url, element) => {
 const detectLinkType = (url, elem) => {
   if (elem.is('a') || elem.is('iframe')) {
     const paths = url.split('/');
-    if (paths && !paths[paths.length - 1].includes('.')) {
-      return 'html';
+    let arr;
+    if (paths && paths.length &&
+      (arr = paths[paths.length - 1].split('.')) && arr.length > 1) {
+      if (!validExtensionName[arr[arr.length - 1].toLowerCase()]) {
+        return 'html';
+      }
     }
   }
 };
