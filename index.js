@@ -106,6 +106,8 @@ const preProcessHtml = ($) => {
   $('#kserrors').remove();
   // head 中可选替代语言
   $('link[rel="alternate"]').remove();
+  $('a[href$="$translate"]').remove();
+  $('a[href$="$edit"]').remove();
   // 新闻脚本
   $('script[src*="newsletter"]').remove();
   $('script[src*="speedcurve.com"]').remove();
@@ -173,9 +175,13 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     // }
     const dir = res.uri.directory(), path = res.uri.path();
     return res.uri.host() !== 'developer.mozilla.org' ||
-      testLocaleRegExp.test(path) || path.endsWith('$history') ||
+      testLocaleRegExp.test(path) ||
+      path.endsWith('$history') ||
       path.endsWith('$edit') ||
       path.endsWith('$translate') ||
+      path.endsWith('%24history') ||
+      path.endsWith('%24edit') ||
+      path.endsWith('%24translate') ||
       path.match('/users/github/login') || path.match('/users/signin') ||
       dir.endsWith('/profiles');
   };
