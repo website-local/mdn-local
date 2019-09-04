@@ -31,6 +31,11 @@ const redirectLocale = {
   'Zh': 1,
   'Ja': 1,
   'ja': 1,
+  'cn': 1,
+  'us': 1,
+  'zh-cn': 1,
+  'en-us': 1,
+  'Zh-cn': 1,
   'zh_CN': 1
 };
 
@@ -53,8 +58,10 @@ const appendDocsPath = {
   'Web': 1,
   'Mozilla': 1,
   'Core_JavaScript_1.5_Reference': 1,
-  'nsIXMLHttpRequest': 1
+  'nsIXMLHttpRequest': 1,
+  'Learn': 1
 };
+
 
 /**
  *
@@ -161,6 +168,10 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     }
     if (appendLocalePath[dirs[1]]) {
       dirs.splice(1, 0, 'zh-CN');
+      needToRebuildPath = true;
+    }
+    if (dirs[1] === 'DOM') {
+      dirs.splice(1, 1, 'zh-CN', 'docs', 'Web', 'API');
       needToRebuildPath = true;
     }
     if (typeof dirs[1] === 'string' && localeLowerCase === dirs[1].toLocaleLowerCase()) {
