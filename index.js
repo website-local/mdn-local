@@ -38,7 +38,8 @@ const redirectLocale = {
   'zh_tw': 1,
   'en-us': 1,
   'Zh-cn': 1,
-  'zh_CN': 1
+  'zh_CN': 1,
+  'ga-IE': 1
 };
 
 const appendLocalePath = {

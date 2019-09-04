@@ -5,7 +5,7 @@ const fs = require('fs');
 const cheerio = require('cheerio');
 const mkdirP = require('mkdirp');
 const defaultOptions = require('./options');
-const forbiddenChar = /[:*?"<>|]+/g;
+const forbiddenChar = /([:*?"<>|]|%3A|%2A|%3F|%22|%3C|%3E|%7C)+/ig;
 
 const cacheUri = {};
 /**
