@@ -40,7 +40,8 @@ const redirectLocale = {
 };
 
 const appendLocalePath = {
-  'docs': 1
+  'docs': 1,
+  'Web': 1
 };
 
 const appendDocsWebPath = {
@@ -172,6 +173,9 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     }
     if (dirs[1] === 'DOM') {
       dirs.splice(1, 1, 'zh-CN', 'docs', 'Web', 'API');
+      needToRebuildPath = true;
+    } else if (dirs[1] === 'zh-CNdocs') {
+      dirs.splice(1, 1, 'zh-CN', 'docs');
       needToRebuildPath = true;
     }
     if (typeof dirs[1] === 'string' && localeLowerCase === dirs[1].toLocaleLowerCase()) {
