@@ -155,6 +155,8 @@ const detectLinkType = (url, elem) => {
       if (!validExtensionName[arr[arr.length - 1].toLowerCase()]) {
         return 'html';
       }
+    } else {
+      return 'html';
     }
   }
 };
