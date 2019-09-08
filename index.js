@@ -27,6 +27,7 @@ const redirectLocale = {
   'en': 1,
   'En': 1,
   'en-US': 1,
+  'en_US': 1,
   'zh': 1,
   'Zh': 1,
   'Ja': 1,
@@ -39,7 +40,20 @@ const redirectLocale = {
   'en-us': 1,
   'Zh-cn': 1,
   'zh_CN': 1,
-  'ga-IE': 1
+  'ga-IE': 1,
+  'zu': 1,
+  'yo': 1,
+  'xh': 1,
+  'wo': 1,
+  'tn': 1,
+  'sw': 1,
+  'son': 1,
+  'mg': 1,
+  'ln': 1,
+  'ha': 1,
+  'ff': 1,
+  'ee': 1,
+  'Cn': 1
 };
 
 const appendLocalePath = {
@@ -167,7 +181,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   }
 
   const testLocaleRegExp =
-    new RegExp(`/(${localeArr.filter(l => l !== locale).join('|')})/`, 'i');
+    new RegExp(`/(${localeArr.filter(l => l !== locale).join('|')})\\//`, 'i');
   const localeLowerCase = locale.toLocaleLowerCase();
 
   const dropResourceFunc = (res) => {
@@ -203,14 +217,14 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       needToRebuildPath = true;
     }
     if (appendLocalePath[dirs[1]]) {
-      dirs.splice(1, 0, 'zh-CN');
+      dirs.splice(1, 0, locale);
       needToRebuildPath = true;
     }
     if (dirs[1] === 'DOM') {
-      dirs.splice(1, 1, 'zh-CN', 'docs', 'Web', 'API');
+      dirs.splice(1, 1, locale, 'docs', 'Web', 'API');
       needToRebuildPath = true;
     } else if (dirs[1] === 'zh-CNdocs') {
-      dirs.splice(1, 1, 'zh-CN', 'docs');
+      dirs.splice(1, 1, locale, 'docs');
       needToRebuildPath = true;
     }
     if (typeof dirs[1] === 'string' && localeLowerCase === dirs[1].toLocaleLowerCase()) {
