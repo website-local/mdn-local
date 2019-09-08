@@ -45,7 +45,7 @@ const process = async (html) => {
           html.options.dropResourceFunc(res))) {
           htmlArr.push(res);
         }
-        if (res.replacePath !== '.html') {
+        if (res.replacePath !== '.html' && res.replacePath !== '/.html') {
           elem.attr(attr, res.replacePath.toString());
         }
         continue;
