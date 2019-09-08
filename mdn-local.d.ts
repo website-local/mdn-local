@@ -26,6 +26,7 @@ interface Options {
 interface Encoding {
     buffer: null;
     html: string;
+    css: string;
 }
 
 interface UrlFilterFunc {
@@ -98,4 +99,8 @@ declare class HtmlResource extends Resource {
 
     doc?: CheerioStatic;
     readonly html?: string;
+}
+
+declare class CssResource extends Resource {
+    urls?: string[];
 }

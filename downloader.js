@@ -1,4 +1,5 @@
-const {Resource, HtmlResource} = require('./link');
+const {Resource, HtmlResource, CssResource} = require('./link');
+const processCss = require('./process-css');
 const Queue = require('p-queue');
 const process = require('./process');
 const defaultOptions = require('./options');
@@ -47,11 +48,11 @@ class Downloader {
       this.queue.add(() => new Promise((resolve) => setImmediate(async () => {
         try {
           const {htmlArr, resArr} = await process(resource);
-          for (const html of htmlArr) {
-            self.add(html);
-          }
           for (const res of resArr) {
             self.add(res);
+          }
+          for (const html of htmlArr) {
+            self.add(html);
           }
           await resource.save();
           // eslint-disable-next-line no-console
@@ -67,6 +68,12 @@ class Downloader {
     } else {
       this.queue.add(async () => {
         try {
+          if (resource instanceof CssResource) {
+            const resArr = await processCss(resource);
+            for (const res of resArr) {
+              self.add(res);
+            }
+          }
           await resource.save();
           // eslint-disable-next-line no-console
           console.debug(url);

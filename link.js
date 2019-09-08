@@ -4,6 +4,7 @@ const got = require('got');
 const fs = require('fs');
 const cheerio = require('cheerio');
 const mkdirP = require('mkdirp');
+const parseCssUrls = require('css-url-parser');
 const defaultOptions = require('./options');
 const forbiddenChar = /([:*?"<>|]|%3A|%2A|%3F|%22|%3C|%3E|%7C)+/ig;
 
@@ -275,5 +276,21 @@ class HtmlResource extends Resource {
   }
 }
 
+class CssResource extends Resource {
+  constructor(url, localRoot, refUrl, options = {}) {
+    super(url, localRoot, refUrl, options);
+    /**
+     * @type {string|null}
+     */
+    this.encoding = this.options.encoding.css;
+  }
+
+  async fetch() {
+    const body = await super.fetch();
+    this.urls = parseCssUrls(body);
+  }
+}
+
 module.exports.Resource = Resource;
 module.exports.HtmlResource = HtmlResource;
+module.exports.CssResource = CssResource;

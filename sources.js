@@ -1,7 +1,7 @@
 // https://github.com/website-scraper/node-website-scraper
 // /blob/a6f989a59e3a665b562f0f38a691aa1cc40557f9/lib/config/defaults.js
 const sources = [
-  // {selector: 'style'},
+  {selector: 'style', type: 'css-inline'},
   // {selector: '[style]', attr: 'style', type: 'css'},
   {selector: 'img', attr: 'src'},
   {selector: 'img', attr: 'srcset'},

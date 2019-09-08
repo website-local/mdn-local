@@ -13,7 +13,8 @@ const defaultOptions = {
   },
   encoding: {
     buffer: null,
-    html: 'utf8'
+    html: 'utf8',
+    css: 'utf8'
   },
   /**
    * @type null | void | function(string): string

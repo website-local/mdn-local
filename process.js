@@ -1,5 +1,7 @@
+const parseCssUrls = require('css-url-parser');
 const sources = require('./sources');
-const {Resource, HtmlResource} = require('./link');
+const {Resource, HtmlResource, CssResource} = require('./link');
+const {createCssResourceFromUrl} = require('./process-css');
 
 /**
  *
@@ -22,8 +24,8 @@ const process = async (html) => {
     const elements = html.doc(selector);
     for (let index = 0; index < elements.length; index++) {
       const elem = elements.eq(index);
-      const originalLink = elem.attr(attr);
-      const link = html.options.linkRedirectFunc ?
+      const originalLink = attr && elem.attr(attr);
+      const link = originalLink && html.options.linkRedirectFunc ?
         html.options.linkRedirectFunc(originalLink, elem, html) : originalLink;
       if (!link || link[0] === '#' ||
         link.startsWith('data:') ||
@@ -37,7 +39,8 @@ const process = async (html) => {
         continue;
       }
       const linkType = html.options.detectLinkType ?
-        await html.options.detectLinkType(link, elem, html) : type;
+        await html.options.detectLinkType(link, elem, html) || type : type;
+      let Clazz = Resource;
       if (linkType === 'html') {
         const res = new HtmlResource(link, html.localRoot, html.url, html.options);
         res.depth = depth;
@@ -49,8 +52,13 @@ const process = async (html) => {
           elem.attr(attr, res.replacePath.toString());
         }
         continue;
+      } else if (linkType === 'css') {
+        Clazz = CssResource;
+      } else if (linkType === 'inline-css') {
+        const cssUrls = parseCssUrls(elem.html());
+        resArr.push(...cssUrls.map(url => createCssResourceFromUrl(url, html)));
       }
-      const res = new Resource(link, html.localRoot, html.url, html.options);
+      const res = new Clazz(link, html.localRoot, html.url, html.options);
       res.depth = depth;
       if (!(typeof html.options.dropResourceFunc === 'function' &&
         html.options.dropResourceFunc(res))) {
