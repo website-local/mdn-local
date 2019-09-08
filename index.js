@@ -175,6 +175,32 @@ const detectLinkType = (url, elem) => {
   }
 };
 
+/**
+ *
+ * @param {string[]} pathArr
+ * @param {string} locale
+ * @return {boolean}
+ */
+const processPathWithMultipleLocale = (pathArr, locale) => {
+  if (!Array.isArray(pathArr) || !pathArr.length) {
+    return false;
+  }
+  let foundDocs, foundLocale;
+  for (let i = 0, item; i < pathArr.length; i++) {
+    item = pathArr[i];
+    if (item === 'docs') {
+      foundDocs = true;
+    } else if (localesMap[item] || redirectLocale[item]) {
+      foundLocale = true;
+    } else if (foundLocale && foundDocs) {
+      pathArr.splice(0, i, locale, 'docs');
+      return true;
+    } else if (item) {
+      return false;
+    }
+  }
+};
+
 const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   if (!localesMap[locale]) {
     throw new TypeError('locale not exists');
@@ -205,43 +231,43 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
 
   const linkRedirectFunc = (url) => {
     const u = new URI(url);
-    const dirs = u.directory()
+    const pathArr = u.path()
       .replace('en-\n\nUS', 'en-US')
       .split('/');
     let needToRebuildPath = false;
-    if (!dirs || !dirs[1]) {
+    if (!pathArr || !pathArr[1]) {
       return url;
     }
-    if (redirectLocale[dirs[1]]) {
-      dirs[1] = locale;
+    if (redirectLocale[pathArr[1]]) {
+      pathArr[1] = locale;
       needToRebuildPath = true;
     }
-    if (appendLocalePath[dirs[1]]) {
-      dirs.splice(1, 0, locale);
+    if (appendLocalePath[pathArr[1]]) {
+      pathArr.splice(1, 0, locale);
       needToRebuildPath = true;
     }
-    if (dirs[1] === 'DOM') {
-      dirs.splice(1, 1, locale, 'docs', 'Web', 'API');
+    if (pathArr[1] === 'DOM') {
+      pathArr.splice(1, 1, locale, 'docs', 'Web', 'API');
       needToRebuildPath = true;
-    } else if (dirs[1] === 'zh-CNdocs') {
-      dirs.splice(1, 1, locale, 'docs');
+    } else if (pathArr[1] === 'zh-CNdocs') {
+      pathArr.splice(1, 1, locale, 'docs');
       needToRebuildPath = true;
     }
-    if (typeof dirs[1] === 'string' && localeLowerCase === dirs[1].toLocaleLowerCase()) {
-      if (appendDocsWebPath[dirs[2]]) {
-        dirs.splice(2, 0, 'docs', 'Web');
+    if (typeof pathArr[1] === 'string' && localeLowerCase === pathArr[1].toLocaleLowerCase()) {
+      if (appendDocsWebPath[pathArr[2]]) {
+        pathArr.splice(2, 0, 'docs', 'Web');
         needToRebuildPath = true;
-      } else if (appendDocsPath[dirs[2]]) {
-        dirs.splice(2, 0, 'docs');
+      } else if (appendDocsPath[pathArr[2]]) {
+        pathArr.splice(2, 0, 'docs');
         needToRebuildPath = true;
       }
     }
     if (needToRebuildPath) {
-      url = u.directory(dirs.join('/')).toString();
+      url = u.path(pathArr.join('/')).toString();
     }
     if (url.match('en-US')) {
       // eslint-disable-next-line no-console
-      console.warn(url, u, dirs);
+      console.warn(url, u, pathArr);
     }
     return url;
   };
@@ -262,3 +288,4 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
 };
 
 module.exports = downloadMdn;
+module.exports.processPathWithMultipleLocale = processPathWithMultipleLocale;
