@@ -48,8 +48,9 @@ const process = async (html) => {
           html.options.dropResourceFunc(res))) {
           htmlArr.push(res);
         }
-        if (res.replacePath !== '.html' && res.replacePath !== '/.html') {
-          elem.attr(attr, res.replacePath.toString());
+        const replacePath = res.replacePath.toString();
+        if (replacePath !== '.html' && replacePath !== '/.html') {
+          elem.attr(attr, replacePath);
         }
         continue;
       } else if (linkType === 'css') {
