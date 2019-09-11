@@ -25,15 +25,15 @@ const process = async (html) => {
     for (let index = 0; index < elements.length; index++) {
       const elem = elements.eq(index);
       const originalLink = attr && elem.attr(attr);
-      const link = originalLink && html.options.linkRedirectFunc ?
-        html.options.linkRedirectFunc(originalLink, elem, html) : originalLink;
-      if (!link || link[0] === '#' ||
-        link.startsWith('data:') ||
-        link.toLowerCase().startsWith('mailto:')) {
-        // skip empty, in-page hash jump, and data-uri links
+      // skip empty, in-page hash jump, and data-uri links
+      if (!originalLink || originalLink[0] === '#' ||
+        originalLink.startsWith('data:') ||
         // skip mail links
+        originalLink.toLowerCase().startsWith('mailto:')) {
         continue;
       }
+      const link = originalLink && html.options.linkRedirectFunc ?
+        html.options.linkRedirectFunc(originalLink, elem, html) : originalLink;
       if (html.options.skipProcessFunc &&
         html.options.skipProcessFunc(link, elem, html)) {
         continue;
