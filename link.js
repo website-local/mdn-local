@@ -129,12 +129,20 @@ class Link {
         this.options.requestRedirectFunc(this._downloadLink, this);
     }
     const downloadLink = encodeURI(decodeURI(this._downloadLink));
-    const res = await get(downloadLink,
+    let res = await get(downloadLink,
       Object.assign({encoding: this.encoding}, this.options.req));
     if (res && res.body) {
       return this.body = res.body;
     } else {
-      throw new Error(res);
+      // try again
+      res = await get(downloadLink,
+        Object.assign({encoding: this.encoding}, this.options.req));
+      if (res && res.body) {
+        return this.body = res.body;
+      } else {
+        console.warn(res);
+        throw new TypeError('Empty response body: ' + downloadLink);
+      }
     }
   }
 
