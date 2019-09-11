@@ -229,8 +229,11 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       dir.endsWith('/profiles');
   };
 
-  const linkRedirectFunc = (url) => {
-    const u = new URI(url);
+  const linkRedirectFunc = (url, elem, html) => {
+    let u = new URI(url);
+    if (u.is('relative')) {
+      u = u.absoluteTo(html.url);
+    }
     const pathArr = u.path()
       .replace('en-\n\nUS', 'en-US')
       .split('/');
