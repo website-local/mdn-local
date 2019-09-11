@@ -7,8 +7,11 @@ const defaultOptions = {
     },
     timeout: {
       lookup: 500,
-      connect: 600,
-      secureConnect: 800
+      connect: 400,
+      secureConnect: 500,
+      send: 700,
+      response: 30000,
+      request: 40000
     }
   },
   encoding: {
