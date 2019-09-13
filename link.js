@@ -259,6 +259,9 @@ class HtmlResource extends Resource {
      * @type string
      */
     const body = await super.fetch();
+    if (this.doc) {
+      return this.doc;
+    }
     /**
      * @type CheerioStatic
      */

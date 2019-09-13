@@ -34,8 +34,8 @@ const process = async (html) => {
       }
       const link = originalLink && html.options.linkRedirectFunc ?
         html.options.linkRedirectFunc(originalLink, elem, html) : originalLink;
-      if (html.options.skipProcessFunc &&
-        html.options.skipProcessFunc(link, elem, html)) {
+      if (!link || (html.options.skipProcessFunc &&
+        html.options.skipProcessFunc(link, elem, html))) {
         continue;
       }
       const linkType = html.options.detectLinkType ?

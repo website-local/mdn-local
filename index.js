@@ -26,12 +26,14 @@ const localesMap = (() => {
 const redirectLocale = {
   'en': 1,
   'En': 1,
+  'EN': 1,
   'en-US': 1,
   'en_US': 1,
   'zh': 1,
   'Zh': 1,
   'Ja': 1,
   'ja': 1,
+  'ig': 1,
   'cn': 1,
   'us': 1,
   'zh-cn': 1,
@@ -98,6 +100,11 @@ const validExtensionName = {
   'zip': 1
 };
 
+// hard coded redirect url map to avoid the max-redirect things
+const hardCodedRedirectUrl = {
+  'https://developer.mozilla.org/zh-CN/docs/CSS/CSS_transitions':
+    'https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions'
+};
 
 /**
  *
@@ -111,18 +118,24 @@ const preProcessHtml = ($) => {
   $('#nav-footer').remove();
   // 新闻盒子
   $('.newsletter-box').remove();
+  $('.newsletter-container').remove();
   // 顶部登录
   $('#toolbox').remove();
   // 顶部语言、编辑、历史记录
   $('.document-actions').remove();
+  $('.dropdown-container').remove();
   // 顶部搜索
   $('#nav-main-search').remove();
+  $('.header-search').remove();
+  $('.contributors-sub').remove();
   // 此页面上有脚本错误。虽然这条信息是写给网站编辑的，但您也可以在下面查看部分内容。
   $('#kserrors').remove();
   // head 中可选替代语言
   $('link[rel="alternate"]').remove();
   $('a[href$="$translate"]').remove();
   $('a[href$="$edit"]').remove();
+  // no script mode ?
+  // $('script').remove();
   // 新闻脚本
   $('script[src*="newsletter"]').remove();
   $('script[src*="speedcurve.com"]').remove();
@@ -130,8 +143,11 @@ const preProcessHtml = ($) => {
   $('script').each((index, elem) => {
     let text;
     elem = $(elem);
-    if ((text = elem.html()) && text.includes('google-analytics')) {
-      elem.remove();
+    if ((text = elem.html())) {
+      if (text.includes('google-analytics')) elem.remove();
+      // if (text.includes('window._react_data')) {
+      //   elem.html('window._react_data = {}');
+      // }
     }
   });
   // 加入社区盒子
@@ -193,7 +209,7 @@ const processPathWithMultipleLocale = (pathArr, locale) => {
     } else if (localesMap[item] || redirectLocale[item]) {
       foundLocale = true;
     } else if (foundLocale && foundDocs) {
-      pathArr.splice(0, i, locale, 'docs');
+      pathArr.splice(0, i, '', locale, 'docs');
       return true;
     } else if (item) {
       return false;
@@ -216,8 +232,13 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     //   // eslint-disable-next-line no-console
     //   console.debug(res.uri.host(), res.uri.toString());
     // }
-    const dir = res.uri.directory(), path = res.uri.path();
-    return res.uri.host() !== 'developer.mozilla.org' ||
+    const dir = res.uri.directory(),
+      path = res.uri.path(),
+      host = res.uri.host();
+    if (host === 'mdn.mozillademos.org' && path.startsWith('/files')) {
+      return ;
+    }
+    return host !== 'developer.mozilla.org' ||
       testLocaleRegExp.test(path) ||
       path.endsWith('$history') ||
       path.endsWith('$edit') ||
@@ -230,7 +251,10 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   };
 
   const linkRedirectFunc = (url, elem, html) => {
-    let u = new URI(url);
+    let u = new URI(url), host;
+    if ((host = u.host()) && host !== 'developer.mozilla.org') {
+      return url;
+    }
     if (u.is('relative')) {
       u = u.absoluteTo(html.url);
     }
@@ -241,7 +265,10 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     if (!pathArr || !pathArr[1]) {
       return url;
     }
-    if (redirectLocale[pathArr[1]]) {
+    if (processPathWithMultipleLocale(pathArr, locale)) {
+      needToRebuildPath = true;
+    }
+    if (redirectLocale[pathArr[1]] || localesMap[pathArr[1]]) {
       pathArr[1] = locale;
       needToRebuildPath = true;
     }
@@ -271,6 +298,9 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     if (url.match('en-US')) {
       // eslint-disable-next-line no-console
       console.warn(url, u, pathArr);
+    }
+    if (hardCodedRedirectUrl[url]) {
+      return hardCodedRedirectUrl[url];
     }
     return url;
   };
