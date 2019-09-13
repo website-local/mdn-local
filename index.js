@@ -251,9 +251,15 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   };
 
   const linkRedirectFunc = (url, elem, html) => {
-    let u = new URI(url), host;
+    let u = new URI(url), host, needToRebuildUrl  =false;
     if ((host = u.host()) && host !== 'developer.mozilla.org') {
-      return url;
+      if (host === 'mdn.mozillademos.org') {
+        // should be automatically redirected back
+        u.host('developer.mozilla.org');
+        needToRebuildUrl = true;
+      } else {
+        return url;
+      }
     }
     if (u.is('relative')) {
       u = u.absoluteTo(html.url);
@@ -261,42 +267,41 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     const pathArr = u.path()
       .replace('en-\n\nUS', 'en-US')
       .split('/');
-    let needToRebuildPath = false;
     if (!pathArr || !pathArr[1]) {
       return url;
     }
     if (u.protocol() === 'http') {
       u.protocol('https');
-      needToRebuildPath = true;
+      needToRebuildUrl = true;
     }
     if (processPathWithMultipleLocale(pathArr, locale)) {
-      needToRebuildPath = true;
+      needToRebuildUrl = true;
     }
     if (redirectLocale[pathArr[1]] || localesMap[pathArr[1]]) {
       pathArr[1] = locale;
-      needToRebuildPath = true;
+      needToRebuildUrl = true;
     }
     if (appendLocalePath[pathArr[1]]) {
       pathArr.splice(1, 0, locale);
-      needToRebuildPath = true;
+      needToRebuildUrl = true;
     }
     if (pathArr[1] === 'DOM') {
       pathArr.splice(1, 1, locale, 'docs', 'Web', 'API');
-      needToRebuildPath = true;
+      needToRebuildUrl = true;
     } else if (pathArr[1] === 'zh-CNdocs') {
       pathArr.splice(1, 1, locale, 'docs');
-      needToRebuildPath = true;
+      needToRebuildUrl = true;
     }
     if (typeof pathArr[1] === 'string' && localeLowerCase === pathArr[1].toLocaleLowerCase()) {
       if (appendDocsWebPath[pathArr[2]]) {
         pathArr.splice(2, 0, 'docs', 'Web');
-        needToRebuildPath = true;
+        needToRebuildUrl = true;
       } else if (appendDocsPath[pathArr[2]]) {
         pathArr.splice(2, 0, 'docs');
-        needToRebuildPath = true;
+        needToRebuildUrl = true;
       }
     }
-    if (needToRebuildPath) {
+    if (needToRebuildUrl) {
       url = u.path(pathArr.join('/')).toString();
     }
     if (url.match('en-US')) {
