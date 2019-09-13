@@ -67,6 +67,7 @@ declare class Link {
     options: Options;
     encoding: string | null;
     refUri: URI;
+    refUrl: string;
     uri: URI;
     savePath: string;
     localRoot: string;

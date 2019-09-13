@@ -90,6 +90,7 @@ class Link {
     if (typeof this.options.urlFilter === 'function') {
       url = this.options.urlFilter(url);
     }
+    this.refUrl = refUrl;
     this.refUri = uriOf(refUrl, this.options.cacheUri);
     if (url.startsWith('//')) {
       // url with the same protocol
