@@ -4,7 +4,7 @@ import {Cheerio, CheerioStatic} from "cheerio";
 
 
 interface Options {
-    beginUrl: string;
+    beginUrl: string | string[];
     localRoot: string;
     depth?: number;
     concurrency?: number;

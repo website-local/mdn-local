@@ -16,8 +16,15 @@ class Downloader {
     this.downloadedLinks = {};
     this.failedLinks = {};
     if (options.beginUrl && options.localRoot) {
-      this.add(new HtmlResource(
-        options.beginUrl, options.localRoot, options.beginUrl, options));
+      if (Array.isArray(options.beginUrl)) {
+        for (let i = 0; i < options.beginUrl.length; i++) {
+          this.add(new HtmlResource(
+            options.beginUrl[i], options.localRoot, options.beginUrl[i], options));
+        }
+      } else {
+        this.add(new HtmlResource(
+          options.beginUrl, options.localRoot, options.beginUrl, options));
+      }
     }
   }
   add(resource) {

@@ -312,7 +312,15 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   const d = new Downloader(Object.assign({
     depth: 5,
     localRoot,
-    beginUrl: `https://developer.mozilla.org/${locale}/docs/Web`,
+    beginUrl: [
+      `https://developer.mozilla.org/${locale}/docs/Web/API`,
+      `https://developer.mozilla.org/${locale}/docs/Web/CSS/Reference`,
+      `https://developer.mozilla.org/${locale}/docs/Web/HTTP`,
+      `https://developer.mozilla.org/${locale}/docs/Web/JavaScript/Index`,
+      `https://developer.mozilla.org/${locale}/docs/Web/HTML/Attributes`,
+      `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element`,
+      `https://developer.mozilla.org/${locale}/docs/Web`
+    ],
     detectLinkType,
     dropResourceFunc,
     preProcessHtml,
