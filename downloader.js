@@ -55,7 +55,7 @@ class Downloader {
           }
           await resource.save();
           // eslint-disable-next-line no-console
-          console.debug(url);
+          console.debug(url, resource.level);
           self.downloadedLinks[url] = 1;
           resource = null;
           resolve();

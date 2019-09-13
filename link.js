@@ -258,7 +258,19 @@ class HtmlResource extends Resource {
     /**
      * @type string
      */
-    const body = await super.fetch();
+    let body = await super.fetch();
+    if (this.options.detectIncompleteHtml && typeof this.body === 'string') {
+      if (!body.includes(this.options.detectIncompleteHtml)) {
+        console.info('Detected incomplete html, try again', this._downloadLink);
+        this.body = null;
+        this.doc = null;
+        body = await super.fetch();
+      }
+      // probably more retries here?
+      if (!body.includes(this.options.detectIncompleteHtml)) {
+        console.warn('Detected incomplete html twice', this._downloadLink);
+      }
+    }
     if (this.doc) {
       return this.doc;
     }

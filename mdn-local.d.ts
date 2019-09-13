@@ -21,6 +21,7 @@ interface Options {
     dropResourceFunc?: DropResourceFunc;
     onSuccess?: Function;
     onError?: Function;
+    detectIncompleteHtml?: '</html>' | '</body>' | string;
 }
 
 interface Encoding {

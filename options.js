@@ -66,6 +66,7 @@ const defaultOptions = {
   depth: 5,
   beginUrl: '',
   localRoot: '',
+  detectIncompleteHtml: '</body>',
   /**
    * @type * | function
    */
