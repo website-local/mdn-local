@@ -15,18 +15,6 @@ class Downloader {
     this.queuedLinks = {};
     this.downloadedLinks = {};
     this.failedLinks = {};
-    const dropResourceFunc = options.dropResourceFunc;
-    const self = this;
-    /**
-     * @param {Resource} res
-     * @return {boolean}
-     */
-    options.dropResourceFunc = (res) => {
-      if (dropResourceFunc && dropResourceFunc(res)) {
-        return true;
-      }
-      return self.queuedLinks[res._downloadLink];
-    };
     if (options.beginUrl && options.localRoot) {
       this.add(new HtmlResource(
         options.beginUrl, options.localRoot, options.beginUrl, options));
@@ -76,7 +64,7 @@ class Downloader {
           }
           await resource.save();
           // eslint-disable-next-line no-console
-          console.debug(url);
+          console.debug(url, resource.level);
           self.downloadedLinks[url] = 1;
           resource = null;
         } catch (e) {

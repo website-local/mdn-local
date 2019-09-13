@@ -268,6 +268,10 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     if (!pathArr || !pathArr[1]) {
       return url;
     }
+    if (u.protocol() === 'http') {
+      u.protocol('https');
+      needToRebuildPath = true;
+    }
     if (processPathWithMultipleLocale(pathArr, locale)) {
       needToRebuildPath = true;
     }
