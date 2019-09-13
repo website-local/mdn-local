@@ -91,6 +91,7 @@ class Link {
       url = this.options.urlFilter(url);
     }
     this.refUrl = refUrl;
+    this.createTimestamp = Date.now();
     this.refUri = uriOf(refUrl, this.options.cacheUri);
     if (url.startsWith('//')) {
       // url with the same protocol
@@ -125,6 +126,10 @@ class Link {
 
   async fetch() {
     if (this.body) return this.body;
+    if (!this.downloadStartTimestamp) {
+      this.downloadStartTimestamp = Date.now();
+      this.waitTime = this.downloadStartTimestamp - this.createTimestamp;
+    }
     if (typeof this.options.requestRedirectFunc === 'function') {
       this._downloadLink =
         this.options.requestRedirectFunc(this._downloadLink, this);
@@ -133,12 +138,16 @@ class Link {
     let res = await get(downloadLink,
       Object.assign({encoding: this.encoding}, this.options.req));
     if (res && res.body) {
+      this.finishTimestamp = Date.now();
+      this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
       return this.body = res.body;
     } else {
       // try again
       res = await get(downloadLink,
         Object.assign({encoding: this.encoding}, this.options.req));
       if (res && res.body) {
+        this.finishTimestamp = Date.now();
+        this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
         return this.body = res.body;
       } else {
         console.warn(res);
@@ -272,6 +281,8 @@ class HtmlResource extends Resource {
         console.warn('Detected incomplete html twice', this._downloadLink);
       }
     }
+    this.finishTimestamp = Date.now();
+    this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
     if (this.doc) {
       return this.doc;
     }

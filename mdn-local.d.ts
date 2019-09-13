@@ -64,6 +64,11 @@ interface Body {
 declare class Link {
     constructor(url: string, localRoot: string, refUrl: string, options: Options);
 
+    createTimestamp: number;
+    downloadStartTimestamp?: number;
+    finishTimestamp?: number;
+    waitTime?: number;
+    downloadTime?: number;
     options: Options;
     encoding: string | null;
     refUri: URI;
