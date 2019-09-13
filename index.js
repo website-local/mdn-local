@@ -39,6 +39,7 @@ const redirectLocale = {
   'zh-cn': 1,
   'xh-CN': 1,
   'zh_tw': 1,
+  'zh-US': 1,
   'en-us': 1,
   'Zh-cn': 1,
   'zh_CN': 1,
@@ -240,6 +241,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     }
     return host !== 'developer.mozilla.org' ||
       testLocaleRegExp.test(path) ||
+      path.startsWith('/search') ||
+      path.startsWith('search') ||
       path.endsWith('$history') ||
       path.endsWith('$edit') ||
       path.endsWith('$translate') ||
