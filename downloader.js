@@ -6,7 +6,11 @@ const defaultOptions = require('./options');
 
 class Downloader {
   constructor(options) {
+    const headers = options && options.req && options.req.headers;
     options = Object.assign({}, defaultOptions, options);
+    if (headers) {
+      Object.assign(options.req.headers, defaultOptions.req.headers, headers);
+    }
     this.options = options;
     /**
      * @type Queue

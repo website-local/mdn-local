@@ -311,6 +311,11 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
 
   const d = new Downloader(Object.assign({
     depth: 5,
+    req: {
+      headers: {
+        'accept-language': locale
+      },
+    },
     localRoot,
     beginUrl: [
       `https://developer.mozilla.org/${locale}/docs/Web/API`,

@@ -3,14 +3,15 @@ const defaultOptions = {
     retry : 20,
     headers: {
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
-        '(KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'
+        '(KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
+      'dnt': 1
     },
     timeout: {
       lookup: 500,
       connect: 400,
       secureConnect: 500,
       send: 700,
-      response: 30000,
+      response: 35000,
       request: 40000
     }
   },
