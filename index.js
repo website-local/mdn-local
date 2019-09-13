@@ -102,10 +102,7 @@ const validExtensionName = {
 };
 
 // hard coded redirect url map to avoid the max-redirect things
-const hardCodedRedirectUrl = {
-  'https://developer.mozilla.org/zh-CN/docs/CSS/CSS_transitions':
-    'https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions'
-};
+const hardCodedRedirectUrl = require('./redirect-url');
 
 /**
  *
