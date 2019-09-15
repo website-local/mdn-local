@@ -59,7 +59,7 @@ const defaultOptions = {
   /**
    * @type number
    */
-  concurrency: 24,
+  concurrency: 16,
   /**
    * @type number
    */

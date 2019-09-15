@@ -5,9 +5,12 @@ const fs = require('fs');
 const cheerio = require('cheerio');
 const mkdirP = require('mkdirp');
 const parseCssUrls = require('css-url-parser');
+const {CookieJar} = require('tough-cookie');
+
 const defaultOptions = require('./options');
 const forbiddenChar = /([:*?"<>|]|%3A|%2A|%3F|%22|%3C|%3E|%7C)+/ig;
 
+const cookieJar = new CookieJar();
 const cacheUri = {};
 /**
  *
@@ -15,7 +18,7 @@ const cacheUri = {};
  * @param {got.GotBodyOptions} opts
  * @return {got.GotPromise<any>}
  */
-const get = (url, opts = {}) => got(url, opts);
+const get = (url, opts = {}) => got(url, {...opts, cookieJar});
 
 const mkdirRetry = (dir) => {
   try {
