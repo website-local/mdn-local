@@ -138,16 +138,20 @@ class Link {
         this.options.requestRedirectFunc(this._downloadLink, this);
     }
     const downloadLink = encodeURI(decodeURI(this._downloadLink));
-    let res = await get(downloadLink,
-      Object.assign({encoding: this.encoding}, this.options.req));
+    const reqOptions = Object.assign({}, this.options.req, {encoding: this.encoding});
+    if (this.refUrl && this.refUrl !== downloadLink) {
+      const headers = Object.assign({}, reqOptions.headers);
+      headers.referer = this.refUrl;
+      reqOptions.headers = headers;
+    }
+    let res = await get(downloadLink, reqOptions);
     if (res && res.body) {
       this.finishTimestamp = Date.now();
       this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
       return this.body = res.body;
     } else {
       // try again
-      res = await get(downloadLink,
-        Object.assign({encoding: this.encoding}, this.options.req));
+      res = await get(downloadLink, reqOptions);
       if (res && res.body) {
         this.finishTimestamp = Date.now();
         this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
