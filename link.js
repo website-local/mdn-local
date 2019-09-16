@@ -10,6 +10,9 @@ const {CookieJar} = require('tough-cookie');
 const defaultOptions = require('./options');
 const forbiddenChar = /([:*?"<>|]|%3A|%2A|%3F|%22|%3C|%3E|%7C)+/ig;
 
+const MAX_RETRY = 20;
+const MAX_RETRY_DELAY = 5000;
+
 const cookieJar = new CookieJar();
 const cacheUri = {};
 /**
@@ -18,7 +21,32 @@ const cacheUri = {};
  * @param {got.GotBodyOptions} opts
  * @return {got.GotPromise<any>}
  */
-const get = (url, opts = {}) => got(url, {...opts, cookieJar});
+const get = got.extend({cookieJar, hooks: {
+  beforeRetry: [
+    (options, error, retryCount) => {
+      options.retry.retries = function hackRetryDelay(iteration, error) {
+        if (iteration > MAX_RETRY) {
+          return 0;
+        }
+
+        if ((!error ||
+        !options.retry.errorCodes.has(error.code)) &&
+        (!options.retry.methods.has(error.method) ||
+          !options.retry.statusCodes.has(error.statusCode))) {
+          return 0;
+        }
+
+        let delay = ((2 * (iteration - 1)) * 1000) + Math.random() * 200;
+        if (delay > MAX_RETRY_DELAY) {
+          delay = MAX_RETRY_DELAY + (Math.random() - 0.5) * 1000;
+        }
+        delay |= 0;
+        return delay;
+      };
+      (retryCount > 1 ? console.info : console.debug)('retry: ', error.url, error.code, retryCount);
+    }
+  ]
+}});
 
 const mkdirRetry = (dir) => {
   try {
