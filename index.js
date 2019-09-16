@@ -241,6 +241,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       path.startsWith('/search') ||
       path.startsWith('search') ||
       path.endsWith('$history') ||
+      path.endsWith('$samples') ||
       path.endsWith('$edit') ||
       path.endsWith('$translate') ||
       path.endsWith('%24history') ||
@@ -306,7 +307,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     }
     if (url.match('en-US')) {
       // eslint-disable-next-line no-console
-      console.warn(url, u, pathArr);
+      console.warn(url, pathArr);
     }
     if (hardCodedRedirectUrl[url]) {
       return hardCodedRedirectUrl[url];
