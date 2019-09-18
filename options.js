@@ -1,3 +1,4 @@
+const adjust = require('./adjust-concurrency');
 const defaultOptions = {
   req: {
     retry : 20,
@@ -11,8 +12,8 @@ const defaultOptions = {
       connect: 400,
       secureConnect: 500,
       send: 700,
-      response: 35000,
-      request: 40000
+      response: 20000,
+      request: 23000
     }
   },
   encoding: {
@@ -59,7 +60,7 @@ const defaultOptions = {
   /**
    * @type number
    */
-  concurrency: 16,
+  concurrency: 12,
   /**
    * @type number
    */
@@ -74,6 +75,8 @@ const defaultOptions = {
   /**
    * @type * | function
    */
-  onError: null
+  onError: null,
+  adjustConcurrencyPeriod: 60000,
+  adjustConcurrencyFunc: adjust
 };
 module.exports = defaultOptions;

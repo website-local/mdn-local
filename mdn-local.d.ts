@@ -22,6 +22,8 @@ interface Options {
     onSuccess?: Function;
     onError?: Function;
     detectIncompleteHtml?: '</html>' | '</body>' | string;
+    adjustConcurrencyPeriod: number;
+    adjustConcurrencyFunc?(downloader: any): void;
 }
 
 interface Encoding {

@@ -97,6 +97,14 @@ class Downloader {
   }
   start() {
     this.finished = 0;
+    if (this.adjustConcurrencyTimer) {
+      clearInterval(this.adjustConcurrencyTimer);
+    }
+    if (this.options.adjustConcurrencyPeriod > 0) {
+      this.adjustConcurrencyTimer = setInterval(() => {
+        this.options.adjustConcurrencyFunc(this);
+      }, this.options.adjustConcurrencyPeriod);
+    }
     this.queue.onIdle().then(() => {
       this.finished = 1;
       if (typeof this.options.onSuccess === 'function') {
@@ -107,6 +115,9 @@ class Downloader {
   }
 
   stop() {
+    if (this.adjustConcurrencyTimer) {
+      clearInterval(this.adjustConcurrencyTimer);
+    }
     this.queue.pause();
   }
 }
