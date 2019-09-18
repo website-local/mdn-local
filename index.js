@@ -56,7 +56,8 @@ const redirectLocale = {
   'ha': 1,
   'ff': 1,
   'ee': 1,
-  'Cn': 1
+  'Cn': 1,
+  'bn': 1
 };
 
 const appendLocalePath = {
@@ -177,6 +178,9 @@ const skipProcessFunc = (url, element) => {
 const detectLinkType = (url, elem) => {
   if (elem.is('a') || elem.is('iframe')) {
     const paths = url.split('/');
+    if (url.includes('/@api/deki/files/')) {
+      return 'binary';
+    }
     let arr;
     if (paths && paths.length &&
       (arr = paths[paths.length - 1].split('.')) && arr.length > 1) {
@@ -244,6 +248,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       path.startsWith('search') ||
       path.endsWith('$history') ||
       path.endsWith('$samples') ||
+      path.endsWith('$json') ||
       path.endsWith('$edit') ||
       path.endsWith('$translate') ||
       path.endsWith('%24history') ||
