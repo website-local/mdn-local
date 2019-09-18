@@ -182,7 +182,7 @@ const detectLinkType = (url, elem) => {
       (arr = paths[paths.length - 1].split('.')) && arr.length > 1) {
       if (!validExtensionName[arr[arr.length - 1].toLowerCase()]) {
         return 'html';
-      }
+      } else return 'binary';
     } else {
       return 'html';
     }
@@ -239,6 +239,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     return host !== 'developer.mozilla.org' ||
       testLocaleRegExp.test(path) ||
       path.startsWith('/search') ||
+      path.startsWith('/zh-CN/search') ||
+      path.startsWith('zh-CN/search') ||
       path.startsWith('search') ||
       path.endsWith('$history') ||
       path.endsWith('$samples') ||
