@@ -181,6 +181,14 @@ const detectLinkType = (url, elem) => {
     if (url.includes('/@api/deki/files/')) {
       return 'binary';
     }
+    if (url.includes('/docs/') ||
+      url.includes('Add-ons/WebExtensions') ||
+      url.includes('Add-ons/Firefox_for_Android') ||
+      url.includes('Apps/Build') ||
+      url.includes('JavaScript_code_modules/') ||
+      url.includes('Creating_XPCOM_Components/Building_the_WebLock_UI')) {
+      return 'html';
+    }
     let arr;
     if (paths && paths.length &&
       (arr = paths[paths.length - 1].split('.')) && arr.length > 1) {
