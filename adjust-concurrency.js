@@ -15,6 +15,9 @@ const adjust = (downloader) => {
   downloader.lastPeriodCount = downloader.currentPreiodCount;
   downloader.currentPreiodCount = total - downloader.lastPeriodTotalCount;
   downloader.lastPeriodTotalCount = total;
+  if (downloader.queue.size === 0) {
+    return console.info('Queue is empty, keep concurrency as ', downloader.queue.concurrency);
+  }
   if (downloader.currentPreiodCount < 2) {
     downloader.queue.concurrency += 8;
   } else if (downloader.currentPreiodCount < downloader.lastPeriodCount >> 1) {
