@@ -159,6 +159,9 @@ const preProcessHtml = ($) => {
   $('#doc-pending-fallback').remove();
   // TODO: 处理iframe
   $('iframe').remove();
+  // TODO: Tag pagination
+  // https://github.com/myfreeer/mdn-local/issues/10
+  $('.pagination').remove();
   return $;
 };
 /**
