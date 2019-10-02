@@ -3,6 +3,13 @@ const processCss = require('./process-css');
 const Queue = require('p-queue');
 const process = require('./process');
 const defaultOptions = require('./options');
+const log4js = require('log4js');
+const logger = {
+  notFound: log4js.getLogger('404-not-found'),
+  complete: log4js.getLogger('complete'),
+  error: log4js.getLogger('error')
+};
+
 
 class Downloader {
   constructor(options) {
@@ -57,8 +64,7 @@ class Downloader {
             self.add(html);
           }
           await resource.save();
-          // eslint-disable-next-line no-console
-          console.debug(url, resource.depth, resource.waitTime, resource.downloadTime);
+          logger.complete.info(url, resource.depth, resource.waitTime, resource.downloadTime);
           self.downloadedLinks[url] = 1;
           if (resource.redirectedUrl) {
             self.downloadedLinks[resource.redirectedUrl] = 1;
@@ -80,8 +86,7 @@ class Downloader {
             }
           }
           await resource.save();
-          // eslint-disable-next-line no-console
-          console.debug(url, resource.depth, resource.waitTime, resource.downloadTime);
+          logger.complete.info(url, resource.depth, resource.waitTime, resource.downloadTime);
           self.downloadedLinks[url] = 1;
           if (resource.redirectedUrl) {
             self.queuedLinks[resource.redirectedUrl] = 1;
@@ -102,8 +107,11 @@ class Downloader {
       this.options.onError(this, error, url, resource);
     }
     this.failedLinks[url] = 1;
-    // eslint-disable-next-line no-console
-    console.error(error, url, resource);
+    if (error && error.name === 'HTTPError' && error.statusCode === 404) {
+      logger.notFound.error(url, resource.url);
+    } else {
+      logger.error.error(error, url, resource);
+    }
   }
   start() {
     this.finished = 0;

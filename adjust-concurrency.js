@@ -1,4 +1,4 @@
-
+const logger = require('log4js').getLogger('adjust-concurrency');
 /**
  * @param {Downloader} downloader
  */
@@ -16,7 +16,7 @@ const adjust = (downloader) => {
   downloader.currentPreiodCount = total - downloader.lastPeriodTotalCount;
   downloader.lastPeriodTotalCount = total;
   if (downloader.queue.size === 0) {
-    return console.info('Queue is empty, keep concurrency as ', downloader.queue.concurrency);
+    return logger.info('Queue is empty, keep concurrency as ', downloader.queue.concurrency);
   }
   if (downloader.currentPreiodCount < 2) {
     downloader.queue.concurrency += 8;
@@ -29,7 +29,7 @@ const adjust = (downloader) => {
   if (downloader.currentPreiodCount > downloader.firstPeriodCount) {
     downloader.queue.concurrency -= 4;
   }
-  console.info('concurrency', downloader.queue.concurrency);
+  logger.info('concurrency', downloader.queue.concurrency);
 };
 
 module.exports = adjust;

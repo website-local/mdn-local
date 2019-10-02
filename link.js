@@ -6,7 +6,12 @@ const cheerio = require('cheerio');
 const mkdirP = require('mkdirp');
 const parseCssUrls = require('css-url-parser');
 const {CookieJar} = require('tough-cookie');
-
+const log4js = require('log4js');
+const logger = {
+  retry: log4js.getLogger('retry'),
+  mkdir: log4js.getLogger('mkdir'),
+  error: log4js.getLogger('error')
+};
 const defaultOptions = require('./options');
 const forbiddenChar = /([:*?"<>|]|%3A|%2A|%3F|%22|%3C|%3E|%7C)+/ig;
 
@@ -37,13 +42,17 @@ const get = got.extend({cookieJar, hooks: {
         }
 
         let delay = ((2 * (iteration - 1)) * 1000) + Math.random() * 200;
+        if (iteration > 2) {
+          delay += 1000;
+        }
         if (delay > MAX_RETRY_DELAY) {
           delay = MAX_RETRY_DELAY + (Math.random() - 0.5) * 1000;
         }
         delay |= 0;
         return delay;
       };
-      (retryCount > 1 ? console.info : console.debug)('retry: ', error.url, error.code, retryCount);
+      (retryCount > 1 ? logger.retry.warn : logger.retry.info)
+        .call(logger.retry,'retry: ', error.url, error.code, retryCount);
     }
   ]
 }});
@@ -54,12 +63,14 @@ const mkdirRetry = (dir) => {
       mkdirP.sync(dir);
     }
   } catch (e) {
+    logger.mkdir.trace('mkdir ', dir, 'fail', e);
     // in case of concurrent dir creation
     try {
       if (!fs.existsSync(dir)) {
         mkdirP.sync(dir);
       }
     } catch (e) {
+      logger.mkdir.debug('mkdir ', dir, 'fail again', e);
       // try again, 3 times seeming pretty enough
       if (!fs.existsSync(dir)) {
         mkdirP.sync(dir);

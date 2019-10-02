@@ -1,5 +1,9 @@
 const Downloader = require('./downloader');
 const URI = require('urijs');
+const log4js = require('log4js');
+const path = require('path');
+const errorLogger = log4js.getLogger('error');
+
 const localeArr = [
   'af', 'ar', 'az', 'bg',
   'bm', 'bn-BD', 'bn-IN',
@@ -234,7 +238,67 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   if (!localesMap[locale]) {
     throw new TypeError('locale not exists');
   }
+  log4js.configure({
+    appenders: {
+      'retry': {
+        type: 'file',
+        filename: path.join(localRoot, 'retry.log')
+      },
+      'mkdir': {
+        type: 'file',
+        filename: path.join(localRoot, 'mkdir.log')
+      },
+      'error': {
+        type: 'file',
+        filename: path.join(localRoot, 'error.log')
+      },
+      '404': {
+        type: 'file',
+        filename: path.join(localRoot, '404.log')
+      },
+      'complete': {
+        type: 'file',
+        filename: path.join(localRoot, 'complete.log')
+      },
+      'stdout': {
+        type: 'stdout'
+      },
+      'stderr': {
+        type: 'stderr'
+      }
+    },
 
+    categories: {
+      'retry': {
+        appenders: ['stdout', 'retry'],
+        level: 'debug'
+      },
+      'mkdir': {
+        appenders: ['mkdir'],
+        level: 'debug'
+      },
+      'error': {
+        appenders: ['stderr', 'error'],
+        level: 'debug'
+      },
+      '404-not-found': {
+        appenders: ['404'],
+        level: 'debug'
+      },
+      'complete': {
+        appenders: ['complete'],
+        level: 'debug'
+      },
+      'adjust-concurrency': {
+        appenders: ['stdout', 'complete'],
+        level: 'debug'
+      },
+      'default': {
+        appenders: ['stdout', 'complete'],
+        level: 'debug'
+      }
+    }
+  });
   const testLocaleRegExp =
     new RegExp(`/(${localeArr.filter(l => l !== locale).join('|')})\\//`, 'i');
   const localeLowerCase = locale.toLocaleLowerCase();
@@ -320,12 +384,16 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
         needToRebuildUrl = true;
       }
     }
+    if (pathArr[1] === 'static' && pathArr[2] === 'jsi18n' && redirectLocale[pathArr[3]]) {
+      pathArr[3] = locale;
+      needToRebuildUrl = true;
+    }
     if (needToRebuildUrl) {
       url = u.path(pathArr.join('/')).toString();
     }
     if (url.match('en-US')) {
       // eslint-disable-next-line no-console
-      console.warn(url, pathArr);
+      errorLogger.warn(url, pathArr);
     }
     if (hardCodedRedirectUrl[url]) {
       return hardCodedRedirectUrl[url];
