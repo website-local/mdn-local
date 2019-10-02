@@ -176,6 +176,7 @@ class Link {
     if (res && res.body) {
       this.finishTimestamp = Date.now();
       this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
+      this.redirectedUrl = res.url;
       return this.body = res.body;
     } else {
       // try again
@@ -183,12 +184,21 @@ class Link {
       if (res && res.body) {
         this.finishTimestamp = Date.now();
         this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
+        this.redirectedUrl = res.url;
         return this.body = res.body;
       } else {
         console.warn(res);
         throw new TypeError('Empty response body: ' + downloadLink);
       }
     }
+  }
+
+  _save() {
+    const savePathUnEncoded = decodeURI(this.savePath);
+    if (this.encoding) {
+      return writeStr(this.body, savePathUnEncoded, this.encoding);
+    }
+    return writeFile(this.body, savePathUnEncoded);
   }
 
   async save() {
@@ -198,11 +208,12 @@ class Link {
     if (!this.body) {
       await this.fetch();
     }
-    const savePathUnEncoded = decodeURI(this.savePath);
-    if (this.encoding) {
-      return await writeStr(this.body, savePathUnEncoded, this.encoding);
+    let ret = await this._save();
+    if (this.redirectedUrl && this.url !== this.redirectedUrl) {
+      this.url = this.redirectedUrl;
+      ret = await this._save();
     }
-    return await writeFile(this.body, savePathUnEncoded);
+    return ret;
   }
 }
 
@@ -216,6 +227,7 @@ class Resource extends Link {
 
   set url(url) {
     this._url = url;
+    this.uri = new URI(url);
     if (this.uri.is('relative')) {
       this.replacePath = this.uri.clone();
       this.uri = this.uri.absoluteTo(this.refUri);
@@ -327,6 +339,11 @@ class HtmlResource extends Resource {
     return this.doc = cheerio.load(body);
   }
 
+  _save() {
+    const savePathUnEncoded = decodeURI(this.savePath);
+    return writeStr(this.html, savePathUnEncoded, this.encoding);
+  }
+
   async save() {
     if (!this.savePath) {
       return false;
@@ -337,8 +354,11 @@ class HtmlResource extends Resource {
     if (!this.doc) {
       await this.fetch();
     }
-    const savePathUnEncoded = decodeURI(this.savePath);
-    const ret = await writeStr(this.html, savePathUnEncoded, this.encoding);
+    let ret = await this._save();
+    if (this.redirectedUrl && this.url !== this.redirectedUrl) {
+      this.url = this.redirectedUrl;
+      ret = await this._save();
+    }
     this.saved = 1;
     this.doc = null;
     this.body = null;

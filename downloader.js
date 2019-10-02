@@ -47,6 +47,9 @@ class Downloader {
       this.queue.add(() => new Promise((resolve) => setImmediate(async () => {
         try {
           const {htmlArr, resArr} = await process(resource);
+          if (resource.redirectedUrl) {
+            self.queuedLinks[resource.redirectedUrl] = 1;
+          }
           for (const res of resArr) {
             self.add(res);
           }
@@ -57,6 +60,9 @@ class Downloader {
           // eslint-disable-next-line no-console
           console.debug(url, resource.depth, resource.waitTime, resource.downloadTime);
           self.downloadedLinks[url] = 1;
+          if (resource.redirectedUrl) {
+            self.downloadedLinks[resource.redirectedUrl] = 1;
+          }
           resource = null;
           resolve();
         } catch (e) {
@@ -77,6 +83,10 @@ class Downloader {
           // eslint-disable-next-line no-console
           console.debug(url, resource.depth, resource.waitTime, resource.downloadTime);
           self.downloadedLinks[url] = 1;
+          if (resource.redirectedUrl) {
+            self.queuedLinks[resource.redirectedUrl] = 1;
+            self.downloadedLinks[resource.redirectedUrl] = 1;
+          }
           resource = null;
         } catch (e) {
           self.handleError(e, url, resource);

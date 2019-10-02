@@ -14,6 +14,7 @@ const process = async (html) => {
   if (!html.doc) {
     await html.fetch();
   }
+  let url = html.redirectedUrl || html.url;
   const depth = (+html.depth || 0) + 1;
   const htmlArr = [];
   const resArr = [];
@@ -42,7 +43,7 @@ const process = async (html) => {
         await html.options.detectLinkType(link, elem, html) || type : type;
       let Clazz = Resource;
       if (linkType === 'html') {
-        const res = new HtmlResource(link, html.localRoot, html.url, html.options);
+        const res = new HtmlResource(link, html.localRoot, url, html.options);
         res.depth = depth;
         if (!(typeof html.options.dropResourceFunc === 'function' &&
           html.options.dropResourceFunc(res))) {
@@ -59,7 +60,7 @@ const process = async (html) => {
         const cssUrls = parseCssUrls(elem.html());
         resArr.push(...cssUrls.map(url => createCssResourceFromUrl(url, html)));
       }
-      const res = new Clazz(link, html.localRoot, html.url, html.options);
+      const res = new Clazz(link, html.localRoot, url, html.options);
       res.depth = depth;
       if (!(typeof html.options.dropResourceFunc === 'function' &&
         html.options.dropResourceFunc(res))) {
