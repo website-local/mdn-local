@@ -359,12 +359,17 @@ class HtmlResource extends Resource {
 
   _save(placeholder) {
     const savePathUnEncoded = decodeURI(this.savePath);
-    const relativePath = placeholder && new URI(this.redirectedUrl).relativeTo(this.uri).toString();
+    let relativePath = placeholder && new URI(this.redirectedUrl).relativeTo(this.uri).toString();
+    if (relativePath.endsWith('/')) {
+      relativePath += 'index.html';
+    } else {
+      relativePath += '.html';
+    }
     return writeStr(placeholder ? `<html lang="en">
 <head>
-<meta http-equiv="refresh" content="0;url=${relativePath}.html">
+<meta http-equiv="refresh" content="0;url=${relativePath}">
 <script>
-location.replace('${relativePath}.html');
+location.replace('${relativePath}');
 </script>
 <title></title>
 </head>
