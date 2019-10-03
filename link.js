@@ -55,6 +55,10 @@ const get = got.extend({cookieJar, hooks: {
         .call(logger.retry,'retry: ', error.url, error.code, retryCount);
     }
   ]
+}, headers: {
+  'user-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) ' +
+    'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+    'Chrome/53.0.2785.143 Safari/537.36'
 }});
 
 const mkdirRetry = (dir) => {
@@ -220,6 +224,9 @@ class Link {
       await this.fetch();
     }
     let ret = await this._save();
+    if (this.redirectedUrl && typeof this.options.redirectFilterFunc === 'function') {
+      this.redirectedUrl = this.options.redirectFilterFunc(this.redirectedUrl, this);
+    }
     if (this.redirectedUrl && this.url !== this.redirectedUrl) {
       this.url = this.redirectedUrl;
       ret = await this._save();
@@ -232,7 +239,7 @@ class Resource extends Link {
   constructor(url, localRoot, refUrl, options = {}) {
     super(url, localRoot, refUrl, options);
     if (this.refUri.is('relative')) {
-      throw new TypeError('refUrl必须是绝对路径');
+      throw new TypeError('refUrl must be absolute path');
     }
   }
 
@@ -352,12 +359,12 @@ class HtmlResource extends Resource {
 
   _save(placeholder) {
     const savePathUnEncoded = decodeURI(this.savePath);
-    const relativePath = placeholder && this.uri.relativeTo(this.redirectedUrl).toString();
+    const relativePath = placeholder && new URI(this.redirectedUrl).relativeTo(this.uri).toString();
     return writeStr(placeholder ? `<html lang="en">
 <head>
-<meta http-equiv="refresh" content="0;url=${relativePath}">
+<meta http-equiv="refresh" content="0;url=${relativePath}.html">
 <script>
-location.replace('${relativePath}');
+location.replace('${relativePath}.html');
 </script>
 <title></title>
 </head>
@@ -375,6 +382,9 @@ location.replace('${relativePath}');
       await this.fetch();
     }
     let ret;
+    if (this.redirectedUrl && typeof this.options.redirectFilterFunc === 'function') {
+      this.redirectedUrl = this.options.redirectFilterFunc(this.redirectedUrl, this);
+    }
     if (this.redirectedUrl && this.url !== this.redirectedUrl) {
       ret = await this._save(true);
       this.url = this.redirectedUrl;
