@@ -50,7 +50,9 @@ const process = async (html) => {
           htmlArr.push(res);
         }
         const replacePath = res.replacePath.toString();
-        if (replacePath !== '.html' && replacePath !== '/.html') {
+        if (replacePath === '.html' || replacePath === '/.html') {
+          elem.attr(attr, '');
+        } else {
           elem.attr(attr, replacePath);
         }
         continue;
