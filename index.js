@@ -174,7 +174,7 @@ const preProcessHtml = ($) => {
  * @param {Cheerio} element
  */
 const skipProcessFunc = (url, element) => {
-  return url.startsWith('#') || element.is('a.external-icon') || element.hasClass('external');
+  return url.startsWith('#') || element.hasClass('external-icon') || element.hasClass('external');
 };
 
 /**
@@ -242,23 +242,23 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     appenders: {
       'retry': {
         type: 'file',
-        filename: path.join(localRoot, 'retry.log')
+        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'retry.log')
       },
       'mkdir': {
         type: 'file',
-        filename: path.join(localRoot, 'mkdir.log')
+        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'mkdir.log')
       },
       'error': {
         type: 'file',
-        filename: path.join(localRoot, 'error.log')
+        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'error.log')
       },
       '404': {
         type: 'file',
-        filename: path.join(localRoot, '404.log')
+        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', '404.log')
       },
       'complete': {
         type: 'file',
-        filename: path.join(localRoot, 'complete.log')
+        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'complete.log')
       },
       'stdout': {
         type: 'stdout'
@@ -333,16 +333,26 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       dir.endsWith('/profiles');
   };
 
+  const redirectFilterFunc = (url, res) => {
+    const uri = new URI(url), host = uri.host();
+    if (host === 'mdn.mozillademos.org') {
+      uri.host('developer.mozilla.org');
+      return uri.toString();
+    }
+    if (host !== 'developer.mozilla.org') {
+      return res.url;
+    }
+    const path = uri.path(), pathArr = path.split('/');
+    if (redirectLocale[pathArr[1]]) {
+      pathArr[1] = locale;
+      return uri.path(pathArr.join('/')).toString();
+    }
+    return url;
+  };
   const linkRedirectFunc = (url, elem, html) => {
     let u = new URI(url), host, needToRebuildUrl  =false;
     if ((host = u.host()) && host !== 'developer.mozilla.org') {
-      if (host === 'mdn.mozillademos.org') {
-        // should be automatically redirected back
-        u.host('developer.mozilla.org');
-        needToRebuildUrl = true;
-      } else {
-        return url;
-      }
+      return url;
     }
     if (u.is('relative')) {
       u = u.absoluteTo(html.url);
@@ -400,7 +410,22 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     }
     return url;
   };
-
+  if (!options.req) {
+    options.req = {};
+  }
+  if (!options.req.hooks) {
+    options.req.hooks = {};
+  }
+  if (!options.req.hooks.beforeRedirect) {
+    options.req.hooks.beforeRedirect = [];
+  }
+  options.req.hooks.beforeRedirect.push(function (options) {
+    const {path} = options, pathArr = path.split('/');
+    if (pathArr && redirectLocale[pathArr[1]]) {
+      pathArr[1] = locale;
+      options.path = pathArr.join('/');
+    }
+  });
   const d = new Downloader(Object.assign({
     depth: 5,
     req: {
@@ -419,6 +444,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       `https://developer.mozilla.org/${locale}/docs/Web`
     ],
     detectLinkType,
+    redirectFilterFunc,
     dropResourceFunc,
     preProcessHtml,
     linkRedirectFunc,

@@ -54,6 +54,10 @@ const defaultOptions = {
    */
   requestRedirectFunc: null,
   /**
+   * @type * | function(string, Link): string | void
+   */
+  redirectFilterFunc: null,
+  /**
    * @type * | function(Resource): boolean
    */
   dropResourceFunc: null,

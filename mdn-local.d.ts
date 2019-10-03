@@ -16,6 +16,7 @@ interface Options {
     preProcessHtml?: HtmlProcessFunc;
     postProcessHtml?: HtmlProcessFunc;
     linkRedirectFunc?: LinkRedirectFunc;
+    redirectFilterFunc?: RequestRedirectFunc;
     skipProcessFunc?: SkipProcessFunc;
     requestRedirectFunc?: RequestRedirectFunc;
     dropResourceFunc?: DropResourceFunc;
@@ -45,7 +46,7 @@ interface HtmlProcessFunc {
 }
 
 interface RequestRedirectFunc {
-    (url: string, res: Link): string;
+    (url: string, res: Link): string | void;
 }
 
 interface LinkRedirectFunc {
