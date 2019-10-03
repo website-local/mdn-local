@@ -350,9 +350,18 @@ class HtmlResource extends Resource {
     return this.doc = cheerio.load(body);
   }
 
-  _save() {
+  _save(placeholder) {
     const savePathUnEncoded = decodeURI(this.savePath);
-    return writeStr(this.html, savePathUnEncoded, this.encoding);
+    const relativePath = placeholder && this.uri.relativeTo(this.redirectedUrl).toString();
+    return writeStr(placeholder ? `<html lang="en">
+<head>
+<meta http-equiv="refresh" content="0;url=${relativePath}">
+<script>
+location.replace('${relativePath}');
+</script>
+<title></title>
+</head>
+</html>` : this.html, savePathUnEncoded, this.encoding);
   }
 
   async save() {
@@ -365,9 +374,12 @@ class HtmlResource extends Resource {
     if (!this.doc) {
       await this.fetch();
     }
-    let ret = await this._save();
+    let ret;
     if (this.redirectedUrl && this.url !== this.redirectedUrl) {
+      ret = await this._save(true);
       this.url = this.redirectedUrl;
+      ret = await this._save();
+    } else {
       ret = await this._save();
     }
     this.saved = 1;
