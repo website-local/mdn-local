@@ -20,6 +20,8 @@ const MAX_RETRY_DELAY = 5000;
 
 const cookieJar = new CookieJar();
 const cacheUri = {};
+
+const escapePath = str => str && str.replace(forbiddenChar, '_');
 /**
  *
  * @param {string} url
@@ -263,9 +265,8 @@ class Resource extends Link {
     this.serverPath = this.uri.path();
     // escape char for windows path
     const replacePathStr = this.replacePath.path();
-    this.replacePath.path(replacePathStr.replace(forbiddenChar, '_'));
-    this.savePath = path.join(this.localRoot, this.host,
-      this.serverPath.replace(forbiddenChar, '_'));
+    this.replacePath.path(escapePath(replacePathStr));
+    this.savePath = path.join(this.localRoot, this.host, escapePath(this.serverPath));
     this._downloadLink = this.uri.clone().hash('').toString();
   }
 
@@ -366,6 +367,7 @@ class HtmlResource extends Resource {
       } else {
         relativePath += '.html';
       }
+      relativePath = escapePath(relativePath);
       return writeStr(`<html lang="en">
 <head>
 <meta http-equiv="refresh" content="0;url=${relativePath}">
