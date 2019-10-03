@@ -359,13 +359,14 @@ class HtmlResource extends Resource {
 
   _save(placeholder) {
     const savePathUnEncoded = decodeURI(this.savePath);
-    let relativePath = placeholder && new URI(this.redirectedUrl).relativeTo(this.uri).toString();
-    if (relativePath.endsWith('/')) {
-      relativePath += 'index.html';
-    } else {
-      relativePath += '.html';
-    }
-    return writeStr(placeholder ? `<html lang="en">
+    if (placeholder) {
+      let relativePath = new URI(this.redirectedUrl).relativeTo(this.uri).toString();
+      if (relativePath.endsWith('/')) {
+        relativePath += 'index.html';
+      } else {
+        relativePath += '.html';
+      }
+      return writeStr(`<html lang="en">
 <head>
 <meta http-equiv="refresh" content="0;url=${relativePath}">
 <script>
@@ -373,7 +374,9 @@ location.replace('${relativePath}');
 </script>
 <title></title>
 </head>
-</html>` : this.html, savePathUnEncoded, this.encoding);
+</html>`, savePathUnEncoded, this.encoding);
+    }
+    return writeStr(this.html, savePathUnEncoded, this.encoding);
   }
 
   async save() {
