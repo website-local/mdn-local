@@ -108,7 +108,7 @@ class Downloader {
     }
     this.failedLinks[url] = 1;
     if (error && error.name === 'HTTPError' && error.statusCode === 404) {
-      logger.notFound.error(url, resource.url);
+      logger.notFound.error(url, resource.refUrl);
     } else {
       logger.error.error(error, url, resource);
     }
