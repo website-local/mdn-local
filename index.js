@@ -446,7 +446,16 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       `https://developer.mozilla.org/${locale}/docs/Web/JavaScript/Index`,
       `https://developer.mozilla.org/${locale}/docs/Web/HTML/Attributes`,
       `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element`,
-      `https://developer.mozilla.org/${locale}/docs/Web`
+      `https://developer.mozilla.org/${locale}/docs/Web`,
+      `https://developer.mozilla.org/${locale}/docs/Web/MathML`,
+      `https://developer.mozilla.org/${locale}/docs/Mozilla/Add-ons/WebExtensions`,
+      `https://developer.mozilla.org/${locale}/docs/Learn`,
+      `https://developer.mozilla.org/${locale}/docs/Web/Tutorials`,
+      `https://developer.mozilla.org/${locale}/docs/Web/Guide`,
+      `https://developer.mozilla.org/${locale}/docs/Web/Accessibility`,
+      `https://developer.mozilla.org/${locale}/docs/Web/Reference`,
+      `https://developer.mozilla.org/${locale}/docs/Games`,
+      `https://developer.mozilla.org/${locale}/docs/Web/Web_components`
     ],
     detectLinkType,
     redirectFilterFunc,
