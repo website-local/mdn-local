@@ -338,7 +338,51 @@ const hardCodedRedirectUrl = {
   'https://developer.mozilla.org/zh-CN/docs/API/WebSMS/Introduction_to_WebSMS':
     'https://developer.mozilla.org/zh-CN/docs/Archive/B2G_OS/API/Mobile_Messaging_API/Introduction_to_Mobile_Message_API',
   'https://developer.mozilla.org/zh-CN/docs/XUL_School/Connecting_to_Remote_Content':
-    'https://developer.mozilla.org/zh-CN/docs/Archive/Add-ons/Overlay_Extensions/XUL_School/Connecting_to_Remote_Content'
+    'https://developer.mozilla.org/zh-CN/docs/Archive/Add-ons/Overlay_Extensions/XUL_School/Connecting_to_Remote_Content',
+  'https://developer.mozilla.org/en-US/docs/Web/Events/readystatechange':
+    'https://developer.mozilla.org/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6',
+  'https://developer.mozilla.org/en-US/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/ui_button_toggle':
+    'https://developer.mozilla.org/zh-CN/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/ui_button_toggle',
+  'https://developer.mozilla.org/../../../../En/Mozilla_developer_guide':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/Developer_guide',
+  'https://developer.mozilla.org/../../../../en/XUL_Tutorial/Localization':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL/Tutorial/Localization',
+  'https://developer.mozilla.org/../../../../en/XUL_Tutorial/Document_Object_Model':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL/Tutorial/Document_Object_Model',
+  'https://developer.mozilla.org/../../../../En/NsITimer':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsITimer',
+  'https://developer.mozilla.org/../../../../en/XUL_Tutorial/More_Event_Handlers':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL/Tutorial/More_Event_Handlers',
+  'https://developer.mozilla.org/../../../../en/Using_JavaScript_code_modules':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/JavaScript_code_modules/Using',
+  'https://developer.mozilla.org/../../../../En/nsITimer':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsITimer',
+  'https://developer.mozilla.org/../../../../en/DOM/window.setTimeout':
+    'https://developer.mozilla.org/zh-CN/docs/Web/API/Window/setTimeout',
+  'https://developer.mozilla.org/../../../../En/Publishing_Mercurial_Clones':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/Creating_Mercurial_User_Repositories',
+  'https://developer.mozilla.org/../../../../En/SpiderMonkey':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/Projects/SpiderMonkey',
+  'https://developer.mozilla.org/../../../../en/nsIFeedTextConstruct':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIFeedTextConstruct',
+  'https://developer.mozilla.org/../../../../En/NsIAccessible/Parent':
+    'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIAccessible/Parent',
+  'https://developer.mozilla.org/en-US/docs/DOM/event.charCode':
+    'https://developer.mozilla.org/zh-CN/docs/Web/API/KeyboardEvent/charCode',
+  'https://developer.mozilla.org/zh-CN/docs/Web/CSS/en-US/docs/Web/API/WebVTT_API':
+    'https://developer.mozilla.org/zh-CN/docs/Web/API/WebVTT_API',
+  'https://developer.mozilla.org/zh-CN/docs/Glossary/%3Ca%20href=%22/en-US/docs/Glossary/Microsoft_Internet_Explorer%22%20title=%22Internet%20Explorer%203.0:%20Internet%20Explorer%20%28or%20IE%29%20is%20a%20free%20graphical%20browser%20maintained%20by%20Microsoft%20for%20legacy%20enterprise%20uses.%20Microsoft%20Edge%20is%20currently%20the%20default%20Windows%20browser.%22%20class=%22glossaryLink%22%3EInternet%20Explorer%203.0%3C/a%3E':
+    'https://developer.mozilla.org/zh-CN/docs/Glossary/Microsoft_Internet_Explorer',
+  'https://developer.mozilla.org/zh-CN/docs/Web/API/en-US/docs/Server-sent_events/Using_server-sent_events':
+    'https://developer.mozilla.org/zh-CN/docs/Server-sent_events/Using_server-sent_events',
+  'https://developer.mozilla.org/zh-CN/docs/MDN/Contribute/Localize/en-US/docs/MDN/Contribute/Tools/Template_editing':
+    'https://developer.mozilla.org/zh-CN/docs/MDN/Contribute/Tools/Template_editing',
+  'https://developer.mozilla.org/zh-CN/docs/Web/Accessibility/Understanding_WCAG/en-US/docs/Web/Accessibility/Understanding_WCAG':
+    'https://developer.mozilla.org/zh-CN/docs/Web/Accessibility/Understanding_WCAG',
+  'https://developer.mozilla.org/zh-CN/Firefox/Releases/en-US/Add-ons/SDK/Low-Level_APIs/test_httpd':
+    'https://developer.mozilla.org/zh-CN/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/test_httpd',
+  'https://developer.mozilla.org/zh-CN/docs/Web/CSS/en-US/docs/Web/CSS':
+    'https://developer.mozilla.org/zh-CN/docs/Web/CSS/en-US/docs/Web/CSS'
 };
 
 module.exports = hardCodedRedirectUrl;
