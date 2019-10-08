@@ -103,7 +103,11 @@ const validExtensionName = {
   'txt': 1,
   'woff2': 1,
   'xul': 1,
-  'zip': 1
+  'zip': 1,
+  'mp4': 1,
+  'flv': 1,
+  'm4v': 1,
+  'mkv': 1
 };
 
 // hard coded redirect url map to avoid the max-redirect things
