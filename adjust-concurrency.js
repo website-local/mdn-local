@@ -18,17 +18,19 @@ const adjust = (downloader) => {
   if (downloader.queue.size === 0) {
     return logger.info('Queue is empty, keep concurrency as ', downloader.queue.concurrency);
   }
+  let concurrency = downloader.queue.concurrency;
   if (downloader.currentPreiodCount < 2) {
-    downloader.queue.concurrency += 8;
+    concurrency += 8;
   } else if (downloader.currentPreiodCount < downloader.lastPeriodCount >> 1) {
-    downloader.queue.concurrency += 4;
+    concurrency += 4;
   }
   if (downloader.currentPreiodCount < downloader.firstPeriodCount >> 2) {
-    downloader.queue.concurrency += 2;
+    concurrency += 2;
   }
   if (downloader.currentPreiodCount > downloader.firstPeriodCount) {
-    downloader.queue.concurrency -= 4;
+    concurrency -= 4;
   }
+  downloader.queue.concurrency = Math.max(1, concurrency);
   logger.info('concurrency', downloader.queue.concurrency);
 };
 
