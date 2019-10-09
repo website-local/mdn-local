@@ -18,7 +18,8 @@
     "eslint": "^6.2.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --fix ."
   },
   "repository": {
     "type": "git",
@@ -28,7 +29,7 @@
     "mdn"
   ],
   "author": "myfreeer",
-  "license": "ISC",
+  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/myfreeer/mdn-local/issues"
   },
