@@ -2,6 +2,7 @@ const Downloader = require('./downloader');
 const URI = require('urijs');
 const log4js = require('log4js');
 const path = require('path');
+const JSON5 = require('json5');
 const errorLogger = log4js.getLogger('error');
 
 const localeArr = [
@@ -110,15 +111,83 @@ const validExtensionName = {
   'mkv': 1
 };
 
+const TO_REMOVE_CLASS = 'to-remove-elem';
+
 // hard coded redirect url map to avoid the max-redirect things
 const hardCodedRedirectUrl = require('./redirect-url');
 
-/**
- *
- * @param {CheerioStatic} $
- * @return {CheerioStatic}
- */
+const extractMdnAssets = (text) => {
+
+  let assetsBaseIndex, assetsBeginIndex, assetsEndIndex, assetsData;
+
+  if ((assetsBaseIndex = text.indexOf('mdn.assets')) > 0 &&
+    (assetsBeginIndex = text.indexOf('=', assetsBaseIndex)) > 0 &&
+    (assetsEndIndex = text.indexOf(';', assetsBeginIndex)) > 0) {
+    try {
+      assetsData = JSON5.parse(text.slice(++assetsBeginIndex, assetsEndIndex));
+    } catch (e) {
+      errorLogger.warn('extractMdnAssets fail', e);
+    }
+  }
+  if (!assetsData) {
+    return;
+  }
+  return {
+    assetsData,
+    assetsBeginIndex,
+    assetsEndIndex
+  };
+};
+
+const postProcessHtml = ($) => {
+  $('script').each((index, elem) => {
+    let assetsData, text, assetsBody;
+    elem = $(elem);
+    if (!(text = elem.html())) {
+      return;
+    }
+    if (!((assetsData = extractMdnAssets(text)) &&
+      assetsData.assetsBeginIndex > 0 &&
+      assetsData.assetsEndIndex > assetsData.assetsBeginIndex)) {
+      return;
+    }
+    assetsBody = {
+      js: {},
+      css: {}
+    };
+    $('.' + TO_REMOVE_CLASS).each((index, elem) => {
+      let base, key, url;
+      elem = $(elem);
+      if (elem.is('script')) {
+        base = assetsBody.js;
+        url = elem.attr('src');
+      } else if (elem.is('link')) {
+        base = assetsBody.css;
+        url = elem.attr('href');
+      } else {
+        return;
+      }
+      if (!(key = elem.attr('data-key'))) {
+        return;
+      }
+      if (!base[key]) {
+        base[key] = [];
+      }
+      base[key].push(url);
+      elem.remove();
+    });
+    text = text.slice(0, assetsData.assetsBeginIndex) +
+      JSON.stringify(assetsBody) +
+      text.slice(assetsData.assetsEndIndex);
+    elem.html(text);
+  });
+  return $;
+};
+
 const preProcessHtml = ($) => {
+  $('.bc-github-link').remove();
+  $('.hidden').remove();
+  $('meta[name^="twitter"]').remove();
   // 顶部提示
   $('.global-notice').remove();
   // 页脚
@@ -133,12 +202,16 @@ const preProcessHtml = ($) => {
   $('.dropdown-container').remove();
   // 顶部搜索
   $('#nav-main-search').remove();
+  $('#edit-history-menu').remove();
   $('.header-search').remove();
   $('.contributors-sub').remove();
   // 此页面上有脚本错误。虽然这条信息是写给网站编辑的，但您也可以在下面查看部分内容。
   $('#kserrors').remove();
   // head 中可选替代语言
   $('link[rel="alternate"]').remove();
+  $('link[rel="preconnect"]').remove();
+  $('link[rel="canonical"]').remove();
+  $('link[rel="search"]').remove();
   $('a[href$="$translate"]').remove();
   $('a[href$="$edit"]').remove();
   // no script mode ?
@@ -146,15 +219,49 @@ const preProcessHtml = ($) => {
   // 新闻脚本
   $('script[src*="newsletter"]').remove();
   $('script[src*="speedcurve.com"]').remove();
-  // google-analytics
+  let assetsData;
+
   $('script').each((index, elem) => {
-    let text;
+    let text, head, keys, len, i, key, values, valueLen, j;
     elem = $(elem);
     if ((text = elem.html())) {
+      // google-analytics
       if (text.includes('google-analytics')) elem.remove();
       // if (text.includes('window._react_data')) {
       //   elem.html('window._react_data = {}');
       // }
+      if ((assetsData = extractMdnAssets(text)) &&
+        ({assetsData} = assetsData) && assetsData) {
+        head = $('head');
+        if (assetsData.js &&
+          (keys = Object.keys(assetsData.js)) &&
+          (len = keys.length)) {
+          for (i = 0; i < len; i++) {
+            if ((key = keys[i]) &&
+              (values = assetsData.js[key]) &&
+              (valueLen = values.length)) {
+              for (j = 0; j < valueLen; j++) {
+                $(`<script class="${TO_REMOVE_CLASS}" src="${values[j]}" defer data-key="${key}"></script>`)
+                  .appendTo(head);
+              }
+            }
+          }
+        }
+        if (assetsData.css &&
+          (keys = Object.keys(assetsData.css)) &&
+          (len = keys.length)) {
+          for (i = 0; i < len; i++) {
+            if ((key = keys[i]) &&
+              (values = assetsData.css[key]) &&
+              (valueLen = values.length)) {
+              for (j = 0; j < valueLen; j++) {
+                $(`<link class="${TO_REMOVE_CLASS}" rel="stylesheet" href="${values[j]}" data-key="${key}"/>`)
+                  .appendTo(head);
+              }
+            }
+          }
+        }
+      }
     }
   });
   // 加入社区盒子
@@ -170,6 +277,12 @@ const preProcessHtml = ($) => {
   // TODO: Tag pagination
   // https://github.com/myfreeer/mdn-local/issues/10
   $('.pagination').remove();
+  // fix script
+  $(`<div style="display:none" class="script-workaround">
+<div id="close-header-search"></div>
+<div id="nav-main-search"></div>
+<div id="main-q"></div>
+</div>`).appendTo('#main-header');
   return $;
 };
 /**
@@ -317,7 +430,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       path = res.uri.path(),
       host = res.uri.host();
     if (host === 'mdn.mozillademos.org' && path.startsWith('/files')) {
-      return ;
+      return;
     }
     return host !== 'developer.mozilla.org' ||
       testLocaleRegExp.test(path) ||
@@ -353,7 +466,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     return url;
   };
   const linkRedirectFunc = (url, elem, html) => {
-    let u = new URI(url), host, needToRebuildUrl  =false;
+    let u = new URI(url), host, needToRebuildUrl = false;
     if ((host = u.host()) && host !== 'developer.mozilla.org') {
       if (host === 'mdn.mozillademos.org') {
         // should be automatically redirected back
@@ -467,6 +580,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     redirectFilterFunc,
     dropResourceFunc,
     preProcessHtml,
+    postProcessHtml,
     linkRedirectFunc,
     skipProcessFunc
   }, options));
