@@ -139,11 +139,83 @@ const extractMdnAssets = (text) => {
   };
 };
 
+const JSON_PARSE_STR = 'JSON.parse(';
+const PLACE_HOLDER_BODY_HTML = '@#%PLACE_HOLDER_BODY_HTML%#@';
+const PLACE_HOLDER_QUICK_HTML = '@#!PLACE_HOLDER_QUICK_HTML!#@';
+const PLACE_HOLDER_TOC_HTML = '@#!%PLACE_HOLDER_TOC_HTML!#%@';
+const postProcessReactData = (text, elem) => {
+  let jsonStrBeginIndex = text.indexOf(JSON_PARSE_STR),
+    jsonStrEndIndex, escapedJsonText, jsonText, data;
+  if (jsonStrBeginIndex < 1 ||
+    jsonStrBeginIndex + JSON_PARSE_STR.length > text.length) {
+    return;
+  }
+  jsonStrBeginIndex += JSON_PARSE_STR.length;
+  if (!((jsonStrEndIndex = text.lastIndexOf('"')) > 0 &&
+    ++jsonStrEndIndex < text.length &&
+    (escapedJsonText = text.slice(jsonStrBeginIndex, jsonStrEndIndex)))) {
+    return;
+  }
+  try {
+    jsonText = JSON.parse(escapedJsonText);
+    data = JSON.parse(jsonText);
+  } catch (e) {
+    errorLogger.warn('postProcessReactData: json parse fail', e);
+  }
+  if (!data || !data.documentData) {
+    return;
+  }
+  data.documentData.translations = [];
+  if (data.documentData.bodyHTML) {
+    data.documentData.bodyHTML = PLACE_HOLDER_BODY_HTML;
+  }
+  if (data.documentData.quickLinksHTML) {
+    data.documentData.quickLinksHTML = PLACE_HOLDER_QUICK_HTML;
+  }
+  if (data.documentData.tocHTML) {
+    data.documentData.tocHTML = PLACE_HOLDER_TOC_HTML;
+  }
+  // language=JavaScript
+  text = `
+!function() {
+  var _mdn_local_quickLinks = document.querySelector('.quick-links ol'),
+  _mdn_local_body = document.getElementById('wikiArticle'),
+  _mdn_local_toc = document.querySelector('.document-toc ul');
+  // replace _react_data to reduce size
+  window._react_data = ${JSON.stringify(data)
+    .replace(`"${PLACE_HOLDER_QUICK_HTML}"`,
+      '_mdn_local_quickLinks && _mdn_local_quickLinks.outerHTML')
+    .replace(`"${PLACE_HOLDER_BODY_HTML}"`,
+      '_mdn_local_body && _mdn_local_body.innerHTML')
+    .replace(`"${PLACE_HOLDER_TOC_HTML}"`,
+      '_mdn_local_toc && _mdn_local_toc.innerHTML')};
+  // mock fetch to avoid script errors
+  window.fetch = () => Promise.resolve({json:()=>Promise.resolve({
+  is_superuser:true,waffle:{flags:{},samples:{},switches:{registration_disabled:true}}})});
+}();
+  `.trim();
+  elem.html(text);
+};
+
 const postProcessHtml = ($) => {
   $('script').each((index, elem) => {
     let assetsData, text, assetsBody;
     elem = $(elem);
     if (!(text = elem.html())) {
+      return;
+    }
+    if (text.includes('window._react_data')) {
+      postProcessReactData(text, elem);
+      // $('#react-container').removeAttr('id');
+      // hide dynamically created useless stuff via css
+      $(`<style>
+#nav-footer,
+.contributors-sub,
+#nav-main-search,
+.newsletter-container,
+.dropdown-container,
+.bc-data .bc-github-link,
+.signin-link{ display:none }`).appendTo('head');
       return;
     }
     if (!((assetsData = extractMdnAssets(text)) &&
@@ -185,6 +257,7 @@ const postProcessHtml = ($) => {
 };
 
 const preProcessHtml = ($) => {
+  $('bdi').parent().parent().remove();
   $('.bc-github-link').remove();
   $('.hidden').remove();
   $('meta[name^="twitter"]').remove();
@@ -227,9 +300,7 @@ const preProcessHtml = ($) => {
     if ((text = elem.html())) {
       // google-analytics
       if (text.includes('google-analytics')) elem.remove();
-      // if (text.includes('window._react_data')) {
-      //   elem.html('window._react_data = {}');
-      // }
+      if (text.includes('mdn.analytics.trackOutboundLinks')) elem.remove();
       if ((assetsData = extractMdnAssets(text)) &&
         ({assetsData} = assetsData) && assetsData) {
         head = $('head');
