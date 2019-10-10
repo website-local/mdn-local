@@ -504,6 +504,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       return;
     }
     return host !== 'developer.mozilla.org' ||
+      path === '/presentations/screencasts/jresig-digg-firebug-jquery.mp4' ||
       testLocaleRegExp.test(path) ||
       path.startsWith('/search') ||
       path.startsWith('/zh-CN/search') ||
