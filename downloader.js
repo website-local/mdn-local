@@ -38,6 +38,7 @@ class Downloader {
       }
     }
   }
+
   add(resource) {
     if (!(resource instanceof Resource)) {
       return false;
@@ -102,9 +103,17 @@ class Downloader {
     this.queuedLinks[url] = 1;
     return true;
   }
+
   handleError(error, url, resource) {
     if (error && typeof this.options.onError === 'function') {
       this.options.onError(this, error, url, resource);
+    }
+    // try to save failed resource
+    if (((resource instanceof HtmlResource) &&
+      resource.doc && !resource.saved && !resource.saving) ||
+      (resource && resource.body && !resource.saved && !resource.saving)) {
+      resource.save().catch((err) =>
+        logger.error.error('save resource fail', resource.url, err));
     }
     this.failedLinks[url] = 1;
     if (error && error.name === 'HTTPError' && error.statusCode === 404) {
@@ -113,6 +122,7 @@ class Downloader {
       logger.error.error(error, url, resource);
     }
   }
+
   start() {
     this.finished = 0;
     if (this.adjustConcurrencyTimer) {
@@ -139,4 +149,5 @@ class Downloader {
     this.queue.pause();
   }
 }
+
 module.exports = Downloader;

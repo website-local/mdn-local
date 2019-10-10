@@ -222,6 +222,7 @@ class Link {
     if (!this.savePath) {
       return false;
     }
+    this.saving = 1;
     if (!this.body) {
       await this.fetch();
     }
@@ -233,6 +234,8 @@ class Link {
       this.url = this.redirectedUrl;
       ret = await this._save();
     }
+    this.saving = 0;
+    this.saved = 1;
     return ret;
   }
 }
@@ -361,20 +364,19 @@ class HtmlResource extends Resource {
   _save(placeholder) {
     const savePathUnEncoded = decodeURI(this.savePath);
     if (placeholder) {
-      let relativePath = new URI(this.redirectedUrl).relativeTo(this.uri).toString();
+      let relativePath = new URI(this.redirectedUrl).
+        search('').relativeTo(this.uri).toString();
       if (relativePath.endsWith('/')) {
         relativePath += 'index.html';
       } else {
         relativePath += '.html';
       }
       relativePath = escapePath(relativePath);
+      // noinspection HtmlRequiredTitleElement
       return writeStr(`<html lang="en">
 <head>
-<meta http-equiv="refresh" content="0;url=${relativePath}">
-<script>
-location.replace('${relativePath}');
-</script>
-<title></title>
+<meta http-equiv="refresh" content="0; url=${relativePath}">
+<script>location.replace('${relativePath}');</script>
 </head>
 </html>`, savePathUnEncoded, this.encoding);
     }
@@ -388,6 +390,7 @@ location.replace('${relativePath}');
     if (this.saved) {
       return true;
     }
+    this.saving = 1;
     if (!this.doc) {
       await this.fetch();
     }
@@ -402,6 +405,7 @@ location.replace('${relativePath}');
     } else {
       ret = await this._save();
     }
+    this.saving = 0;
     this.saved = 1;
     this.doc = null;
     this.body = null;
