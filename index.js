@@ -143,6 +143,14 @@ const JSON_PARSE_STR = 'JSON.parse(';
 const PLACE_HOLDER_BODY_HTML = '@#%PLACE_HOLDER_BODY_HTML%#@';
 const PLACE_HOLDER_QUICK_HTML = '@#!PLACE_HOLDER_QUICK_HTML!#@';
 const PLACE_HOLDER_TOC_HTML = '@#!%PLACE_HOLDER_TOC_HTML!#%@';
+
+// language=JavaScript
+const MOCK_FETCH_JS = `
+// mock fetch to avoid script errors
+window.fetch = () => Promise.resolve({json:()=>Promise.resolve({
+  is_superuser:true,waffle:{flags:{},samples:{},switches:{registration_disabled:true}}})});
+`;
+
 const postProcessReactData = (text, elem) => {
   let jsonStrBeginIndex = text.indexOf(JSON_PARSE_STR),
     jsonStrEndIndex, escapedJsonText, jsonText, data;
@@ -162,7 +170,11 @@ const postProcessReactData = (text, elem) => {
   } catch (e) {
     errorLogger.warn('postProcessReactData: json parse fail', e);
   }
-  if (!data || !data.documentData) {
+  if (!data) {
+    return;
+  }
+  if (!data.documentData) {
+    elem.html(MOCK_FETCH_JS + text);
     return;
   }
   data.documentData.translations = [];
@@ -189,9 +201,7 @@ const postProcessReactData = (text, elem) => {
       '_mdn_local_body && _mdn_local_body.innerHTML')
     .replace(`"${PLACE_HOLDER_TOC_HTML}"`,
       '_mdn_local_toc && _mdn_local_toc.innerHTML')};
-  // mock fetch to avoid script errors
-  window.fetch = () => Promise.resolve({json:()=>Promise.resolve({
-  is_superuser:true,waffle:{flags:{},samples:{},switches:{registration_disabled:true}}})});
+${MOCK_FETCH_JS}
 }();
   `.trim();
   elem.html(text);
