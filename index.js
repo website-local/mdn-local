@@ -147,12 +147,12 @@ const PLACE_HOLDER_TOC_HTML = '@#!%PLACE_HOLDER_TOC_HTML!#%@';
 const PLACE_HOLDER_SUMMARY_HTML = '@#!%$PLACE_HOLDER_SUMMARY_HTML!$#%@';
 // language=JavaScript
 const MOCK_FETCH_JS = `
-// mock fetch to avoid script errors
-window.fetch = () => Promise.resolve({
-  json: () => Promise.resolve({
-    is_superuser: true, waffle: {flags: {}, samples: {}, switches: {registration_disabled: true}}
-  })
-});
+  // mock fetch to avoid script errors
+  window.fetch = () => Promise.resolve({
+    json: () => Promise.resolve({
+      is_superuser: true, waffle: {flags: {}, samples: {}, switches: {registration_disabled: true}}
+    })
+  });
 `;
 const postProcessReactData = (text, elem) => {
   let jsonStrBeginIndex = text.indexOf(JSON_PARSE_STR),
@@ -441,10 +441,7 @@ const processPathWithMultipleLocale = (pathArr, locale) => {
   }
 };
 
-const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
-  if (!localesMap[locale]) {
-    throw new TypeError('locale not exists');
-  }
+const configureLogger = localRoot =>
   log4js.configure({
     appenders: {
       'retry': {
@@ -506,6 +503,12 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       }
     }
   });
+
+const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
+  if (!localesMap[locale]) {
+    throw new TypeError('locale not exists');
+  }
+  configureLogger(localRoot);
   const testLocaleRegExp =
     new RegExp(`/(${localeArr.filter(l => l !== locale).join('|')})\\//`, 'i');
   const localeLowerCase = locale.toLocaleLowerCase();
