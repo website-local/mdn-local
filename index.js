@@ -140,17 +140,20 @@ const extractMdnAssets = (text) => {
 };
 
 const JSON_PARSE_STR = 'JSON.parse(';
+// place holders
 const PLACE_HOLDER_BODY_HTML = '@#%PLACE_HOLDER_BODY_HTML%#@';
 const PLACE_HOLDER_QUICK_HTML = '@#!PLACE_HOLDER_QUICK_HTML!#@';
 const PLACE_HOLDER_TOC_HTML = '@#!%PLACE_HOLDER_TOC_HTML!#%@';
-
+const PLACE_HOLDER_SUMMARY_HTML = '@#!%$PLACE_HOLDER_SUMMARY_HTML!$#%@';
 // language=JavaScript
 const MOCK_FETCH_JS = `
 // mock fetch to avoid script errors
-window.fetch = () => Promise.resolve({json:()=>Promise.resolve({
-  is_superuser:true,waffle:{flags:{},samples:{},switches:{registration_disabled:true}}})});
+window.fetch = () => Promise.resolve({
+  json: () => Promise.resolve({
+    is_superuser: true, waffle: {flags: {}, samples: {}, switches: {registration_disabled: true}}
+  })
+});
 `;
-
 const postProcessReactData = (text, elem) => {
   let jsonStrBeginIndex = text.indexOf(JSON_PARSE_STR),
     jsonStrEndIndex, escapedJsonText, jsonText, data;
@@ -187,18 +190,24 @@ const postProcessReactData = (text, elem) => {
   if (data.documentData.tocHTML) {
     data.documentData.tocHTML = PLACE_HOLDER_TOC_HTML;
   }
+  if (data.documentData.summary) {
+    data.documentData.summary = PLACE_HOLDER_SUMMARY_HTML;
+  }
   // language=JavaScript
   text = `
 !function() {
   var _mdn_local_quickLinks = document.querySelector('.quick-links ol'),
   _mdn_local_body = document.getElementById('wikiArticle'),
-  _mdn_local_toc = document.querySelector('.document-toc ul');
+  _mdn_local_toc = document.querySelector('.document-toc ul'),
+  _mdn_local_summary = document.querySelector('#wikiArticle>p');
   // replace _react_data to reduce size
   window._react_data = ${JSON.stringify(data)
     .replace(`"${PLACE_HOLDER_QUICK_HTML}"`,
       '_mdn_local_quickLinks && _mdn_local_quickLinks.outerHTML')
     .replace(`"${PLACE_HOLDER_BODY_HTML}"`,
       '_mdn_local_body && _mdn_local_body.innerHTML')
+    .replace(`"${PLACE_HOLDER_SUMMARY_HTML}"`,
+      '_mdn_local_summary && _mdn_local_summary.innerHTML')
     .replace(`"${PLACE_HOLDER_TOC_HTML}"`,
       '_mdn_local_toc && _mdn_local_toc.innerHTML')};
 ${MOCK_FETCH_JS}
