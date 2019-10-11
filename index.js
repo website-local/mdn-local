@@ -561,14 +561,17 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     if ((host = u.host()) && host !== 'developer.mozilla.org') {
       if (host === 'mdn.mozillademos.org') {
         // should be automatically redirected back
-        u.host('developer.mozilla.org');
+        u = u.host('developer.mozilla.org');
         needToRebuildUrl = true;
       } else {
         return url;
       }
     }
     if (u.is('relative')) {
-      u = u.absoluteTo(html.url);
+      u = u.absoluteTo(html.url)
+        .normalizePath()
+        .removeSearch('redirectlocale', 'redirectslug', 'tag', 'language', 'raw', 'section');
+      needToRebuildUrl = true;
     }
     const pathArr = u.path()
       .replace('en-\n\nUS', 'en-US')

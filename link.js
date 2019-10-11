@@ -365,7 +365,7 @@ class HtmlResource extends Resource {
     const savePathUnEncoded = decodeURI(this.savePath);
     if (placeholder) {
       let relativePath = new URI(this.redirectedUrl).
-        search('').relativeTo(this.uri).toString();
+        search('').normalizePath().relativeTo(this.uri).toString();
       if (relativePath.endsWith('/')) {
         relativePath += 'index.html';
       } else {
