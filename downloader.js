@@ -47,7 +47,9 @@ class Downloader {
     if (this.queuedLinks[url]) {
       return true;
     }
-    if (resource.depth > resource.options.depth) {
+    if (resource instanceof HtmlResource &&
+      resource.depth > resource.options.depth) {
+      logger.error.info(`skip ${resource.url} at depth ${resource.depth}`);
       return false;
     }
     const self = this;
