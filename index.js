@@ -456,6 +456,10 @@ const configureLogger = localRoot =>
         type: 'file',
         filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'error.log')
       },
+      'skip': {
+        type: 'file',
+        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'skip.log')
+      },
       '404': {
         type: 'file',
         filename: path.join(localRoot, 'developer.mozilla.org', 'logs', '404.log')
@@ -483,6 +487,10 @@ const configureLogger = localRoot =>
       },
       'error': {
         appenders: ['stderr', 'error'],
+        level: 'debug'
+      },
+      'skip': {
+        appenders: ['stdout', 'skip'],
         level: 'debug'
       },
       '404-not-found': {
@@ -583,7 +591,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       return url;
     }
     if (u.protocol() === 'http') {
-      u.protocol('https');
+      u = u.protocol('https');
       needToRebuildUrl = true;
     }
     if (processPathWithMultipleLocale(pathArr, locale)) {

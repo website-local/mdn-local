@@ -7,7 +7,8 @@ const log4js = require('log4js');
 const logger = {
   notFound: log4js.getLogger('404-not-found'),
   complete: log4js.getLogger('complete'),
-  error: log4js.getLogger('error')
+  error: log4js.getLogger('error'),
+  skip: log4js.getLogger('skip')
 };
 
 
@@ -49,7 +50,7 @@ class Downloader {
     }
     if (resource instanceof HtmlResource &&
       resource.depth > resource.options.depth) {
-      logger.error.info(`skip ${resource.url} at depth ${resource.depth}`);
+      logger.skip.info(`skip ${resource.url} at depth ${resource.depth}`);
       return false;
     }
     const self = this;
