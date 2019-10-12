@@ -94,12 +94,14 @@ const validExtensionName = {
   'css': 1,
   'gif': 1,
   'jpg': 1,
+  'JPG': 1,
   'jpeg': 1,
   'js': 1,
   'jsm': 1,
   'json': 1,
   'jar': 1,
   'png': 1,
+  'PNG': 1,
   'svg': 1,
   'txt': 1,
   'woff2': 1,
@@ -108,7 +110,10 @@ const validExtensionName = {
   'mp4': 1,
   'flv': 1,
   'm4v': 1,
-  'mkv': 1
+  'mkv': 1,
+  'msi': 1,
+  'xpi': 1,
+  'rdf': 1
 };
 
 
