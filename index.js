@@ -350,6 +350,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       `https://developer.mozilla.org/${locale}/docs/Web/Web_components`,
       `https://developer.mozilla.org/${locale}/docs/Web/MathML`,
       `https://developer.mozilla.org/${locale}/docs/Web`,
+      `https://developer.mozilla.org/${locale}/docs/Mozilla`,
+      `https://developer.mozilla.org/${locale}/docs/Mozilla/Tech`,
       `https://developer.mozilla.org/${locale}/docs/Mozilla/Add-ons/WebExtensions`,
       `https://developer.mozilla.org/${locale}/docs/Learn`,
       `https://developer.mozilla.org/${locale}/docs/Games`,
