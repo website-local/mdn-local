@@ -11,6 +11,14 @@ const logger = {
   skip: log4js.getLogger('skip')
 };
 
+const filterResourceForLogging = (resource) => {
+  if (!resource) return resource;
+  const copy = Object.assign({}, resource);
+  delete copy.body;
+  delete copy.options;
+  delete copy.doc;
+  return copy;
+};
 
 class Downloader {
   constructor(options) {
@@ -122,7 +130,7 @@ class Downloader {
     if (error && error.name === 'HTTPError' && error.statusCode === 404) {
       logger.notFound.error(url, resource.refUrl);
     } else {
-      logger.error.error(error, url, resource);
+      logger.error.error(error, url, filterResourceForLogging(resource));
     }
   }
 
