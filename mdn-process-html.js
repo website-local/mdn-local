@@ -154,7 +154,7 @@ const postProcessJsPolyFill = ($, elem, text) => {
   if (!tempScript || !tempScript.length) return elem.remove();
   src = tempScript.attr('src');
   tempScript.remove();
-  elem.text(text.slice(0, beginIndex) + src + text.slice(endIndex));
+  elem.html(text.slice(0, beginIndex) + src + text.slice(endIndex));
 };
 
 const postProcessHtml = ($) => {
@@ -260,6 +260,7 @@ const preProcessHtml = ($) => {
   $('link[rel="preconnect"]').remove();
   $('link[rel="canonical"]').remove();
   $('link[rel="search"]').remove();
+  $('link[rel="apple-touch-icon-precomposed"]').remove();
   $('a[href$="$translate"]').remove();
   $('a[href$="$edit"]').remove();
   // no script mode ?
