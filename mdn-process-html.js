@@ -142,6 +142,21 @@ ${MOCK_FETCH_JS}
   elem.html(text);
 };
 
+const JS_POLYFILL_CLASS = 'js-polyfill-temp-script';
+const SCRIPT_PREFIX = '<script src="';
+const postProcessJsPolyFill = ($, elem, text) => {
+  let beginIndex = text.indexOf(SCRIPT_PREFIX), tempScript, endIndex, src;
+  if (beginIndex < 1) return elem.remove();
+  beginIndex += SCRIPT_PREFIX.length;
+  endIndex = text.indexOf('"', beginIndex);
+  if (endIndex < 1) return elem.remove();
+  tempScript = $('.' + JS_POLYFILL_CLASS);
+  if (!tempScript || !tempScript.length) return elem.remove();
+  src = tempScript.attr('src');
+  tempScript.remove();
+  elem.text(text.slice(0, beginIndex) + src + text.slice(endIndex));
+};
+
 const postProcessHtml = ($) => {
   $('script').each((index, elem) => {
     let text;
@@ -163,6 +178,9 @@ const postProcessHtml = ($) => {
 .signin-link{ display:none }
 </style>`).appendTo('head');
       return;
+    }
+    if (text.includes('document.write') && text.includes('js-polyfill')) {
+      return postProcessJsPolyFill($, elem, text);
     }
     postProcessMdnAssets(text, $, elem);
   });
@@ -201,6 +219,16 @@ const preProcessMdnAssets = ($, text, assetsData) => {
       }
     }
   }
+};
+
+const preProcessJsPolyFill = ($, text) => {
+  let beginIndex = text.indexOf(SCRIPT_PREFIX), endIndex, src;
+  if (beginIndex < 1) return;
+  beginIndex += SCRIPT_PREFIX.length;
+  endIndex = text.indexOf('"', beginIndex);
+  if (endIndex < 1) return;
+  src = text.slice(beginIndex, endIndex);
+  $('head').append(`<script class="${JS_POLYFILL_CLASS}" src="${src}">`);
 };
 
 const preProcessHtml = ($) => {
@@ -256,7 +284,10 @@ const preProcessHtml = ($) => {
 
       if ((assetsData = extractMdnAssets(text)) &&
         ({assetsData} = assetsData) && assetsData) {
-        preProcessMdnAssets($, text, assetsData);
+        return preProcessMdnAssets($, text, assetsData);
+      }
+      if (text.includes('document.write') && text.includes('js-polyfill')) {
+        preProcessJsPolyFill($, text);
       }
     }
   });
