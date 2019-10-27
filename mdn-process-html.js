@@ -160,12 +160,47 @@ const postProcessHtml = ($) => {
 .newsletter-container,
 .dropdown-container,
 .bc-data .bc-github-link,
-.signin-link{ display:none }`).appendTo('head');
+.signin-link{ display:none }
+</style>`).appendTo('head');
       return;
     }
     postProcessMdnAssets(text, $, elem);
   });
   return $;
+};
+
+const preProcessMdnAssets = ($, text, assetsData) => {
+
+  let head, keys, len, i, key, values, valueLen, j;
+  head = $('head');
+  if (assetsData.js &&
+    (keys = Object.keys(assetsData.js)) &&
+    (len = keys.length)) {
+    for (i = 0; i < len; i++) {
+      if ((key = keys[i]) &&
+        (values = assetsData.js[key]) &&
+        (valueLen = values.length)) {
+        for (j = 0; j < valueLen; j++) {
+          $(`<script class="${TO_REMOVE_CLASS}" src="${values[j]}" defer data-key="${key}"></script>`)
+            .appendTo(head);
+        }
+      }
+    }
+  }
+  if (assetsData.css &&
+    (keys = Object.keys(assetsData.css)) &&
+    (len = keys.length)) {
+    for (i = 0; i < len; i++) {
+      if ((key = keys[i]) &&
+        (values = assetsData.css[key]) &&
+        (valueLen = values.length)) {
+        for (j = 0; j < valueLen; j++) {
+          $(`<link class="${TO_REMOVE_CLASS}" rel="stylesheet" href="${values[j]}" data-key="${key}"/>`)
+            .appendTo(head);
+        }
+      }
+    }
+  }
 };
 
 const preProcessHtml = ($) => {
@@ -206,10 +241,9 @@ const preProcessHtml = ($) => {
   // bcd-signal script, not needed for offline usage
   $('script[src*="react-bcd-signal"]').remove();
   $('script[src*="speedcurve.com"]').remove();
-  let assetsData;
+  let assetsData, text;
 
   $('script').each((index, elem) => {
-    let text, head, keys, len, i, key, values, valueLen, j;
     elem = $(elem);
     if ((text = elem.html())) {
       // google-analytics
@@ -222,35 +256,7 @@ const preProcessHtml = ($) => {
 
       if ((assetsData = extractMdnAssets(text)) &&
         ({assetsData} = assetsData) && assetsData) {
-        head = $('head');
-        if (assetsData.js &&
-          (keys = Object.keys(assetsData.js)) &&
-          (len = keys.length)) {
-          for (i = 0; i < len; i++) {
-            if ((key = keys[i]) &&
-              (values = assetsData.js[key]) &&
-              (valueLen = values.length)) {
-              for (j = 0; j < valueLen; j++) {
-                $(`<script class="${TO_REMOVE_CLASS}" src="${values[j]}" defer data-key="${key}"></script>`)
-                  .appendTo(head);
-              }
-            }
-          }
-        }
-        if (assetsData.css &&
-          (keys = Object.keys(assetsData.css)) &&
-          (len = keys.length)) {
-          for (i = 0; i < len; i++) {
-            if ((key = keys[i]) &&
-              (values = assetsData.css[key]) &&
-              (valueLen = values.length)) {
-              for (j = 0; j < valueLen; j++) {
-                $(`<link class="${TO_REMOVE_CLASS}" rel="stylesheet" href="${values[j]}" data-key="${key}"/>`)
-                  .appendTo(head);
-              }
-            }
-          }
-        }
+        preProcessMdnAssets($, text, assetsData);
       }
     }
   });
