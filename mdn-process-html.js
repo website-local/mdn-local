@@ -203,6 +203,8 @@ const preProcessHtml = ($) => {
   // $('script').remove();
   // 新闻脚本
   $('script[src*="newsletter"]').remove();
+  // bcd-signal script, not needed for offline usage
+  $('script[src*="react-bcd-signal"]').remove();
   $('script[src*="speedcurve.com"]').remove();
   let assetsData;
 
@@ -211,8 +213,13 @@ const preProcessHtml = ($) => {
     elem = $(elem);
     if ((text = elem.html())) {
       // google-analytics
-      if (text.includes('google-analytics')) elem.remove();
-      if (text.includes('mdn.analytics.trackOutboundLinks')) elem.remove();
+      if (text.includes('google-analytics') ||
+        text.includes('mdn.analytics.trackOutboundLinks') ||
+        // fetch polyfill not needed since it's mocked.
+        text.includes('fetch-polyfill')) {
+        return elem.remove();
+      }
+
       if ((assetsData = extractMdnAssets(text)) &&
         ({assetsData} = assetsData) && assetsData) {
         head = $('head');
