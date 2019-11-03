@@ -74,11 +74,16 @@ const PLACE_HOLDER_SUMMARY_HTML = '@#!%$PLACE_HOLDER_SUMMARY_HTML!$#%@';
 // language=JavaScript
 const MOCK_FETCH_JS = `
   // mock fetch to avoid script errors
-  window.fetch = () => Promise.resolve({
-    json: () => Promise.resolve({
-      is_superuser: true, waffle: {flags: {}, samples: {}, switches: {registration_disabled: true}}
-    })
-  });
+  window.fetch = function () {
+    return Promise.resolve({
+      json: function () {
+        return Promise.resolve({
+          is_superuser: true,
+          waffle: {flags: {}, samples: {}, switches: {registration_disabled: true}}
+        });
+      }
+    });
+  };
 `;
 const postProcessReactData = (text, elem) => {
   let jsonStrBeginIndex = text.indexOf(JSON_PARSE_STR),
