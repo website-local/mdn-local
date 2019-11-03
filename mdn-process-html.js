@@ -119,6 +119,9 @@ const postProcessReactData = (text, elem) => {
   if (data.documentData.summary) {
     data.documentData.summary = PLACE_HOLDER_SUMMARY_HTML;
   }
+  if (data.documentData.raw) {
+    data.documentData.raw = PLACE_HOLDER_BODY_HTML;
+  }
   // language=JavaScript
   text = `
 !function() {
