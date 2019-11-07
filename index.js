@@ -253,6 +253,13 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       }
     }
     if (u.is('relative')) {
+      if (url[0] !== '/') {
+        const pathArr1 = url.split('/');
+        if (redirectLocale[pathArr1[0]] || localesMap[pathArr1[1]]) {
+          pathArr1[0] = locale;
+          u = new URI('/' + pathArr1.join('/'));
+        }
+      }
       u = u.absoluteTo(html.url)
         .normalizePath()
         .removeSearch('redirectlocale', 'redirectslug', 'tag', 'language', 'raw', 'section');
@@ -285,6 +292,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     } else if (pathArr[1] === 'zh-CNdocs') {
       pathArr.splice(1, 1, locale, 'docs');
       needToRebuildUrl = true;
+    } else if (pathArr[2] === 'DOM') {
+      pathArr.splice(1, 2, locale, 'docs', 'Web', 'API');
     }
     if (typeof pathArr[1] === 'string' && localeLowerCase === pathArr[1].toLocaleLowerCase()) {
       if (appendDocsWebPath[pathArr[2]]) {
@@ -336,26 +345,27 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     },
     localRoot,
     beginUrl: [
-      `https://developer.mozilla.org/${locale}/docs/Web/API`,
-      `https://developer.mozilla.org/${locale}/docs/Web/CSS/Reference`,
-      `https://developer.mozilla.org/${locale}/docs/Web/JavaScript/Index`,
-      `https://developer.mozilla.org/${locale}/docs/Web/HTML/Index`,
-      `https://developer.mozilla.org/${locale}/docs/Web/HTML/Attributes`,
-      `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element`,
-      `https://developer.mozilla.org/${locale}/docs/Web/HTTP`,
-      `https://developer.mozilla.org/${locale}/docs/Web/Tutorials`,
-      `https://developer.mozilla.org/${locale}/docs/Web/Guide`,
-      `https://developer.mozilla.org/${locale}/docs/Web/Accessibility`,
-      `https://developer.mozilla.org/${locale}/docs/Web/Reference`,
-      `https://developer.mozilla.org/${locale}/docs/Web/Web_components`,
-      `https://developer.mozilla.org/${locale}/docs/Web/MathML`,
-      `https://developer.mozilla.org/${locale}/docs/Web`,
-      `https://developer.mozilla.org/${locale}/docs/Mozilla`,
-      `https://developer.mozilla.org/${locale}/docs/Mozilla/Tech`,
-      `https://developer.mozilla.org/${locale}/docs/Mozilla/Add-ons/WebExtensions`,
-      `https://developer.mozilla.org/${locale}/docs/Learn`,
-      `https://developer.mozilla.org/${locale}/docs/Games`,
-      `https://developer.mozilla.org/${locale}/docs/Glossary`
+      'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL/Attribute'
+      // `https://developer.mozilla.org/${locale}/docs/Web/API`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/CSS/Reference`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/JavaScript/Index`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/HTML/Index`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/HTML/Attributes`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/HTTP`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/Tutorials`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/Guide`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/Accessibility`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/Reference`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/Web_components`,
+      // `https://developer.mozilla.org/${locale}/docs/Web/MathML`,
+      // `https://developer.mozilla.org/${locale}/docs/Web`,
+      // `https://developer.mozilla.org/${locale}/docs/Mozilla`,
+      // `https://developer.mozilla.org/${locale}/docs/Mozilla/Tech`,
+      // `https://developer.mozilla.org/${locale}/docs/Mozilla/Add-ons/WebExtensions`,
+      // `https://developer.mozilla.org/${locale}/docs/Learn`,
+      // `https://developer.mozilla.org/${locale}/docs/Games`,
+      // `https://developer.mozilla.org/${locale}/docs/Glossary`
     ],
     detectLinkType,
     redirectFilterFunc,
