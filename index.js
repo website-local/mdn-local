@@ -1,6 +1,7 @@
 const URI = require('urijs');
 const errorLogger = require('log4js').getLogger('error');
 
+const {cookieJar} = require('./link');
 const Downloader = require('./downloader');
 const {preProcessHtml, postProcessHtml} = require('./mdn-process-html');
 const configureLogger = require('./logger-config');
@@ -374,7 +375,11 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     linkRedirectFunc,
     skipProcessFunc
   }, options));
-  d.start();
+
+  cookieJar.setCookie(
+    'django_language=' + locale,
+    'https://developer.mozilla.org',
+    () => d.start());
 
   return d;
 };

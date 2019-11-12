@@ -428,6 +428,7 @@ class CssResource extends Resource {
   }
 }
 
+module.exports.cookieJar = cookieJar;
 module.exports.Resource = Resource;
 module.exports.HtmlResource = HtmlResource;
 module.exports.CssResource = CssResource;
