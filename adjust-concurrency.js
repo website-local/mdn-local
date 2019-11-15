@@ -32,7 +32,8 @@ const adjust = (downloader) => {
     concurrency -= 4;
   }
   downloader.queue.concurrency = Math.max(1, concurrency);
-  logger.info('concurrency', downloader.queue.concurrency);
+  logger.info('concurrency', downloader.queue.concurrency,
+    'queue size:', downloader.queue.size);
 };
 
 module.exports = adjust;
