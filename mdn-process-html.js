@@ -219,6 +219,92 @@ const postProcessHtml = ($) => {
   return $;
 };
 
+const preProcessRemoveCompatibilityTableWarning = ($) => {
+  let i = 0,
+    result = $('.blockIndicator.warning'),
+    len = result.length,
+    item,
+    html,
+    hasCompatibilityTableWarning = false;
+  for (; i < len; i++) {
+    item = $(result[i]);
+    html = item.html();
+    if (html && html.includes('https://github.com/mdn/browser-compat-data')) {
+      item.remove();
+      hasCompatibilityTableWarning = true;
+    }
+  }
+  if (hasCompatibilityTableWarning) {
+    // add workaround event handler
+    // implemented with pure js
+    $(`<script class="old-compatibility-table">
+'use strict';
+!function () {
+  var htabs = document.getElementsByClassName('htab'),
+    desktops = document.querySelectorAll('div[id=compat-desktop]'),
+    mobiles = document.querySelectorAll('div[id=compat-mobile]'),
+    len = htabs.length,
+    i, j, htab, links, a;
+  function changeTabListener(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    var li, ul, i, index, selfIndex, elems, tab;
+    if (!(li = this.parentNode)) return false;
+    if ((ul = li.parentNode)) {
+      index = 0;
+      elems = ul.childNodes;
+      for (i = 0; i < elems.length; i++) {
+        if (elems[i].tagName !== 'LI') {
+          continue;
+        }
+        if (elems[i] === li) {
+          selfIndex = index;
+          elems[i].classList.add('selected');
+        } else {
+          elems[i].classList.remove('selected');
+        }
+        ++index;
+      }
+    }
+    if ((tab = ul.parentNode)) {
+      index = 0;
+      elems = tab.childNodes;
+      for (i = 0; i < elems.length; i++) {
+        if (elems[i].tagName !== 'DIV') {
+          continue;
+        }
+        if (index++ === selfIndex) {
+          elems[i].style.display = '';
+        } else {
+          elems[i].style.display = 'none';
+        }
+      }
+    }
+  }
+  for (i = 0; i < len; i++) {
+    htab = htabs[i];
+    links = htab.querySelectorAll('ul>li>a');
+    if (desktops[i]) {
+      htab.appendChild(desktops[i]);
+    }
+    if (mobiles[i]) {
+      htab.appendChild(mobiles[i]);
+    }
+    for (j = 0; j < links.length; j++) {
+      a = links[j];
+      a.addEventListener('click', changeTabListener);
+      if (j === 0) {
+        changeTabListener.call(a);
+      }
+    }
+  }
+}();
+</script>`).appendTo('body');
+  }
+};
+
 const preProcessMdnAssets = ($, text, assetsData) => {
 
   let head, keys, len, i, key, values, valueLen, j;
@@ -345,6 +431,8 @@ const preProcessHtml = ($) => {
 <div id="nav-main-search"></div>
 <div id="main-q"></div>
 </div>`).appendTo('#main-header');
+  // We're converting our compatibility data into a machine-readable JSON format.
+  preProcessRemoveCompatibilityTableWarning($);
   return $;
 };
 
