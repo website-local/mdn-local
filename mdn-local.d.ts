@@ -114,3 +114,7 @@ declare class HtmlResource extends Resource {
 declare class CssResource extends Resource {
     urls?: string[];
 }
+
+declare class SiteMapResource extends Resource {
+
+}
