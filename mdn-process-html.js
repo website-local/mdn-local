@@ -87,7 +87,7 @@ const MOCK_FETCH_JS = `
 `;
 const postProcessReactData = (text, elem) => {
   let jsonStrBeginIndex = text.indexOf(JSON_PARSE_STR),
-    jsonStrEndIndex, escapedJsonText, jsonText, data;
+    jsonStrEndIndex, escapedJsonText, jsonText, data, stringCatalog, key;
   if (jsonStrBeginIndex < 1 ||
     jsonStrBeginIndex + JSON_PARSE_STR.length > text.length) {
     return;
@@ -107,25 +107,49 @@ const postProcessReactData = (text, elem) => {
   if (!data) {
     return;
   }
-  if (!data.documentData) {
-    elem.html(MOCK_FETCH_JS + text);
-    return;
+  if (data.documentData) {
+    data.documentData.translations = [];
+    if (data.documentData.bodyHTML) {
+      data.documentData.bodyHTML = PLACE_HOLDER_BODY_HTML;
+    }
+    if (data.documentData.quickLinksHTML) {
+      data.documentData.quickLinksHTML = PLACE_HOLDER_QUICK_HTML;
+    }
+    if (data.documentData.tocHTML) {
+      data.documentData.tocHTML = PLACE_HOLDER_TOC_HTML;
+    }
+    if (data.documentData.summary) {
+      data.documentData.summary = PLACE_HOLDER_SUMMARY_HTML;
+    }
+    if (data.documentData.raw) {
+      // not needed in pages
+      data.documentData.raw = '';
+    }
+    // remove the generated translate sign
+    if (data.documentData.translateURL) {
+      data.documentData.translateURL = '';
+    }
+    if (data.locale && data.documentData.locale) {
+      data.documentData.locale = data.locale;
+    }
   }
-  data.documentData.translations = [];
-  if (data.documentData.bodyHTML) {
-    data.documentData.bodyHTML = PLACE_HOLDER_BODY_HTML;
-  }
-  if (data.documentData.quickLinksHTML) {
-    data.documentData.quickLinksHTML = PLACE_HOLDER_QUICK_HTML;
-  }
-  if (data.documentData.tocHTML) {
-    data.documentData.tocHTML = PLACE_HOLDER_TOC_HTML;
-  }
-  if (data.documentData.summary) {
-    data.documentData.summary = PLACE_HOLDER_SUMMARY_HTML;
-  }
-  if (data.documentData.raw) {
-    data.documentData.raw = PLACE_HOLDER_BODY_HTML;
+  if ((stringCatalog = data.stringCatalog)) {
+    for (key in stringCatalog) {
+      // noinspection JSUnfilteredForInLoop
+      if (key.includes('<') ||
+        // Invalid or unexpected token
+        key.includes('>') ||
+        // useless items for local version
+        key.startsWith('Our goal is to provide accurate') ||
+        key.startsWith('Publishing failed.') ||
+        key.startsWith('Would you answer 4 questions for us') ||
+        key.startsWith('I’m okay with Mozilla') ||
+        key.startsWith('A newer version of this article') ||
+        key.startsWith('Our team will review your report.')) {
+        // noinspection JSUnfilteredForInLoop
+        delete stringCatalog[key];
+      }
+    }
   }
   // language=JavaScript
   text = `
@@ -244,6 +268,7 @@ const preProcessHtml = ($) => {
   $('.bc-github-link').remove();
   $('.hidden').remove();
   $('meta[name^="twitter"]').remove();
+  $('meta[name^="og"]').remove();
   // 顶部提示
   $('.global-notice').remove();
   // 页脚
@@ -286,6 +311,7 @@ const preProcessHtml = ($) => {
       // google-analytics
       if (text.includes('google-analytics') ||
         text.includes('mdn.analytics.trackOutboundLinks') ||
+        text.includes('LUX=') ||
         // fetch polyfill not needed since it's mocked.
         text.includes('fetch-polyfill')) {
         return elem.remove();
