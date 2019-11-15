@@ -127,6 +127,9 @@ const hardCodedRedirectUrl = require('./redirect-url');
  * @param {Cheerio} element
  */
 const skipProcessFunc = (url, element) => {
+  if (url.startsWith('/')) {
+    return false;
+  }
   return url.startsWith('#') || element.hasClass('external-icon') || element.hasClass('external');
 };
 
@@ -365,7 +368,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       `https://developer.mozilla.org/${locale}/docs/Mozilla/Add-ons/WebExtensions`,
       `https://developer.mozilla.org/${locale}/docs/Learn`,
       `https://developer.mozilla.org/${locale}/docs/Games`,
-      `https://developer.mozilla.org/${locale}/docs/Glossary`
+      `https://developer.mozilla.org/${locale}/docs/Glossary`,
+      `https://developer.mozilla.org/sitemaps/${locale}/sitemap.xml`
     ],
     detectLinkType,
     redirectFilterFunc,

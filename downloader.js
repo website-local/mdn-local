@@ -1,5 +1,6 @@
-const {Resource, HtmlResource, CssResource} = require('./link');
+const {Resource, HtmlResource, CssResource, SiteMapResource} = require('./link');
 const processCss = require('./process-css');
+const processSiteMap = require('./process-site-map');
 const Queue = require('p-queue');
 const process = require('./process');
 const defaultOptions = require('./options');
@@ -20,6 +21,9 @@ const filterResourceForLogging = (resource) => {
   return copy;
 };
 
+const isSiteMap = (url) => url && url.includes('/sitemaps/') &&
+  (url.endsWith('sitemap.xml') || url.endsWith('sitemap_other.xml'));
+
 class Downloader {
   constructor(options) {
     const headers = options && options.req && options.req.headers;
@@ -35,15 +39,26 @@ class Downloader {
     this.queuedLinks = {};
     this.downloadedLinks = {};
     this.failedLinks = {};
+    let url = '';
     if (options.beginUrl && options.localRoot) {
       if (Array.isArray(options.beginUrl)) {
         for (let i = 0; i < options.beginUrl.length; i++) {
+          if ((url = options.beginUrl[i]) && isSiteMap(url)) {
+            this.add(new SiteMapResource(
+              options.beginUrl[i], options.localRoot, options.beginUrl[i], options));
+            continue;
+          }
           this.add(new HtmlResource(
             options.beginUrl[i], options.localRoot, options.beginUrl[i], options));
         }
       } else {
-        this.add(new HtmlResource(
-          options.beginUrl, options.localRoot, options.beginUrl, options));
+        if ((url = options.beginUrl) && isSiteMap(url)) {
+          this.add(new SiteMapResource(
+            options.beginUrl, options.localRoot, options.beginUrl, options));
+        } else {
+          this.add(new HtmlResource(
+            options.beginUrl, options.localRoot, options.beginUrl, options));
+        }
       }
     }
   }
@@ -93,6 +108,11 @@ class Downloader {
         try {
           if (resource instanceof CssResource) {
             const resArr = await processCss(resource);
+            for (const res of resArr) {
+              self.add(res);
+            }
+          } else if (resource instanceof SiteMapResource) {
+            const resArr = await processSiteMap(resource);
             for (const res of resArr) {
               self.add(res);
             }

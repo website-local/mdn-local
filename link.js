@@ -428,7 +428,18 @@ class CssResource extends Resource {
   }
 }
 
+class SiteMapResource extends Resource {
+  constructor(url, localRoot, refUrl, options = {}) {
+    super(url, localRoot, refUrl, options);
+    /**
+     * @type {string|null}
+     */
+    this.encoding = this.options.encoding.html;
+  }
+}
+
 module.exports.cookieJar = cookieJar;
 module.exports.Resource = Resource;
 module.exports.HtmlResource = HtmlResource;
 module.exports.CssResource = CssResource;
+module.exports.SiteMapResource = SiteMapResource;
