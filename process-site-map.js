@@ -22,12 +22,25 @@ const processSiteMap = async (siteMap) => {
       urls.push(url);
     }
   });
-  return urls.map(url => {
+  const htmlArr = [];
+  for (let url of urls) {
+
+    if (siteMap.options.linkRedirectFunc) {
+      url = siteMap.options.linkRedirectFunc(url, null, siteMap);
+    }
+    if (!url || (siteMap.options.skipProcessFunc &&
+      siteMap.options.skipProcessFunc(url, null))) {
+      continue;
+    }
     let htmlResource = new HtmlResource(url,
       siteMap.localRoot, siteMap.refUrl, siteMap.options);
     htmlResource.depth = depth;
-    return htmlResource;
-  });
+    if (!(typeof siteMap.options.dropResourceFunc === 'function' &&
+      siteMap.options.dropResourceFunc(htmlResource))) {
+      htmlArr.push(htmlResource);
+    }
+  }
+  return htmlArr;
 };
 
 module.exports = processSiteMap;
