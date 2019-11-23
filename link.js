@@ -204,7 +204,7 @@ class Link {
         this.redirectedUrl = res.url;
         return this.body = res.body;
       } else {
-        console.warn(res);
+        logger.error.warn(res);
         throw new TypeError('Empty response body: ' + downloadLink);
       }
     }
@@ -340,14 +340,14 @@ class HtmlResource extends Resource {
     let body = await super.fetch();
     if (this.options.detectIncompleteHtml && typeof this.body === 'string') {
       if (!body.includes(this.options.detectIncompleteHtml)) {
-        console.info('Detected incomplete html, try again', this._downloadLink);
+        logger.error.info('Detected incomplete html, try again', this._downloadLink);
         this.body = null;
         this.doc = null;
         body = await super.fetch();
       }
       // probably more retries here?
       if (!body.includes(this.options.detectIncompleteHtml)) {
-        console.warn('Detected incomplete html twice', this._downloadLink);
+        logger.error.warn('Detected incomplete html twice', this._downloadLink);
       }
     }
     this.finishTimestamp = Date.now();
