@@ -278,14 +278,14 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       }
       u = u.absoluteTo(html.url)
         .normalizePath()
-        .removeSearch('redirectlocale', 'redirectslug', 'tag', 'language', 'raw', 'section');
+        .removeSearch('redirectlocale', 'redirectslug', 'tag', 'language', 'raw', 'section', 'size');
       needToRebuildUrl = true;
     }
     const pathArr = u.path()
       .replace('en-\n\nUS', 'en-US')
       .split('/');
     if (!pathArr || !pathArr[1]) {
-      return url;
+      return needToRebuildUrl ? u.toString() : url;
     }
     if (u.protocol() === 'http') {
       u = u.protocol('https');
