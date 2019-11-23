@@ -227,7 +227,9 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       path.endsWith('%24history') ||
       path.endsWith('%24edit') ||
       path.endsWith('%24translate') ||
-      path.match('/users/github/login') || path.match('/users/signin') ||
+      path.match('/users/github/login') ||
+      path.match('/users/signin') ||
+      (path.includes('/profiles/') && path.endsWith('/edit')) ||
       dir.endsWith('/profiles');
   };
 
@@ -276,9 +278,11 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
           u = new URI('/' + pathArr1.join('/'));
         }
       }
-      u = u.absoluteTo(html.url)
-        .normalizePath()
-        .removeSearch('redirectlocale', 'redirectslug', 'tag', 'language', 'raw', 'section', 'size');
+      u = u
+        .removeSearch('redirectlocale', 'redirectslug', 'tag', 'language', 'raw', 'section', 'size')
+        .search('')
+        .absoluteTo(html.url)
+        .normalizePath();
       needToRebuildUrl = true;
     }
     const pathArr = u.path()
