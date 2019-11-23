@@ -232,9 +232,14 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   };
 
   const redirectFilterFunc = (url, res) => {
-    const uri = new URI(url), host = uri.host();
+    let uri = new URI(url), host = uri.host();
     if (host === 'mdn.mozillademos.org') {
       return uri.host('developer.mozilla.org').toString();
+    }
+    if (host === 'wiki.developer.mozilla.org') {
+      uri = uri.host('developer.mozilla.org');
+      host = uri.host();
+      url = uri.toString();
     }
     if (host !== 'developer.mozilla.org') {
       return res.url;
@@ -254,6 +259,9 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     if ((host = u.host()) && host !== 'developer.mozilla.org') {
       if (host === 'mdn.mozillademos.org') {
         // should be automatically redirected back
+        u = u.host('developer.mozilla.org');
+        needToRebuildUrl = true;
+      } else if (host === 'wiki.developer.mozilla.org') {
         u = u.host('developer.mozilla.org');
         needToRebuildUrl = true;
       } else {
