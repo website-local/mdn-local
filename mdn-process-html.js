@@ -234,10 +234,12 @@ const preProcessRemoveCompatibilityTableWarning = ($) => {
       hasCompatibilityTableWarning = true;
     }
   }
-  if (hasCompatibilityTableWarning) {
-    // add workaround event handler
-    // implemented with pure js
-    $(`<script class="old-compatibility-table">
+  if (!hasCompatibilityTableWarning) {
+    return;
+  }
+  // add workaround event handler
+  // implemented with pure js
+  $(`<script class="old-compatibility-table">
 'use strict';
 !function () {
   var htabs = document.getElementsByClassName('htab'),
@@ -302,7 +304,19 @@ const preProcessRemoveCompatibilityTableWarning = ($) => {
   }
 }();
 </script>`).appendTo('body');
+};
+
+const preProcessAddIconToExternalLinks =($) => {
+  if ($('script[src*="build/js/wiki"]').length) {
+    return;
   }
+  // original script form developer.mozilla.org/static/build/js/wiki.62ddb187a9d0.js
+  $('.external').each(function() {
+    let $link = $(this);
+    if (!$link.find('img').length) {
+      $link.addClass('external-icon');
+    }
+  });
 };
 
 const preProcessMdnAssets = ($, text, assetsData) => {
@@ -317,7 +331,9 @@ const preProcessMdnAssets = ($, text, assetsData) => {
         (values = assetsData.js[key]) &&
         (valueLen = values.length)) {
         for (j = 0; j < valueLen; j++) {
-          $(`<script class="${TO_REMOVE_CLASS}" src="${values[j]}" defer data-key="${key}"></script>`)
+          $(`<script class="${TO_REMOVE_CLASS}" src="${
+            values[j]
+          }" defer data-key="${key}"></script>`)
             .appendTo(head);
         }
       }
@@ -331,7 +347,9 @@ const preProcessMdnAssets = ($, text, assetsData) => {
         (values = assetsData.css[key]) &&
         (valueLen = values.length)) {
         for (j = 0; j < valueLen; j++) {
-          $(`<link class="${TO_REMOVE_CLASS}" rel="stylesheet" href="${values[j]}" data-key="${key}"/>`)
+          $(`<link class="${TO_REMOVE_CLASS}" rel="stylesheet" href="${
+            values[j]
+          }" data-key="${key}"/>`)
             .appendTo(head);
         }
       }
@@ -355,6 +373,7 @@ const preProcessHtml = ($) => {
   $('.hidden').remove();
   $('meta[name^="twitter"]').remove();
   $('meta[name^="og"]').remove();
+  $('.mdn-wiki-notice').remove();
   // 顶部提示
   $('.global-notice').remove();
   // 页脚
@@ -433,6 +452,8 @@ const preProcessHtml = ($) => {
 </div>`).appendTo('#main-header');
   // We're converting our compatibility data into a machine-readable JSON format.
   preProcessRemoveCompatibilityTableWarning($);
+  // Add icon to external links for new ui
+  preProcessAddIconToExternalLinks($);
   return $;
 };
 
