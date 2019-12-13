@@ -399,7 +399,7 @@ class HtmlResource extends Resource {
       this.redirectedUrl = this.options.redirectFilterFunc(this.redirectedUrl, this);
     }
     if (this.redirectedUrl && this.url !== this.redirectedUrl) {
-      ret = await this._save(true);
+      await this._save(true);
       this.url = this.redirectedUrl;
       ret = await this._save();
     } else {
