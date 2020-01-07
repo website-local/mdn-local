@@ -1,7 +1,9 @@
 import URI from 'urijs'
 import * as got from "got";
-import {Cheerio, CheerioStatic} from "cheerio";
+import * as cheerio from "cheerio";
 
+type CheerioStatic = ReturnType<typeof cheerio.load>;
+type Cheerio = ReturnType<CheerioStatic>;
 
 interface Options {
     beginUrl: string | string[];
