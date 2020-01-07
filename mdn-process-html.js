@@ -167,7 +167,10 @@ const postProcessReactData = (text, elem) => {
     .replace(`"${PLACE_HOLDER_SUMMARY_HTML}"`,
       '_mdn_local_summary && _mdn_local_summary.innerHTML')
     .replace(`"${PLACE_HOLDER_TOC_HTML}"`,
-      '_mdn_local_toc && _mdn_local_toc.innerHTML')};
+      '_mdn_local_toc && _mdn_local_toc.innerHTML')
+    // escape html for js
+    .replace(/</g, '\\x3c')
+    .replace(/>/g, '\\x3e')};
 ${MOCK_FETCH_JS}
 }();
   `.trim();
@@ -370,7 +373,7 @@ const preProcessJsPolyFill = ($, text) => {
 
 /**
  *
- * @param {Cheerio} $
+ * @param {CheerioStatic} $
  */
 const preProcessHtml = ($) => {
   $('.bc-github-link').remove();
