@@ -203,6 +203,7 @@ const postProcessHtml = ($) => {
       $(`<style>
 #nav-footer,
 .contributors-sub,
+.overheadIndicator.translationInProgress,
 #nav-main-search,
 .newsletter-container,
 .dropdown-container,
@@ -367,8 +368,11 @@ const preProcessJsPolyFill = ($, text) => {
   $('head').append(`<script class="${JS_POLYFILL_CLASS}" src="${src}">`);
 };
 
+/**
+ *
+ * @param {Cheerio} $
+ */
 const preProcessHtml = ($) => {
-  $('bdi').parent().parent().remove();
   $('.bc-github-link').remove();
   $('.hidden').remove();
   $('meta[name^="twitter"]').remove();
@@ -436,7 +440,7 @@ const preProcessHtml = ($) => {
   // 底部弹出
   $('#contribution-popover-container').remove();
   // 正在翻译
-  $('.overheadIndicator.translationInProgress').remove();
+  $('.translationInProgress').remove();
   // 我们的志愿者还没有将这篇文章翻译
   $('#doc-pending-fallback').remove();
   // TODO: 处理iframe
