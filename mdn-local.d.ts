@@ -26,6 +26,7 @@ interface Options {
     onError?: Function;
     detectIncompleteHtml?: '</html>' | '</body>' | string;
     adjustConcurrencyPeriod: number;
+
     adjustConcurrencyFunc?(downloader: any): void;
 }
 
@@ -119,4 +120,53 @@ declare class CssResource extends Resource {
 
 declare class SiteMapResource extends Resource {
 
+}
+
+declare interface MdnReactData {
+    locale?: string;
+    pluralExpression?: string | number;
+    url?: string;
+    stringCatalog?: {
+        [k: string]: string | string[]
+    };
+    documentData?: {
+        absoluteURL?: string;
+        bodyHTML?: string;
+        enSlug?: string;
+        hrefLang?: string;
+        id?: number | string;
+        language?: string;
+        lastModified?: string;
+        locale?: string;
+        parents?: {
+            url: string;
+            title: string;
+        }[];
+        quickLinksHTML?: string;
+        raw?: string;
+        slug?: string;
+        summary?: string;
+        title?: string;
+        tocHTML?: string;
+        translateURL?: null | any;
+        translationStatus?: null | any;
+        translations: {
+            hrefLang?: string;
+            language?: string;
+            locale?: string;
+            localizedLanguage?: string;
+            title?: string;
+            url?: string;
+        }[];
+        wikiURL?: string;
+    }
+}
+
+declare interface MdnAssets {
+    css?: {
+        [k: string]: string[];
+    };
+    js?: {
+        [k: string]: string[];
+    };
 }

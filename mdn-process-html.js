@@ -33,6 +33,7 @@ const postProcessMdnAssets = (text, $, elem) => {
     assetsData.assetsEndIndex > assetsData.assetsBeginIndex)) {
     return;
   }
+  /** @type MdnAssets */
   assetsBody = {
     js: {},
     css: {}
@@ -100,7 +101,7 @@ const postProcessReactData = (text, elem) => {
   }
   try {
     jsonText = JSON.parse(escapedJsonText);
-    data = JSON.parse(jsonText);
+    data = /** @type MdnReactData */ JSON.parse(jsonText);
   } catch (e) {
     errorLogger.warn('postProcessReactData: json parse fail', e);
   }
