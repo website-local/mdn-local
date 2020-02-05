@@ -387,8 +387,11 @@ const preProcessHtml = ($) => {
   // 页脚
   $('#nav-footer').remove();
   // 新闻盒子
+  $('.home-callouts').remove();
   $('.newsletter-box').remove();
   $('.newsletter-container').remove();
+  // Hacks Blog
+  $('.column-hacks').remove();
   // 顶部登录
   $('#toolbox').remove();
   // 顶部语言、编辑、历史记录
