@@ -191,6 +191,26 @@ const processPathWithMultipleLocale = (pathArr, locale) => {
   }
 };
 
+/** @type {RequestRedirectFunc} */
+const requestRedirectFunc = (url, res) => {
+  let uri, path;
+  if (res && (uri = new URI(url)) &&
+    uri.host() === 'developer.mozilla.org' &&
+    (path = uri.path())) {
+    if (path.includes('/docs/') &&
+      path.includes('$samples/') &&
+      uri.search().includes('revision=')) {
+      // probably example iframe
+      return uri.search('').host('mdn.mozillademos.org').toString();
+    }
+    if (path.startsWith('/files/') && path.match(/^\/files\/\d+\//i)) {
+      // static files
+      return uri.search('').host('mdn.mozillademos.org').toString();
+    }
+  }
+  return url;
+};
+
 const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   if (!localesMap[locale]) {
     throw new TypeError('locale not exists');
@@ -216,8 +236,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       path === '/presentations/screencasts/jresig-digg-firebug-jquery.mp4' ||
       testLocaleRegExp.test(path) ||
       path.startsWith('/search') ||
-      path.startsWith('/zh-CN/search') ||
-      path.startsWith('zh-CN/search') ||
+      path.startsWith(`/${locale}/search`) ||
+      path.startsWith(locale + '/search') ||
       path.startsWith('search') ||
       path.endsWith('$history') ||
       path.endsWith('$samples') ||
@@ -340,25 +360,6 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     }
     return url;
   };
-  /** @type {RequestRedirectFunc} */
-  const requestRedirectFunc = (url, res) => {
-    let uri, path;
-    if (res && (uri = new URI(url)) &&
-      uri.host() === 'developer.mozilla.org' &&
-      (path = uri.path())) {
-      if (path.includes('/docs/') &&
-        path.includes('$samples/') &&
-        uri.search().includes('revision=')) {
-        // probably example iframe
-        return uri.search('').host('mdn.mozillademos.org').toString();
-      }
-      if (path.startsWith('/files/') && path.match(/^\/files\/\d+\//i)) {
-        // static files
-        return uri.search('').host('mdn.mozillademos.org').toString();
-      }
-    }
-    return url;
-  };
   if (!options.req) {
     options.req = {};
   }
@@ -367,6 +368,12 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   }
   if (!options.req.hooks.beforeRedirect) {
     options.req.hooks.beforeRedirect = [];
+  }
+  if (!options.req.headers) {
+    options.req.headers = {};
+  }
+  if (!options.req.headers['accept-language']) {
+    options.req.headers['accept-language'] = locale;
   }
   options.req.hooks.beforeRedirect.push(function (options) {
     const {pathname} = options.url, pathArr = pathname.split('/');
@@ -378,11 +385,6 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   });
   const d = new Downloader(Object.assign({
     depth: 8,
-    req: {
-      headers: {
-        'accept-language': locale
-      },
-    },
     localRoot,
     beginUrl: [
       `https://developer.mozilla.org/${locale}/docs/Web/API`,
