@@ -416,9 +416,13 @@ const preProcessHtml = ($) => {
   // $('script').remove();
   // 新闻脚本
   $('script[src*="newsletter"]').remove();
+  $('script[src*="auth-modal."]').remove();
+  $('script[src*="perf."]').remove();
   // bcd-signal script, not needed for offline usage
   $('script[src*="react-bcd-signal"]').remove();
   $('script[src*="speedcurve.com"]').remove();
+  // google-analytics
+  $('script[src*="google-analytics.com"]').remove();
   let assetsData, text;
 
   $('script').each((index, elem) => {
@@ -427,6 +431,7 @@ const preProcessHtml = ($) => {
       // google-analytics
       if (text.includes('google-analytics') ||
         text.includes('mdn.analytics.trackOutboundLinks') ||
+        text.includes('Mozilla.dntEnabled()') ||
         text.includes('LUX=') ||
         // fetch polyfill not needed since it's mocked.
         text.includes('fetch-polyfill')) {

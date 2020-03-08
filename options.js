@@ -1,7 +1,39 @@
 const adjust = require('./adjust-concurrency');
+
+const MAX_RETRY = 20;
+const MAX_RETRY_DELAY = 5000;
+/**
+ * @type {Options}
+ */
 const defaultOptions = {
   req: {
-    retry : 20,
+    retry: {
+      limit: MAX_RETRY,
+      calculateDelay: ({attemptCount, retryOptions, error}) => {
+        if (attemptCount > retryOptions.limit) {
+          return 0;
+        }
+
+        const hasMethod = retryOptions.methods.has(error.options.method);
+        const hasErrorCode = Reflect.has(error, 'code') &&
+          retryOptions.errorCodes.has((error).code);
+        const hasStatusCode = Reflect.has(error, 'response') &&
+          retryOptions.statusCodes.has((error).response.statusCode );
+        if (!hasMethod || (!hasErrorCode && !hasStatusCode)) {
+          return 0;
+        }
+
+        let delay = ((2 * (attemptCount - 1)) * 1000) + Math.random() * 200;
+        if (attemptCount > 2) {
+          delay += 1000;
+        }
+        if (delay > MAX_RETRY_DELAY) {
+          delay = MAX_RETRY_DELAY + (Math.random() - 0.5) * 1000;
+        }
+        delay |= 0;
+        return delay;
+      }
+    },
     headers: {
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
         '(KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',

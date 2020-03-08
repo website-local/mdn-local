@@ -350,11 +350,12 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     options.req.hooks.beforeRedirect = [];
   }
   options.req.hooks.beforeRedirect.push(function (options) {
-    const {path} = options, pathArr = path.split('/');
+    const {pathname} = options.url, pathArr = pathname.split('/');
     if (pathArr && redirectLocale[pathArr[1]]) {
       pathArr[1] = locale;
-      options.path = pathArr.join('/');
+      options.url.pathname = pathArr.join('/');
     }
+    options.url.search = '';
   });
   const d = new Downloader(Object.assign({
     depth: 8,

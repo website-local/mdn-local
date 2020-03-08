@@ -15,8 +15,6 @@ const logger = {
 const defaultOptions = require('./options');
 const forbiddenChar = /([:*?"<>|]|%3A|%2A|%3F|%22|%3C|%3E|%7C)+/ig;
 
-const MAX_RETRY = 20;
-const MAX_RETRY_DELAY = 5000;
 
 const cookieJar = new CookieJar();
 const cacheUri = {};
@@ -25,42 +23,16 @@ const escapePath = str => str && str.replace(forbiddenChar, '_');
 /**
  *
  * @param {string} url
- * @param {got.GotBodyOptions} opts
- * @return {got.GotPromise<any>}
+ * @param {got.Options} opts
+ * @return {Promise<any>}
  */
 const get = got.extend({cookieJar, hooks: {
   beforeRetry: [
     (options, error, retryCount) => {
-      options.retry.retries = function hackRetryDelay(iteration, error) {
-        if (iteration > MAX_RETRY) {
-          return 0;
-        }
-
-        if ((!error ||
-        !options.retry.errorCodes.has(error.code)) &&
-        (!options.retry.methods.has(error.method) ||
-          !options.retry.statusCodes.has(error.statusCode))) {
-          return 0;
-        }
-
-        let delay = ((2 * (iteration - 1)) * 1000) + Math.random() * 200;
-        if (iteration > 2) {
-          delay += 1000;
-        }
-        if (delay > MAX_RETRY_DELAY) {
-          delay = MAX_RETRY_DELAY + (Math.random() - 0.5) * 1000;
-        }
-        delay |= 0;
-        return delay;
-      };
       (retryCount > 1 ? logger.retry.warn : logger.retry.info)
         .call(logger.retry,'retry: ', error.url, error.code, retryCount);
     }
   ]
-}, headers: {
-  'user-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) ' +
-    'AppleWebKit/537.36 (KHTML, like Gecko) ' +
-    'Chrome/53.0.2785.143 Safari/537.36'
 }});
 
 const mkdirRetry = (dir) => {
@@ -183,7 +155,11 @@ class Link {
         this.options.requestRedirectFunc(this._downloadLink, this);
     }
     const downloadLink = encodeURI(decodeURI(this._downloadLink));
-    const reqOptions = Object.assign({}, this.options.req, {encoding: this.encoding});
+    const reqOptions = Object.assign({}, this.options.req);
+    if (this.encoding) {
+      reqOptions.encoding = this.encoding;
+      reqOptions.responseType = 'text';
+    }
     if (this.refUrl && this.refUrl !== downloadLink) {
       const headers = Object.assign({}, reqOptions.headers);
       headers.referer = this.refUrl;

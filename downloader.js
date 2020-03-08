@@ -147,7 +147,8 @@ class Downloader {
         logger.error.error('save resource fail', resource.url, err));
     }
     this.failedLinks[url] = 1;
-    if (error && error.name === 'HTTPError' && error.statusCode === 404) {
+    if (error && error.name === 'HTTPError' &&
+      error.response && error.response.statusCode === 404) {
       logger.notFound.error(url, resource.refUrl);
     } else {
       logger.error.error(error, url, filterResourceForLogging(resource));

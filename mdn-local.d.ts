@@ -10,7 +10,7 @@ interface Options {
     localRoot: string;
     depth?: number;
     concurrency?: number;
-    req?: got.GotBodyOptions;
+    req?: got.Options;
     encoding?: Encoding;
     urlFilter?: UrlFilterFunc;
     cacheUri?: boolean;
