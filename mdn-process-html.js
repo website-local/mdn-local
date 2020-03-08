@@ -375,10 +375,13 @@ const preProcessJsPolyFill = ($, text) => {
 /**
  *
  * @param {CheerioStatic} $
+ * @param {HtmlResource} html
  */
-const preProcessHtml = ($) => {
+const preProcessHtml = ($, html) => {
   $('.bc-github-link').remove();
-  $('.hidden').remove();
+  if (!html.uri.path().startsWith('/interactive-examples/')) {
+    $('.hidden').remove();
+  }
   $('meta[name^="twitter"]').remove();
   $('meta[name^="og"]').remove();
   $('.mdn-wiki-notice').remove();

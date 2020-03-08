@@ -125,13 +125,25 @@ const hardCodedRedirectUrl = require('./redirect-url');
  *
  * @param {string} url
  * @param {Cheerio} element
+ * @param {HtmlResource} parent
  */
 const skipProcessFunc = (url, element) => {
   if (url.startsWith('/')) {
     return false;
   }
   return url.startsWith('#') ||
-    element && (element.hasClass('external-icon') || element.hasClass('external'));
+    element && (element.hasClass('external-icon') ||
+      element.hasClass('external'));
+};
+
+/** @type {PreProcessResourceFunc} */
+const preProcessResource = (url, element, res, parent) => {
+  if (parent && parent._downloadLink && (
+    parent._downloadLink.startsWith('https://interactive-examples.mdn.mozilla.net/') ||
+    parent._downloadLink.startsWith('http://interactive-examples.mdn.mozilla.net/'))) {
+    // interactive-examples
+    res.replacePath = res.uri.relativeTo(parent.uri);
+  }
 };
 
 /**
@@ -206,6 +218,14 @@ const requestRedirectFunc = (url, res) => {
     if (path.startsWith('/files/') && path.match(/^\/files\/\d+\//i)) {
       // static files
       return uri.search('').host('mdn.mozillademos.org').toString();
+    }
+    if (path.startsWith('/interactive-examples/')) {
+      // interactive-examples
+      // redirect back to real url
+      return uri.search('')
+        .host('interactive-examples.mdn.mozilla.net')
+        .path(path.slice('/interactive-examples'.length))
+        .toString();
     }
   }
   return url;
@@ -290,6 +310,12 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       } else if (host === 'wiki.developer.mozilla.org') {
         u = u.host('developer.mozilla.org');
         needToRebuildUrl = true;
+      } else if (host === 'interactive-examples.mdn.mozilla.net') {
+        // interactive-examples
+        // fake url, redirected back in requestRedirectFunc
+        return u.host('developer.mozilla.org')
+          .path('/interactive-examples' + u.path())
+          .toString();
       } else {
         return url;
       }
@@ -421,7 +447,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     postProcessHtml,
     linkRedirectFunc,
     skipProcessFunc,
-    requestRedirectFunc
+    requestRedirectFunc,
+    preProcessResource
   }, options));
 
   cookieJar.setCookie(
