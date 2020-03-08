@@ -1,6 +1,6 @@
 const adjust = require('./adjust-concurrency');
 
-const MAX_RETRY = 20;
+const MAX_RETRY = 25;
 const MAX_RETRY_DELAY = 5000;
 /**
  * @type {Options}
@@ -8,6 +8,7 @@ const MAX_RETRY_DELAY = 5000;
 const defaultOptions = {
   req: {
     retry: {
+      decompress: true,
       limit: MAX_RETRY,
       calculateDelay: ({attemptCount, retryOptions, error}) => {
         if (attemptCount > retryOptions.limit) {
@@ -41,10 +42,10 @@ const defaultOptions = {
     },
     timeout: {
       lookup: 500,
-      connect: 3000,
+      connect: 3500,
       secureConnect: 4000,
-      send: 2000,
-      socket: 4000,
+      send: 3000,
+      socket: 5000,
       response: 50000,
       request: 60000
     }
