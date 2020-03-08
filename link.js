@@ -169,6 +169,8 @@ class Link {
     if (this.encoding) {
       reqOptions.encoding = this.encoding;
       reqOptions.responseType = 'text';
+    } else {
+      reqOptions.responseType = 'buffer';
     }
     if (this.refUrl && this.refUrl !== downloadLink) {
       const headers = Object.assign({}, reqOptions.headers);
