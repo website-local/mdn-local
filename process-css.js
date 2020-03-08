@@ -27,6 +27,9 @@ const processCss = async (css) => {
   }
   return css.urls.map(url => {
     const res = createCssResourceFromUrl(url, css);
+    if (css.options.preProcessResource) {
+      css.options.preProcessResource(url, null, res, css);
+    }
     css.body = css.body.split(url).join(res.replacePath.toString());
     return res;
   });

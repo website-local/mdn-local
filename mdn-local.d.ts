@@ -15,6 +15,7 @@ interface Options {
     urlFilter?: UrlFilterFunc;
     cacheUri?: boolean;
     detectLinkType?: DetectTypeFunc,
+    preProcessResource?: PreProcessResourceFunc;
     preProcessHtml?: HtmlProcessFunc;
     postProcessHtml?: HtmlProcessFunc;
     linkRedirectFunc?: LinkRedirectFunc;
@@ -58,6 +59,10 @@ interface LinkRedirectFunc {
 
 interface SkipProcessFunc {
     (url: string, element: Cheerio | null, parent?: HtmlResource): boolean;
+}
+
+interface PreProcessResourceFunc {
+    (url: string, element: Cheerio | null, res?: Resource, parent?: Resource): void;
 }
 
 interface DropResourceFunc {

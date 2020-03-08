@@ -55,6 +55,9 @@ const process = async (html) => {
         } else {
           elem.attr(attr, replacePath);
         }
+        if (html.options.preProcessResource) {
+          html.options.preProcessResource(link, elem, res, html);
+        }
         continue;
       } else if (linkType === 'css') {
         Clazz = CssResource;
@@ -67,6 +70,9 @@ const process = async (html) => {
       if (!(typeof html.options.dropResourceFunc === 'function' &&
         html.options.dropResourceFunc(res))) {
         resArr.push(res);
+      }
+      if (html.options.preProcessResource) {
+        html.options.preProcessResource(link, elem, res, html);
       }
       elem.attr(attr, res.replacePath.toString());
     }

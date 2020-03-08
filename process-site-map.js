@@ -37,6 +37,9 @@ const processSiteMap = async (siteMap) => {
     htmlResource.depth = depth;
     if (!(typeof siteMap.options.dropResourceFunc === 'function' &&
       siteMap.options.dropResourceFunc(htmlResource))) {
+      if (siteMap.options.preProcessResource) {
+        siteMap.options.preProcessResource(url, null, htmlResource, siteMap);
+      }
       htmlArr.push(htmlResource);
     }
   }
