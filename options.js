@@ -13,16 +13,16 @@ const defaultOptions = {
         if (attemptCount > retryOptions.limit) {
           return 0;
         }
-
-        const hasMethod = retryOptions.methods.has(error.options.method);
+        const hasMethod = error.options &&
+          retryOptions.methods.includes(error.options.method);
         const hasErrorCode = Reflect.has(error, 'code') &&
-          retryOptions.errorCodes.has((error).code);
-        const hasStatusCode = Reflect.has(error, 'response') &&
-          retryOptions.statusCodes.has((error).response.statusCode );
+          retryOptions.errorCodes.includes(error.code);
+        const hasStatusCode = retryOptions.statusCodes &&
+          error.response &&
+          retryOptions.statusCodes.includes(error.response.statusCode);
         if (!hasMethod || (!hasErrorCode && !hasStatusCode)) {
           return 0;
         }
-
         let delay = ((2 * (attemptCount - 1)) * 1000) + Math.random() * 200;
         if (attemptCount > 2) {
           delay += 1000;
@@ -41,12 +41,12 @@ const defaultOptions = {
     },
     timeout: {
       lookup: 500,
-      connect: 400,
-      secureConnect: 500,
-      send: 700,
-      socket: 1000,
-      response: 20000,
-      request: 23000
+      connect: 3000,
+      secureConnect: 4000,
+      send: 2000,
+      socket: 4000,
+      response: 50000,
+      request: 60000
     }
   },
   encoding: {

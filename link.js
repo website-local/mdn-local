@@ -29,8 +29,15 @@ const escapePath = str => str && str.replace(forbiddenChar, '_');
 const get = got.extend({cookieJar, hooks: {
   beforeRetry: [
     (options, error, retryCount) => {
+      let url = error.url;
+      if (!url && error.options) {
+        url = error.options.url;
+        if (typeof url !== 'string') {
+          url = String(url);
+        }
+      }
       (retryCount > 1 ? logger.retry.warn : logger.retry.info)
-        .call(logger.retry,'retry: ', error.url, error.code, retryCount);
+        .call(logger.retry,'retry: ', url, error.code, retryCount);
     }
   ]
 }});
@@ -92,10 +99,13 @@ const writeStr = (str, filePath, encoding = 'utf8') => {
     fs.writeFile(filePath, str, {encoding}, resolve));
 };
 
-const defaultOpt = (opt, defaultOpt) => {
+const defaultOpt = (opt, defOpt) => {
   if (!opt) opt = {};
-  if (!defaultOpt) return opt;
-  for (const key of Object.keys(defaultOpt)) {
+  if (!defOpt) return opt;
+  if (opt.req && opt.req !== defOpt.req) {
+    opt.req = Object.assign({}, defOpt.req, opt.req);
+  }
+  for (const key of Object.keys(defOpt)) {
     if (!(key in opt)) {
       opt[key] = defaultOptions[key];
     }

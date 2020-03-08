@@ -277,6 +277,10 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     if (url && url.trim) {
       url = url.trim();
     }
+    if (!url) return url;
+    if (url.startsWith('<=%=baseURL')) {
+      url = url.slice('<=%=baseURL'.length);
+    }
     let u = new URI(url), host, needToRebuildUrl = false;
     if ((host = u.host()) && host !== 'developer.mozilla.org') {
       if (host === 'mdn.mozillademos.org') {
