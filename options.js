@@ -44,6 +44,7 @@ const defaultOptions = {
       connect: 400,
       secureConnect: 500,
       send: 700,
+      socket: 1000,
       response: 20000,
       request: 23000
     }

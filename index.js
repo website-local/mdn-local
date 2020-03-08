@@ -234,7 +234,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   };
 
   const redirectFilterFunc = (url, res) => {
-    let uri = new URI(url), host = uri.host();
+    let uri = new URI(url).search(''), host = uri.host();
     if (host === 'mdn.mozillademos.org') {
       return uri.host('developer.mozilla.org').toString();
     }
@@ -340,6 +340,25 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     }
     return url;
   };
+  /** @type {RequestRedirectFunc} */
+  const requestRedirectFunc = (url, res) => {
+    let uri, path;
+    if (res && (uri = new URI(url)) &&
+      uri.host() === 'developer.mozilla.org' &&
+      (path = uri.path())) {
+      if (path.includes('/docs/') &&
+        path.includes('$samples/') &&
+        uri.search().includes('revision=')) {
+        // probably example iframe
+        return uri.search('').host('mdn.mozillademos.org').toString();
+      }
+      if (path.startsWith('/files/') && path.match(/^\/files\/\d+\//i)) {
+        // static files
+        return uri.search('').host('mdn.mozillademos.org').toString();
+      }
+    }
+    return url;
+  };
   if (!options.req) {
     options.req = {};
   }
@@ -395,7 +414,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     preProcessHtml,
     postProcessHtml,
     linkRedirectFunc,
-    skipProcessFunc
+    skipProcessFunc,
+    requestRedirectFunc
   }, options));
 
   cookieJar.setCookie(
