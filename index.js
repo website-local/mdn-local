@@ -142,6 +142,11 @@ const preProcessResource = (url, element, res, parent) => {
     parent._downloadLink.startsWith('https://interactive-examples.mdn.mozilla.net/') ||
     parent._downloadLink.startsWith('http://interactive-examples.mdn.mozilla.net/'))) {
     // interactive-examples
+    if (url && url[0] === '/') {
+      // absolute path
+      res.url = res.uri.path('/interactive-examples' + res.uri.path()).toString();
+    }
+    // interactive-examples
     res.replacePath = res.uri.relativeTo(parent.uri);
   }
 };
@@ -333,6 +338,14 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
         .search('')
         .absoluteTo(html.url)
         .normalizePath();
+      if (html._downloadLink.includes('//interactive-examples.mdn.mozilla.net/') &&
+        !u.path().includes('/interactive-examples/')) {
+        // interactive-examples
+        // fake url, redirected back in requestRedirectFunc
+        return u.host('developer.mozilla.org')
+          .path('/interactive-examples' + u.path())
+          .toString();
+      }
       needToRebuildUrl = true;
     }
     const pathArr = u.path()
