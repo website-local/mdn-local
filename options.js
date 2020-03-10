@@ -41,7 +41,7 @@ const defaultOptions = {
       'dnt': 1
     },
     timeout: {
-      lookup: 500,
+      lookup: 1000,
       connect: 3500,
       secureConnect: 4000,
       send: 3000,
