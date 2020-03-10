@@ -138,16 +138,24 @@ const skipProcessFunc = (url, element) => {
 
 /** @type {PreProcessResourceFunc} */
 const preProcessResource = (url, element, res, parent) => {
-  if (parent && parent._downloadLink && (
-    parent._downloadLink.startsWith('https://interactive-examples.mdn.mozilla.net/') ||
-    parent._downloadLink.startsWith('http://interactive-examples.mdn.mozilla.net/'))) {
-    // interactive-examples
-    if (url && url[0] === '/') {
-      // absolute path
-      res.url = res.uri.path('/interactive-examples' + res.uri.path()).toString();
+  if (parent && parent._downloadLink) {
+    if (parent._downloadLink.startsWith('https://interactive-examples.mdn.mozilla.net/') ||
+      parent._downloadLink.startsWith('http://interactive-examples.mdn.mozilla.net/')) {
+      // interactive-examples
+      if (url && url[0] === '/') {
+        // absolute path
+        res.url = res.uri.path('/interactive-examples' + res.uri.path()).toString();
+      }
+      res.replacePath = res.uri.relativeTo(parent.uri);
+    } else if (parent._downloadLink.startsWith('https://mdn.github.io/') ||
+      parent._downloadLink.startsWith('http://mdn.github.io/')) {
+      // mdn.github.io
+      if (url && url[0] === '/') {
+        // absolute path
+        res.url = res.uri.path('/mdn-github-io' + res.uri.path()).toString();
+      }
+      res.replacePath = res.uri.relativeTo(parent.uri);
     }
-    // interactive-examples
-    res.replacePath = res.uri.relativeTo(parent.uri);
   }
 };
 
@@ -230,6 +238,14 @@ const requestRedirectFunc = (url, res) => {
       return uri.search('')
         .host('interactive-examples.mdn.mozilla.net')
         .path(path.slice('/interactive-examples'.length))
+        .toString();
+    }
+    if (path.startsWith('/mdn-github-io/')) {
+      // mdn.github.io
+      // redirect back to real url
+      return uri.search('')
+        .host('mdn.github.io')
+        .path(path.slice('/mdn-github-io'.length))
         .toString();
     }
   }
@@ -321,6 +337,12 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
         return u.host('developer.mozilla.org')
           .path('/interactive-examples' + u.path())
           .toString();
+      } else if (host === 'mdn.github.io') {
+        // mdn.github.io
+        // fake url, redirected back in requestRedirectFunc
+        return u.host('developer.mozilla.org')
+          .path('/mdn-github-io' + u.path())
+          .toString();
       } else {
         return url;
       }
@@ -344,6 +366,14 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
         // fake url, redirected back in requestRedirectFunc
         return u.host('developer.mozilla.org')
           .path('/interactive-examples' + u.path())
+          .toString();
+      }
+      if (html._downloadLink.includes('//mdn.github.io/') &&
+        !u.path().includes('/mdn-github-io/')) {
+        // mdn.github.io
+        // fake url, redirected back in requestRedirectFunc
+        return u.host('developer.mozilla.org')
+          .path('/mdn-github-io' + u.path())
           .toString();
       }
       needToRebuildUrl = true;
