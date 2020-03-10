@@ -459,6 +459,7 @@ const preProcessHtml = ($, html) => {
   // 我们的志愿者还没有将这篇文章翻译
   $('#doc-pending-fallback').remove();
   // $('iframe').remove();
+  $('iframe[src*="youtube.com/"]').remove();
   // TODO: Tag pagination
   // https://github.com/myfreeer/mdn-local/issues/10
   $('.pagination').remove();
