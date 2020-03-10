@@ -26,12 +26,14 @@ const processCss = async (css) => {
     await css.fetch();
   }
   return css.urls.map(url => {
-    const res = createCssResourceFromUrl(url, css);
+    const link = url && css.options.linkRedirectFunc ?
+      css.options.linkRedirectFunc(url, null, css) : url;
+    let r = createCssResourceFromUrl(link, css);
     if (css.options.preProcessResource) {
-      css.options.preProcessResource(url, null, res, css);
+      css.options.preProcessResource(link, null, r, css);
     }
-    css.body = css.body.split(url).join(res.replacePath.toString());
-    return res;
+    css.body = css.body.split(url).join(r.replacePath.toString());
+    return r;
   });
 };
 

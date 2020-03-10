@@ -35,7 +35,7 @@ const sources = [
   {selector: 'iframe', attr: 'src', type: 'html'},
   {selector: 'a', attr: 'href', type: 'html'}
 ].map(obj => {
-  if (!obj.selector.startsWith('svg'))
+  if (!obj.selector.startsWith('svg') && obj.attr)
     obj.selector += `[${obj.attr}]`;
   return obj;
 });

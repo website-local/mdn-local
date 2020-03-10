@@ -31,6 +31,21 @@ const process = async (html) => {
         originalLink.startsWith('data:') ||
         // skip mail links
         originalLink.toLowerCase().startsWith('mailto:')) {
+        if (!originalLink && type === 'css-inline') {
+          let content = elem.html();
+          const cssUrls = parseCssUrls(content);
+          resArr.push(...cssUrls.map(url => {
+            const link = url && html.options.linkRedirectFunc ?
+              html.options.linkRedirectFunc(url, elem, html) : url;
+            let r = createCssResourceFromUrl(link, html);
+            if (html.options.preProcessResource) {
+              html.options.preProcessResource(link, elem, r, html);
+            }
+            content = content.split(url).join(r.replacePath.toString());
+            return r;
+          }));
+          elem.html(content);
+        }
         continue;
       }
       const link = originalLink && html.options.linkRedirectFunc ?
@@ -61,9 +76,6 @@ const process = async (html) => {
         continue;
       } else if (linkType === 'css') {
         Clazz = CssResource;
-      } else if (linkType === 'inline-css') {
-        const cssUrls = parseCssUrls(elem.html());
-        resArr.push(...cssUrls.map(url => createCssResourceFromUrl(url, html)));
       }
       const res = new Clazz(link, html.localRoot, url, html.options);
       res.depth = depth;
