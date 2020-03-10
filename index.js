@@ -114,7 +114,11 @@ const validExtensionName = {
   'mkv': 1,
   'msi': 1,
   'xpi': 1,
-  'rdf': 1
+  'rdf': 1,
+  'pdf': 1,
+  'webm': 1,
+  'dia': 1,
+  'eot': 1
 };
 
 
