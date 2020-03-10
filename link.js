@@ -18,6 +18,7 @@ const forbiddenChar = /([:*?"<>|]|%3A|%2A|%3F|%22|%3C|%3E|%7C)+/ig;
 
 const cookieJar = new CookieJar();
 const cacheUri = {};
+const dnsCache = new Map();
 
 const escapePath = str => str && str.replace(forbiddenChar, '_');
 /**
@@ -26,7 +27,7 @@ const escapePath = str => str && str.replace(forbiddenChar, '_');
  * @param {got.Options} opts
  * @return {Promise<any>}
  */
-const get = got.extend({cookieJar, hooks: {
+const get = got.extend({cookieJar, dnsCache, hooks: {
   beforeRetry: [
     (options, error, retryCount) => {
       let url = error.url;
@@ -427,6 +428,7 @@ class SiteMapResource extends Resource {
 }
 
 module.exports.cookieJar = cookieJar;
+module.exports.dnsCache = dnsCache;
 module.exports.Resource = Resource;
 module.exports.HtmlResource = HtmlResource;
 module.exports.CssResource = CssResource;
