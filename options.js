@@ -17,11 +17,12 @@ const defaultOptions = {
         const hasMethod = error.options &&
           retryOptions.methods.includes(error.options.method);
         const hasErrorCode = Reflect.has(error, 'code') &&
-          retryOptions.errorCodes.includes(error.code);
+          (retryOptions.errorCodes.includes(error.code) ||
+            'ERR_STREAM_PREMATURE_CLOSE' === error.code);
         const hasStatusCode = retryOptions.statusCodes &&
           error.response &&
           retryOptions.statusCodes.includes(error.response.statusCode);
-        if (!hasMethod || (!hasErrorCode && !hasStatusCode)) {
+        if (!hasMethod || (!hasErrorCode && !hasStatusCode && error.name !== 'ReadError')) {
           return 0;
         }
         let delay = ((2 * (attemptCount - 1)) * 1000) + Math.random() * 200;
