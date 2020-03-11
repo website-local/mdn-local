@@ -43,7 +43,8 @@ const get = got.extend({cookieJar, dnsCache, hooks: {
 }});
 
 /**
- * workaround for premature close on node 12
+ * workaround for retry premature close on node 12
+ * retry on empty body
  *
  * @param url
  * @param options
@@ -58,11 +59,15 @@ const getRetry = async (url, options) => {
     try {
       optionsClone = Object.assign({}, options);
       res = await get(url, optionsClone);
+      if (!res || !res.body || !res.body.length) {
+        logger.error.warn(i, url, 'retry on empty response or body', res && res.body);
+        continue;
+      }
       break;
     } catch (e) {
       err = e;
       if (e && e.message === 'premature close') {
-        logger.error.warn(i, url, 'retry on premature close', e.message, e.name, e);
+        logger.error.warn(i, url, 'retry on premature close', e.message, e.name);
         await sleep(i * 150);
         continue;
       }
@@ -223,21 +228,8 @@ class Link {
       this.redirectedUrl = res.url;
       return this.body = res.body;
     } else {
-      // try again
-      logger.request.info(this.url, downloadLink, this.refUrl, this.encoding,
-        'retry on empty response');
-      res = await getRetry(downloadLink, reqOptions);
-      if (res && res.body) {
-        logger.response.info(res.statusCode,res.requestUrl,
-          this.url, downloadLink, this.refUrl, this.encoding, 'retry on empty response');
-        this.finishTimestamp = Date.now();
-        this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
-        this.redirectedUrl = res.url;
-        return this.body = res.body;
-      } else {
-        logger.error.warn(res);
-        throw new TypeError('Empty response body: ' + downloadLink);
-      }
+      logger.error.warn(res);
+      throw new TypeError('Empty response body: ' + downloadLink);
     }
   }
 
