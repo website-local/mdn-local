@@ -10,11 +10,13 @@ const log4js = require('log4js');
 const logger = {
   retry: log4js.getLogger('retry'),
   mkdir: log4js.getLogger('mkdir'),
+  request: log4js.getLogger('request'),
+  response: log4js.getLogger('response'),
   error: log4js.getLogger('error')
 };
 const defaultOptions = require('./options');
 const forbiddenChar = /([:*?"<>|]|%3A|%2A|%3F|%22|%3C|%3E|%7C)+/ig;
-
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const cookieJar = new CookieJar();
 const cacheUri = {};
@@ -22,10 +24,7 @@ const dnsCache = new Map();
 
 const escapePath = str => str && str.replace(forbiddenChar, '_');
 /**
- *
- * @param {string} url
- * @param {got.Options} opts
- * @return {Promise<any>}
+ * @type {GotFunction}
  */
 const get = got.extend({cookieJar, dnsCache, hooks: {
   beforeRetry: [
@@ -42,6 +41,41 @@ const get = got.extend({cookieJar, dnsCache, hooks: {
     }
   ]
 }});
+
+/**
+ * workaround for premature close on node 12
+ *
+ * @param url
+ * @param options
+ * @return {Promise<GotResponse>}
+ */
+const getRetry = async (url, options) => {
+  /** @type {GotResponse} */
+  let res;
+  let err, optionsClone;
+  for (let i = 0; i < 25; i++) {
+    err = void 0;
+    try {
+      optionsClone = Object.assign({}, options);
+      res = await get(url, optionsClone);
+      break;
+    } catch (e) {
+      err = e;
+      if (e && e.message === 'premature close') {
+        logger.error.warn(i, url, 'retry on premature close', e.message, e.name, e);
+        await sleep(i * 150);
+        continue;
+      }
+      throw e;
+    }
+  }
+  if (err) {
+    logger.error.error(url, 'no more retries on premature close',
+      err.message, err.name, err);
+    throw err;
+  }
+  return res;
+};
 
 const mkdirRetry = (dir) => {
   try {
@@ -178,16 +212,24 @@ class Link {
       headers.referer = this.refUrl;
       reqOptions.headers = headers;
     }
-    let res = await get(downloadLink, reqOptions);
+    logger.request.info(this.url, downloadLink, this.refUrl, this.encoding);
+    /** @type {GotResponse} */
+    let res = await getRetry(downloadLink, reqOptions);
     if (res && res.body) {
+      logger.response.info(res.statusCode,res.requestUrl,
+        this.url, downloadLink, this.refUrl, this.encoding);
       this.finishTimestamp = Date.now();
       this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
       this.redirectedUrl = res.url;
       return this.body = res.body;
     } else {
       // try again
-      res = await get(downloadLink, reqOptions);
+      logger.request.info(this.url, downloadLink, this.refUrl, this.encoding,
+        'retry on empty response');
+      res = await getRetry(downloadLink, reqOptions);
       if (res && res.body) {
+        logger.response.info(res.statusCode,res.requestUrl,
+          this.url, downloadLink, this.refUrl, this.encoding, 'retry on empty response');
         this.finishTimestamp = Date.now();
         this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
         this.redirectedUrl = res.url;

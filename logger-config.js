@@ -28,6 +28,14 @@ const configureLogger = (localRoot) =>
         type: 'file',
         filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'complete.log')
       },
+      'request': {
+        type: 'file',
+        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'request.log')
+      },
+      'response': {
+        type: 'file',
+        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'response.log')
+      },
       'stdout': {
         type: 'stdout'
       },
@@ -59,6 +67,14 @@ const configureLogger = (localRoot) =>
       },
       'complete': {
         appenders: ['complete'],
+        level: 'debug'
+      },
+      'request': {
+        appenders: ['request'],
+        level: 'debug'
+      },
+      'response': {
+        appenders: ['response'],
         level: 'debug'
       },
       'adjust-concurrency': {

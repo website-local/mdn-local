@@ -175,3 +175,7 @@ declare interface MdnAssets {
         [k: string]: string[];
     };
 }
+
+
+declare type GotFunction = got.Got;
+declare type GotResponse = got.Response;
