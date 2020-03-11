@@ -26,21 +26,23 @@ const escapePath = str => str && str.replace(forbiddenChar, '_');
 /**
  * @type {GotFunction}
  */
-const get = got.extend({cookieJar, dnsCache, hooks: {
-  beforeRetry: [
-    (options, error, retryCount) => {
-      let url = error.url;
-      if (!url && error.options) {
-        url = error.options.url;
-        if (typeof url !== 'string') {
-          url = String(url);
+const get = got.extend({
+  cookieJar, dnsCache, hooks: {
+    beforeRetry: [
+      (options, error, retryCount) => {
+        let url = error.url;
+        if (!url && error.options) {
+          url = error.options.url;
+          if (typeof url !== 'string') {
+            url = String(url);
+          }
         }
+        (retryCount > 1 ? logger.retry.warn : logger.retry.info)
+          .call(logger.retry, 'retry: ', url, error.code, retryCount);
       }
-      (retryCount > 1 ? logger.retry.warn : logger.retry.info)
-        .call(logger.retry,'retry: ', url, error.code, retryCount);
-    }
-  ]
-}});
+    ]
+  }
+});
 
 /**
  * workaround for retry premature close on node 12
@@ -217,12 +219,13 @@ class Link {
       headers.referer = this.refUrl;
       reqOptions.headers = headers;
     }
-    logger.request.info(this.url, downloadLink, this.refUrl, this.encoding);
+    logger.request.info(this.url, downloadLink, this.refUrl,
+      this.encoding, this.constructor.name);
     /** @type {GotResponse} */
     let res = await getRetry(downloadLink, reqOptions);
     if (res && res.body) {
-      logger.response.info(res.statusCode,res.requestUrl,
-        this.url, downloadLink, this.refUrl, this.encoding);
+      logger.response.info(res.statusCode, res.requestUrl, this.url,
+        downloadLink, this.refUrl, this.encoding, this.constructor.name);
       this.finishTimestamp = Date.now();
       this.downloadTime = this.finishTimestamp - this.downloadStartTimestamp;
       this.redirectedUrl = res.url;
@@ -387,8 +390,8 @@ class HtmlResource extends Resource {
   _save(placeholder) {
     const savePathUnEncoded = decodeURI(this.savePath);
     if (placeholder) {
-      let relativePath = new URI(this.redirectedUrl).
-        search('').normalizePath().relativeTo(this.uri).toString();
+      let relativePath = new URI(this.redirectedUrl)
+        .search('').normalizePath().relativeTo(this.uri).toString();
       if (relativePath.endsWith('/')) {
         relativePath += 'index.html';
       } else {
