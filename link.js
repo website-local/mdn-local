@@ -60,14 +60,14 @@ const getRetry = async (url, options) => {
       optionsClone = Object.assign({}, options);
       res = await get(url, optionsClone);
       if (!res || !res.body || !res.body.length) {
-        logger.error.warn(i, url, 'retry on empty response or body', res && res.body);
+        logger.retry.warn(i, url, 'retry on empty response or body', res && res.body);
         continue;
       }
       break;
     } catch (e) {
       err = e;
       if (e && e.message === 'premature close') {
-        logger.error.warn(i, url, 'retry on premature close', e.message, e.name);
+        logger.retry.warn(i, url, 'retry on premature close', e.message, e.name);
         await sleep(i * 150);
         continue;
       }
