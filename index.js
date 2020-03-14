@@ -332,7 +332,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
         // should be automatically redirected back
         u = u.host('developer.mozilla.org');
         needToRebuildUrl = true;
-      } else if (host === 'wiki.developer.mozilla.org') {
+      } else if (host === 'wiki.developer.mozilla.org' ||
+        host === 'developer.cdn.mozilla.net') {
         u = u.host('developer.mozilla.org');
         needToRebuildUrl = true;
       } else if (host === 'interactive-examples.mdn.mozilla.net') {
