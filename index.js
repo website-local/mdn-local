@@ -348,6 +348,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
         return u.host('developer.mozilla.org')
           .path('/mdn-github-io' + u.path())
           .toString();
+      } else if (hardCodedRedirectUrl[url]) {
+        return hardCodedRedirectUrl[url];
       } else {
         return url;
       }
