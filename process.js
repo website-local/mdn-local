@@ -83,10 +83,13 @@ const process = async (html) => {
             htmlArr.push(res);
           }
           const replacePath = res.replacePath.toString();
+          // not likely srcset here
           if (replacePath === '.html' || replacePath === '/.html') {
-            elem.attr(attr, '');
+            replaceValue = '';
+            elem.attr(attr, replaceValue);
           } else {
-            elem.attr(attr, replacePath);
+            replaceValue = replacePath;
+            elem.attr(attr, replaceValue);
           }
           if (html.options.preProcessResource) {
             html.options.preProcessResource(link, elem, res, html);
