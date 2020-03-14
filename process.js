@@ -2,6 +2,7 @@ const parseCssUrls = require('css-url-parser');
 const sources = require('./sources');
 const {Resource, HtmlResource, CssResource} = require('./link');
 const {createCssResourceFromUrl} = require('./process-css');
+const srcset = require('srcset');
 
 /**
  *
@@ -15,6 +16,9 @@ const process = async (html) => {
     await html.fetch();
   }
   let url = html.redirectedUrl || html.url;
+  if (html.options.linkRedirectFunc) {
+    url = html.options.linkRedirectFunc(url, null, html);
+  }
   const depth = (+html.depth || 0) + 1;
   const htmlArr = [];
   const resArr = [];
@@ -25,13 +29,9 @@ const process = async (html) => {
     const elements = html.doc(selector);
     for (let index = 0; index < elements.length; index++) {
       const elem = elements.eq(index);
-      const originalLink = attr && elem.attr(attr);
-      // skip empty, in-page hash jump, and data-uri links
-      if (!originalLink || originalLink[0] === '#' ||
-        originalLink.startsWith('data:') ||
-        // skip mail links
-        originalLink.toLowerCase().startsWith('mailto:')) {
-        if (!originalLink && type === 'css-inline') {
+      let attrValue = attr && elem.attr(attr);
+      if (!attrValue) {
+        if (type === 'css-inline') {
           let content = elem.html();
           const cssUrls = parseCssUrls(content);
           resArr.push(...cssUrls.map(url => {
@@ -48,45 +48,73 @@ const process = async (html) => {
         }
         continue;
       }
-      const link = originalLink && html.options.linkRedirectFunc ?
-        html.options.linkRedirectFunc(originalLink, elem, html) : originalLink;
-      if (!link || (html.options.skipProcessFunc &&
-        html.options.skipProcessFunc(link, elem, html))) {
-        continue;
+      let links, replaceValue;
+      if (attr === 'srcset') {
+        replaceValue = srcset.parse(attrValue);
+        links = replaceValue.map(e => e.url);
+      } else {
+        links = [attrValue];
+        replaceValue = attrValue;
       }
-      const linkType = html.options.detectLinkType ?
-        await html.options.detectLinkType(link, elem, html) || type : type;
-      let Clazz = Resource;
-      if (linkType === 'html') {
-        const res = new HtmlResource(link, html.localRoot, url, html.options);
+      for (let linkIndex = 0, l = links.length; linkIndex < l; linkIndex++) {
+        let originalLink = links[linkIndex];
+
+        // skip empty, in-page hash jump, and data-uri links
+        if (!originalLink || originalLink[0] === '#' ||
+          originalLink.startsWith('data:') ||
+          // skip mail links
+          originalLink.toLowerCase().startsWith('mailto:')) {
+          continue;
+        }
+        const link = originalLink && html.options.linkRedirectFunc ?
+          html.options.linkRedirectFunc(originalLink, elem, html) : originalLink;
+        if (!link || (html.options.skipProcessFunc &&
+          html.options.skipProcessFunc(link, elem, html))) {
+          continue;
+        }
+        const linkType = html.options.detectLinkType ?
+          await html.options.detectLinkType(link, elem, html) || type : type;
+        let Clazz = Resource;
+        if (linkType === 'html') {
+          const res = new HtmlResource(link, html.localRoot, url, html.options);
+          res.depth = depth;
+          if (!(typeof html.options.dropResourceFunc === 'function' &&
+            html.options.dropResourceFunc(res))) {
+            htmlArr.push(res);
+          }
+          const replacePath = res.replacePath.toString();
+          if (replacePath === '.html' || replacePath === '/.html') {
+            elem.attr(attr, '');
+          } else {
+            elem.attr(attr, replacePath);
+          }
+          if (html.options.preProcessResource) {
+            html.options.preProcessResource(link, elem, res, html);
+          }
+          continue;
+        } else if (linkType === 'css') {
+          Clazz = CssResource;
+        }
+        const res = new Clazz(link, html.localRoot, url, html.options);
         res.depth = depth;
         if (!(typeof html.options.dropResourceFunc === 'function' &&
           html.options.dropResourceFunc(res))) {
-          htmlArr.push(res);
-        }
-        const replacePath = res.replacePath.toString();
-        if (replacePath === '.html' || replacePath === '/.html') {
-          elem.attr(attr, '');
-        } else {
-          elem.attr(attr, replacePath);
+          resArr.push(res);
         }
         if (html.options.preProcessResource) {
           html.options.preProcessResource(link, elem, res, html);
         }
-        continue;
-      } else if (linkType === 'css') {
-        Clazz = CssResource;
+        if (attr === 'srcset') {
+          replaceValue[linkIndex].url = res.replacePath.toString();
+        } else {
+          replaceValue = res.replacePath.toString();
+        }
       }
-      const res = new Clazz(link, html.localRoot, url, html.options);
-      res.depth = depth;
-      if (!(typeof html.options.dropResourceFunc === 'function' &&
-        html.options.dropResourceFunc(res))) {
-        resArr.push(res);
+      if (attr === 'srcset') {
+        elem.attr(attr, srcset.stringify(replaceValue));
+      } else {
+        elem.attr(attr, replaceValue);
       }
-      if (html.options.preProcessResource) {
-        html.options.preProcessResource(link, elem, res, html);
-      }
-      elem.attr(attr, res.replacePath.toString());
     }
   }
   if (typeof html.options.postProcessHtml === 'function') {
