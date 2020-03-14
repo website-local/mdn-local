@@ -382,7 +382,23 @@ const hardCodedRedirectUrl = {
   'https://developer.mozilla.org/zh-CN/Firefox/Releases/en-US/Add-ons/SDK/Low-Level_APIs/test_httpd':
     'https://developer.mozilla.org/zh-CN/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/test_httpd',
   'https://developer.mozilla.org/zh-CN/docs/Web/CSS/en-US/docs/Web/CSS':
-    'https://developer.mozilla.org/zh-CN/docs/Web/CSS/en-US/docs/Web/CSS'
+    'https://developer.mozilla.org/zh-CN/docs/Web/CSS/en-US/docs/Web/CSS',
+  'http://w3c.org/2008/site/images/favicon.ico':
+    'https://developer.mozilla.org/static/img/favicon32.png',
+  'https://w3c.org/2008/site/images/favicon.ico':
+    'https://developer.mozilla.org/static/img/favicon32.png',
+  'https://mozorg.cdn.mozilla.net/media/img/favicon.ico':
+    'https://developer.mozilla.org/static/img/favicon32.png',
+  'http://mozorg.cdn.mozilla.net/media/img/favicon.ico':
+    'https://developer.mozilla.org/static/img/favicon32.png',
+  'http://www.mozilla.org/favicon.ico':
+    'https://developer.mozilla.org/static/img/favicon32.png',
+  'https://www.mozilla.org/favicon.ico':
+    'https://developer.mozilla.org/static/img/favicon32.png',
+  'https://developer.cdn.mozilla.net/media/redesign/img/favicon32.png':
+    'https://developer.mozilla.org/static/img/favicon32.png',
+  'http://developer.cdn.mozilla.net/media/redesign/img/favicon32.png':
+    'https://developer.mozilla.org/static/img/favicon32.png'
 };
 
 module.exports = hardCodedRedirectUrl;
