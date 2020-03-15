@@ -1,5 +1,7 @@
 const URI = require('urijs');
-const errorLogger = require('log4js').getLogger('error');
+const log4js = require('log4js');
+const errorLogger = log4js.getLogger('error');
+const skipExternalLogger = log4js.getLogger('skip-external');
 
 const {cookieJar} = require('./link');
 const Downloader = require('./downloader');
@@ -131,13 +133,23 @@ const hardCodedRedirectUrl = require('./redirect-url');
  * @param {Cheerio} element
  * @param {HtmlResource} parent
  */
-const skipProcessFunc = (url, element) => {
+const skipProcessFunc = (url, element, parent) => {
   if (url.startsWith('/')) {
     return false;
   }
-  return url.startsWith('#') ||
+  if (url.startsWith('#') ||
     element && (element.hasClass('external-icon') ||
-      element.hasClass('external'));
+      element.hasClass('external'))) {
+    return true;
+  }
+  let uri = new URI(url), host = uri.host();
+  if (host && host !== 'developer.mozilla.org' &&
+    // not likely happen here
+    host !== 'mdn.mozillademos.org') {
+    skipExternalLogger.debug('skipped external link', host, url, parent && parent.url);
+    return true;
+  }
+  return false;
 };
 
 /** @type {PreProcessResourceFunc} */

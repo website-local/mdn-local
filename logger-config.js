@@ -61,6 +61,10 @@ const configureLogger = (localRoot) =>
         appenders: ['stdout', 'skip'],
         level: 'debug'
       },
+      'skip-external': {
+        appenders: ['skip'],
+        level: 'debug'
+      },
       '404-not-found': {
         appenders: ['404'],
         level: 'debug'
