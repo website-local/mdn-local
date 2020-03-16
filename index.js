@@ -304,8 +304,9 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       path.endsWith('%24history') ||
       path.endsWith('%24edit') ||
       path.endsWith('%24translate') ||
-      path.match('/users/github/login') ||
-      path.match('/users/signin') ||
+      path.includes('/users/github/login') ||
+      path.includes('/users/google/login') ||
+      path.includes('/users/signin') ||
       (path.includes('/profiles/') && path.endsWith('/edit')) ||
       dir.endsWith('/profiles');
   };
