@@ -28,8 +28,13 @@ const adjust = (downloader) => {
   if (downloader.currentPreiodCount < downloader.firstPeriodCount >> 2) {
     concurrency += 2;
   }
-  if (downloader.currentPreiodCount > downloader.firstPeriodCount) {
+
+  if (downloader.currentPreiodCount > downloader.lastPeriodCount << 2) {
     concurrency -= 4;
+  } else if (downloader.currentPreiodCount > downloader.lastPeriodCount << 1) {
+    concurrency -= 2;
+  } else if (downloader.currentPreiodCount > downloader.firstPeriodCount) {
+    concurrency -= 2;
   }
   downloader.queue.concurrency = Math.max(4, concurrency);
   logger.info('concurrency', downloader.queue.concurrency,
