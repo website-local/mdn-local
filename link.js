@@ -70,6 +70,12 @@ const getRetry = async (url, options) => {
       err = e;
       if (e && e.message === 'premature close') {
         logger.retry.warn(i, url, 'retry on premature close', e.message, e.name);
+        await sleep(i * 200);
+        continue;
+      }
+      if (e && e.name === 'RequestError' &&
+        e.message === 'Cannot read property \'address\' of undefined') {
+        logger.retry.warn(i, url, 'retry on cacheable-lookup error', e.message, e.name);
         await sleep(i * 150);
         continue;
       }
