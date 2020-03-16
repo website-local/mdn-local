@@ -138,6 +138,8 @@ const skipProcessFunc = (url, element, parent) => {
     return false;
   }
   if (url.startsWith('#') ||
+    url.startsWith('data:') ||
+    url.startsWith('javascript:') ||
     element && (element.hasClass('external-icon') ||
       element.hasClass('external'))) {
     return true;
