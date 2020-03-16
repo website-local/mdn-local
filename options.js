@@ -47,8 +47,8 @@ const defaultOptions = {
       secureConnect: 4000,
       send: 3000,
       socket: 5000,
-      response: 1500000,
-      request: 170000
+      response: 190000,
+      request: 200000
     }
   },
   encoding: {
