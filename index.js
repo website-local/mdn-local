@@ -300,6 +300,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       path.startsWith('search') ||
       path.endsWith('$history') ||
       path.endsWith('$samples') ||
+      path.endsWith('$children') ||
       path.endsWith('$json') ||
       path.endsWith('$edit') ||
       path.endsWith('$translate') ||
@@ -340,6 +341,20 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     if (!url) return url;
     if (url.startsWith('<=%=baseURL')) {
       url = url.slice('<=%=baseURL'.length);
+    } else if ((url.startsWith('<') || url.startsWith('&lt;')) &&
+      (url.endsWith('>') || url.endsWith('&gt;'))) {
+      if (url.startsWith('<')) {
+        url = url.slice(1);
+      }
+      if (url.startsWith('&lt;')) {
+        url = url.slice(4);
+      }
+      if (url.endsWith('>')) {
+        url = url.slice(0, url.length - 1);
+      }
+      if (url.endsWith('&gt;')) {
+        url = url.slice(0, url.length - 4);
+      }
     }
     let u = new URI(url), host, needToRebuildUrl = false;
     if ((host = u.host()) && host !== 'developer.mozilla.org') {
@@ -370,11 +385,25 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       }
     }
     if (u.is('relative')) {
+      const pathArr1 = url.split('/');
       if (url[0] !== '/') {
-        const pathArr1 = url.split('/');
-        if (redirectLocale[pathArr1[0]] || localesMap[pathArr1[1]]) {
+        if (redirectLocale[pathArr1[0]] || localesMap[pathArr1[0]]) {
           pathArr1[0] = locale;
           u = new URI('/' + pathArr1.join('/'));
+        } else if (pathArr1[0] === '..' && pathArr1[1] === '..' &&
+          (redirectLocale[pathArr1[2]] || localesMap[pathArr1[2]])) {
+          // ../../en-US/docs/Mercurial
+          // ../../zh-cn/docs/JavaScript/Reference/Global_Objects/Map
+          pathArr1.splice(0, 3, locale);
+          u = new URI('/' + pathArr1.join('/'));
+        }
+      } else if (redirectLocale[pathArr1[1]] || localesMap[pathArr1[1]]) {
+        // /zh-CN/docs/https://developer.mozilla.org/en-US/docs/Web
+        // /en-US/docs/https://developer.mozilla.org/zh-CN/docs/Web/API/ImageBitmap
+        if ('docs' === pathArr1[2] && ('https:' === pathArr1[3] || 'http:' === pathArr1[3])) {
+          if ('' === pathArr1[4] && 'developer.mozilla.org' === pathArr1[5]) {
+            u = u.path('/' + pathArr1.slice(6).join('/'));
+          }
         }
       }
       u = u
