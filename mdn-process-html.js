@@ -193,6 +193,28 @@ const postProcessJsPolyFill = ($, elem, text) => {
   elem.html(text.slice(0, beginIndex) + src + text.slice(endIndex));
 };
 
+const postProcessReplaceExternalIframeWithLink = ($) => {
+  let i = 0,
+    result = $('iframe'),
+    len = result.length,
+    item, src, a;
+
+  for (; i < len; i++) {
+    item = $(result[i]);
+    src = item.attr('src');
+    if (src && src.startsWith('https://') || src.startsWith('http://')) {
+      a = $('<a class="external external-icon mdn-local-external-iframe-link"></a>');
+      a.attr('href', src)
+        .attr('target', '_blank')
+        .attr('rel', 'noopener noreferrer');
+      // workaround for outer html
+      // https://github.com/cheeriojs/cheerio/issues/944
+      a.text(item.clone().wrap('<container />').parent().html());
+      item.replaceWith(a);
+    }
+  }
+};
+
 const postProcessHtml = ($) => {
   $('script').each((index, elem) => {
     let text;
@@ -204,7 +226,7 @@ const postProcessHtml = ($) => {
       postProcessReactData(text, elem);
       // $('#react-container').removeAttr('id');
       // hide dynamically created useless stuff via css
-      $(`<style>
+      $(`<style class="mdn-local-hide-elements">
 #nav-footer,
 .contributors-sub,
 .overheadIndicator.translationInProgress,
@@ -221,6 +243,8 @@ const postProcessHtml = ($) => {
     }
     postProcessMdnAssets(text, $, elem);
   });
+  // replace external iframe with external links
+  postProcessReplaceExternalIframeWithLink($);
   return $;
 };
 
