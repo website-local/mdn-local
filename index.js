@@ -241,9 +241,7 @@ const requestRedirectFunc = (url, res) => {
   if (res && (uri = new URI(url)) &&
     uri.host() === 'developer.mozilla.org' &&
     (path = uri.path())) {
-    if (path.includes('/docs/') &&
-      path.includes('$samples/') &&
-      uri.search().includes('revision=')) {
+    if (path.includes('/docs/') && path.includes('$samples/')) {
       // probably example iframe
       return uri.search('').host('mdn.mozillademos.org').toString();
     }
