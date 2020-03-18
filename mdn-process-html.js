@@ -202,7 +202,7 @@ const postProcessReplaceExternalIframeWithLink = ($) => {
   for (; i < len; i++) {
     item = $(result[i]);
     src = item.attr('src');
-    if (src && src.startsWith('https://') || src.startsWith('http://')) {
+    if (src && (src.startsWith('https://') || src.startsWith('http://'))) {
       a = $('<a class="external external-icon mdn-local-external-iframe-link"></a>');
       a.attr('href', src)
         .attr('target', '_blank')
