@@ -1,4 +1,4 @@
-const {processPathWithMultipleLocale} = require('../');
+const {processPathWithMultipleLocale} = require('../mdn-process-url');
 const URI = require('urijs');
 const assertEquals = (expected, actual, msg) => {
   if (expected !== actual) {
