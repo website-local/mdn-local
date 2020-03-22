@@ -426,6 +426,10 @@ const preProcessHtml = ($, html) => {
   preProcessRemoveCompatibilityTableWarning($);
   // Add icon to external links for new ui
   preProcessAddIconToExternalLinks($);
+  // keep href of red links by replacing class and fixup style
+  $('article a.new')
+    .removeClass('new')
+    .addClass('mdn-local-red-link');
   return $;
 };
 

@@ -9,3 +9,8 @@
 .signin-link {
     display: none;
 }
+
+/* style from article a.new */
+article a.mdn-local-red-link {
+    color: #900;
+}
