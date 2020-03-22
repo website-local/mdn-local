@@ -1,9 +1,11 @@
+const fs = require('fs');
+const path = require('path');
 const URI = require('urijs');
 const log4js = require('log4js');
 const errorLogger = log4js.getLogger('error');
 const skipExternalLogger = log4js.getLogger('skip-external');
 
-const {cookieJar} = require('./link');
+const {cookieJar, mkdir} = require('./link');
 const Downloader = require('./downloader');
 const {preProcessHtml, postProcessHtml} = require('./mdn-process-html');
 const configureLogger = require('./logger-config');
@@ -547,7 +549,21 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   cookieJar.setCookie(
     'django_language=' + locale,
     'https://developer.mozilla.org',
-    () => d.start());
+    () => {
+      let basePath = path.join(localRoot, 'developer.mozilla.org', 'static', 'build'),
+        jsPath = path.join(basePath, 'js'),
+        cssPath = path.join(basePath, 'styles');
+      mkdir(jsPath);
+      mkdir(cssPath);
+      fs.copyFileSync(path.join(__dirname, 'inject', 'inject.js'),
+        path.join(jsPath, 'inject.js'));
+      fs.copyFileSync(path.join(__dirname, 'inject', 'inject.css'),
+        path.join(cssPath, 'inject.css'));
+      d.start();
+      d.queue.onIdle().then(() => {
+        errorLogger.info('possibly finished.');
+      });
+    });
 
   return d;
 };

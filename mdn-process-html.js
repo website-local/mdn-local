@@ -67,25 +67,14 @@ const postProcessMdnAssets = (text, $, elem) => {
 };
 
 const JSON_PARSE_STR = 'JSON.parse(';
+
+/// region postProcessReactData
 // place holders
 const PLACE_HOLDER_BODY_HTML = '@#%PLACE_HOLDER_BODY_HTML%#@';
 const PLACE_HOLDER_QUICK_HTML = '@#!PLACE_HOLDER_QUICK_HTML!#@';
 const PLACE_HOLDER_TOC_HTML = '@#!%PLACE_HOLDER_TOC_HTML!#%@';
 const PLACE_HOLDER_SUMMARY_HTML = '@#!%$PLACE_HOLDER_SUMMARY_HTML!$#%@';
-// language=JavaScript
-const MOCK_FETCH_JS = `
-  // mock fetch to avoid script errors
-  window.fetch = function () {
-    return Promise.resolve({
-      json: function () {
-        return Promise.resolve({
-          is_superuser: true,
-          waffle: {flags: {}, samples: {}, switches: {registration_disabled: true}}
-        });
-      }
-    });
-  };
-`;
+
 const postProcessReactData = (text, elem) => {
   let jsonStrBeginIndex = text.indexOf(JSON_PARSE_STR),
     jsonStrEndIndex, escapedJsonText, jsonText, data, stringCatalog, key;
@@ -155,6 +144,7 @@ const postProcessReactData = (text, elem) => {
   // language=JavaScript
   text = `
 !function() {
+  'use strict';
   var _mdn_local_quickLinks = document.querySelector('.quick-links ol'),
   _mdn_local_body = document.getElementById('wikiArticle'),
   _mdn_local_toc = document.querySelector('.document-toc ul'),
@@ -172,11 +162,12 @@ const postProcessReactData = (text, elem) => {
     // escape html for js
     .replace(/</g, '\\x3c')
     .replace(/>/g, '\\x3e')};
-${MOCK_FETCH_JS}
 }();
   `.trim();
   elem.html(text);
 };
+
+/// endregion postProcessReactData
 
 const JS_POLYFILL_CLASS = 'js-polyfill-temp-script';
 const SCRIPT_PREFIX = '<script src="';
@@ -225,17 +216,6 @@ const postProcessHtml = ($) => {
     if (text.includes('window._react_data')) {
       postProcessReactData(text, elem);
       // $('#react-container').removeAttr('id');
-      // hide dynamically created useless stuff via css
-      $(`<style class="mdn-local-hide-elements">
-#nav-footer,
-.contributors-sub,
-.overheadIndicator.translationInProgress,
-#nav-main-search,
-.newsletter-container,
-.dropdown-container,
-.bc-data .bc-github-link,
-.signin-link{ display:none }
-</style>`).appendTo('head');
       return;
     }
     if (text.includes('document.write') && text.includes('js-polyfill')) {
@@ -243,6 +223,27 @@ const postProcessHtml = ($) => {
     }
     postProcessMdnAssets(text, $, elem);
   });
+
+  /// region inject external script and style
+  let reactMainScript = $('script[src*="react-main"]'), src, pathArr;
+  if (reactMainScript && reactMainScript.length &&
+    (src = reactMainScript.attr('src')) &&
+    (pathArr = src.split('/')) && pathArr.length) {
+    pathArr.pop();
+    pathArr.push('inject.js');
+    // sync script
+    $(`<script class="mdn-local-inject-js" src="${pathArr.join('/')}"></script>`)
+      .insertBefore(reactMainScript);
+    pathArr.pop();
+    pathArr.pop();
+    pathArr.push('styles');
+    pathArr.push('inject.css');
+    $(`<link href="${pathArr.join('/')}" rel="stylesheet"\
+ type="text/css" class="mdn-local-inject-css">`)
+      .appendTo('head');
+  }
+  /// endregion inject external script and style
+
   // replace external iframe with external links
   postProcessReplaceExternalIframeWithLink($);
   return $;
@@ -253,86 +254,14 @@ const preProcessRemoveCompatibilityTableWarning = ($) => {
     result = $('.blockIndicator.warning'),
     len = result.length,
     item,
-    html,
-    hasCompatibilityTableWarning = false;
+    html;
   for (; i < len; i++) {
     item = $(result[i]);
     html = item.html();
     if (html && html.includes('https://github.com/mdn/browser-compat-data')) {
       item.remove();
-      hasCompatibilityTableWarning = true;
     }
   }
-  if (!hasCompatibilityTableWarning) {
-    return;
-  }
-  // add workaround event handler
-  // implemented with pure js
-  $(`<script class="old-compatibility-table">
-'use strict';
-!function () {
-  var htabs = document.getElementsByClassName('htab'),
-    desktops = document.querySelectorAll('div[id=compat-desktop]'),
-    mobiles = document.querySelectorAll('div[id=compat-mobile]'),
-    len = htabs.length,
-    i, j, htab, links, a;
-  function changeTabListener(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    var li, ul, i, index, selfIndex, elems, tab;
-    if (!(li = this.parentNode)) return false;
-    if ((ul = li.parentNode)) {
-      index = 0;
-      elems = ul.childNodes;
-      for (i = 0; i < elems.length; i++) {
-        if (elems[i].tagName !== 'LI') {
-          continue;
-        }
-        if (elems[i] === li) {
-          selfIndex = index;
-          elems[i].classList.add('selected');
-        } else {
-          elems[i].classList.remove('selected');
-        }
-        ++index;
-      }
-    }
-    if ((tab = ul.parentNode)) {
-      index = 0;
-      elems = tab.childNodes;
-      for (i = 0; i < elems.length; i++) {
-        if (elems[i].tagName !== 'DIV') {
-          continue;
-        }
-        if (index++ === selfIndex) {
-          elems[i].style.display = '';
-        } else {
-          elems[i].style.display = 'none';
-        }
-      }
-    }
-  }
-  for (i = 0; i < len; i++) {
-    htab = htabs[i];
-    links = htab.querySelectorAll('ul>li>a');
-    if (desktops[i]) {
-      htab.appendChild(desktops[i]);
-    }
-    if (mobiles[i]) {
-      htab.appendChild(mobiles[i]);
-    }
-    for (j = 0; j < links.length; j++) {
-      a = links[j];
-      a.addEventListener('click', changeTabListener);
-      if (j === 0) {
-        changeTabListener.call(a);
-      }
-    }
-  }
-}();
-</script>`).appendTo('body');
 };
 
 const preProcessAddIconToExternalLinks =($) => {

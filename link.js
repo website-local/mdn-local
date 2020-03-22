@@ -478,6 +478,7 @@ class SiteMapResource extends Resource {
 
 module.exports.cookieJar = cookieJar;
 module.exports.dnsCache = dnsCache;
+module.exports.mkdir = mkdirRetry;
 module.exports.Resource = Resource;
 module.exports.HtmlResource = HtmlResource;
 module.exports.CssResource = CssResource;

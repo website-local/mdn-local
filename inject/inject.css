@@ -1,0 +1,11 @@
+/* hide dynamically created useless stuff via css */
+#nav-footer,
+.contributors-sub,
+.overheadIndicator.translationInProgress,
+#nav-main-search,
+.newsletter-container,
+.dropdown-container,
+.bc-data .bc-github-link,
+.signin-link {
+    display: none;
+}
