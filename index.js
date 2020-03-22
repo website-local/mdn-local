@@ -104,6 +104,25 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       errorLogger.info('started');
       d.queue.onIdle().then(() => {
         errorLogger.info('possibly finished.');
+        /// region workaround for index.html
+        let indexPath = path.join(localRoot, 'developer.mozilla.org', 'index.html');
+        let replaceIndex = true;
+        if (fs.existsSync(indexPath)) {
+          let stats = fs.statSync(indexPath);
+          if (stats && stats.size > 1024) {
+            replaceIndex = false;
+          }
+        }
+        if (!replaceIndex) return;
+        // noinspection HtmlRequiredTitleElement
+        let indexRedirect = `<html lang="en">
+<head>
+<meta http-equiv="refresh" content="0; url=${locale}/index.html">
+<script>location.replace('${locale}/index.html');</script>
+</head>
+</html>`;
+        fs.writeFileSync(indexPath, indexRedirect, {encoding: 'utf8'});
+        /// endregion workaround for index.html
       });
     });
 
