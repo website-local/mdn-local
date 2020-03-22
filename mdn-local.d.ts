@@ -1,4 +1,4 @@
-import URI from 'urijs'
+import URI = require("urijs");
 import * as got from "got";
 import * as cheerio from "cheerio";
 
@@ -69,8 +69,7 @@ interface DropResourceFunc {
     (res: Resource): boolean;
 }
 
-interface Body {
-}
+declare type Body = ArrayBuffer | Buffer | string | null | void;
 
 declare class Link {
     constructor(url: string, localRoot: string, refUrl: string, options: Options);
@@ -113,7 +112,7 @@ declare class Resource extends Link {
 declare class HtmlResource extends Resource {
     constructor(url: string, localRoot: string, refUrl: string, options: Options);
 
-    private __appendSuffix(suffix: string): void;
+    protected __appendSuffix(suffix: string): void;
 
     doc?: CheerioStatic;
     readonly html?: string;

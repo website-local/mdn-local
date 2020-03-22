@@ -128,7 +128,7 @@ const uriOf = (url, enabled = false) => {
   if (enabled && url in cacheUri && cacheUri[url] instanceof URI) {
     return cacheUri[url];
   }
-  const uri = new URI(url);
+  const uri = URI(url);
   if (enabled) {
     return cacheUri[url] = uri;
   }
@@ -288,7 +288,7 @@ class Resource extends Link {
 
   set url(url) {
     this._url = url;
-    this.uri = new URI(url);
+    this.uri = URI(url);
     if (this.uri.is('relative')) {
       this.replacePath = this.uri.clone();
       this.uri = this.uri.absoluteTo(this.refUri);
@@ -402,7 +402,7 @@ class HtmlResource extends Resource {
   _save(placeholder) {
     const savePathUnEncoded = decodeURI(this.savePath);
     if (placeholder) {
-      let relativePath = new URI(this.redirectedUrl)
+      let relativePath = URI(this.redirectedUrl)
         .search('').normalizePath().relativeTo(this.uri).toString();
       if (relativePath.endsWith('/')) {
         relativePath += 'index.html';

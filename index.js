@@ -101,6 +101,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
       fs.copyFileSync(path.join(__dirname, 'inject', 'inject.css'),
         path.join(cssPath, 'inject.css'));
       d.start();
+      errorLogger.info('started');
       d.queue.onIdle().then(() => {
         errorLogger.info('possibly finished.');
       });

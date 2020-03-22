@@ -2,6 +2,8 @@ const URI = require('urijs');
 const log4js = require('log4js');
 const errorLogger = log4js.getLogger('error');
 const skipExternalLogger = log4js.getLogger('skip-external');
+// hard coded redirect url map to avoid the max-redirect things
+const hardCodedRedirectUrl = require('./redirect-url');
 
 const localeArr = [
   'af', 'ar', 'az', 'bg',
@@ -119,8 +121,6 @@ const validExtensionName = {
 };
 
 
-// hard coded redirect url map to avoid the max-redirect things
-const hardCodedRedirectUrl = require('./redirect-url');
 
 /**
  * @type {SkipProcessFunc}
@@ -140,7 +140,7 @@ const skipProcessFunc = (url, element, parent) => {
       element.hasClass('external'))) {
     return true;
   }
-  let uri = new URI(url), host = uri.host();
+  let uri = URI(url), host = uri.host();
   if (host && host !== 'developer.mozilla.org' &&
     // not likely happen here
     host !== 'mdn.mozillademos.org') {
@@ -238,7 +238,7 @@ const processPathWithMultipleLocale = (pathArr, locale) => {
 /** @type {RequestRedirectFunc} */
 const requestRedirectFunc = (url, res) => {
   let uri, path;
-  if (res && (uri = new URI(url)) &&
+  if (res && (uri = URI(url)) &&
     uri.host() === 'developer.mozilla.org' &&
     (path = uri.path())) {
     if (path.includes('/docs/') && path.includes('$samples/')) {
@@ -317,7 +317,7 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
  * @return {string|*}
  */
 function redirectUrlAfterFetch(url, res, locale) {
-  let uri = new URI(url).search(''), host = uri.host();
+  let uri = URI(url).search(''), host = uri.host();
   if (host === 'mdn.mozillademos.org') {
     return uri.host('developer.mozilla.org').toString();
   }
@@ -360,7 +360,7 @@ function redirectLinkBeforeResourceInit(url, locale, html, localeLowerCase) {
       url = url.slice(0, url.length - 4);
     }
   }
-  let u = new URI(url), host, needToRebuildUrl = false;
+  let u = URI(url), host, needToRebuildUrl = false;
   if ((host = u.host()) && host !== 'developer.mozilla.org') {
     if (host === 'mdn.mozillademos.org') {
       // should be automatically redirected back
@@ -393,13 +393,13 @@ function redirectLinkBeforeResourceInit(url, locale, html, localeLowerCase) {
     if (url[0] !== '/') {
       if (redirectLocale[pathArr1[0]] || localesMap[pathArr1[0]]) {
         pathArr1[0] = locale;
-        u = new URI('/' + pathArr1.join('/'));
+        u = URI('/' + pathArr1.join('/'));
       } else if (pathArr1[0] === '..' && pathArr1[1] === '..' &&
         (redirectLocale[pathArr1[2]] || localesMap[pathArr1[2]])) {
         // ../../en-US/docs/Mercurial
         // ../../zh-cn/docs/JavaScript/Reference/Global_Objects/Map
         pathArr1.splice(0, 3, locale);
-        u = new URI('/' + pathArr1.join('/'));
+        u = URI('/' + pathArr1.join('/'));
       }
     } else if (redirectLocale[pathArr1[1]] || localesMap[pathArr1[1]]) {
       // /zh-CN/docs/https://developer.mozilla.org/en-US/docs/Web
@@ -411,7 +411,7 @@ function redirectLinkBeforeResourceInit(url, locale, html, localeLowerCase) {
       }
     }
     u = u
-      .removeSearch('redirectlocale', 'redirectslug', 'tag', 'language', 'raw', 'section', 'size')
+      .removeSearch(['redirectlocale', 'redirectslug', 'tag', 'language', 'raw', 'section', 'size'])
       .search('')
       .absoluteTo(html.url)
       .normalizePath();

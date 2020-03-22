@@ -34,7 +34,7 @@ const testCases = [
 ];
 
 const process = url => {
-  const u = new URI(url);
+  const u = URI(url);
   const pathArr = u.path().split('/');
   if (processPathWithMultipleLocale(pathArr, 'zh-CN')) {
     url = u.path(pathArr.join('/')).toString();
