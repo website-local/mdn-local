@@ -12,7 +12,7 @@
     "mkdirp": "^1.0.3",
     "p-queue": "^6.3.0",
     "srcset": "^2.0.1",
-    "tough-cookie": "^4.0.0",
+    "tough-cookie": "^3.0.1",
     "urijs": "^1.19.2"
   },
   "devDependencies": {
