@@ -5,6 +5,10 @@ const errorLogger = log4js.getLogger('error');
 
 const {cookieJar, mkdir} = require('./link');
 const Downloader = require('./downloader');
+
+// hard coded redirect url map to avoid the max-redirect things
+const hardCodedRedirectUrl = require('./redirect-url');
+
 const {preProcessHtml, postProcessHtml} = require('./mdn-process-html');
 const configureLogger = require('./logger-config');
 const {
@@ -38,6 +42,8 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
 
   const localeLowerCase = locale.toLocaleLowerCase();
 
+  const redirectUrlMap = hardCodedRedirectUrl(locale);
+
   const dropResourceFunc = (res) =>
     shouldDropResource(res, testLocaleRegExp, locale);
 
@@ -45,7 +51,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     redirectUrlAfterFetch(url, res, locale);
 
   const linkRedirectFunc = (url, elem, html) =>
-    redirectLinkBeforeResourceInit(url, locale, html, localeLowerCase);
+    redirectLinkBeforeResourceInit(url, locale, html, localeLowerCase, redirectUrlMap);
 
   if (!options.req) {
     options.req = {};

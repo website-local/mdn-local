@@ -2,8 +2,6 @@ const URI = require('urijs');
 const log4js = require('log4js');
 const errorLogger = log4js.getLogger('error');
 const skipExternalLogger = log4js.getLogger('skip-external');
-// hard coded redirect url map to avoid the max-redirect things
-const hardCodedRedirectUrl = require('./redirect-url');
 
 const localeArr = [
   'af', 'ar', 'az', 'bg',
@@ -338,7 +336,8 @@ function redirectUrlAfterFetch(url, res, locale) {
 }
 
 
-function redirectLinkBeforeResourceInit(url, locale, html, localeLowerCase) {
+function redirectLinkBeforeResourceInit(url, locale, html,
+  localeLowerCase, hardCodedRedirectUrl) {
   if (url && url.trim) {
     url = url.trim();
   }
