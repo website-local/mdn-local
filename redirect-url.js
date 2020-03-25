@@ -397,7 +397,27 @@ const hardCodedRedirectUrl = (locale) => ({
   'https://developer.cdn.mozilla.net/media/redesign/img/favicon32.png':
     'https://developer.mozilla.org/static/img/favicon32.png',
   'http://developer.cdn.mozilla.net/media/redesign/img/favicon32.png':
-    'https://developer.mozilla.org/static/img/favicon32.png'
+    'https://developer.mozilla.org/static/img/favicon32.png',
+  [`https://developer.mozilla.org/${locale}/docs/@api/deki/files/706/=Groupbox2.png`]:
+    'https://developer.mozilla.org/@api/deki/files/706/=Groupbox2.png',
+  [`https://developer.mozilla.org/${locale}/docs/@api/deki/files/568/=Boxfinal2.png`]:
+    'https://developer.mozilla.org/@api/deki/files/568/=Boxfinal2.png',
+  [`https://developer.mozilla.org/${locale}/docs/@api/deki/files/567/=Boxfinal1.png`]:
+    'https://developer.mozilla.org/@api/deki/files/567/=Boxfinal1.png',
+  [`https://developer.mozilla.org/${locale}/docs/@api/deki/files/891/=Titledbox1.png`]:
+    'https://developer.mozilla.org/@api/deki/files/891/=Titledbox1.png',
+  'https://developer.mozilla.org/zh-CN/docs/Glossary/%E7%94%A8%E6%88%B7%E4%BB%A3%E7%90%86':
+    `https://developer.mozilla.org/${locale}/docs/Glossary/User_Agent`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/slotchange`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLSlotElement/slotchange_event`,
+  [`https://developer.mozilla.org/${locale}/Web_Development/Responsive_Web_design`]:
+  `https://developer.mozilla.org/${locale}/docs/Web_Development/Mobile/Responsive_design`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/CSS/Using_CSS_gradients`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/CSS/CSS_Images/Using_CSS_gradients`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/style`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/style`,
+  'https://developer.mozilla.org/zh-CN/docs/Web/Media/Overview':
+    `https://developer.mozilla.org/${locale}/docs/Web/Media`
 });
 
 module.exports = hardCodedRedirectUrl;

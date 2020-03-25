@@ -496,7 +496,7 @@ function defaultBeginUrl(locale) {
   return [
     `https://developer.mozilla.org/${locale}/docs/Web/API`,
     `https://developer.mozilla.org/${locale}/docs/Web/CSS/Reference`,
-    `https://developer.mozilla.org/${locale}/docs/Web/JavaScript/Index`,
+    `https://developer.mozilla.org/${locale}/docs/Web/JavaScript`,
     `https://developer.mozilla.org/${locale}/docs/Web/HTML/Index`,
     `https://developer.mozilla.org/${locale}/docs/Web/HTML/Attributes`,
     `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element`,
