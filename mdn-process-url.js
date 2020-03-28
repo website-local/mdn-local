@@ -60,7 +60,8 @@ const redirectLocale = {
   'ff': 1,
   'ee': 1,
   'Cn': 1,
-  'bn': 1
+  'bn': 1,
+  'ch-ZN': 1
 };
 
 const appendLocalePath = {
@@ -344,6 +345,8 @@ function redirectLinkBeforeResourceInit(url, locale, html,
   if (!url) return url;
   if (url.startsWith('<=%=baseURL')) {
     url = url.slice('<=%=baseURL'.length);
+  } else if (url.startsWith('%3Ccode%3E') && url.endsWith('%3C/code%3E')) {
+    url = url.slice(10, url.length - 11);
   } else if ((url.startsWith('<') || url.startsWith('&lt;')) &&
     (url.endsWith('>') || url.endsWith('&gt;'))) {
     if (url.startsWith('<')) {
@@ -493,7 +496,7 @@ function redirectLinkBeforeResourceInit(url, locale, html,
  * @return {string[]}
  */
 function defaultBeginUrl(locale) {
-  return [
+  let strings = [
     `https://developer.mozilla.org/${locale}/docs/Web/API`,
     `https://developer.mozilla.org/${locale}/docs/Web/CSS/Reference`,
     `https://developer.mozilla.org/${locale}/docs/Web/JavaScript`,
@@ -514,9 +517,12 @@ function defaultBeginUrl(locale) {
     `https://developer.mozilla.org/${locale}/docs/Learn`,
     `https://developer.mozilla.org/${locale}/docs/Games`,
     `https://developer.mozilla.org/${locale}/docs/Glossary`,
-    `https://developer.mozilla.org/sitemaps/${locale}/sitemap.xml`,
-    'https://developer.mozilla.org/sitemaps/en-US/sitemap.xml'
+    `https://developer.mozilla.org/sitemaps/${locale}/sitemap.xml`
   ];
+  if (locale !== 'en-US') {
+    strings.push('https://developer.mozilla.org/sitemaps/en-US/sitemap.xml');
+  }
+  return strings;
 }
 
 module.exports = {

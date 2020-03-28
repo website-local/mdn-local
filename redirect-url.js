@@ -339,7 +339,7 @@ const hardCodedRedirectUrl = (locale) => ({
   [`https://developer.mozilla.org/${locale}/docs/XUL_School/Connecting_to_Remote_Content`]:
     `https://developer.mozilla.org/${locale}/docs/Archive/Add-ons/Overlay_Extensions/XUL_School/Connecting_to_Remote_Content`,
   'https://developer.mozilla.org/en-US/docs/Web/Events/readystatechange':
-    `https://developer.mozilla.org/${locale}/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6`,
+    `https://developer.mozilla.org/${locale}/docs/Web/Events/readystatechange_event`,
   'https://developer.mozilla.org/en-US/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/ui_button_toggle':
     `https://developer.mozilla.org/${locale}/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/ui_button_toggle`,
   'https://developer.mozilla.org/../../../../En/Mozilla_developer_guide':
@@ -381,7 +381,7 @@ const hardCodedRedirectUrl = (locale) => ({
   [`https://developer.mozilla.org/${locale}/Firefox/Releases/en-US/Add-ons/SDK/Low-Level_APIs/test_httpd`]:
     `https://developer.mozilla.org/${locale}/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/test_httpd`,
   [`https://developer.mozilla.org/${locale}/docs/Web/CSS/en-US/docs/Web/CSS`]:
-    `https://developer.mozilla.org/${locale}/docs/Web/CSS/en-US/docs/Web/CSS`,
+    `https://developer.mozilla.org/${locale}/docs/Web/CSS`,
   'http://w3c.org/2008/site/images/favicon.ico':
     'https://developer.mozilla.org/static/img/favicon32.png',
   'https://w3c.org/2008/site/images/favicon.ico':
@@ -411,13 +411,166 @@ const hardCodedRedirectUrl = (locale) => ({
   [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/slotchange`]:
     `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLSlotElement/slotchange_event`,
   [`https://developer.mozilla.org/${locale}/Web_Development/Responsive_Web_design`]:
-  `https://developer.mozilla.org/${locale}/docs/Web_Development/Mobile/Responsive_design`,
+    `https://developer.mozilla.org/${locale}/docs/Web_Development/Mobile/Responsive_design`,
   [`https://developer.mozilla.org/${locale}/docs/Web/CSS/Using_CSS_gradients`]:
     `https://developer.mozilla.org/${locale}/docs/Web/CSS/CSS_Images/Using_CSS_gradients`,
   [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/style`]:
     `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/style`,
   'https://developer.mozilla.org/zh-CN/docs/Web/Media/Overview':
-    `https://developer.mozilla.org/${locale}/docs/Web/Media`
+    `https://developer.mozilla.org/${locale}/docs/Web/Media`,
+  'https://developer.mozilla.org/zh-CN/Add-ons/Code_snippets/Tabbed_browser?redirectlocale=en-US&redirectslug=Code_snippets%2FTabbed_browser':
+    `https://developer.mozilla.org/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
+  'https://developer.mozilla.org/zh-CN/Add-ons/Code_snippets/Tabbed_browser':
+    `https://developer.mozilla.org/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Events/readystatechange`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Document/readystatechange_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Document/onreadystatechange`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Document/readystatechange_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/BluetoothAdapter/startDiscovery`]:
+    `https://developer.mozilla.org/${locale}/docs/Archive/B2G_OS/API/BluetoothAdapter/startDiscovery`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/childNodes`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/childNodes`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/blur`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/blur`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/span`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/span`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/span`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLSpanElement`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/%20object`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/object`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/firstChild`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/firstChild`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/nextSibling`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/nextSibling`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/lastChild`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/lastChild`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/parentNode`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/parentNode`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/removeChild`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/removeChild`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/previousSibling`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/previousSibling`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/insertBefore`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/insertBefore`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/onclick`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/onclick`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/TableRow/insertCell`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLTableRowElement/insertCell`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/NodeList`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/NodeList`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/HTML/Element/script`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLScriptElement`,
+  [`https://developer.mozilla.org/${locale}/SVG/Content_type`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Content_type`,
+  [`https://developer.mozilla.org/${locale}/SVG/FAQ`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/FAQ`,
+  [`https://developer.mozilla.org/${locale}/SVG/Content_type`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Content_type`,
+  [`https://developer.mozilla.org/${locale}/SVG/Namespaces_Crash_Course`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Namespaces_Crash_Course`,
+  [`https://developer.mozilla.org/${locale}/SVG/Attribute`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Attribute`,
+  [`https://developer.mozilla.org/${locale}/SVG/Compatibility_sources`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Compatibility_sources`,
+  [`https://developer.mozilla.org/${locale}/SVG/Tutorial/Filter_effects`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Tutorial/Filter_effects`,
+  [`https://developer.mozilla.org/${locale}/SVG/Element/rect`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Element/rect`,
+  [`https://developer.mozilla.org/${locale}/SVG/Element/circle`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Element/circle`,
+  [`https://developer.mozilla.org/${locale}/SVG/Tutorial/Paths`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Tutorial/Paths`,
+  [`https://developer.mozilla.org/${locale}/SVG/Tutorial/Positions`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Tutorial/Positions`,
+  [`https://developer.mozilla.org/${locale}/SVG/Element/polygon`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Element/polygon`,
+  [`https://developer.mozilla.org/${locale}/SVG/Element/defs`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Element/defs`,
+  [`https://developer.mozilla.org/${locale}/SVG/Tutorial/SVG_Fonts`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Tutorial/SVG_Fonts`,
+  [`https://developer.mozilla.org/${locale}/SVG/SVG_animation_with_SMIL`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/SVG_animation_with_SMIL`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/svg`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Element/svg`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Events/fullscreen`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Document/fullscreenchange_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/JavaScript/Reference/new`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/JavaScript/Reference/Operators/new`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/HTMLVideoElement`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLVideoElement`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/NodeList`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/NodeList`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/offsetHeight`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Element/offsetHeight`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/dataset`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/dataset`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/click`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/click`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/focus`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/focus`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/onkeypress`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/onkeypress`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/onkeydown`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/onkeydown`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/dir`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/dir`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/onkeyup`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/onkeyup`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/oncontextmenu`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/oncontextmenu`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/isContentEditable`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/isContentEditable`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/contenteditable`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/contentEditable`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/contentEditable`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/contentEditable`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/transitionend_event`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/transitionend_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/offsetWidth`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/offsetWidth`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/textContent`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/textContent`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Document/en/HTML/Element/a`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/a`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/SVGColorProfileElement`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/SVGColorProfileElement`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/%3Cvideo%3E`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/video`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Element/createTextRange`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Document/createRange`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/referrer`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Document/referrer`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/SVG/Element/foreignObjects`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/SVG/Element/foreignObject`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/input/%3Cinput_type=_tel_%3E`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/input/tel`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/%3Cimg%3E`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/HTML/Element/img`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/CSS/Web/Events/pointermove`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLElement/pointermove_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/search`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLInputElement/search_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/message`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/BroadcastChannel/message_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/message_%28ServiceWorker%29`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/ServiceWorkerGlobalScope/message_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/cancel`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLDialogElement/cancel_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/close`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLDialogElement/close_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/FontFaceSetLoadEvent`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/FontFaceSetLoadEvent`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/addtrack`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/MediaStream/addtrack_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/muted`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/MediaStreamTrack/mute_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/unmuted`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/MediaStreamTrack/unmute_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/ended%20%28MediaStreamTrack%29`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/MediaStreamTrack/ended_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/removetrack`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/MediaStream/removetrack_event`
+
 });
 
 module.exports = hardCodedRedirectUrl;
