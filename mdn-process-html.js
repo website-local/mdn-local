@@ -430,6 +430,10 @@ const preProcessHtml = ($, html) => {
   $('article a.new')
     .removeClass('new')
     .addClass('mdn-local-red-link');
+
+  // remove google cdn stuff
+  $('link[href*="googleapis.com"]').remove();
+  $('script[src*="googleapis.com"]').remove();
   return $;
 };
 
