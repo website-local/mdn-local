@@ -264,6 +264,14 @@ const requestRedirectFunc = (url, res) => {
         .path(path.slice('/mdn-github-io'.length))
         .toString();
     }
+    if (path.startsWith('/unpkg-com/')) {
+      // unpkg.com
+      // redirect back to real url
+      return uri.search('')
+        .host('unpkg.com')
+        .path(path.slice('/unpkg-com'.length))
+        .toString();
+    }
   }
   return url;
 };
@@ -294,7 +302,6 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
     path.startsWith(locale + '/search') ||
     path.startsWith('search') ||
     path.endsWith('$history') ||
-    path.endsWith('$samples') ||
     path.endsWith('$children') ||
     path.endsWith('$json') ||
     path.endsWith('$edit') ||
@@ -367,11 +374,9 @@ function redirectLinkBeforeResourceInit(url, locale, html,
     if (host === 'mdn.mozillademos.org') {
       // should be automatically redirected back
       u = u.host('developer.mozilla.org');
-      needToRebuildUrl = true;
     } else if (host === 'wiki.developer.mozilla.org' ||
       host === 'developer.cdn.mozilla.net') {
       u = u.host('developer.mozilla.org');
-      needToRebuildUrl = true;
     } else if (host === 'interactive-examples.mdn.mozilla.net') {
       // interactive-examples
       // fake url, redirected back in requestRedirectFunc
@@ -384,7 +389,13 @@ function redirectLinkBeforeResourceInit(url, locale, html,
       return u.host('developer.mozilla.org')
         .path('/mdn-github-io' + u.path())
         .toString();
-    } else if (hardCodedRedirectUrl[url]) {
+    } else if (host === 'unpkg.com') {
+      // unpkg.com
+      // fake url, redirected back in requestRedirectFunc
+      return u.host('developer.mozilla.org')
+        .path('/unpkg-com' + u.path())
+        .toString();
+    } if (hardCodedRedirectUrl[url]) {
       return hardCodedRedirectUrl[url];
     } else {
       return url;
@@ -431,6 +442,14 @@ function redirectLinkBeforeResourceInit(url, locale, html,
       // fake url, redirected back in requestRedirectFunc
       return u.host('developer.mozilla.org')
         .path('/mdn-github-io' + u.path())
+        .toString();
+    }
+    if (html._downloadLink.includes('//unpkg.com/') &&
+      !u.path().includes('/unpkg-com/')) {
+      // mdn.github.io
+      // fake url, redirected back in requestRedirectFunc
+      return u.host('developer.mozilla.org')
+        .path('/unpkg-com' + u.path())
         .toString();
     }
     needToRebuildUrl = true;
