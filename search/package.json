@@ -1,0 +1,27 @@
+{
+  "name": "search",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.6.1",
+    "cheerio": "^1.0.0-rc.3",
+    "fast-glob": "^3.2.2",
+    "koa": "^2.11.0",
+    "koa-static": "^5.0.0",
+    "log4js": "^6.1.2",
+    "yargs": "^15.3.1"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.17",
+    "@types/koa": "^2.11.0",
+    "@types/yargs": "^15.0.4",
+    "elastic-ts": "^0.2.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
