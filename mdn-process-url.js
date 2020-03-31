@@ -374,9 +374,11 @@ function redirectLinkBeforeResourceInit(url, locale, html,
     if (host === 'mdn.mozillademos.org') {
       // should be automatically redirected back
       u = u.host('developer.mozilla.org');
+      needToRebuildUrl = true;
     } else if (host === 'wiki.developer.mozilla.org' ||
       host === 'developer.cdn.mozilla.net') {
       u = u.host('developer.mozilla.org');
+      needToRebuildUrl = true;
     } else if (host === 'interactive-examples.mdn.mozilla.net') {
       // interactive-examples
       // fake url, redirected back in requestRedirectFunc
@@ -395,7 +397,7 @@ function redirectLinkBeforeResourceInit(url, locale, html,
       return u.host('developer.mozilla.org')
         .path('/unpkg-com' + u.path())
         .toString();
-    } if (hardCodedRedirectUrl[url]) {
+    } else if (hardCodedRedirectUrl[url]) {
       return hardCodedRedirectUrl[url];
     } else {
       return url;
@@ -500,8 +502,7 @@ function redirectLinkBeforeResourceInit(url, locale, html,
   if (needToRebuildUrl) {
     url = u.path(pathArr.join('/')).toString();
   }
-  if (url.match('en-US')) {
-    // eslint-disable-next-line no-console
+  if (locale !== 'en-US' && url.match('en-US')) {
     errorLogger.warn(url, pathArr);
   }
   if (hardCodedRedirectUrl[url]) {
