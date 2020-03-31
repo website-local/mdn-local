@@ -79,9 +79,9 @@ const getRetry = async (url, options) => {
         await sleep(i * 150);
         continue;
       }
-      if (e && e.name === 'TimeoutError' && e.event === 'lookup') {
+      if (e && e.name === 'TimeoutError' && (e.event === 'lookup' || e.event === 'socket')) {
         // GotError: Timeout awaiting 'lookup' for 1000ms
-        logger.retry.warn(i, url, 'retry on lookup timeout', e.message, e.name);
+        logger.retry.warn(i, url, `retry on ${e.event} timeout`, e.message, e.name);
         await sleep(i * 150);
         continue;
       }
