@@ -25,16 +25,25 @@ const processCss = async (css) => {
   if (!css.urls) {
     await css.fetch();
   }
-  return css.urls.map(url => {
+  let resources = [];
+  for (let i = 0, l = css.urls.length, url, r; i < l; i++) {
+    url = css.urls[i];
     const link = url && css.options.linkRedirectFunc ?
       css.options.linkRedirectFunc(url, null, css) : url;
-    let r = createCssResourceFromUrl(link, css);
+    if (!url || (css.options.skipProcessFunc &&
+      css.options.skipProcessFunc(url, null, css))) {
+      continue;
+    }
+    r = createCssResourceFromUrl(link, css);
+
     if (css.options.preProcessResource) {
       css.options.preProcessResource(link, null, r, css);
     }
+
     css.body = css.body.split(url).join(r.replacePath.toString());
-    return r;
-  });
+    resources.push(r);
+  }
+  return resources;
 };
 
 module.exports = processCss;
