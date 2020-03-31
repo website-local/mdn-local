@@ -569,8 +569,19 @@ const hardCodedRedirectUrl = (locale) => ({
   [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/ended%20%28MediaStreamTrack%29`]:
     `https://developer.mozilla.org/${locale}/docs/Web/API/MediaStreamTrack/ended_event`,
   [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/removetrack`]:
-    `https://developer.mozilla.org/${locale}/docs/Web/API/MediaStream/removetrack_event`
-
+    `https://developer.mozilla.org/${locale}/docs/Web/API/MediaStream/removetrack_event`,
+  // just an alternative, not original pic
+  'https://i.picsum.photos/id/1080/6858/4574.jpg':
+    'https://developer.mozilla.org/files/16869/new-york-skyline-4by3.jpg',
+  // just an alternative, not original pic
+  'http://www.mozilla.org/images/mozilla-banner.gif':
+    'https://developer.mozilla.org/files/3811/linear_red_angles.png',
+  // just an alternative, not original pic
+  'https://www.mozilla.org/images/mozilla-banner.gif':
+    'https://developer.mozilla.org/files/3811/linear_red_angles.png',
+  // just an alternative, not original pic
+  'https://www.mozilla.org/media/img/logos/firefox/logo-quantum.9c5e96634f92.png':
+    'https://developer.mozilla.org/files/2917/fxlogo.png'
 });
 
 module.exports = hardCodedRedirectUrl;
