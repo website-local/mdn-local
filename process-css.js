@@ -3,13 +3,17 @@ const {Resource, CssResource} = require('./link');
 /**
  * @param {string} url
  * @param {Resource} base
- * @return {Resource}
+ * @return {Resource | CssResource}
  */
 const createCssResourceFromUrl = (url, base) => {
+  let refUrl = base.redirectedUrl || base.url;
+  if (base.options.linkRedirectFunc) {
+    url = base.options.linkRedirectFunc(url, null, base);
+  }
   if (url.endsWith('.css')) {
-    return new CssResource(url, base.localRoot, base.url, base.options);
+    return new CssResource(url, base.localRoot, refUrl, base.options);
   } else {
-    return new Resource(url, base.localRoot, base.url, base.options);
+    return new Resource(url, base.localRoot, refUrl, base.options);
   }
 };
 
@@ -17,7 +21,7 @@ const createCssResourceFromUrl = (url, base) => {
  * @param {string} url
  * @param {null | Cheerio} elem
  * @param {HtmlResource | CssResource} parent
- * @return {Resource}
+ * @return {Resource | CssResource}
  */
 const createResourceFromCss = (url, elem, parent) => {
   const link = url && parent.options.linkRedirectFunc ?
