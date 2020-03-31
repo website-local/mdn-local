@@ -33,7 +33,7 @@ const {
  * @return {Downloader}
  */
 const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
-  if (!localesMap[locale]) {
+  if (!localesMap[locale] && locale !== 'en-US') {
     throw new TypeError('locale not exists');
   }
   configureLogger(localRoot);
