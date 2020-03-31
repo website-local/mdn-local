@@ -39,7 +39,8 @@ const process = async () => {
         id: entry,
         index: config.esIndex,
         body: {
-          title: escapeHtml(title),
+          title: escapeHtml(title)
+            .replace(/| MDN$/i, ''),
           time: time,
           breadcrumb: escapeHtml(breadcrumb)
             .replace(/\s{2,}/g, ' '),
