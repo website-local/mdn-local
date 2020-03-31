@@ -48,8 +48,6 @@ const hardCodedRedirectUrl = (locale) => ({
     `https://developer.mozilla.org/${locale}/docs/Archive/B2G_OS/API/MozAlarmsManager/getAll`,
   [`https://developer.mozilla.org/${locale}/docs/DOM/window.clearTimeout`]:
     `https://developer.mozilla.org/${locale}/docs/Web/API/WindowTimers/clearTimeout`,
-  [`https://developer.mozilla.org/${locale}/Configuring_Build_Options`]:
-    `https://developer.mozilla.org/${locale}/docs/%E9%85%8D%E7%BD%AE%E7%BC%96%E8%AF%91%E9%80%89%E9%A1%B9`,
   [`https://developer.mozilla.org/${locale}/DOM/window.openDialog`]:
     `https://developer.mozilla.org/${locale}/docs/Web/API/Window/openDialog`,
   // [`https://developer.mozilla.org/${locale}/docs/XUL_School/The_Essentials_of_an_Extension`]: ``,
@@ -125,8 +123,6 @@ const hardCodedRedirectUrl = (locale) => ({
     `https://developer.mozilla.org/${locale}/docs/Web/CSS/column-rule-color`,
   [`https://developer.mozilla.org/${locale}/docs/Web/API/Web_Animations_API/Animation_timing_options`]:
     `https://developer.mozilla.org/${locale}/docs/Web/API/EffectTiming`,
-  [`https://developer.mozilla.org/${locale}/docs/Apps/Packaged_apps`]:
-    `https://developer.mozilla.org/${locale}/docs/Archive/Mozilla/Marketplace/Options/%E6%89%93%E5%8C%85_%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F`,
   [`https://developer.mozilla.org/${locale}/docs/Web/API/MozMobileMessageManager/send`]:
     `https://developer.mozilla.org/${locale}/docs/Archive/B2G_OS/API/MozMobileMessageManager/send`,
   [`https://developer.mozilla.org/${locale}/docs/Apps/Updating_apps`]:
@@ -248,12 +244,8 @@ const hardCodedRedirectUrl = (locale) => ({
     `https://developer.mozilla.org/${locale}/docs/Mozilla/Add-ons/Plugins/Plugin_API_Reference`,
   [`https://developer.mozilla.org/${locale}/DOM/document.async`]:
     `https://developer.mozilla.org/${locale}/docs/Web/API/XMLDocument/async`,
-  [`https://developer.mozilla.org/${locale}/docs/Project:MDC_editor_guide`]:
-    `https://developer.mozilla.org/${locale}/docs/Project:MDN/%E8%B4%A1%E7%8C%AE/Editor_guide/Basics`,
   [`https://developer.mozilla.org/${locale}/docs/Project:Custom_templates`]:
     `https://developer.mozilla.org/${locale}/docs/MDN/Contribute/Content/Custom_macros`,
-  [`https://developer.mozilla.org/${locale}/Apps/Packaged_apps`]:
-    `https://developer.mozilla.org/${locale}/docs/Archive/Mozilla/Marketplace/Options/%E6%89%93%E5%8C%85_%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F`,
   [`https://developer.mozilla.org/${locale}/docs/Project:MDN/Contributing/Custom_macros`]:
     `https://developer.mozilla.org/${locale}/docs/MDN/Contribute/Content/Custom_macros`,
   [`https://developer.mozilla.org/${locale}/Add-ons/SDK/Getting_Started_With_cfx`]:
@@ -296,8 +288,6 @@ const hardCodedRedirectUrl = (locale) => ({
     `https://developer.mozilla.org/${locale}/docs/Archive/Add-ons/Legacy_Firefox_for_Android/API/PageActions.jsm`,
   [`https://developer.mozilla.org/${locale}/DOM/EventTarget`]:
     `https://developer.mozilla.org/${locale}/docs/Web/API/EventTarget`,
-  [`https://developer.mozilla.org/${locale}/docs/Web/API/SpeechRecognition`]:
-    `https://developer.mozilla.org/${locale}/docs/Web/API/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB`,
   [`https://developer.mozilla.org/${locale}/docs/Web/CSS/-webkit-animation-direction`]:
     `https://developer.mozilla.org/${locale}/docs/Web/CSS/animation-direction`,
   [`https://developer.mozilla.org/${locale}/docs/Mozilla/Add-ons/WebExtensions/Alternative_distribution_options/Sideloading_add-ons`]:
@@ -584,4 +574,20 @@ const hardCodedRedirectUrl = (locale) => ({
     'https://developer.mozilla.org/files/2917/fxlogo.png'
 });
 
-module.exports = hardCodedRedirectUrl;
+module.exports = (locale) => {
+  const ret = hardCodedRedirectUrl(locale);
+  if ('zh-CN' === locale) {
+    ret[`https://developer.mozilla.org/${locale}/Configuring_Build_Options`]=
+     `https://developer.mozilla.org/${locale}/docs/%E9%85%8D%E7%BD%AE%E7%BC%96%E8%AF%91%E9%80%89%E9%A1%B9`;
+    ret [`https://developer.mozilla.org/${locale}/docs/Apps/Packaged_apps`] =
+         `https://developer.mozilla.org/${locale}/docs/Archive/Mozilla/Marketplace/Options/%E6%89%93%E5%8C%85_%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F`;
+    ret [`https://developer.mozilla.org/${locale}/docs/Project:MDC_editor_guide`] =
+       `https://developer.mozilla.org/${locale}/docs/Project:MDN/%E8%B4%A1%E7%8C%AE/Editor_guide/Basics`;
+    ret[`https://developer.mozilla.org/${locale}/Apps/Packaged_apps`] =
+       `https://developer.mozilla.org/${locale}/docs/Archive/Mozilla/Marketplace/Options/%E6%89%93%E5%8C%85_%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F`;
+
+    ret [`https://developer.mozilla.org/${locale}/docs/Web/API/SpeechRecognition`] =
+       `https://developer.mozilla.org/${locale}/docs/Web/API/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB`;
+  }
+  return ret;
+};
