@@ -14,6 +14,27 @@ const createCssResourceFromUrl = (url, base) => {
 };
 
 /**
+ * @param {string} url
+ * @param {null | Cheerio} elem
+ * @param {HtmlResource | CssResource} parent
+ * @return {Resource}
+ */
+const createResourceFromCss = (url, elem, parent) => {
+  const link = url && parent.options.linkRedirectFunc ?
+    parent.options.linkRedirectFunc(url, elem, parent) : url;
+  if (!url || (parent.options.skipProcessFunc &&
+    parent.options.skipProcessFunc(url, elem, parent))) {
+    return null;
+  }
+  let r = createCssResourceFromUrl(link, parent);
+
+  if (parent.options.preProcessResource) {
+    parent.options.preProcessResource(link, elem, r, parent);
+  }
+  return r;
+};
+
+/**
  *
  * @param {CssResource} css
  * @return {Resource[]}
@@ -28,18 +49,9 @@ const processCss = async (css) => {
   let resources = [];
   for (let i = 0, l = css.urls.length, url, r; i < l; i++) {
     url = css.urls[i];
-    const link = url && css.options.linkRedirectFunc ?
-      css.options.linkRedirectFunc(url, null, css) : url;
-    if (!url || (css.options.skipProcessFunc &&
-      css.options.skipProcessFunc(url, null, css))) {
+    if (!(r = createResourceFromCss(url, null, css))) {
       continue;
     }
-    r = createCssResourceFromUrl(link, css);
-
-    if (css.options.preProcessResource) {
-      css.options.preProcessResource(link, null, r, css);
-    }
-
     css.body = css.body.split(url).join(r.replacePath.toString());
     resources.push(r);
   }
@@ -48,3 +60,4 @@ const processCss = async (css) => {
 
 module.exports = processCss;
 module.exports.createCssResourceFromUrl = createCssResourceFromUrl;
+module.exports.createResourceFromCss = createResourceFromCss;

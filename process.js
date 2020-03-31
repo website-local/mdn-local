@@ -1,7 +1,7 @@
 const parseCssUrls = require('css-url-parser');
 const sources = require('./sources');
 const {Resource, HtmlResource, CssResource} = require('./link');
-const {createCssResourceFromUrl} = require('./process-css');
+const {createResourceFromCss} = require('./process-css');
 const srcset = require('srcset');
 
 /**
@@ -34,16 +34,14 @@ const process = async (html) => {
         if (type === 'css-inline') {
           let content = elem.html();
           const cssUrls = parseCssUrls(content);
-          resArr.push(...cssUrls.map(url => {
-            const link = url && html.options.linkRedirectFunc ?
-              html.options.linkRedirectFunc(url, elem, html) : url;
-            let r = createCssResourceFromUrl(link, html);
-            if (html.options.preProcessResource) {
-              html.options.preProcessResource(link, elem, r, html);
+          for (let i = 0, l = cssUrls.length, url, r; i < l; i++) {
+            url = cssUrls[i];
+            if (!(r = createResourceFromCss(url, elem, html))) {
+              continue;
             }
             content = content.split(url).join(r.replacePath.toString());
-            return r;
-          }));
+            resArr.push(r);
+          }
           elem.html(content);
         }
         continue;
