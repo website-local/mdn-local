@@ -356,6 +356,8 @@ function redirectLinkBeforeResourceInit(url, locale, html,
     url = url.slice('<=%=baseURL'.length);
   } else if (url.startsWith('%3Ccode%3E') && url.endsWith('%3C/code%3E')) {
     url = url.slice(10, url.length - 11);
+  } else if (url.startsWith('<code>') && url.endsWith('</code>')) {
+    url = url.slice(6, url.length - 7);
   } else if ((url.startsWith('<') || url.startsWith('&lt;')) &&
     (url.endsWith('>') || url.endsWith('&gt;'))) {
     if (url.startsWith('<')) {

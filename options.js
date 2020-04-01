@@ -7,6 +7,7 @@ const MAX_RETRY_DELAY = 5000;
  */
 const defaultOptions = {
   req: {
+    maxRedirects: 15,
     retry: {
       decompress: true,
       limit: MAX_RETRY,
