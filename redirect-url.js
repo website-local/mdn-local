@@ -571,7 +571,13 @@ const hardCodedRedirectUrl = (locale) => ({
     'https://developer.mozilla.org/files/3811/linear_red_angles.png',
   // just an alternative, not original pic
   'https://www.mozilla.org/media/img/logos/firefox/logo-quantum.9c5e96634f92.png':
-    'https://developer.mozilla.org/files/2917/fxlogo.png'
+    'https://developer.mozilla.org/files/2917/fxlogo.png',
+  // fake url, prevent external downloads
+  'http://weloveiconfonts.com/api/?family=entypo':
+    'https://developer.mozilla.org/static/build/styles/inject.css',
+  // fake url, prevent external downloads
+  'https://weloveiconfonts.com/api/?family=entypo':
+    'https://developer.mozilla.org/static/build/styles/inject.css'
 });
 
 module.exports = (locale) => {

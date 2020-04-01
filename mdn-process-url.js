@@ -301,6 +301,8 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
     path.startsWith(`/${locale}/search`) ||
     path.startsWith(locale + '/search') ||
     path.startsWith('search') ||
+    // fake url
+    path.startsWith('/static/build/styles/inject.css') ||
     path.endsWith('$history') ||
     path.endsWith('$children') ||
     path.endsWith('$json') ||
