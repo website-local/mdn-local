@@ -560,6 +560,60 @@ const hardCodedRedirectUrl = (locale) => ({
     `https://developer.mozilla.org/${locale}/docs/Web/API/MediaStreamTrack/ended_event`,
   [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/removetrack`]:
     `https://developer.mozilla.org/${locale}/docs/Web/API/MediaStream/removetrack_event`,
+  [`https://developer.mozilla.org/${locale}/docs/Learn/WebGL`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/WebGL_API/Tutorial`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/event/keypress`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Document/keypress_event`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/Event/UIEvent/KeyboardEvent`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/KeyboardEvent`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/HTMLBaseFontElement`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/HTMLBaseFontElement`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/DOM_Events`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Document_Object_Model/Events`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/element.contextmenu`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/HTML/Global_attributes/contextmenu`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/DOM/Window`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Window`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/element.appendChild`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/appendChild`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/element.isSupported`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/isSupported`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/element.scrollHeight`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Element/scrollHeight`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/element.isDefaultNamespace`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/Node/isDefaultNamespace`,
+  [`https://developer.mozilla.org/${locale}/Code_snippets/HTML_to_DOM`]:
+    `https://developer.mozilla.org/${locale}/Archive/Add-ons/Code_snippets/HTML_to_DOM`,
+  [`https://developer.mozilla.org/${locale}/DOM_Mutation_Observers`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/MutationObserver`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/DOM_event_reference/input`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/InputEvent/InputEvent`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/Reference/Events/abort_%28dom_abort_api%29`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/AbortSignal/abort_event`,
+  [`https://developer.mozilla.org/${locale}/DOMString`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/DOMString`,
+  [`https://developer.mozilla.org/${locale}/DOMParser`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/DOMParser`,
+  [`https://developer.mozilla.org/${locale}/Session_store_API`]:
+    `https://developer.mozilla.org/${locale}/docs/Archive/Add-ons/Session_store_API`,
+  [`https://developer.mozilla.org/${locale}/docs/DOM/Using_the_Telephony_API`]:
+    `https://developer.mozilla.org/${locale}/docs/Archive/B2G_OS/Web_Telephony_API/Using_the_Web_Telephony_API`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Window/DOMPoint`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/DOMPoint`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Window/DOMMatrix`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/DOMMatrix`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Window/DOMMatrixReadOnly`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/DOMMatrixReadOnly`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Window/DOMQuad`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/DOMQuad`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Window/DOMRect`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/DOMRect`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/API/Window/DOMRectReadOnly`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/DOMRectReadOnly`,
+  [`https://developer.mozilla.org/${locale}/docs/Web/JavaScript/Reference/DOMException`]:
+    `https://developer.mozilla.org/${locale}/docs/Web/API/DOMException`,
+  [`https://developer.mozilla.org/${locale}/Using_Web_Standards_in_your_Web_Pages/Using_the_W3C_DOM`]:
+    `https://developer.mozilla.org/${locale}/docs/Archive/Using_Web_Standards_in_your_Web_Pages/Using_the_W3C_DOM`,
   // just an alternative, not original pic
   'https://i.picsum.photos/id/1080/6858/4574.jpg':
     'https://developer.mozilla.org/files/16869/new-york-skyline-4by3.jpg',
@@ -594,6 +648,13 @@ module.exports = (locale) => {
 
     ret [`https://developer.mozilla.org/${locale}/docs/Web/API/SpeechRecognition`] =
        `https://developer.mozilla.org/${locale}/docs/Web/API/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB`;
+    // readystatechange event
+    ret['https://developer.mozilla.org/en-US/docs/Web/Events/readystatechange'] =
+      'https://developer.mozilla.org/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6';
+    ret['https://developer.mozilla.org/zh-CN/docs/Web/Events/readystatechange'] =
+      'https://developer.mozilla.org/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6';
+    ret['https://developer.mozilla.org/zh-CN/docs/Web/Events/readystatechange_event'] =
+      'https://developer.mozilla.org/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6';
   }
   return ret;
 };
