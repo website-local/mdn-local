@@ -181,7 +181,10 @@ const postProcessJsPolyFill = ($, elem, text) => {
   if (!tempScript || !tempScript.length) return elem.remove();
   src = tempScript.attr('src');
   tempScript.remove();
-  elem.html(text.slice(0, beginIndex) + src + text.slice(endIndex));
+  elem.html((text.slice(0, beginIndex) + src + text.slice(endIndex))
+    // escape tag for cheerio
+    .replace('<script', '\\x3cscript')
+    .replace('<\\/script>', '\\x3c/script\\x3e'));
 };
 
 const postProcessReplaceExternalIframeWithLink = ($) => {
