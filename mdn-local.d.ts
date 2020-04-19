@@ -54,7 +54,8 @@ interface RequestRedirectFunc {
 }
 
 interface LinkRedirectFunc {
-    (url: string, element: Cheerio | null, parent: HtmlResource | CssResource): string;
+    (url: string, element: Cheerio | null, parent: HtmlResource | CssResource):
+        string | Promise<string>;
 }
 
 interface SkipProcessFunc {

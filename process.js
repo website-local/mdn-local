@@ -17,7 +17,7 @@ const process = async (html) => {
   }
   let url = html.redirectedUrl || html.url;
   if (html.options.linkRedirectFunc) {
-    url = html.options.linkRedirectFunc(url, null, html);
+    url = await html.options.linkRedirectFunc(url, null, html);
   }
   const depth = (+html.depth || 0) + 1;
   const htmlArr = [];
@@ -65,7 +65,7 @@ const process = async (html) => {
           continue;
         }
         const link = originalLink && html.options.linkRedirectFunc ?
-          html.options.linkRedirectFunc(originalLink, elem, html) : originalLink;
+          (await html.options.linkRedirectFunc(originalLink, elem, html)) : originalLink;
         if (!link || (html.options.skipProcessFunc &&
           html.options.skipProcessFunc(link, elem, html))) {
           continue;
