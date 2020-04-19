@@ -295,7 +295,9 @@ class Resource extends Link {
       this._url = this.uri.toString();
     } else if (this.uri.host() !== this.refUri.host()) {
       const crossOrigin = this.uri.host();
-      const crossUri = this.uri.clone().host(this.refUri.host());
+      const crossUri = this.uri.clone()
+        .host(this.refUri.host())
+        .protocol(this.refUri.protocol());
       crossUri.path(crossOrigin + '/' + crossUri.path());
       this.replacePath = crossUri.relativeTo(this.refUri);
       this.replacePath.path('../' + this.replacePath.path());
