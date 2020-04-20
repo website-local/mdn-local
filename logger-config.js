@@ -1,40 +1,40 @@
 const log4js = require('log4js');
 const path = require('path');
 
-const configureLogger = (localRoot) =>
+const configureLogger = (localRoot, subDir) =>
   log4js.configure({
     appenders: {
       'retry': {
         type: 'file',
-        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'retry.log')
+        filename: path.join(localRoot, subDir, 'logs', 'retry.log')
       },
       'mkdir': {
         type: 'file',
-        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'mkdir.log')
+        filename: path.join(localRoot, subDir, 'logs', 'mkdir.log')
       },
       'error': {
         type: 'file',
-        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'error.log')
+        filename: path.join(localRoot, subDir, 'logs', 'error.log')
       },
       'skip': {
         type: 'file',
-        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'skip.log')
+        filename: path.join(localRoot, subDir, 'logs', 'skip.log')
       },
       '404': {
         type: 'file',
-        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', '404.log')
+        filename: path.join(localRoot, subDir, 'logs', '404.log')
       },
       'complete': {
         type: 'file',
-        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'complete.log')
+        filename: path.join(localRoot, subDir, 'logs', 'complete.log')
       },
       'request': {
         type: 'file',
-        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'request.log')
+        filename: path.join(localRoot, subDir, 'logs', 'request.log')
       },
       'response': {
         type: 'file',
-        filename: path.join(localRoot, 'developer.mozilla.org', 'logs', 'response.log')
+        filename: path.join(localRoot, subDir, 'logs', 'response.log')
       },
       'stdout': {
         type: 'stdout'

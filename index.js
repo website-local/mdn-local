@@ -36,7 +36,7 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
   if (!localesMap[locale] && locale !== 'en-US') {
     throw new TypeError('locale not exists');
   }
-  configureLogger(localRoot);
+  configureLogger(localRoot, 'developer.mozilla.org');
   const testLocaleRegExp =
     new RegExp(`/(${localeArr.filter(l => l !== locale).join('|')})\\//`, 'i');
 
