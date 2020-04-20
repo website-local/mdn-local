@@ -29,6 +29,6 @@
             "error",
             "always"
         ],
-        "require-atomic-updates": [1]
+        "require-atomic-updates": [0]
     }
 }
