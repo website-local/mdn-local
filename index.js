@@ -3,14 +3,14 @@ const path = require('path');
 const log4js = require('log4js');
 const errorLogger = log4js.getLogger('error');
 
-const {cookieJar, mkdir} = require('./link');
-const Downloader = require('./downloader');
+const {cookieJar, mkdir} = require('./lib/link');
+const Downloader = require('./lib/downloader');
 
 // hard coded redirect url map to avoid the max-redirect things
 const hardCodedRedirectUrl = require('./redirect-url');
 
 const {preProcessHtml, postProcessHtml} = require('./mdn-process-html');
-const configureLogger = require('./logger-config');
+const configureLogger = require('./lib/logger-config');
 const {
   localesMap,
   localeArr,
