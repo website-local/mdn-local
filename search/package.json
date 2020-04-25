@@ -12,12 +12,12 @@
     "fast-glob": "^3.2.2",
     "koa": "^2.11.0",
     "koa-static": "^5.0.0",
-    "log4js": "^6.1.2",
+    "log4js": "^6.2.1",
     "yargs": "^15.3.1"
   },
   "devDependencies": {
-    "@types/cheerio": "^0.22.17",
-    "@types/koa": "^2.11.0",
+    "@types/cheerio": "^0.22.18",
+    "@types/koa": "^2.11.3",
     "@types/yargs": "^15.0.4",
     "elastic-ts": "^0.2.0"
   },
