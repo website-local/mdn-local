@@ -141,8 +141,11 @@ const skipProcessFunc = (url, element, parent) => {
   }
   let uri = URI(url), host = uri.host();
   if (host && host !== 'developer.mozilla.org' &&
-    // not likely happen here
-    host !== 'mdn.mozillademos.org') {
+    // https://github.com/myfreeer/mdn-local/issues/44
+    host !== 'mdn.mozillademos.org' &&
+    host !== 'interactive-examples.mdn.mozilla.net' &&
+    host !== 'wiki.developer.mozilla.org' &&
+    host !== 'mdn.github.io') {
     skipExternalLogger.debug('skipped external link', host, url, parent && parent.url);
     return true;
   }
