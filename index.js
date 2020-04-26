@@ -25,14 +25,17 @@ const {
   redirectUrlAfterFetch
 } = require('./mdn-process-url');
 
+const setCookie = (cookie, url) =>
+  new Promise(r => cookieJar.setCookie(cookie, url, r));
+
 /**
  *
  * @param localRoot
  * @param locale
  * @param {Partial<Options>} options
- * @return {Downloader}
+ * @return {Promise<Downloader>}
  */
-const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
+const downloadMdn = async (localRoot, locale = 'zh-CN', options = {}) => {
   if (!localesMap[locale] && locale !== 'en-US') {
     throw new TypeError('locale not exists');
   }
@@ -93,44 +96,42 @@ const downloadMdn = (localRoot, locale = 'zh-CN', options = {}) => {
     preProcessResource
   }, options));
 
-  cookieJar.setCookie(
-    'django_language=' + locale,
-    'https://developer.mozilla.org',
-    () => {
-      let basePath = path.join(localRoot, 'developer.mozilla.org', 'static', 'build'),
-        jsPath = path.join(basePath, 'js'),
-        cssPath = path.join(basePath, 'styles');
-      mkdir(jsPath);
-      mkdir(cssPath);
-      fs.copyFileSync(path.join(__dirname, 'inject', 'inject.js'),
-        path.join(jsPath, 'inject.js'));
-      fs.copyFileSync(path.join(__dirname, 'inject', 'inject.css'),
-        path.join(cssPath, 'inject.css'));
-      d.start();
-      errorLogger.info('started');
-      d.queue.onIdle().then(() => {
-        errorLogger.info('possibly finished.');
-        /// region workaround for index.html
-        let indexPath = path.join(localRoot, 'developer.mozilla.org', 'index.html');
-        let replaceIndex = true;
-        if (fs.existsSync(indexPath)) {
-          let stats = fs.statSync(indexPath);
-          if (stats && stats.size > 1024) {
-            replaceIndex = false;
-          }
-        }
-        if (!replaceIndex) return;
-        // noinspection HtmlRequiredTitleElement
-        let indexRedirect = `<html lang="en">
+  await setCookie('django_language=' + locale,
+    'https://developer.mozilla.org');
+
+  let basePath = path.join(localRoot, 'developer.mozilla.org', 'static', 'build'),
+    jsPath = path.join(basePath, 'js'),
+    cssPath = path.join(basePath, 'styles');
+  mkdir(jsPath);
+  mkdir(cssPath);
+  fs.copyFileSync(path.join(__dirname, 'inject', 'inject.js'),
+    path.join(jsPath, 'inject.js'));
+  fs.copyFileSync(path.join(__dirname, 'inject', 'inject.css'),
+    path.join(cssPath, 'inject.css'));
+  d.start();
+  errorLogger.info('started');
+  d.queue.onIdle().then(() => {
+    errorLogger.info('possibly finished.');
+    /// region workaround for index.html
+    let indexPath = path.join(localRoot, 'developer.mozilla.org', 'index.html');
+    let replaceIndex = true;
+    if (fs.existsSync(indexPath)) {
+      let stats = fs.statSync(indexPath);
+      if (stats && stats.size > 1024) {
+        replaceIndex = false;
+      }
+    }
+    if (!replaceIndex) return;
+    // noinspection HtmlRequiredTitleElement
+    let indexRedirect = `<html lang="en">
 <head>
 <meta http-equiv="refresh" content="0; url=${locale}/index.html">
 <script>location.replace('${locale}/index.html');</script>
 </head>
 </html>`;
-        fs.writeFileSync(indexPath, indexRedirect, {encoding: 'utf8'});
-        /// endregion workaround for index.html
-      });
-    });
+    fs.writeFileSync(indexPath, indexRedirect, {encoding: 'utf8'});
+    /// endregion workaround for index.html
+  });
 
   return d;
 };
