@@ -310,6 +310,7 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
     path.endsWith('$children') ||
     path.endsWith('$json') ||
     path.endsWith('$edit') ||
+    path.endsWith('$toc') ||
     path.endsWith('$translate') ||
     path.endsWith('%24history') ||
     path.endsWith('%24edit') ||
