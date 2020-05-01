@@ -5,11 +5,12 @@ import * as cheerio from "cheerio";
 type CheerioStatic = ReturnType<typeof cheerio.load>;
 type Cheerio = ReturnType<CheerioStatic>;
 
-interface Options {
+export declare interface DownloaderOptions {
     beginUrl: string | string[];
     localRoot: string;
     depth?: number;
     concurrency?: number;
+    minConcurrency?: number;
     req?: got.Options;
     encoding?: Encoding;
     urlFilter?: UrlFilterFunc;
@@ -73,14 +74,14 @@ interface DropResourceFunc {
 declare type Body = ArrayBuffer | Buffer | string | null | void;
 
 declare class Link {
-    constructor(url: string, localRoot: string, refUrl: string, options: Options);
+    constructor(url: string, localRoot: string, refUrl: string, options: DownloaderOptions);
 
     createTimestamp: number;
     downloadStartTimestamp?: number;
     finishTimestamp?: number;
     waitTime?: number;
     downloadTime?: number;
-    options: Options;
+    options: DownloaderOptions;
     encoding: string | null;
     refUri: URI;
     refUrl: string;
@@ -102,7 +103,7 @@ declare class Link {
 }
 
 declare class Resource extends Link {
-    constructor(url: string, localRoot: string, refUrl: string, options: Options);
+    constructor(url: string, localRoot: string, refUrl: string, options: DownloaderOptions);
 
     readonly replaceStr: string;
     private _url: string;
@@ -111,7 +112,7 @@ declare class Resource extends Link {
 }
 
 declare class HtmlResource extends Resource {
-    constructor(url: string, localRoot: string, refUrl: string, options: Options);
+    constructor(url: string, localRoot: string, refUrl: string, options: DownloaderOptions);
 
     protected __appendSuffix(suffix: string): void;
 
