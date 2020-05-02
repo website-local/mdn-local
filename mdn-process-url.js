@@ -119,8 +119,6 @@ const validExtensionName = {
   'eot': 1
 };
 
-
-
 /**
  * @type {SkipProcessFunc}
  * @param {string} url
