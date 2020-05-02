@@ -44,7 +44,8 @@ const searchServer = (config, client, template) => async (ctx, next) => {
     },
     highlight: {
       fields: {
-        content: {}
+        content: {},
+        summary: {}
       }
     },
     query: {

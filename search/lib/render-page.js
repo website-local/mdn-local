@@ -27,9 +27,15 @@ const renderSearch = (config, stream, title, page, from, body) => {
     item = hits.hits[i];
     stream.push(`<div class="result-container"><div class="result">\
 <div><a class="result-title" href="../${item._id}">${item._source.title}</a></div>\
-<div class="result-excerpt">${
-  item.highlight && item.highlight.content.join('<br/>') || ''
-}</div>\
+<div class="result-excerpt">`);
+    if (item.highlight) {
+      if (item.highlight.content && item.highlight.content.length) {
+        stream.push(item.highlight.content.join('<br/>'));
+      } else if (item.highlight.summary && item.highlight.summary.length) {
+        stream.push(item.highlight.summary.join('<br/>'));
+      }
+    }
+    stream.push(`</div>\
 <div class="result-url"><a href="../${item._id}">${item._id}</a></div></div></div>`);
   }
   stream.push('<div class="result-container results-more"><div>');
