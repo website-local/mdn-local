@@ -134,8 +134,7 @@ const skipProcessFunc = (url, element, parent) => {
     url.startsWith('data:') ||
     url.startsWith('javascript:') ||
     url.startsWith('about:') ||
-    element && (element.hasClass('external-icon') ||
-      element.hasClass('external'))) {
+    url.startsWith('chrome:')) {
     return true;
   }
   let uri = URI(url), host = uri.host();
@@ -144,6 +143,7 @@ const skipProcessFunc = (url, element, parent) => {
     host !== 'mdn.mozillademos.org' &&
     host !== 'interactive-examples.mdn.mozilla.net' &&
     host !== 'wiki.developer.mozilla.org' &&
+    host !== 'unpkg.com' &&
     host !== 'mdn.github.io') {
     skipExternalLogger.debug('skipped external link', host, url, parent && parent.url);
     return true;
