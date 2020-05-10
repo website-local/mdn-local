@@ -61,7 +61,8 @@ const redirectLocale = {
   'ee': 1,
   'Cn': 1,
   'bn': 1,
-  'ch-ZN': 1
+  'ch-ZN': 1,
+  'zh-Hans': 1
 };
 
 const appendLocalePath = {

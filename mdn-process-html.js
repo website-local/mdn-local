@@ -135,6 +135,19 @@ const postProcessReactData = (text, elem) => {
         key.startsWith('Would you answer 4 questions for us') ||
         key.startsWith('I’m okay with Mozilla') ||
         key.startsWith('A newer version of this article') ||
+        key.startsWith('If you haven’t previously confirmed a subscription to a Mozilla') ||
+        key.startsWith('Because we aren’t looking for a lump sum.') ||
+        key.startsWith('An error occurred trying to set up the subscription with Stripe') ||
+        key.startsWith('Currently, Mozilla pays for site operations and overhead') ||
+        key.startsWith('MDN is funded out of the Mozilla Corporation') ||
+        key.startsWith('Mozilla will collect and store your name and email') ||
+        key.startsWith('No. Payments to Mozilla Corporation in support of MDN') ||
+        key.startsWith('Our user base has grown exponentially in the last few years') ||
+        key.startsWith('Sign in to support MDN') ||
+        key.startsWith('Support MDN with a %(amount)s') ||
+        key.startsWith('The Mozilla Corporation, which funds MDN') ||
+        key.startsWith('The money collected through MDN') ||
+        key.startsWith('When you request to delete your account') ||
         key.startsWith('Our team will review your report.')) {
         // noinspection JSUnfilteredForInLoop
         delete stringCatalog[key];
@@ -376,6 +389,11 @@ const preProcessHtml = ($, html) => {
   // 新闻脚本
   $('script[src*="newsletter"]').remove();
   $('script[src*="auth-modal."]').remove();
+  // remove styles
+  $('link[rel="stylesheet"][href*="auth-modal."]').remove();
+  $('link[rel="stylesheet"][href*="subscriptions."]').remove();
+  $('link[rel="stylesheet"][href*="mdn-subscriptions."]').remove();
+  $('link[rel="stylesheet"][href*="banners."]').remove();
   $('script[src*="perf."]').remove();
   // bcd-signal script, not needed for offline usage
   $('script[src*="react-bcd-signal"]').remove();
