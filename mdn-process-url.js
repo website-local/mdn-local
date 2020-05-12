@@ -394,6 +394,7 @@ function redirectLinkBeforeResourceInit(url, locale, html,
   }
   let u = URI(url), host, needToRebuildUrl = false;
   if ((host = u.host()) && host !== 'developer.mozilla.org') {
+    let shouldReturnEarly = false;
     if (host === 'mdn.mozillademos.org') {
       // should be automatically redirected back
       u = u.host('developer.mozilla.org');
@@ -405,24 +406,30 @@ function redirectLinkBeforeResourceInit(url, locale, html,
     } else if (host === 'interactive-examples.mdn.mozilla.net') {
       // interactive-examples
       // fake url, redirected back in requestRedirectFunc
-      return u.host('developer.mozilla.org')
-        .path('/interactive-examples' + u.path())
-        .toString();
+      u = u.host('developer.mozilla.org')
+        .path('/interactive-examples' + u.path());
+      shouldReturnEarly = true;
     } else if (host === 'mdn.github.io') {
       // mdn.github.io
       // fake url, redirected back in requestRedirectFunc
-      return u.host('developer.mozilla.org')
-        .path('/mdn-github-io' + u.path())
-        .toString();
+      u = u.host('developer.mozilla.org')
+        .path('/mdn-github-io' + u.path());
+      shouldReturnEarly = true;
     } else if (host === 'unpkg.com') {
       // unpkg.com
       // fake url, redirected back in requestRedirectFunc
-      return u.host('developer.mozilla.org')
-        .path('/unpkg-com' + u.path())
-        .toString();
+      u = u.host('developer.mozilla.org')
+        .path('/unpkg-com' + u.path());
     } else if (hardCodedRedirectUrl[url]) {
       return hardCodedRedirectUrl[url];
     } else {
+      return url;
+    }
+    if (shouldReturnEarly) {
+      url = u.toString();
+      if (hardCodedRedirectUrl[url]) {
+        return hardCodedRedirectUrl[url];
+      }
       return url;
     }
   }
