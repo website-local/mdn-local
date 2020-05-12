@@ -62,7 +62,9 @@ const redirectLocale = {
   'Cn': 1,
   'bn': 1,
   'ch-ZN': 1,
-  'zh-Hans': 1
+  'zh-Hans': 1,
+  'pt-PT': 1,
+  'tr': 1
 };
 
 const appendLocalePath = {
@@ -117,7 +119,8 @@ const validExtensionName = {
   'pdf': 1,
   'webm': 1,
   'dia': 1,
-  'eot': 1
+  'eot': 1,
+  'psd': 1
 };
 
 /**
@@ -146,6 +149,17 @@ const skipProcessFunc = (url, element, parent) => {
     host !== 'unpkg.com' &&
     host !== 'mdn.github.io') {
     skipExternalLogger.debug('skipped external link', host, url, parent && parent.url);
+    return true;
+  }
+  let path = uri.path();
+  if (path.startsWith('/presentations/') ||
+    // very large file
+    path.startsWith('/files/5237/CommonControls_20130305.psd') ||
+    path.startsWith('/files/5239/IconsMedia_20130305.psd') ||
+    path.startsWith('/files/5243/IconsCommunications_20130401.psd') ||
+    path.startsWith('/files/5245/IconsSettings_20130415.psd') ||
+    path.startsWith('/files/5247/IconsPrimaryAction_20130501.psd')) {
+    skipExternalLogger.debug('skipped link to large file', url, parent && parent.url);
     return true;
   }
   return false;
@@ -297,9 +311,9 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
     return;
   }
   return host !== 'developer.mozilla.org' ||
-    path === '/presentations/screencasts/jresig-digg-firebug-jquery.mp4' ||
     testLocaleRegExp.test(path) ||
     path.startsWith('/search') ||
+    path.startsWith('/presentations/') ||
     path.startsWith(`/${locale}/search`) ||
     path.startsWith(locale + '/search') ||
     path.startsWith('search') ||
@@ -314,6 +328,8 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
     path.endsWith('%24history') ||
     path.endsWith('%24edit') ||
     path.endsWith('%24translate') ||
+    // A very large file
+    path.endsWith('CommonControls_20130305.psd') ||
     path.includes('/users/github/login') ||
     path.includes('/users/google/login') ||
     path.includes('/users/signin') ||
