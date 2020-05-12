@@ -3,6 +3,18 @@ const log4js = require('log4js');
 const errorLogger = log4js.getLogger('error');
 const skipExternalLogger = log4js.getLogger('skip-external');
 
+/**
+ * @param {string[]} array
+ * @return {object}
+ */
+const arrayToMap = (array) => {
+  const obj = {};
+  for (const item of array) {
+    obj[item] = 1;
+  }
+  return obj;
+};
+
 const localeArr = [
   'af', 'ar', 'az', 'bg',
   'bm', 'bn-BD', 'bn-IN',
@@ -18,110 +30,67 @@ const localeArr = [
   'te', 'th', 'tl', 'tr',
   'uk', 'vi', 'zh-CN', 'zh-TW'
 ];
-const localesMap = (() => {
-  const obj = {};
-  for (const locale of localeArr) {
-    obj[locale] = 1;
-  }
-  return obj;
-})();
+const localesMap = arrayToMap(localeArr);
 
-const redirectLocale = {
-  'en': 1,
-  'En': 1,
-  'EN': 1,
-  'en-US': 1,
-  'en_US': 1,
-  'zh': 1,
-  'Zh': 1,
-  'Ja': 1,
-  'ja': 1,
-  'ig': 1,
-  'cn': 1,
-  'us': 1,
-  'zh-cn': 1,
-  'xh-CN': 1,
-  'zh_tw': 1,
-  'zh-US': 1,
-  'en-us': 1,
-  'Zh-cn': 1,
-  'zh_CN': 1,
-  'ga-IE': 1,
-  'zu': 1,
-  'yo': 1,
-  'xh': 1,
-  'wo': 1,
-  'tn': 1,
-  'sw': 1,
-  'son': 1,
-  'mg': 1,
-  'ln': 1,
-  'ha': 1,
-  'ff': 1,
-  'ee': 1,
-  'Cn': 1,
-  'bn': 1,
-  'ch-ZN': 1,
-  'zh-Hans': 1,
-  'pt-PT': 1,
-  'tr': 1
-};
+const redirectLocale = arrayToMap([
+  'en', 'En', 'EN', 'en-US', 'en_US', 'us', 'en-us',
+  'zh', 'Zh', 'cn', 'Cn',
+  'zh-cn', 'xh-CN', 'Zh-cn', 'zh_CN', 'zh-US', 'zh-Hans', 'ch-ZN', 'zh_tw',
+  'Ja', 'ja', 'ig', 'ga-IE', 'zu',
+  'yo', 'xh', 'wo', 'tn', 'sw', 'son', 'mg',
+  'ln', 'ha', 'ff', 'ee', 'bn', 'pt-PT', 'tr'
+]);
 
-const appendLocalePath = {
-  'docs': 1,
-  'Web': 1
-};
+const appendLocalePath = arrayToMap(['docs', 'Web']);
 
-const appendDocsWebPath = {
-  'JavaScript': 1,
-  'MathML': 1,
-  'API': 1,
-  'Guide': 1,
-  'CSS': 1,
-  'HTML': 1,
-  'Accessibility': 1,
-  'XPath': 1
-};
+const appendDocsWebPath = arrayToMap([
+  'JavaScript', 'API', 'CSS', 'HTML',
+  'Guide', 'MathML',
+  'Accessibility', 'XPath'
+]);
 
-const appendDocsPath = {
-  'Web': 1,
-  'Mozilla': 1,
-  'Core_JavaScript_1.5_Reference': 1,
-  'nsIXMLHttpRequest': 1,
-  'Learn': 1
-};
+const appendDocsPath = arrayToMap([
+  'Web',
+  'Mozilla',
+  'Core_JavaScript_1.5_Reference',
+  'nsIXMLHttpRequest',
+  'Learn'
+]);
 
 // manually collected
-const validExtensionName = {
-  'css': 1,
-  'gif': 1,
-  'jpg': 1,
-  'JPG': 1,
-  'jpeg': 1,
-  'js': 1,
-  'jsm': 1,
-  'json': 1,
-  'jar': 1,
-  'png': 1,
-  'PNG': 1,
-  'svg': 1,
-  'txt': 1,
-  'woff2': 1,
-  'xul': 1,
-  'zip': 1,
-  'mp4': 1,
-  'flv': 1,
-  'm4v': 1,
-  'mkv': 1,
-  'msi': 1,
-  'xpi': 1,
-  'rdf': 1,
-  'pdf': 1,
-  'webm': 1,
-  'dia': 1,
-  'eot': 1,
-  'psd': 1
-};
+const validExtensionName = arrayToMap([
+  'css', 'gif',
+  'jpg', 'JPG', 'jpeg',
+  'js', 'jsm',
+  'json',
+  'jar',
+  'png', 'PNG',
+  'svg',
+  'txt',
+  'woff2',
+  'xul',
+  'zip',
+  'mp4', 'flv', 'm4v', 'mkv', 'webm',
+  'msi',
+  'xpi',
+  'rdf',
+  'pdf',
+  'dia',
+  'eot',
+  'psd'
+]);
+
+// manually collected
+const largeMp4Videos = arrayToMap([
+  '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.mp4',
+  '/imsc/videos/coffee.mp4',
+  '/imsc/videos/stars.mp4'
+]);
+
+// manually collected
+const largeWebmVideos = arrayToMap([
+  '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.webm'
+]);
 
 /**
  * @type {SkipProcessFunc}
@@ -250,16 +219,6 @@ const processPathWithMultipleLocale = (pathArr, locale) => {
   }
 };
 
-const largeMp4Videos = [
-  '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.mp4',
-  '/imsc/videos/coffee.mp4',
-  '/imsc/videos/stars.mp4'
-];
-
-const largeWebmVideos = [
-  '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.webm'
-];
-
 /** @type {RequestRedirectFunc} */
 const requestRedirectFunc = (url, res) => {
   let uri, path;
@@ -285,13 +244,13 @@ const requestRedirectFunc = (url, res) => {
     if (path.startsWith('/mdn-github-io/')) {
       // mdn.github.io
       // redirect back to real url
-      let path = path.slice('/mdn-github-io'.length);
+      path = path.slice('/mdn-github-io'.length);
       // redirect large videos to small ones
       // https://github.com/myfreeer/mdn-local/issues/46
-      if (largeMp4Videos.includes(path)) {
+      if (largeMp4Videos[path]) {
         path = '/learning-area/html/multimedia-and-embedding/' +
           'video-and-audio-content/rabbit320.mp4';
-      } else if (largeWebmVideos.includes(path)) {
+      } else if (largeWebmVideos[path]) {
         path = '/learning-area/html/multimedia-and-embedding/' +
           'video-and-audio-content/rabbit320.webm';
       }
