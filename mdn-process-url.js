@@ -250,6 +250,16 @@ const processPathWithMultipleLocale = (pathArr, locale) => {
   }
 };
 
+const largeMp4Videos = [
+  '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.mp4',
+  '/imsc/videos/coffee.mp4',
+  '/imsc/videos/stars.mp4'
+];
+
+const largeWebmVideos = [
+  '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.webm'
+];
+
 /** @type {RequestRedirectFunc} */
 const requestRedirectFunc = (url, res) => {
   let uri, path;
@@ -275,9 +285,19 @@ const requestRedirectFunc = (url, res) => {
     if (path.startsWith('/mdn-github-io/')) {
       // mdn.github.io
       // redirect back to real url
+      let path = path.slice('/mdn-github-io'.length);
+      // redirect large videos to small ones
+      // https://github.com/myfreeer/mdn-local/issues/46
+      if (largeMp4Videos.includes(path)) {
+        path = '/learning-area/html/multimedia-and-embedding/' +
+          'video-and-audio-content/rabbit320.mp4';
+      } else if (largeWebmVideos.includes(path)) {
+        path = '/learning-area/html/multimedia-and-embedding/' +
+          'video-and-audio-content/rabbit320.webm';
+      }
       return uri.search('')
         .host('mdn.github.io')
-        .path(path.slice('/mdn-github-io'.length))
+        .path(path)
         .toString();
     }
     if (path.startsWith('/unpkg-com/')) {
