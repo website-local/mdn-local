@@ -312,8 +312,6 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
     path.endsWith('%24history') ||
     path.endsWith('%24edit') ||
     path.endsWith('%24translate') ||
-    // A very large file
-    path.endsWith('CommonControls_20130305.psd') ||
     path.includes('/users/github/login') ||
     path.includes('/users/google/login') ||
     path.includes('/users/signin') ||
@@ -517,7 +515,7 @@ function redirectLinkBeforeResourceInit(url, locale, html,
     url = u.path(pathArr.join('/')).toString();
   }
   if (locale !== 'en-US' && url.match('en-US')) {
-    errorLogger.warn(url, pathArr);
+    errorLogger.warn(url, pathArr.join('/'));
   }
   if (hardCodedRedirectUrl[url]) {
     return hardCodedRedirectUrl[url];
