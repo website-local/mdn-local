@@ -38,7 +38,7 @@ const redirectLocale = arrayToMap([
   'zh-cn', 'xh-CN', 'Zh-cn', 'zh_CN', 'zh-US', 'zh-Hans', 'ch-ZN', 'zh_tw',
   'Ja', 'ja', 'ig', 'ga-IE', 'zu',
   'yo', 'xh', 'wo', 'tn', 'sw', 'son', 'mg',
-  'ln', 'ha', 'ff', 'ee', 'bn', 'pt-PT', 'tr'
+  'ln', 'ha', 'ff', 'ee', 'bn', 'pt', 'pt-PT', 'tr'
 ]);
 
 const appendLocalePath = arrayToMap(['docs', 'Web']);
@@ -70,6 +70,7 @@ const validExtensionName = arrayToMap([
   'woff2',
   'xul',
   'zip',
+  'mp3',
   'mp4', 'flv', 'm4v', 'mkv', 'webm',
   'msi',
   'xpi',
@@ -83,13 +84,15 @@ const validExtensionName = arrayToMap([
 // manually collected
 const largeMp4Videos = arrayToMap([
   '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.mp4',
+  '/html-examples/link-rel-preload/video/sintel-short.mp4',
   '/imsc/videos/coffee.mp4',
   '/imsc/videos/stars.mp4'
 ]);
 
 // manually collected
 const largeWebmVideos = arrayToMap([
-  '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.webm'
+  '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.webm',
+  '/html-examples/link-rel-preload/video/sintel-short.webm'
 ]);
 
 /**
