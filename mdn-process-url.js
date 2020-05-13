@@ -59,18 +59,19 @@ const appendDocsPath = arrayToMap([
 
 // manually collected
 const validExtensionName = arrayToMap([
-  'css', 'gif',
+  'gif',
   'jpg', 'JPG', 'jpeg',
-  'js', 'jsm',
-  'json',
-  'jar',
   'png', 'PNG',
   'svg',
+  'css',
+  'js', 'jsm',
+  'json',
   'txt',
+  'jar',
   'woff2',
   'xul',
   'zip',
-  'mp3',
+  'mp3', 'ogg',
   'mp4', 'flv', 'm4v', 'mkv', 'webm',
   'msi',
   'xpi',
@@ -128,6 +129,7 @@ const skipProcessFunc = (url, element, parent) => {
     // very large file
     path.startsWith('/files/5237/CommonControls_20130305.psd') ||
     path.startsWith('/files/5239/IconsMedia_20130305.psd') ||
+    path.startsWith('/files/5241/IconsStatusBar_20130122.psd') ||
     path.startsWith('/files/5243/IconsCommunications_20130401.psd') ||
     path.startsWith('/files/5245/IconsSettings_20130415.psd') ||
     path.startsWith('/files/5247/IconsPrimaryAction_20130501.psd')) {
