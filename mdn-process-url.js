@@ -38,7 +38,7 @@ const redirectLocale = arrayToMap([
   'zh-cn', 'xh-CN', 'Zh-cn', 'zh_CN', 'zh-US', 'zh-Hans', 'ch-ZN', 'zh_tw',
   'Ja', 'ja', 'ig', 'ga-IE', 'zu',
   'yo', 'xh', 'wo', 'tn', 'sw', 'son', 'mg',
-  'ln', 'ha', 'ff', 'ee', 'bn', 'pt', 'pt-PT', 'tr'
+  'ln', 'ha', 'ff', 'ee', 'bn', 'pt', 'pt-PT', 'tr', 'Tr'
 ]);
 
 const appendLocalePath = arrayToMap(['docs', 'Web']);
@@ -110,8 +110,17 @@ const skipProcessFunc = (url, element, parent) => {
     url.startsWith('data:') ||
     url.startsWith('javascript:') ||
     url.startsWith('about:') ||
-    url.startsWith('chrome:')) {
+    url.startsWith('chrome:') ||
+    // mozilla's newsgroup uri
+    // docs/Archive/Meta_docs/Existing_Content_DOM_in_Mozilla
+    // docs/Mozilla/Tech/XPCOM/Binary_compatibility
+    url.startsWith('news:')) {
     return true;
+  }
+  // https:\\google.com
+  // from https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Introduction
+  if (url.startsWith('http:\\\\') || url.startsWith('https:\\\\')) {
+    url = url.replace('\\\\', '//');
   }
   let uri = URI(url), host = uri.host();
   if (host && host !== 'developer.mozilla.org' &&
@@ -308,6 +317,8 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
     path.endsWith('$json') ||
     path.endsWith('$edit') ||
     path.endsWith('$toc') ||
+    // /docs/Archive/Mozilla/Bookmark_keywords
+    path.endsWith('/docs/Special:Search') ||
     path.endsWith('$translate') ||
     path.endsWith('%24history') ||
     path.endsWith('%24edit') ||
@@ -374,6 +385,11 @@ function redirectLinkBeforeResourceInit(url, locale, html,
       url = url.slice(0, url.length - 4);
     }
   }
+  // https:\\google.com
+  // from https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Introduction
+  if (url.startsWith('http:\\\\') || url.startsWith('https:\\\\')) {
+    url = url.replace('\\\\', '//');
+  }
   let u = URI(url), host, needToRebuildUrl = false;
   if ((host = u.host()) && host !== 'developer.mozilla.org') {
     let shouldReturnEarly = false;
@@ -402,6 +418,7 @@ function redirectLinkBeforeResourceInit(url, locale, html,
       // fake url, redirected back in requestRedirectFunc
       u = u.host('developer.mozilla.org')
         .path('/unpkg-com' + u.path());
+      shouldReturnEarly = true;
     } else if (hardCodedRedirectUrl[url]) {
       return hardCodedRedirectUrl[url];
     } else {
