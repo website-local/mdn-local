@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^7.6.1",
+    "@elastic/elasticsearch": "^7.7.1",
     "cheerio": "^1.0.0-rc.3",
     "fast-glob": "^3.2.2",
     "koa": "^2.11.0",
@@ -18,7 +18,7 @@
   "devDependencies": {
     "@types/cheerio": "^0.22.18",
     "@types/koa": "^2.11.3",
-    "@types/yargs": "^15.0.4",
+    "@types/yargs": "^15.0.5",
     "elastic-ts": "^0.2.0"
   },
   "keywords": [],
