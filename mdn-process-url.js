@@ -82,6 +82,16 @@ const validExtensionName = arrayToMap([
   'psd'
 ]);
 
+const downloadableHosts = arrayToMap([
+  'developer.mozilla.org',
+  // https://github.com/myfreeer/mdn-local/issues/44
+  'mdn.mozillademos.org',
+  'interactive-examples.mdn.mozilla.net',
+  'wiki.developer.mozilla.org',
+  'unpkg.com',
+  'mdn.github.io'
+]);
+
 // manually collected
 const largeMp4Videos = arrayToMap([
   '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.mp4',
@@ -123,13 +133,7 @@ const skipProcessFunc = (url, element, parent) => {
     url = url.replace('\\\\', '//');
   }
   let uri = URI(url), host = uri.host();
-  if (host && host !== 'developer.mozilla.org' &&
-    // https://github.com/myfreeer/mdn-local/issues/44
-    host !== 'mdn.mozillademos.org' &&
-    host !== 'interactive-examples.mdn.mozilla.net' &&
-    host !== 'wiki.developer.mozilla.org' &&
-    host !== 'unpkg.com' &&
-    host !== 'mdn.github.io') {
+  if (host && !downloadableHosts[host]) {
     skipExternalLogger.debug('skipped external link', host, url, parent && parent.url);
     return true;
   }
@@ -303,7 +307,7 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
   if (host === 'mdn.mozillademos.org' && path.startsWith('/files')) {
     return;
   }
-  return host !== 'developer.mozilla.org' ||
+  return !downloadableHosts[host] ||
     testLocaleRegExp.test(path) ||
     path.startsWith('/search') ||
     path.startsWith('/presentations/') ||
@@ -393,6 +397,10 @@ function redirectLinkBeforeResourceInit(url, locale, html,
   let u = URI(url), host, needToRebuildUrl = false;
   if ((host = u.host()) && host !== 'developer.mozilla.org') {
     let shouldReturnEarly = false;
+    if (downloadableHosts[host] && u.protocol() === 'http') {
+      u = u.protocol('https');
+      needToRebuildUrl = true;
+    }
     if (host === 'mdn.mozillademos.org') {
       // should be automatically redirected back
       u = u.host('developer.mozilla.org');
