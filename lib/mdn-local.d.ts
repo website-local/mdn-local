@@ -55,7 +55,7 @@ interface RequestRedirectFunc {
 }
 
 interface LinkRedirectFunc {
-    (url: string, element: Cheerio | null, parent: HtmlResource | CssResource):
+    (url: string, element: Cheerio | null, parent: HtmlResource | CssResource | Resource):
         string | Promise<string>;
 }
 
@@ -88,7 +88,7 @@ declare class Link {
     uri: URI;
     savePath: string;
     localRoot: string;
-    private _downloadLink: string;
+    _downloadLink?: string;
     public depth: number;
     url: string;
     body: null | Body;
@@ -106,6 +106,7 @@ declare class Resource extends Link {
     constructor(url: string, localRoot: string, refUrl: string, options: DownloaderOptions);
 
     readonly replaceStr: string;
+    redirectedUrl?: string;
     private _url: string;
     public replacePath: URI;
     serverPath: string;

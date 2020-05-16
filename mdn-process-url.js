@@ -330,6 +330,8 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
     path.includes('/users/github/login') ||
     path.includes('/users/google/login') ||
     path.includes('/users/signin') ||
+    // file name conflicts
+    path.includes('release_notes.html/NSS_3.12.3_release_notes.html') ||
     (path.includes('/profiles/') && path.endsWith('/edit')) ||
     dir.endsWith('/profiles');
 }
