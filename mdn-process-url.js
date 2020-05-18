@@ -124,7 +124,8 @@ const skipProcessFunc = (url, element, parent) => {
     // mozilla's newsgroup uri
     // docs/Archive/Meta_docs/Existing_Content_DOM_in_Mozilla
     // docs/Mozilla/Tech/XPCOM/Binary_compatibility
-    url.startsWith('news:')) {
+    url.startsWith('news:') ||
+    url.startsWith('irc:')) {
     return true;
   }
   // https:\\google.com
@@ -311,6 +312,7 @@ function shouldDropResource(res, testLocaleRegExp, locale) {
     testLocaleRegExp.test(path) ||
     path.startsWith('/search') ||
     path.startsWith('/presentations/') ||
+    path.startsWith('/devnews/') ||
     path.startsWith(`/${locale}/search`) ||
     path.startsWith(locale + '/search') ||
     path.startsWith('search') ||
@@ -501,12 +503,12 @@ function redirectLinkBeforeResourceInit(url, locale, html,
   const pathArr = u.path()
     .replace('en-\n\nUS', 'en-US')
     .split('/');
-  if (!pathArr || !pathArr[1]) {
-    return needToRebuildUrl ? u.toString() : url;
-  }
   if (u.protocol() === 'http') {
     u = u.protocol('https');
     needToRebuildUrl = true;
+  }
+  if (!pathArr || !pathArr[1]) {
+    return needToRebuildUrl ? u.toString() : url;
   }
   if (processPathWithMultipleLocale(pathArr, locale)) {
     needToRebuildUrl = true;
