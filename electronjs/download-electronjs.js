@@ -36,6 +36,16 @@ const linkRedirectFunc = (url) => {
   return url;
 };
 
+const redirectFilterFunc = (url, res) => {
+  if (!url) return url;
+  let uri = URI(url), host = uri.host();
+  if (!host || host === HOST) return url;
+  if (!remapHosts.has(host)) {
+    return res.url;
+  }
+  return uri.path('/' + host + uri.path()).host(HOST).toString();
+};
+
 
 const dropResourceFunc = res => {
   if (!res.uri.host()) {
@@ -107,7 +117,7 @@ module.exports = async (localRoot, locale, options = {}) => {
     requestRedirectFunc,
     preProcessHtml,
     postProcessHtml,
-    redirectFilterFunc: linkRedirectFunc
+    redirectFilterFunc
   }, options));
 
   await setCookie('language=' + locale,
