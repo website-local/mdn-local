@@ -145,12 +145,16 @@ const preProcessHtml = ($) => {
 };
 
 const postProcessHtml = ($) => {
-  Object.keys(cache).forEach(link => {
-    let replaceValue = cache[link];
-    if (replaceValue) {
-      $(`a[href="${link}"]`).attr('href', replaceValue);
+  let array = $('a[href]');
+  for (let i = 0, a, attr, href; i < array.length; i++) {
+    if ((a = array[i]) &&
+      (attr = a.attribs) &&
+      (href = attr.href) &&
+      (href = cache[href])) {
+      a.attribs.href = href;
     }
-  });
+  }
+
   $('a[href^="https://github.com/nodejscn/node-api-cn/edit/"]')
     .addClass('link-to-edit');
   return $;
