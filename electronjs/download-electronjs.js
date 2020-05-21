@@ -7,7 +7,7 @@ const HOST = 'www.electronjs.org';
 
 const remapHosts = new Set([
   'cloud.githubusercontent.com',
-  'cdn.rawgit.com',
+  'raw.githubusercontent.com',
   'help.ubuntu.com',
   'mdn.mozillademos.org',
   'i-msdn.sec.s-msft.com'
@@ -30,6 +30,9 @@ const linkRedirectFunc = (url) => {
   if (!url) return url;
   let uri = URI(url), host = uri.host();
   if (!host || host === HOST) return url;
+  if (host === 'cdn.rawgit.com') {
+    uri.host(host = 'raw.githubusercontent.com');
+  }
   if (remapHosts.has(host)) {
     return uri.path('/' + host + uri.path()).host(HOST).toString();
   }
@@ -99,6 +102,9 @@ module.exports = async (localRoot, locale, options = {}) => {
   configureLogger(localRoot, HOST);
   if (!options.req) {
     options.req = {};
+  }
+  if (!('dnsCache' in options.req)) {
+    options.req.dnsCache = false;
   }
   if (!options.req.headers) {
     options.req.headers = {};
