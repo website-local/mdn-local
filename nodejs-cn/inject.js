@@ -8,6 +8,7 @@ if (activeElem && activeElem.scrollIntoView) {
     block: 'center'
   });
 }
+
 /* PrismJS 1.20.0 */
 /**
  * Prism: Lightweight, robust, elegant syntax highlighting
@@ -801,3 +802,53 @@ Prism.languages.insertBefore('cpp', 'string', {
 
 Prism.highlightAll();
 
+/* align blocks */
+!function () {
+  var contentLeft, contentRight, alignLength, i, l, r, tl, tr, d,
+    detailsLeft, detailsRight;
+  if (!(contentLeft = document.getElementById('content_left')) ||
+    !(contentRight = document.getElementById('content_right')) ||
+    !(contentLeft = contentLeft.children) ||
+    !contentLeft.length ||
+    !(contentRight = contentRight.children) ||
+    !contentRight.length ||
+    !((alignLength = Math.min(contentLeft.length, contentRight.length)) > 0)) {
+    return;
+  }
+  for (i = 0; i < alignLength; i++) {
+    if (!(l = contentLeft[i]) || !(r = contentRight[i]) ||
+      !(tl = l.offsetTop) || !(tr = r.offsetTop)) {
+      continue;
+    }
+    if ((d = tl - tr) !== 0) {
+      // 1-pass
+      if (d > 0) {
+        r.style.marginTop = d + 'px';
+      } else if (d < 0) {
+        l.style.marginTop = (-d) + 'px';
+      }
+      // 2-pass
+      if ((tl = l.offsetTop)
+        && (tr = r.offsetTop) &&
+        (d += tl - tr) !== 0) {
+        if (d > 0) {
+          r.style.marginTop = d + 'px';
+        } else if (d < 0) {
+          l.style.marginTop = (-d) + 'px';
+        }
+      }
+    }
+  }
+  if (!contentLeft[0] ||
+    !(detailsLeft = contentLeft[0].querySelector('details')) ||
+    !contentRight[0] ||
+    !(detailsRight = contentRight[0].querySelector('details'))) {
+    return;
+  }
+  detailsLeft.addEventListener('toggle', function () {
+    detailsRight.open = detailsLeft.open;
+  });
+  detailsRight.addEventListener('toggle', function () {
+    detailsLeft.open = detailsRight.open;
+  });
+}();
