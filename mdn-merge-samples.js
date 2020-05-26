@@ -98,7 +98,7 @@ const mergeSamples = async (...basePath) => {
       for (let k = 0; k < compareSamples.sampleArray.length; k++) {
         let compareItem = compareSamples.sampleArray[k];
         let item = currentSamples.map[compareItem.key];
-        if (!item || (item.isEmpty && !compareItem.isEmpty)) {
+        if (compareItem && !compareItem.isEmpty && (!item || item.isEmpty)) {
           copyFilePromiseArray.push(copyAndMkdir(
             path.join(compareItem.cwd, compareItem.path),
             path.join(cwd, locale, compareItem.key))
