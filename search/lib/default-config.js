@@ -14,6 +14,8 @@ const defaultConfig = {
     search: '搜索 MDN',
     previousPage: '上一页',
     nextPage: '下一页',
+    openSearch: '打开搜索',
+    closeSearch: '关闭搜索',
     meta: [
       '在 ',
       ' 版本中找到 ',

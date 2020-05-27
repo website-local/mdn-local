@@ -4,6 +4,7 @@ export declare interface MdnSearchTemplate {
     header: string;
     searchStyle: string;
     injectCss: string;
+    searchScript: string;
 }
 
 export default function initTemplate(): Promise<MdnSearchTemplate>;

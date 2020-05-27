@@ -6,17 +6,17 @@ const initTemplate = async (config) => {
   const templatePath = config.templatePage ?
     path.join(config.rootDir, config.templatePage) :
     path.join(config.rootDir, config.locale, 'index.html');
-  const template = await fs.promises.readFile(templatePath, {
-    encoding: 'utf8'
-  });
+
   const injectCssPath = config.injectCssFile ?
     path.join(config.rootDir, config.injectCssFile) :
     path.join(config.rootDir, 'static', 'build', 'styles', 'inject.css');
+  const searchCssPath = path.resolve(__dirname, 'search.min.css');
+  const searchScriptPath = path.resolve(__dirname, 'search.js');
+  // noinspection JSCheckFunctionSignatures
+  const promises = [injectCssPath, searchCssPath, searchScriptPath, templatePath]
+    .map(p => fs.promises.readFile(p, {encoding: 'utf8'}));
 
-  const injectCss = (await fs.promises.readFile(injectCssPath, {
-    encoding: 'utf8'
-  })).replace('#nav-main-search,', '');
-
+  const template = await promises[3];
   const $ = cheerio.load(template);
   const styleSheets = $('link[rel="stylesheet"]');
   const styleSheetUrls = [];
@@ -28,11 +28,9 @@ const initTemplate = async (config) => {
   });
   const icon = $('link[rel="shortcut icon"]').attr('href');
   const header = $('.page-header').html();
-  const searchCssPath = path.resolve(__dirname, 'search.min.css');
-  const searchStyle = await fs.promises.readFile(searchCssPath, {
-    encoding: 'utf8'
-  });
-  return {styleSheetUrls, icon, header, searchStyle, injectCss};
+
+  const [injectCss, searchStyle, searchScript] = await Promise.all(promises);
+  return {styleSheetUrls, icon, header, searchStyle, injectCss, searchScript};
 };
 
 module.exports = initTemplate;

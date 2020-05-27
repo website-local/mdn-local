@@ -23,6 +23,8 @@ export default interface SearchConfig {
         search: string;
         previousPage: string;
         nextPage: string;
+        openSearch: string;
+        closeSearch: string;
         meta: string[];
     };
 
