@@ -12,7 +12,7 @@
     "fast-glob": "^3.2.2",
     "koa": "^2.12.0",
     "koa-static": "^5.0.0",
-    "log4js": "^6.2.1",
+    "log4js": "^6.3.0",
     "yargs": "^15.3.1"
   },
   "devDependencies": {
