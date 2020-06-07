@@ -11,7 +11,7 @@
     "cheerio": "^1.0.0-rc.3",
     "css-url-parser": "^1.1.3",
     "fast-glob": "^3.2.2",
-    "got": "^11.1.4",
+    "got": "^11.3.0",
     "json5": "^2.1.3",
     "log4js": "^6.3.0",
     "mkdirp": "^1.0.4",
@@ -23,7 +23,7 @@
   "devDependencies": {
     "@types/cheerio": "^0.22.18",
     "@types/urijs": "^1.19.9",
-    "eslint": "^7.1.0"
+    "eslint": "^7.2.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
