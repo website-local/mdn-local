@@ -72,7 +72,9 @@ const hardCodedRedirect = {
   '/api/fs/stream.html': '/api/stream.html',
   '/api/addons/n-api.html': '/api/n-api.html',
   '/api/assert/tty.html': '/api/tty.html',
-  '/api/worker_threads/errors.html': '/api/errors.html'
+  '/api/worker_threads/errors.html': '/api/errors.html',
+  '/api/process/cli.html': '/api/cli.html',
+  '/api/zlib/buffer.html': '/api/buffer.html'
 };
 
 const linkRedirectFunc = async (link, elem, parent) => {
