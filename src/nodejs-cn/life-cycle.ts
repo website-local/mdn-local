@@ -1,18 +1,26 @@
-const URI = require('urijs');
-const JSON5 = require('json5');
-const fs = require('fs');
-const path = require('path');
-const log4js = require('log4js');
-const gotNoRedirect = require('got').extend({
+import URI from 'urijs';
+import got from 'got';
+import {Resource} from 'website-scrap-engine/lib/resource';
+import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
+import {ProcessingLifeCycle} from 'website-scrap-engine/lib/life-cycle/types';
+import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle';
+import {
+  dropResource,
+  preProcess,
+  processHtml,
+  skipProcess
+} from 'website-scrap-engine/lib/life-cycle/adapters';
+import {
+  defaultDownloadOptions,
+  DownloadOptions
+} from 'website-scrap-engine/lib/options';
+
+const gotNoRedirect = got.extend({
   followRedirect: false
 });
-const {mkdir} = require('../lib/link');
-const Downloader = require('../lib/downloader');
-const configureLogger = require('../lib/logger-config');
-const errorLogger = log4js.getLogger('error');
 
-const cache = {};
-const asyncRedirectCache = {};
+const cache: Record<string, string> = {};
+const asyncRedirectCache: Record<string, Promise<string>> = {};
 
 const KW_ARR_BEGIN = 'var arr = [',
   KW_ARR_END = '];',
@@ -22,8 +30,8 @@ const HOST = 'nodejs.cn',
   PROTOCOL = 'http',
   URL_PREFIX = `${PROTOCOL}://${HOST}`;
 
-const getRedirectLocation = async (link) => {
-  let redirect = await gotNoRedirect(URL_PREFIX + link);
+const getRedirectLocation = async (link: string): Promise<string> => {
+  const redirect = await gotNoRedirect(URL_PREFIX + link);
   if (redirect.statusCode === 302 && redirect.headers && redirect.headers.location) {
     cache[link] = redirect.headers.location;
     link = redirect.headers.location;
@@ -31,14 +39,14 @@ const getRedirectLocation = async (link) => {
     /**
      * @type string
      */
-    let html = redirect.body;
-    let arrBegin = html.indexOf(KW_ARR_BEGIN),
+    const html = redirect.body;
+    const arrBegin = html.indexOf(KW_ARR_BEGIN),
       arrEnd = html.indexOf(KW_ARR_END, arrBegin),
       arrIndex = html.indexOf(KW_ARR_INDEX_BEGIN, arrEnd);
     if (arrBegin > 0 && arrEnd > 0 && arrIndex > 0) {
       try {
-        let arr = JSON5.parse(html.slice(arrBegin + KW_ARR_BEGIN.length - 1, arrEnd + 1));
-        let i = parseInt(html.slice(arrIndex + KW_ARR_INDEX_BEGIN.length), 10);
+        const arr = JSON.parse(html.slice(arrBegin + KW_ARR_BEGIN.length - 1, arrEnd + 1));
+        const i = parseInt(html.slice(arrIndex + KW_ARR_INDEX_BEGIN.length), 10);
         if (arr && !isNaN(i) && arr[i]) {
           cache[link] = arr[i];
           link = arr[i];
@@ -55,7 +63,7 @@ const getRedirectLocation = async (link) => {
   return link;
 };
 
-const cachedGetRedirectLocation = (link) => {
+const cachedGetRedirectLocation = (link: string): string | Promise<string> => {
   if (cache[link]) {
     return cache[link];
   }
@@ -66,7 +74,7 @@ const cachedGetRedirectLocation = (link) => {
 };
 
 // the 404-not-found links
-const hardCodedRedirect = {
+const hardCodedRedirect: Record<string, string> = {
   '/api/stream.md': '/api/stream.html',
   '/api/http/net.html': '/api/net.html',
   '/api/fs/stream.html': '/api/stream.html',
@@ -77,7 +85,10 @@ const hardCodedRedirect = {
   '/api/zlib/buffer.html': '/api/buffer.html'
 };
 
-const linkRedirectFunc = async (link, elem, parent) => {
+const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Resource | null) => {
+  if (!parent) {
+    return link;
+  }
   if (link && link.startsWith('/s/')) {
     if (cache[link]) {
       link = cache[link];
@@ -96,33 +107,39 @@ const linkRedirectFunc = async (link, elem, parent) => {
   return link;
 };
 
-const dropResourceFunc = res => {
-  return !(res.uri.host() === HOST && res.uri.path().startsWith('/api')) ||
+const dropResourceFunc = (res: Resource): boolean => {
+  return !(res.uri?.host() === HOST && res.uri.path().startsWith('/api')) ||
     res.uri.path() === '/api/static/inject.css' ||
     res.uri.path() === '/api/static/favicon.png' ||
     res.uri.path() === '/api/static/inject.js';
 };
 
-const preProcessResource = (link, elem, res) => {
-  let uri = URI(link);
+const preProcessResource = (link: string, elem: Cheerio | null, res: Resource | null) => {
+  if (!res) {
+    return;
+  }
+  const uri = URI(link);
   if (uri.host() && uri.host() !== HOST) {
-    res.replacePath = uri;
+    res.replacePath = uri.toString();
+    res.replaceUri = uri;
   }
   if (res.replacePath.toString().startsWith('/#')) {
     // redirected hash links
-    res.replacePath = URI(res.replacePath.toString().slice(1));
+    res.replaceUri = URI(res.replacePath.toString().slice(1));
+    res.replacePath = res.replaceUri.toString();
   }
   // fix redirected link
-  if (!res.replacePath.host() && elem.is('a') && elem.attr('target') === '_blank') {
+  if (!res.replaceUri?.host() && elem?.is('a') && elem.attr('target') === '_blank') {
     elem.removeAttr('target');
     elem.removeAttr('rel');
   }
 };
 
-const preProcessHtml = ($) => {
-  let head = $('head'), body = $('body');
+const preProcessHtml = ($: CheerioStatic): CheerioStatic => {
+  const head = $('head'), body = $('body');
   // remove comments in body
-  body.contents().filter(function () {
+  // note the 'this' hack, nodeType is actually defined
+  body.contents().filter(function (this: { nodeType: number }) {
     return this.nodeType === 8;
   }).remove();
   $('#biz_nav').remove();
@@ -146,8 +163,8 @@ const preProcessHtml = ($) => {
   return $;
 };
 
-const postProcessHtml = ($) => {
-  let array = $('a[href]');
+const postProcessHtml = ($: CheerioStatic) => {
+  const array = $('a[href]');
   for (let i = 0, a, attr, href; i < array.length; i++) {
     if ((a = array[i]) &&
       (attr = a.attribs) &&
@@ -162,28 +179,23 @@ const postProcessHtml = ($) => {
   return $;
 };
 
-module.exports = (localRoot, options = {}) => {
-  configureLogger(localRoot, HOST);
-  let d = new Downloader(Object.assign({
-    beginUrl: URL_PREFIX + '/api/',
-    depth: 4,
-    localRoot,
-    skipProcessFunc: link => !link || link.startsWith('https://github.com/'),
-    linkRedirectFunc,
-    dropResourceFunc,
-    preProcessResource,
-    preProcessHtml,
-    postProcessHtml
-  }, options));
+const lifeCycle: ProcessingLifeCycle = defaultLifeCycle();
+lifeCycle.linkRedirect.push(skipProcess(
+  (link: string) => !link || link.startsWith('https://github.com/')));
+lifeCycle.linkRedirect.push(linkRedirectFunc);
+lifeCycle.processBeforeDownload.push(dropResource(dropResourceFunc));
+lifeCycle.processBeforeDownload.push(preProcess(preProcessResource));
+lifeCycle.processAfterDownload.unshift(processHtml(preProcessHtml));
+lifeCycle.processAfterDownload.push(processHtml(postProcessHtml));
 
-  let staticPath = path.join(localRoot, 'nodejs.cn', 'api', 'static');
-  mkdir(staticPath);
-  fs.copyFileSync(path.join(__dirname, 'inject.css'),
-    path.join(staticPath, 'inject.css'));
-  fs.copyFileSync(path.join(__dirname, 'inject.js'),
-    path.join(staticPath, 'inject.js'));
-  fs.copyFileSync(path.join(__dirname, 'favicon.png'),
-    path.join(staticPath, 'favicon.png'));
-  d.start();
-  return d;
+const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
+options.logSubDir = HOST;
+options.maxDepth = 4;
+options.concurrency = 12;
+options.initialUrl = [URL_PREFIX + '/api/'];
+options.req.headers = {
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+    '(KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'
 };
+
+export default options;
