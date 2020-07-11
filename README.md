@@ -1,6 +1,5 @@
 # mdn-local
 download localized mozilla developer docs to local device
-
 ### Not included
 * Multiple locale docs (only one of them included)
 * Large files

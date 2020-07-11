@@ -1,6 +1,6 @@
 {
   "name": "mdn-local",
-  "version": "0.0.12",
+  "version": "0.2.0",
   "description": "create offline mozilla developer network documents",
   "main": "index.js",
   "engines": {
@@ -18,12 +18,17 @@
     "p-queue": "^6.5.0",
     "srcset": "^2.0.1",
     "tough-cookie": "^4.0.0",
-    "urijs": "^1.19.2"
+    "urijs": "^1.19.2",
+    "website-scrap-engine": "^0.1.1"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.21",
+    "@types/mkdirp": "^1.0.1",
     "@types/urijs": "^1.19.9",
-    "eslint": "^7.4.0"
+    "@typescript-eslint/eslint-plugin": "^3.6.0",
+    "@typescript-eslint/parser": "^3.6.0",
+    "eslint": "^7.4.0",
+    "typescript": "^3.9.6"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -37,9 +42,5 @@
     "mdn"
   ],
   "author": "myfreeer",
-  "license": "MPL-2.0",
-  "bugs": {
-    "url": "https://github.com/myfreeer/mdn-local/issues"
-  },
-  "homepage": "https://github.com/myfreeer/mdn-local#readme"
+  "license": "MPL-2.0"
 }
