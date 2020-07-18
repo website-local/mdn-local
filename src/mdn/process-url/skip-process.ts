@@ -3,7 +3,6 @@ import URI from 'urijs';
 import { downloadableHosts } from './consts';
 import {Resource} from 'website-scrap-engine/lib/resource';
 
-
 export const skipProcess = (
   url: string,
   element: Cheerio | null,

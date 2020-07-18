@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const glob = require('fast-glob');
 const cheerio = require('cheerio');
 const fs = require('fs');

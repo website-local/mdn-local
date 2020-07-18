@@ -17,3 +17,4 @@ eslint.cmd
 /mkdirp
 *.log
 dest
+lib

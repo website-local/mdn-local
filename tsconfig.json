@@ -5,7 +5,7 @@
     "sourceMap": true,
     "charset": "utf8",
     "newLine": "lf",
-    "outDir": "dest",
+    "outDir": "lib",
     "declaration": true,
     "esModuleInterop": true,
     "removeComments": false,

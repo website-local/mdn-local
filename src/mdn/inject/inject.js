@@ -55,9 +55,11 @@
     htab = htabs[i];
     links = htab.querySelectorAll('ul>li>a');
     if (desktops[i]) {
+      // noinspection JSCheckFunctionSignatures
       htab.appendChild(desktops[i]);
     }
     if (mobiles[i]) {
+      // noinspection JSCheckFunctionSignatures
       htab.appendChild(mobiles[i]);
     }
     for (j = 0; j < links.length; j++) {
