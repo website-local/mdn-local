@@ -1,6 +1,9 @@
-const {processPathWithMultipleLocale} = require('../mdn-process-url');
-const URI = require('urijs');
-const assertEquals = (expected, actual, msg) => {
+import {
+  processPathWithMultiLocale
+} from '../../../src/mdn/process-url/process-path-with-multi-locale';
+import URI from 'urijs';
+
+const assertEquals = <T>(expected: T, actual: T, msg?: string): boolean => {
   if (expected !== actual) {
     if (msg) console.error(msg, expected, actual);
     else console.error('assertEquals Fails', ' Expected: ', expected, ' Actual: ', actual);
@@ -33,10 +36,10 @@ const testCases = [
   ]
 ];
 
-const process = url => {
+const process = (url: string) => {
   const u = URI(url);
   const pathArr = u.path().split('/');
-  if (processPathWithMultipleLocale(pathArr, 'zh-CN')) {
+  if (processPathWithMultiLocale(pathArr, 'zh-CN')) {
     url = u.path(pathArr.join('/')).toString();
   }
   return url;
