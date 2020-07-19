@@ -9,12 +9,16 @@ import {
   defaultDownloadOptions,
   DownloadOptions
 } from 'website-scrap-engine/lib/options';
+import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
+import {postProcessHtml, preProcessHtml} from './process-html';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);
 lifeCycle.detectResourceType.push(detectLinkType);
 lifeCycle.processBeforeDownload.push(redirectDownloadLink, dropResource);
-lifeCycle.processAfterDownload.unshift(redirectUrlAfterFetch);
+lifeCycle.processAfterDownload.unshift(
+  redirectUrlAfterFetch, processHtml(preProcessHtml));
+lifeCycle.processAfterDownload.push(processHtml(postProcessHtml));
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.logSubDir = 'developer.mozilla.org';

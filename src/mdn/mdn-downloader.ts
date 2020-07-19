@@ -18,9 +18,6 @@ export class MdnDownloader extends SingleThreadDownloader {
     cookieJar.setCookieSync(
       'django_language=' + locale,
       'https://developer.mozilla.org');
-    if (!this.options.initialUrl?.length) {
-      this.options.initialUrl = defaultInitialUrl(locale);
-    }
 
     if (!this.options.req.hooks) {
       this.options.req.hooks = {};
@@ -89,14 +86,14 @@ export default async function createDownloader(
   if (!overrideOptions.localRoot) {
     throw new TypeError('localRoot is required');
   }
-  if (!overrideOptions.localRoot) {
-    throw new TypeError('localRoot is required');
-  }
   if (!locale) {
     locale = overrideOptions?.meta?.locale as string | undefined;
   }
   if (!locale || (!localesMap[locale] && locale !== 'en-US')) {
     throw new TypeError('locale not exists');
+  }
+  if (!overrideOptions.initialUrl?.length) {
+    overrideOptions.initialUrl = defaultInitialUrl(locale);
   }
   const downloader: MdnDownloader =
     new MdnDownloader(path.join(__dirname, 'life-cycle'), overrideOptions);

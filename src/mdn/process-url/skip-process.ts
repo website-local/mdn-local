@@ -30,7 +30,7 @@ export const skipProcess = (
   }
   const uri = URI(url), host = uri.host();
   if (host && !downloadableHosts[host]) {
-    skipExternalLogger.debug('skipped external link', host, url, parent && parent.url);
+    skipExternalLogger.trace('skipped external link', host, url, parent && parent.url);
     return;
   }
   const path = uri.path();
