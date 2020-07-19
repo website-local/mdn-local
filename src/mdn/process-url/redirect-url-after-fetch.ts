@@ -14,6 +14,7 @@ export function redirectUrlAfterFetch(
   let url = res.redirectedUrl || res.url;
   const uri = URI(url).search(''), host = uri.host();
   if (!mdnHosts[host]) {
+    res.redirectedUrl = res.url;
     return res;
   }
   if (host !== 'developer.mozilla.org') {
