@@ -35,7 +35,6 @@ export const detectLinkType = (
     return type;
   }
   if (elem.is('a') || elem.is('iframe')) {
-    const paths = url.split('/');
     if (url.includes('/@api/deki/files/')) {
       return ResourceType.Binary;
     }
@@ -47,10 +46,29 @@ export const detectLinkType = (
       url.includes('Creating_XPCOM_Components/Building_the_WebLock_UI')) {
       return ResourceType.Html;
     }
-    let arr;
-    if (paths && paths.length &&
-      (arr = paths[paths.length - 1].split('.')) && arr.length > 1) {
-      if (!validExtensionName[arr[arr.length - 1].toLowerCase()]) {
+
+    const hashIndex: number = url.lastIndexOf('#');
+    const searchIndex: number = hashIndex === -1 ?
+      url.lastIndexOf('?') :
+      url.lastIndexOf('?', hashIndex);
+    const endIndex: number = searchIndex === -1 ?
+      hashIndex :
+      hashIndex === -1 ? searchIndex : Math.min(searchIndex, hashIndex);
+    const endPath: number = endIndex === -1 ?
+      url.lastIndexOf('/') :
+      url.lastIndexOf('/', endIndex);
+    const lastIndex: number = endIndex === -1 ?
+      url.lastIndexOf('.') :
+      url.lastIndexOf('.', endIndex);
+    if (lastIndex !== -1 && lastIndex > endPath) {
+      const extension: string = endIndex === -1 ?
+        url.slice(lastIndex + 1).toLowerCase() :
+        url.slice(lastIndex + 1, endIndex).toLowerCase();
+      if (validExtensionName[extension]) {
+        return ResourceType.Binary;
+      } else if ('css' === extension) {
+        return ResourceType.Css;
+      } else {
         return ResourceType.Html;
       }
     }
