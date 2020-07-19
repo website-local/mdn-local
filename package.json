@@ -19,7 +19,7 @@
     "srcset": "^2.0.1",
     "tough-cookie": "^4.0.0",
     "urijs": "^1.19.2",
-    "website-scrap-engine": "^0.1.2"
+    "website-scrap-engine": "^0.1.4"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.21",
