@@ -620,6 +620,10 @@ export const mdnLocaleRedirectPath = (locale: string): Record<string, string> =>
       '/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6',
     ['/zh-CN/docs/Web/Events/readystatechange']:
       '/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6',
+    ['/en-US/docs/Web/Reference/Events/readystatechange']:
+      '/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6',
+    ['/zh-CN/docs/Web/Reference/Events/readystatechange']:
+      '/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6',
     ['/zh-CN/docs/Web/Events/readystatechange_event']:
       '/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6'
   };
