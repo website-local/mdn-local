@@ -2,7 +2,7 @@ import path from 'path';
 import {promises as fs} from 'fs';
 import {sync as mkdir} from 'mkdirp';
 import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
-import {StaticDownloadOptions} from 'website-scrap-engine/src/options';
+import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 
 export default function createDownloader(
   overrideOptions: Partial<StaticDownloadOptions>

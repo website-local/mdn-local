@@ -7,11 +7,11 @@ import {
   DownloadOptions
 } from 'website-scrap-engine/lib/options';
 import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
-import {StaticDownloadOptions} from 'website-scrap-engine/src/options';
+import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import {
   DownloadResource,
   SubmitResourceFunc
-} from 'website-scrap-engine/src/life-cycle/types';
+} from 'website-scrap-engine/lib/life-cycle/types';
 
 const remapHosts: Set<string> = new Set([
   'cdn.jsdelivr.net',

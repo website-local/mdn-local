@@ -1,4 +1,4 @@
-import { arrayToMap } from 'website-scrap-engine/src/util';
+import { arrayToMap } from 'website-scrap-engine/lib/util';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 
 // manually collected
