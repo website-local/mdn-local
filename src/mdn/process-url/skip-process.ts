@@ -1,4 +1,4 @@
-import {skip as skipExternalLogger} from 'website-scrap-engine/lib/logger/logger';
+import {skipExternal as skipExternalLogger} from 'website-scrap-engine/lib/logger/logger';
 import URI from 'urijs';
 import { downloadableHosts } from './consts';
 import {Resource} from 'website-scrap-engine/lib/resource';
@@ -30,7 +30,7 @@ export const skipProcess = (
   }
   const uri = URI(url), host = uri.host();
   if (host && !downloadableHosts[host]) {
-    skipExternalLogger.trace('skipped external link', host, url, parent && parent.url);
+    skipExternalLogger.debug('skipped external link', host, url, parent && parent.url);
     return;
   }
   const path = uri.path();

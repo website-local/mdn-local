@@ -95,10 +95,6 @@ export default async function createDownloader(
   if (!overrideOptions.initialUrl?.length) {
     overrideOptions.initialUrl = defaultInitialUrl(locale);
   }
-  const downloader: MdnDownloader =
-    new MdnDownloader(path.join(__dirname, 'life-cycle'), overrideOptions);
-  await downloader.init;
-  downloader.start();
   const basePath = path.join(overrideOptions.localRoot,
       'developer.mozilla.org', 'static', 'build'),
     jsPath = path.join(basePath, 'js'),
@@ -109,5 +105,9 @@ export default async function createDownloader(
     path.join(jsPath, 'inject.js'));
   await fs.copyFile(path.join(__dirname, 'inject', 'inject.css'),
     path.join(cssPath, 'inject.css'));
+  const downloader: MdnDownloader =
+    new MdnDownloader(path.join(__dirname, 'life-cycle'), overrideOptions);
+  await downloader.init;
+  downloader.start();
   return downloader;
 }
