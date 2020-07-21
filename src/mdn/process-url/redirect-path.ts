@@ -359,7 +359,8 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/KeyboardEvent/charCode`,
   [`/${locale}/docs/Web/CSS/en-US/docs/Web/API/WebVTT_API`]:
     `/${locale}/docs/Web/API/WebVTT_API`,
-  [`/${locale}/docs/Glossary/%3Ca%20href=%22/en-US/docs/Glossary/Microsoft_Internet_Explorer%22%20title=%22Internet%20Explorer%203.0:%20Internet%20Explorer%20%28or%20IE%29%20is%20a%20free%20graphical%20browser%20maintained%20by%20Microsoft%20for%20legacy%20enterprise%20uses.%20Microsoft%20Edge%20is%20currently%20the%20default%20Windows%20browser.%22%20class=%22glossaryLink%22%3EInternet%20Explorer%203.0%3C/a%3E`]:
+  // from https://developer.mozilla.org/zh-CN/docs/Glossary/JavaScript
+  [`/${locale}/docs/Glossary/a%20href=%22/en-US/docs/Glossary/Microsoft_Internet_Explorer%22%20title=%22Internet%20Explorer%203.0:%20Internet%20Explorer%20%28or%20IE%29%20is%20a%20free%20graphical%20browser%20maintained%20by%20Microsoft%20for%20legacy%20enterprise%20uses.%20Microsoft%20Edge%20is%20currently%20the%20default%20Windows%20browser.%22%20class=%22glossaryLink%22%3EInternet%20Explorer%203.0%3C/a`]:
     `/${locale}/docs/Glossary/Microsoft_Internet_Explorer`,
   [`/${locale}/docs/Web/API/en-US/docs/Server-sent_events/Using_server-sent_events`]:
     `/${locale}/docs/Server-sent_events/Using_server-sent_events`,
