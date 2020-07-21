@@ -1,4 +1,7 @@
 export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
+  // https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/Places/Using_the_Places_keywords_AP
+  [`/${locale}/docs/Bookmark_Keywords`]:
+    `/${locale}/docs/Archive/Mozilla/Bookmark_keywords`,
   [`/${locale}/docs/CSS/CSS_transitions`]:
     `/${locale}/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions`,
   [`/${locale}/docs/Mozilla/Add-ons/WebExtensions/Using_the_JavaScript_APIs`]:
