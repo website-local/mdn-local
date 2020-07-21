@@ -141,10 +141,7 @@ export function redirectUrl(
         }
       }
     }
-    u = u
-      .removeSearch(['redirectlocale', 'redirectslug', 'tag', 'language', 'raw', 'section', 'size'])
-      .search('')
-      .normalizePath();
+    u = u.search('').normalizePath();
     if (html) {
       u = u
         .absoluteTo(html.url)
@@ -174,6 +171,11 @@ export function redirectUrl(
         .path('/unpkg-com' + u.path())
         .toString();
     }
+    needToRebuildUrl = true;
+  }
+  // remove search
+  if (u.search()) {
+    u.search('');
     needToRebuildUrl = true;
   }
   const pathArr = u.path()
