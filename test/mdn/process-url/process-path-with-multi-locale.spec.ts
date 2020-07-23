@@ -3,15 +3,6 @@ import {
 } from '../../../src/mdn/process-url/process-path-with-multi-locale';
 import URI from 'urijs';
 
-const assertEquals = <T>(expected: T, actual: T, msg?: string): boolean => {
-  if (expected !== actual) {
-    if (msg) console.error(msg, expected, actual);
-    else console.error('assertEquals Fails', ' Expected: ', expected, ' Actual: ', actual);
-    return false;
-  }
-  return true;
-};
-
 const testCases = [
   [
     'https://developer.mozilla.org/zh-CN/zh-cn/docs/E4X',
@@ -36,13 +27,19 @@ const testCases = [
   ]
 ];
 
-const process = (url: string) => {
-  const u = URI(url);
-  const pathArr = u.path().split('/');
-  if (processPathWithMultiLocale(pathArr, 'zh-CN')) {
-    url = u.path(pathArr.join('/')).toString();
-  }
-  return url;
-};
-
-testCases.forEach(testCase => assertEquals(testCase[1], process(testCase[0])));
+describe('process-path-with-multi-locale', function () {
+  const process = (url: string) => {
+    const u = URI(url);
+    const pathArr = u.path().split('/');
+    if (processPathWithMultiLocale(pathArr, 'zh-CN')) {
+      url = u.path(pathArr.join('/')).toString();
+    }
+    return url;
+  };
+  // https://github.com/myfreeer/mdn-local/issues/4
+  test('process-path-with-multi-locale', () => {
+    for (const testCase of testCases) {
+      expect(process(testCase[0])).toBe(testCase[1]);
+    }
+  });
+});
