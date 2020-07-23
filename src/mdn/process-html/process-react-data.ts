@@ -40,6 +40,70 @@ export interface MdnReactData {
   }
 }
 
+const uselessStringCatalogsForLocalUsage = [
+  'A newer version of this article',
+  'All payment information goes through',
+  'An error happened trying to',
+  'Because we aren’t looking for a lump sum.',
+  'Browser documentation and release notes',
+  'By clicking this button, I authorize',
+  'Compare this date to the latest',
+  'Currently, Mozilla pays for site operations',
+  'Deleting your account loses any preferences',
+  'Get 20% off at the',
+  'Get discounts on sweet',
+  'If you have questions, please',
+  'If you haven’t previously confirmed',
+  'If you would like to',
+  'I’m okay with Mozilla',
+  'MDN is funded out of the Mozilla',
+  'MDN is seeking direct support',
+  'Mozilla will collect and store your',
+  'No. Payments to Mozilla Corporation',
+  'Our goal is to provide accurate',
+  'Our team will review your report.',
+  'Our user base has grown exponentially in the last few years',
+  'Publishing failed.',
+  'Separately, the Mozilla',
+  'Sign in to support MDN',
+  'Sorry, we can’t seem to reach',
+  'Support MDN with a %(amount)s',
+  'The Mozilla Corporation, which funds MDN',
+  'The money collected through MDN',
+  'To find out more about',
+  'When you request to delete your account',
+  'Would you answer 4 questions for us',
+  'You can cancel your monthly',
+  'You can join the GitHub',
+  '👋 Do you use Chrome’s automatic'
+];
+
+let fastUselessStringCatalogsForLocalUsage: Record<string, string[]> | void;
+
+const shouldDropStringCatalog = (key: string): boolean => {
+  // lazy init
+  if (!fastUselessStringCatalogsForLocalUsage) {
+    fastUselessStringCatalogsForLocalUsage = {};
+    for (const string of uselessStringCatalogsForLocalUsage) {
+      if (!fastUselessStringCatalogsForLocalUsage[string[0]]) {
+        fastUselessStringCatalogsForLocalUsage[string[0]] = [string];
+        continue;
+      }
+      fastUselessStringCatalogsForLocalUsage[string[0]].push(string);
+    }
+  }
+  let uselessStringCatalogs: string[];
+  if (!(uselessStringCatalogs = fastUselessStringCatalogsForLocalUsage[key[0]])) {
+    return false;
+  }
+  for (const uselessStringCatalog of uselessStringCatalogs) {
+    if (key.startsWith(uselessStringCatalog)) {
+      return true;
+    }
+  }
+  return false;
+};
+
 const JSON_PARSE_STR = 'JSON.parse(';
 // place holders
 const PLACE_HOLDER_BODY_HTML = '@#%PLACE_HOLDER_BODY_HTML%#@';
@@ -107,25 +171,7 @@ export const postProcessReactData = (text: string, elem: Cheerio): void => {
         // Invalid or unexpected token
         key.includes('>') ||
         // useless items for local version
-        key.startsWith('Our goal is to provide accurate') ||
-        key.startsWith('Publishing failed.') ||
-        key.startsWith('Would you answer 4 questions for us') ||
-        key.startsWith('I’m okay with Mozilla') ||
-        key.startsWith('A newer version of this article') ||
-        key.startsWith('If you haven’t previously confirmed a subscription to a Mozilla') ||
-        key.startsWith('Because we aren’t looking for a lump sum.') ||
-        key.startsWith('An error occurred trying to set up the subscription with Stripe') ||
-        key.startsWith('Currently, Mozilla pays for site operations and overhead') ||
-        key.startsWith('MDN is funded out of the Mozilla Corporation') ||
-        key.startsWith('Mozilla will collect and store your name and email') ||
-        key.startsWith('No. Payments to Mozilla Corporation in support of MDN') ||
-        key.startsWith('Our user base has grown exponentially in the last few years') ||
-        key.startsWith('Sign in to support MDN') ||
-        key.startsWith('Support MDN with a %(amount)s') ||
-        key.startsWith('The Mozilla Corporation, which funds MDN') ||
-        key.startsWith('The money collected through MDN') ||
-        key.startsWith('When you request to delete your account') ||
-        key.startsWith('Our team will review your report.')) {
+        shouldDropStringCatalog(key)) {
         // noinspection JSUnfilteredForInLoop
         delete stringCatalog[key];
       }
