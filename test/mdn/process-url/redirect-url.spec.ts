@@ -125,4 +125,21 @@ describe('redirect-url', function () {
       } as Resource, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/interactive-examples/media/examples/star.png');
   });
+  // https://github.com/myfreeer/mdn-local/issues/32
+  test('redirect mdn.github.io #32', () => {
+    expect(redirectUrl('https://mdn.github.io/web-tech-games/index.html',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn-github-io/web-tech-games/index.html');
+    expect(redirectUrl('https://mdn.github.io/dom-examples/channel-messaging-basic/',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn-github-io/dom-examples/channel-messaging-basic/');
+    expect(redirectUrl('style.css',
+      null,
+      {
+        url: 'https://developer.mozilla.org/mdn-github-io/webaudio-examples/panner-node/',
+        downloadLink: 'https://mdn.github.io/webaudio-examples/panner-node/'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn-github-io/webaudio-examples/panner-node/style.css');
+  });
 });
