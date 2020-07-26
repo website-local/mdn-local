@@ -61,7 +61,7 @@ export function fixUrlWithBadFormat(url: string): string {
 export function redirectUrl(
   url: string,
   element: Cheerio | null,
-  html: Resource | null,
+  parent: Resource | null,
   options: StaticDownloadOptions
 ): string | void {
   const locale = options.meta.locale as string;
@@ -142,12 +142,12 @@ export function redirectUrl(
       }
     }
     u = u.search('').normalizePath();
-    if (html) {
+    if (parent) {
       u = u
-        .absoluteTo(html.url)
+        .absoluteTo(parent.url)
         .normalizePath();
     }
-    if (html && html.downloadLink.includes('//interactive-examples.mdn.mozilla.net/') &&
+    if (parent && parent.downloadLink.includes('//interactive-examples.mdn.mozilla.net/') &&
       !u.path().includes('/interactive-examples/')) {
       // interactive-examples
       // fake url, redirected back in requestRedirectFunc
@@ -155,7 +155,7 @@ export function redirectUrl(
         .path('/interactive-examples' + u.path())
         .toString();
     }
-    if (html && html.downloadLink.includes('//mdn.github.io/') &&
+    if (parent && parent.downloadLink.includes('//mdn.github.io/') &&
       !u.path().includes('/mdn-github-io/')) {
       // mdn.github.io
       // fake url, redirected back in requestRedirectFunc
@@ -163,7 +163,7 @@ export function redirectUrl(
         .path('/mdn-github-io' + u.path())
         .toString();
     }
-    if (html && html.downloadLink.includes('//unpkg.com/') &&
+    if (parent && parent.downloadLink.includes('//unpkg.com/') &&
       !u.path().includes('/unpkg-com/')) {
       // mdn.github.io
       // fake url, redirected back in requestRedirectFunc

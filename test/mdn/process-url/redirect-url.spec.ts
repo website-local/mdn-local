@@ -107,4 +107,22 @@ describe('redirect-url', function () {
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/docs/tag/Credibility');
   });
+  // https://github.com/myfreeer/mdn-local/issues/30
+  test('redirect interactive-examples #30', () => {
+    expect(redirectUrl('https://interactive-examples.mdn.mozilla.net/pages/css/box-sizing.html',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Web/CSS/box-sizing'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/interactive-examples/pages/css/box-sizing.html');
+  });
+  // https://github.com/myfreeer/mdn-local/issues/31
+  test('redirect absolute links in interactive-examples #31', () => {
+    expect(redirectUrl('/media/examples/star.png',
+      null, {
+        url: redirectUrl('https://interactive-examples.mdn.mozilla.net/live-examples/css-examples/backgrounds-and-borders/background-position.css',
+          null, null, opt('zh-CN')),
+        downloadLink: 'https://interactive-examples.mdn.mozilla.net/live-examples/css-examples/backgrounds-and-borders/background-position.css'
+      } as Resource, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/interactive-examples/media/examples/star.png');
+  });
 });
