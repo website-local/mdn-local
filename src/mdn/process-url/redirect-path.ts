@@ -1,4 +1,6 @@
 export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
+  // https://github.com/myfreeer/mdn-local/issues/34
+  '/media/redesign/img/favicon32.png': '/static/img/favicon32.png',
   // https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/Places/Using_the_Places_keywords_AP
   [`/${locale}/docs/Bookmark_Keywords`]:
     `/${locale}/docs/Archive/Mozilla/Bookmark_keywords`,
