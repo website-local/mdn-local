@@ -83,6 +83,28 @@ describe('redirect-url', function () {
       .toBe('https://developer.mozilla.org/zh-CN/docs/Web');
   });
 
+  // commit e7f67301380a9338ff36f231749999497cfe1717
+  // 2019/9/13 15:46
+  test('redirect http link to https', () => {
+    expect(redirectUrl('http://developer.mozilla.org/docs',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs');
+
+    expect(redirectUrl('http://mdn.mozillademos.org/files/3855/HTML5_Badge_16.png',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/files/3855/HTML5_Badge_16.png');
+
+    expect(redirectUrl('http://interactive-examples.mdn.mozilla.net/pages/css/box-sizing.html',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Web/CSS/box-sizing'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/interactive-examples/pages/css/box-sizing.html');
+
+    expect(redirectUrl('http://mdn.github.io/web-tech-games/index.html',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn-github-io/web-tech-games/index.html');
+  });
+
   // https://github.com/myfreeer/mdn-local/issues/5
   test('redirecting mdn.mozillademos.org #5', () => {
     expect(redirectUrl('https://mdn.mozillademos.org/files/3855/HTML5_Badge_16.png',
