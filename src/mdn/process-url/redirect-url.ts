@@ -69,7 +69,7 @@ export function redirectUrl(
     url = fixUrlWithBadFormat(url);
   }
   if (!url) return url;
-  let u = URI(url), host, needToRebuildUrl = false;
+  let u = URI(url).normalize(), host, needToRebuildUrl = false;
   if ((host = u.host()) && host !== 'developer.mozilla.org') {
     let shouldReturnEarly = false;
     if (downloadableHosts[host] && u.protocol() === 'http') {

@@ -399,6 +399,10 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
   '/zh-CN/Add-ons/Code_snippets/Tabbed_browser':
     `/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
+  [`/${locale}/Add-ons/Code_snippets/Tabbed_browser`]:
+    `/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
+  [`/${locale}/docs/Code_snippets/Tabbed_browser`]:
+    `/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
   [`/${locale}/docs/Web/Events/readystatechange`]:
     `/${locale}/docs/Web/API/Document/readystatechange_event`,
   [`/${locale}/docs/Web/API/Document/onreadystatechange`]:

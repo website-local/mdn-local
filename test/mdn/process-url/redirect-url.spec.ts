@@ -1,6 +1,8 @@
 import {redirectUrl} from '../../../src/mdn/process-url/redirect-url';
 import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import {DownloadOptions} from 'website-scrap-engine/src/options';
+import {Resource} from 'website-scrap-engine/lib/resource';
+
 const opt = (locale: string): StaticDownloadOptions => ({
   localRoot: '/tmp/dummy',
   maxDepth: 1,
@@ -48,5 +50,24 @@ describe('redirect-url', function () {
     expect(redirectUrl('https://developer.mozilla.org/En/docs/XUL/Attribute/align?raw&macros&include',
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/docs/XUL/Attribute/align');
+  });
+  // https://github.com/myfreeer/mdn-local/issues/20
+  test('process bad url #20', () => {
+    expect(redirectUrl('https://developer.mozilla.org/../../../../en-US/docs/Code_snippets/Tabbed_browser',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Archive/Add-ons/Tabbed_browser');
+    expect(redirectUrl('https://developer.mozilla.org/../../../../En/Mozilla_developer_guide',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/Mozilla_developer_guide');
+    expect(redirectUrl('https://developer.mozilla.org/../../../../en/XUL_Tutorial/Localization',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/XUL_Tutorial/Localization');
+    // relative url
+    expect(redirectUrl('../../../../en/XUL_Tutorial/Localization',
+      null, {
+        url: 'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL',
+        downloadLink: 'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL'
+      } as Resource, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/XUL_Tutorial/Localization');
   });
 });
