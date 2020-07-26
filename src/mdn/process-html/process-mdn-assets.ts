@@ -65,6 +65,7 @@ export const preProcessMdnAssets = (
         (values = assets.js[key]) &&
         (valueLen = values.length)) {
         for (j = 0; j < valueLen; j++) {
+          // language=HTML
           $(`<script class="${TO_REMOVE_CLASS}" src="${
             values[j]
           }" defer data-key="${key}"></script>`)
@@ -81,6 +82,7 @@ export const preProcessMdnAssets = (
         (values = assets.css[key]) &&
         (valueLen = values.length)) {
         for (j = 0; j < valueLen; j++) {
+          // language=HTML
           $(`<link class="${TO_REMOVE_CLASS}" rel="stylesheet" href="${
             values[j]
           }" data-key="${key}"/>`)

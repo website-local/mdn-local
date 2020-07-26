@@ -163,6 +163,7 @@ const preProcessHtml = ($: CheerioStatic, res: Resource & { type: ResourceType.H
   $('footer.footer').remove();
   const axios = $('script[src*="axios"]');
   if (axios.length) {
+    // language=HTML
     $(`<script>
 'use strict';
 var axios = window.axios || {

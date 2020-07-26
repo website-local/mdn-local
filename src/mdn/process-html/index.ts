@@ -112,6 +112,7 @@ export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic 
   // https://github.com/myfreeer/mdn-local/issues/10
   $('.pagination').remove();
   // fix script
+  // language=HTML
   $(`<div style="display:none" class="script-workaround">
 <div id="close-header-search"></div>
 <div id="nav-main-search"></div>
@@ -161,12 +162,14 @@ export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
     pathArr.pop();
     pathArr.push('inject.js');
     // sync script
+    // language=HTML
     $(`<script class="mdn-local-inject-js" src="${pathArr.join('/')}"></script>`)
       .insertBefore(reactMainScript);
     pathArr.pop();
     pathArr.pop();
     pathArr.push('styles');
     pathArr.push('inject.css');
+    // language=HTML
     $(`<link href="${pathArr.join('/')}" rel="stylesheet"\
  type="text/css" class="mdn-local-inject-css">`)
       .appendTo($('head'));

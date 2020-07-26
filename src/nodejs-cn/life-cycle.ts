@@ -150,9 +150,11 @@ const preProcessHtml = ($: CheerioStatic): CheerioStatic => {
   $('a[href="/"]').remove();
   $('a[href="/search"]').addClass('link-to-search');
   // style for page and prism.js
+  // language=HTML
   $(`<link href="${URL_PREFIX}/api/static/inject.css" rel="stylesheet">`)
     .appendTo(head);
   // better code highlighting with prism.js
+  // language=HTML
   $(`<script src="${URL_PREFIX}/api/static/inject.js" defer></script>`)
     .appendTo(body);
   // replace favicon

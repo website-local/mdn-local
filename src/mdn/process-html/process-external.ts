@@ -23,6 +23,7 @@ export const postProcessReplaceExternalIframeWithLink = ($: CheerioStatic): void
     item = $(result[i]);
     src = item.attr('src');
     if (src && (src.startsWith('https://') || src.startsWith('http://'))) {
+      // language=HTML
       a = $('<a class="external external-icon mdn-local-external-iframe-link"></a>');
       a.attr('href', src)
         .attr('target', '_blank')
