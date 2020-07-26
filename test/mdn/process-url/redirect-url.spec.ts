@@ -95,4 +95,16 @@ describe('redirect-url', function () {
       opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/XUL/assign');
   });
+  // https://github.com/myfreeer/mdn-local/issues/27
+  test('redirect wiki.developer.mozilla.org #27', () => {
+    expect(redirectUrl('https://wiki.developer.mozilla.org/zh-CN/docs/tag/Accessibility:Tools',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/tag/Accessibility:Tools');
+    expect(redirectUrl('https://wiki.developer.mozilla.org/zh-CN/docs/tag/-webkit-appearance',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/tag/-webkit-appearance');
+    expect(redirectUrl('https://wiki.developer.mozilla.org/zh-CN/docs/tag/Credibility',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/tag/Credibility');
+  });
 });
