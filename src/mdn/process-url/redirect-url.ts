@@ -218,10 +218,7 @@ export function redirectUrl(
       needToRebuildUrl = true;
     }
   }
-  if (pathArr[1] === 'static' && pathArr[2] === 'jsi18n' && redirectLocale[pathArr[3]]) {
-    pathArr[3] = locale;
-    needToRebuildUrl = true;
-  }
+
   if (needToRebuildUrl) {
     url = u.path(pathArr.join('/')).toString();
   }
