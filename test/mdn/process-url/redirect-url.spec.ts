@@ -1,6 +1,6 @@
 import {redirectUrl} from '../../../src/mdn/process-url/redirect-url';
 import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import {DownloadOptions} from 'website-scrap-engine/src/options';
+import {DownloadOptions} from 'website-scrap-engine/lib/options';
 import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
 
 const opt = (locale: string): StaticDownloadOptions => ({
@@ -157,5 +157,44 @@ describe('redirect-url', function () {
     expect(redirectUrl('http://w3c.org/2008/site/images/favicon.ico',
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/static/img/favicon32.png');
+  });
+  // https://github.com/myfreeer/mdn-local/issues/38
+  test('resolve malformed links #38', () => {
+    expect(redirectUrl('/zh-CN/docs/https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Tools/Web_Console/Helpers'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/keys');
+
+    expect(redirectUrl('zh-CN/docs/Install_Manifests#targetApplication',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Mozilla/Toolkit_version_format'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Install_Manifests#targetApplication');
+
+    expect(redirectUrl('../../zh-cn/docs/JavaScript/Reference/Global_Objects/Map',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Mozilla/Firefox/Releases/17'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Map');
+
+    expect(redirectUrl('&lt;https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website>',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/learn/Server-side/Express_Nodejs/Installing_on_PWS_Cloud_Foundry'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website');
+
+    expect(redirectUrl('../../en-US/docs/Mercurial',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Mozilla_Source_Code_Directory_Structure'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Mercurial');
+
+    expect(redirectUrl('../../en-US/docs/Mercurial',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Mozilla_Source_Code_Directory_Structure'),
+      opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Mercurial');
+
   });
 });
