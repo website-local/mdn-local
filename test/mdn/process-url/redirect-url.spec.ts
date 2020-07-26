@@ -1,7 +1,7 @@
 import {redirectUrl} from '../../../src/mdn/process-url/redirect-url';
 import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import {DownloadOptions} from 'website-scrap-engine/src/options';
-import {Resource} from 'website-scrap-engine/lib/resource';
+import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
 
 const opt = (locale: string): StaticDownloadOptions => ({
   localRoot: '/tmp/dummy',
@@ -13,6 +13,14 @@ const opt = (locale: string): StaticDownloadOptions => ({
     locale
   }
 });
+
+const fakeRes = (url: string) => ({
+  type: ResourceType.Html,
+  url,
+  refUrl: url,
+  rawUrl: url,
+  downloadLink: url
+}) as Resource;
 
 describe('redirect-url', function () {
   // https://github.com/myfreeer/mdn-local/issues/5
@@ -64,10 +72,27 @@ describe('redirect-url', function () {
       .toBe('https://developer.mozilla.org/zh-CN/XUL_Tutorial/Localization');
     // relative url
     expect(redirectUrl('../../../../en/XUL_Tutorial/Localization',
-      null, {
-        url: 'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL',
-        downloadLink: 'https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL'
-      } as Resource, opt('zh-CN')))
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL'),
+      opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/XUL_Tutorial/Localization');
+  });
+  // https://github.com/myfreeer/mdn-local/issues/21
+  test('process wrong relative links #21', () => {
+    expect(redirectUrl('cn/XUL/Attribute/acceltext',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL/Attribute'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/XUL/Attribute/acceltext');
+    expect(redirectUrl('cn/XUL/Attribute/ontextrevert',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL/Attribute'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/XUL/Attribute/ontextrevert');
+    expect(redirectUrl('ja/XUL/assign',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/XUL/XUL_Reference'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/XUL/assign');
   });
 });
