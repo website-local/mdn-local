@@ -42,4 +42,17 @@ describe('process-path-with-multi-locale', function () {
       expect(process(testCase[0])).toBe(testCase[1]);
     }
   });
+
+  test('not touching normal links', () => {
+    const normalLinks = [
+      'https://developer.mozilla.org/',
+      'https://developer.mozilla.org/zh-CN/',
+      'https://developer.mozilla.org/zh-CN/docs',
+      'https://developer.mozilla.org/static/img/favicon32.png'
+    ];
+    for (const normalLink of normalLinks) {
+      expect(process(normalLink)).toBe(normalLink);
+    }
+    expect(processPathWithMultiLocale([], 'zh-CN')).toBeFalsy();
+  });
 });
