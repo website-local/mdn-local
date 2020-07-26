@@ -23,6 +23,19 @@ const fakeRes = (url: string) => ({
 }) as Resource;
 
 describe('redirect-url', function () {
+  // commit 40ec1502704e6e363f6ab4d691d002125987b7cd
+  // 2019/3/2 10:15
+  test('append locale to path', () => {
+    expect(redirectUrl('https://developer.mozilla.org/docs',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs');
+    expect(redirectUrl('https://developer.mozilla.org/docs/Web',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web');
+    expect(redirectUrl('https://developer.mozilla.org/Web',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web');
+  });
 
   // commit fae4c11784f1168ff3d2a5af5ea45c6ee2cf874b
   // 2019/8/28 20:43
@@ -273,6 +286,19 @@ describe('redirect-url', function () {
     expect(redirectUrl('<=%=baseURLhttps://developer.mozilla.org/en-US/',
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/');
+  });
+
+  // commit f11a10c439357164877bb15fd50029ac80c519b6
+  // 2020/3/28 16:32
+  test('redirect unpkg.com', () => {
+    expect(redirectUrl('https://unpkg.com/imsc@1.1.0-beta.2/build/umd/imsc.all.min.js',
+      null,
+      {
+        url: 'https://developer.mozilla.org/mdn-github-io/imsc/imscjs-demo/imscjs-demo.html',
+        downloadLink: 'https://mdn.github.io/imsc/imscjs-demo/imscjs-demo.html'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/unpkg-com/imsc@1.1.0-beta.2/build/umd/imsc.all.min.js');
   });
 
   // commit 2ee5f6baa338c4edd621f02c77169d651461a10e
