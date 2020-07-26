@@ -336,25 +336,25 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/Events/readystatechange_event`,
   '/en-US/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/ui_button_toggle':
     `/${locale}/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/ui_button_toggle`,
-  '/../../../../En/Mozilla_developer_guide':
+  '/En/Mozilla_developer_guide':
     `/${locale}/docs/Mozilla/Developer_guide`,
-  '/../../../../en/XUL_Tutorial/Localization':
+  '/en/XUL_Tutorial/Localization':
     `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/Localization`,
-  '/../../../../en/XUL_Tutorial/Document_Object_Model':
+  '/en/XUL_Tutorial/Document_Object_Model':
     `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/Document_Object_Model`,
-  '/../../../../En/NsITimer':
+  '/En/NsITimer':
     `/${locale}/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsITimer`,
-  '/../../../../en/XUL_Tutorial/More_Event_Handlers':
+  '/en/XUL_Tutorial/More_Event_Handlers':
     `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/More_Event_Handlers`,
-  '/../../../../en/Using_JavaScript_code_modules':
+  '/en/Using_JavaScript_code_modules':
     `/${locale}/docs/Mozilla/JavaScript_code_modules/Using`,
-  '/../../../../En/nsITimer':
+  '/En/nsITimer':
     `/${locale}/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsITimer`,
-  '/../../../../en/DOM/window.setTimeout':
+  '/en/DOM/window.setTimeout':
     `/${locale}/docs/Web/API/Window/setTimeout`,
-  '/../../../../En/Publishing_Mercurial_Clones':
+  '/En/Publishing_Mercurial_Clones':
     `/${locale}/docs/Mozilla/Creating_Mercurial_User_Repositories`,
-  '/../../../../En/SpiderMonkey':
+  '/En/SpiderMonkey':
     `/${locale}/docs/Mozilla/Projects/SpiderMonkey`,
   '/en/nsIFeedTextConstruct':
     `/${locale}/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIFeedTextConstruct`,

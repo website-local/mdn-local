@@ -59,6 +59,7 @@ describe('redirect-url', function () {
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/docs/XUL/Attribute/align');
   });
+
   // https://github.com/myfreeer/mdn-local/issues/20
   test('process bad url #20', () => {
     expect(redirectUrl('https://developer.mozilla.org/../../../../en-US/docs/Code_snippets/Tabbed_browser',
@@ -77,6 +78,7 @@ describe('redirect-url', function () {
       opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/XUL_Tutorial/Localization');
   });
+
   // https://github.com/myfreeer/mdn-local/issues/21
   test('process wrong relative links #21', () => {
     expect(redirectUrl('cn/XUL/Attribute/acceltext',
@@ -95,6 +97,7 @@ describe('redirect-url', function () {
       opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/XUL/assign');
   });
+
   // https://github.com/myfreeer/mdn-local/issues/27
   test('redirect wiki.developer.mozilla.org #27', () => {
     expect(redirectUrl('https://wiki.developer.mozilla.org/zh-CN/docs/tag/Accessibility:Tools',
@@ -107,6 +110,7 @@ describe('redirect-url', function () {
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/docs/tag/Credibility');
   });
+
   // https://github.com/myfreeer/mdn-local/issues/30
   test('redirect interactive-examples #30', () => {
     expect(redirectUrl('https://interactive-examples.mdn.mozilla.net/pages/css/box-sizing.html',
@@ -115,6 +119,7 @@ describe('redirect-url', function () {
       opt('zh-CN')))
       .toBe('https://developer.mozilla.org/interactive-examples/pages/css/box-sizing.html');
   });
+
   // https://github.com/myfreeer/mdn-local/issues/31
   test('redirect absolute links in interactive-examples #31', () => {
     expect(redirectUrl('/media/examples/star.png',
@@ -125,6 +130,7 @@ describe('redirect-url', function () {
       } as Resource, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/interactive-examples/media/examples/star.png');
   });
+
   // https://github.com/myfreeer/mdn-local/issues/32
   test('redirect mdn.github.io #32', () => {
     expect(redirectUrl('https://mdn.github.io/web-tech-games/index.html',
@@ -158,6 +164,7 @@ describe('redirect-url', function () {
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/static/img/favicon32.png');
   });
+
   // https://github.com/myfreeer/mdn-local/issues/38
   test('resolve malformed links #38', () => {
     expect(redirectUrl('/zh-CN/docs/https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys',
@@ -179,6 +186,18 @@ describe('redirect-url', function () {
       .toBe('https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Map');
 
     expect(redirectUrl('&lt;https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website>',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/learn/Server-side/Express_Nodejs/Installing_on_PWS_Cloud_Foundry'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website');
+
+    expect(redirectUrl('<https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website>',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/learn/Server-side/Express_Nodejs/Installing_on_PWS_Cloud_Foundry'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website');
+
+    expect(redirectUrl('<https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website&gt;',
       null,
       fakeRes('https://developer.mozilla.org/zh-CN/docs/learn/Server-side/Express_Nodejs/Installing_on_PWS_Cloud_Foundry'),
       opt('zh-CN')))
