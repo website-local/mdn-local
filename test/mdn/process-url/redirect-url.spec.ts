@@ -263,4 +263,28 @@ describe('redirect-url', function () {
       .toBe('https://developer.mozilla.org/en-US/docs/Mercurial');
 
   });
+
+  // commit b6b2c169a630853f90d50b96e9a6c85f9dcbeaf6
+  // 2020/3/8 17:38
+  test('url with baseURL prefix', () => {
+    expect(redirectUrl('<=%=baseURLhttps://developer.mozilla.org/zh-CN/',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/');
+    expect(redirectUrl('<=%=baseURLhttps://developer.mozilla.org/en-US/',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/');
+  });
+
+  // commit 2ee5f6baa338c4edd621f02c77169d651461a10e
+  // 2020/3/28 16:20
+  // commit 154a73daead1eb2af1a744af432580e0f6ff6b9d
+  // 2020/4/1 21:17
+  test('url with nested code tag', () => {
+    expect(redirectUrl('<code>https://developer.mozilla.org/zh-CN/</code>',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/');
+    expect(redirectUrl('%3Ccode%3Ehttps://developer.mozilla.org/en-US/%3C/code%3E',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/');
+  });
 });
