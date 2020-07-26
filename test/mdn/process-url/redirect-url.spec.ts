@@ -23,6 +23,53 @@ const fakeRes = (url: string) => ({
 }) as Resource;
 
 describe('redirect-url', function () {
+
+  // commit fae4c11784f1168ff3d2a5af5ea45c6ee2cf874b
+  // 2019/8/28 20:43
+  test('redirect malformed url to more current location', () => {
+    expect(redirectUrl('https://developer.mozilla.org/en/JavaScript',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/JavaScript');
+    expect(redirectUrl('https://developer.mozilla.org/Ja/API',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API');
+    expect(redirectUrl('https://developer.mozilla.org/zu/XPath',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/XPath');
+
+    expect(redirectUrl('https://developer.mozilla.org/zu/Web',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web');
+    expect(redirectUrl('https://developer.mozilla.org/ln/Mozilla',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Mozilla');
+    expect(redirectUrl('https://developer.mozilla.org/zu/Learn',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Learn');
+  });
+
+  // commit 196e529cc84517f7a92564f8ddc2a0c726d2d90a
+  // 2019/9/4 19:10
+  test('redirect links to dom', () => {
+    expect(redirectUrl('https://developer.mozilla.org/DOM',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API');
+    expect(redirectUrl('https://developer.mozilla.org/ja/DOM/',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/');
+  });
+
+  // commit 4f7441eb591610b99da157def9ee726365cd64b2
+  // 2019/9/4 19:59
+  test('redirect bad link with locale and docs', () => {
+    expect(redirectUrl('https://developer.mozilla.org/zh-CNdocs/Web',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web');
+    expect(redirectUrl('https://developer.mozilla.org/en-USdocs/Web',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web');
+  });
+
   // https://github.com/myfreeer/mdn-local/issues/5
   test('redirecting mdn.mozillademos.org #5', () => {
     expect(redirectUrl('https://mdn.mozillademos.org/files/3855/HTML5_Badge_16.png',
