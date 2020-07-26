@@ -35,6 +35,9 @@ describe('redirect-url', function () {
     expect(redirectUrl('https://developer.mozilla.org/Web',
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/docs/Web');
+    expect(redirectUrl('https://developer.mozilla.org/',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/');
   });
 
   // commit fae4c11784f1168ff3d2a5af5ea45c6ee2cf874b
@@ -334,5 +337,18 @@ describe('redirect-url', function () {
     expect(redirectUrl('%3Ccode%3Ehttps://developer.mozilla.org/en-US/%3C/code%3E',
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/');
+  });
+
+  // commit 913c128377428b7b181bdee397c465f5b1e43a3a
+  // 2020/5/14 20:19
+  // also note that this url should be discarded before redirect
+  test('redirect url with bad protocol', () => {
+    expect(redirectUrl('https:\\\\google.com',
+      null,
+      // the real url with this bad link
+      // Last modified: Nov 29, 2019, by MDN contributors
+      fakeRes('https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Introduction'),
+      opt('zh-CN')))
+      .toBe('https://google.com');
   });
 });
