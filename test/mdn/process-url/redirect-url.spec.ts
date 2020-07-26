@@ -232,6 +232,16 @@ describe('redirect-url', function () {
       } as Resource,
       opt('zh-CN')))
       .toBe('https://developer.mozilla.org/mdn-github-io/webaudio-examples/panner-node/style.css');
+
+    // absolute url, not likely to happen
+    expect(redirectUrl('/webaudio-examples/panner-node/style.css',
+      null,
+      {
+        url: 'https://developer.mozilla.org/mdn-github-io/webaudio-examples/panner-node/',
+        downloadLink: 'https://mdn.github.io/webaudio-examples/panner-node/'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn-github-io/webaudio-examples/panner-node/style.css');
   });
 
   // https://github.com/myfreeer/mdn-local/issues/34
@@ -321,6 +331,16 @@ describe('redirect-url', function () {
       {
         url: 'https://developer.mozilla.org/mdn-github-io/imsc/imscjs-demo/imscjs-demo.html',
         downloadLink: 'https://mdn.github.io/imsc/imscjs-demo/imscjs-demo.html'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/unpkg-com/imsc@1.1.0-beta.2/build/umd/imsc.all.min.js');
+
+    // absolute url, not likely to happen
+    expect(redirectUrl('/imsc@1.1.0-beta.2/build/umd/imsc.all.min.js',
+      null,
+      {
+        url: 'https://developer.mozilla.org/unpkg-com/imsc@1.1.0-beta.2/build/umd/imsc.all.min.js',
+        downloadLink: 'https://unpkg.com/imsc@1.1.0-beta.2/build/umd/imsc.all.min.js'
       } as Resource,
       opt('zh-CN')))
       .toBe('https://developer.mozilla.org/unpkg-com/imsc@1.1.0-beta.2/build/umd/imsc.all.min.js');
