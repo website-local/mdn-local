@@ -3,6 +3,13 @@ import URI from 'urijs';
 import { downloadableHosts } from './consts';
 import {Resource} from 'website-scrap-engine/lib/resource';
 
+// https://github.com/myfreeer/mdn-local/issues/34
+const remoteFavicon = new Set([
+  'http://www.mozilla.org/favicon.ico',
+  'https://mozorg.cdn.mozilla.net/media/img/favicon.ico',
+  'http://w3c.org/2008/site/images/favicon.ico'
+]);
+
 export const skipProcess = (
   url: string,
   element: Cheerio | null,
@@ -22,6 +29,10 @@ export const skipProcess = (
     url.startsWith('news:') ||
     url.startsWith('irc:')) {
     return;
+  }
+  // https://github.com/myfreeer/mdn-local/issues/34
+  if (remoteFavicon.has(url)) {
+    return 'https://developer.mozilla.org/static/img/favicon32.png';
   }
   // https:\\google.com
   // from https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Introduction
