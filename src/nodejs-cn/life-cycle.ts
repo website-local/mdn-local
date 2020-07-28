@@ -82,7 +82,11 @@ const hardCodedRedirect: Record<string, string> = {
   '/api/assert/tty.html': '/api/tty.html',
   '/api/worker_threads/errors.html': '/api/errors.html',
   '/api/process/cli.html': '/api/cli.html',
-  '/api/zlib/buffer.html': '/api/buffer.html'
+  '/api/zlib/buffer.html': '/api/buffer.html',
+  '/api/dgram/errors.html': '/api/errors.html',
+  '/api/net/stream.html': '/api/stream.html',
+  '/api/process/stream.html': '/api/stream.html',
+  '/api/worker_threads/fs.html': '/api/fs.html'
 };
 
 const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Resource | null) => {
@@ -95,6 +99,9 @@ const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Reso
     } else {
       link = await cachedGetRedirectLocation(link);
     }
+  }
+  if (link === 'http://nodejs.cn/api/wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options') {
+    link = 'https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options';
   }
   let u = URI(link);
   if (u.is('relative')) {
