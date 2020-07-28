@@ -20,6 +20,7 @@ export const HOST = 'www.electronjs.org';
 
 const remapHosts = new Set([
   'cloud.githubusercontent.com',
+  'user-images.githubusercontent.com',
   'raw.githubusercontent.com',
   'help.ubuntu.com',
   'mdn.mozillademos.org',
