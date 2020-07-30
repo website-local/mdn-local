@@ -1,6 +1,7 @@
 import {
   extractMdnAssets,
-  postProcessMdnAssets, preProcessMdnAssets
+  postProcessMdnAssets,
+  preProcessMdnAssets
 } from './process-mdn-assets';
 import {Resource} from 'website-scrap-engine/lib/resource';
 import URI from 'urijs';
@@ -12,6 +13,8 @@ import {
 import {preProcessRemoveCompatibilityTableWarning} from './process-compatibility-table';
 import {
   postProcessReplaceExternalIframeWithLink,
+  postProcessReplaceExternalImgWithLink,
+  postProcessReplaceExternalMediaWithLink,
   preProcessAddIconToExternalLinks
 } from './process-external';
 
@@ -108,16 +111,17 @@ export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic 
   $('#doc-pending-fallback').remove();
   // $('iframe').remove();
   $('iframe[src*="youtube.com/"]').remove();
-  // TODO: Tag pagination
+  // Tag pagination discarded
   // https://github.com/myfreeer/mdn-local/issues/10
   $('.pagination').remove();
   // fix script
   // language=HTML
-  $(`<div style="display:none" class="script-workaround">
-<div id="close-header-search"></div>
-<div id="nav-main-search"></div>
-<div id="main-q"></div>
-</div>`).appendTo($('#main-header'));
+  $(`
+    <div style="display:none" class="script-workaround">
+      <div id="close-header-search"></div>
+      <div id="nav-main-search"></div>
+      <div id="main-q"></div>
+    </div>`).appendTo($('#main-header'));
   // We're converting our compatibility data into a machine-readable JSON format.
   preProcessRemoveCompatibilityTableWarning($);
   // Add icon to external links for new ui
@@ -132,7 +136,6 @@ export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic 
   $('script[src*="googleapis.com"]').remove();
   return $;
 };
-
 
 
 export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
@@ -178,6 +181,10 @@ export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
 
   // replace external iframe with external links
   postProcessReplaceExternalIframeWithLink($);
+  // replace external img with external links
+  postProcessReplaceExternalImgWithLink($);
+  // replace external audio and video with external links
+  postProcessReplaceExternalMediaWithLink($);
   return $;
 };
 
