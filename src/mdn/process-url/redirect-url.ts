@@ -50,6 +50,20 @@ export function fixUrlWithBadFormat(url: string): string {
       url = url.slice(0, url.length - 4);
     }
   }
+  if ((url.startsWith('(http://') || url.startsWith('(https://')) &&
+    url.endsWith(')')) {
+    url = url.slice(1, -1);
+  } else if ((url.startsWith('/(http://') || url.startsWith('/(https://')) &&
+    url.endsWith(')')) {
+    url = url.slice(2, -1);
+  }
+  if ((url.startsWith('%28http://') || url.startsWith('%28https://')) &&
+    url.endsWith('%29')) {
+    url = url.slice(3, -3);
+  } else if ((url.startsWith('/%28http://') || url.startsWith('/%28https://')) &&
+    url.endsWith('%29')) {
+    url = url.slice(4, -3);
+  }
   // https:\\google.com
   // from https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Introduction
   if (url.startsWith('http:\\\\') || url.startsWith('https:\\\\')) {

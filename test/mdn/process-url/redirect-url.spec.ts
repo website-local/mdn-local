@@ -372,4 +372,37 @@ describe('redirect-url', function () {
       opt('zh-CN')))
       .toBe('https://google.com');
   });
+
+  // 2020/7/30
+  test('redirect bad url nested in quotes', () => {
+
+    expect(redirectUrl('%28https://wiki.mozilla.org/Labs/Jetpack/JEP/24%29',
+      null,
+      // the real url with this bad link
+      // Last modified: Sep 20, 2018, by MDN contributors
+      fakeRes('https://developer.mozilla.org/en-US/docs/Archive/Mozilla/Jetpack/Meta/settings'),
+      opt('en-US')))
+      .toBe('https://wiki.mozilla.org/Labs/Jetpack/JEP/24');
+    expect(redirectUrl('(https://wiki.mozilla.org/Labs/Jetpack/JEP/30)',
+      null,
+      // the real url with this bad link
+      // Last modified: Sep 20, 2018, by MDN contributors
+      fakeRes('https://developer.mozilla.org/en-US/docs/Archive/Mozilla/Jetpack/Meta/firstrun'),
+      opt('en-US')))
+      .toBe('https://wiki.mozilla.org/Labs/Jetpack/JEP/30');
+    expect(redirectUrl('/(https://wiki.mozilla.org/Labs/Jetpack/JEP/13)',
+      null,
+      // the real url with this bad link
+      // Last modified: Mar 23, 2019, by MDN contributors
+      fakeRes('https://developer.mozilla.org/en-US/docs/Archive/Mozilla/Jetpack/Meta/Me'),
+      opt('en-US')))
+      .toBe('https://wiki.mozilla.org/Labs/Jetpack/JEP/13');
+    expect(redirectUrl('/%28https://wiki.mozilla.org/Labs/Jetpack/JEP/30%29',
+      null,
+      // the real url with this bad link
+      // Last modified: Mar 23, 2019, by MDN contributors
+      fakeRes('https://developer.mozilla.org/en-US/docs/Archive/Mozilla/Jetpack/UI/Selection'),
+      opt('en-US')))
+      .toBe('https://wiki.mozilla.org/Labs/Jetpack/JEP/30');
+  });
 });
