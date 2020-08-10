@@ -7,7 +7,6 @@ const validExtensionName = arrayToMap([
   'jpg', 'JPG', 'jpeg',
   'png', 'PNG',
   'svg',
-  'css',
   'js', 'jsm',
   'json',
   'txt',
