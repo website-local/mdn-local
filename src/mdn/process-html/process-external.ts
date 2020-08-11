@@ -13,27 +13,37 @@ export const preProcessAddIconToExternalLinks = ($: CheerioStatic): void => {
   });
 };
 
+export const replaceExternalItemWithLink = (
+  $: CheerioStatic,
+  elem: Cheerio,
+  url: string,
+  type: string
+): void => {
+  // language=HTML
+  const a = $('<a class="external external-icon mdn-local-external-' +
+    type +
+    '-link"></a>');
+  a.attr('href', url)
+    .attr('target', '_blank')
+    .attr('rel', 'noopener noreferrer');
+  // workaround for outer html
+  // https://github.com/cheeriojs/cheerio/issues/944
+  a.text(elem.clone().wrap('<container />').parent().html() as string);
+  elem.replaceWith(a);
+  log.debug('replace external', type, url);
+};
+
 export const postProcessReplaceExternalIframeWithLink = ($: CheerioStatic): void => {
   let i = 0,
     item: Cheerio,
-    src: string | void,
-    a: Cheerio;
+    src: string | void;
   const result = $('iframe'),
     len = result.length;
   for (; i < len; i++) {
     item = $(result[i]);
     src = item.attr('src');
     if (src && (src.startsWith('https://') || src.startsWith('http://'))) {
-      // language=HTML
-      a = $('<a class="external external-icon mdn-local-external-iframe-link"></a>');
-      a.attr('href', src)
-        .attr('target', '_blank')
-        .attr('rel', 'noopener noreferrer');
-      // workaround for outer html
-      // https://github.com/cheeriojs/cheerio/issues/944
-      a.text(item.clone().wrap('<container />').parent().html() as string);
-      item.replaceWith(a);
-      log.debug('replace external iframe', src);
+      replaceExternalItemWithLink($, item, src, 'iframe');
     }
   }
 };
@@ -41,8 +51,7 @@ export const postProcessReplaceExternalIframeWithLink = ($: CheerioStatic): void
 export const postProcessReplaceExternalImgWithLink = ($: CheerioStatic): void => {
   let i = 0,
     item: Cheerio,
-    src: string | void,
-    a: Cheerio;
+    src: string | void;
   const result = $('img'),
     len = result.length;
   for (; i < len; i++) {
@@ -50,16 +59,7 @@ export const postProcessReplaceExternalImgWithLink = ($: CheerioStatic): void =>
     src = item.attr('src');
     // TODO: srcset
     if (src && (src.startsWith('https://') || src.startsWith('http://'))) {
-      // language=HTML
-      a = $('<a class="external external-icon mdn-local-external-img-link"></a>');
-      a.attr('href', src)
-        .attr('target', '_blank')
-        .attr('rel', 'noopener noreferrer');
-      // workaround for outer html
-      // https://github.com/cheeriojs/cheerio/issues/944
-      a.text(item.clone().wrap('<container />').parent().html() as string);
-      item.replaceWith(a);
-      log.debug('replace external img', src);
+      replaceExternalItemWithLink($, item, src, 'img');
     }
   }
 };
@@ -71,7 +71,6 @@ export const postProcessReplaceExternalMediaWithLink = ($: CheerioStatic): void 
     source: Cheerio,
     j: number,
     src: string | void,
-    a: Cheerio,
     foundExternalLink: boolean;
   // TODO: picture and srcset
   const result = $('audio,video'),
@@ -95,17 +94,8 @@ export const postProcessReplaceExternalMediaWithLink = ($: CheerioStatic): void 
       }
     }
     if (foundExternalLink) {
-      // language=HTML
-      a = $('<a class="external external-icon mdn-local-external-media-link"></a>');
       // src must be non-void if foundExternalLink
-      a.attr('href', src as string)
-        .attr('target', '_blank')
-        .attr('rel', 'noopener noreferrer');
-      // workaround for outer html
-      // https://github.com/cheeriojs/cheerio/issues/944
-      a.text(item.clone().wrap('<container />').parent().html() as string);
-      item.replaceWith(a);
-      log.debug('replace external media', src);
+      replaceExternalItemWithLink($, item, src as string, 'media');
     }
   }
 };
