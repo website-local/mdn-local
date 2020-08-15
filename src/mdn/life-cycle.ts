@@ -11,14 +11,22 @@ import {
 } from 'website-scrap-engine/lib/options';
 import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
 import {postProcessHtml, preProcessHtml} from './process-html';
+import {
+  postProcessInteractiveExample,
+  preProcessInteractiveExample
+} from './process-html/process-interactive-examples';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);
 lifeCycle.detectResourceType.push(detectLinkType);
 lifeCycle.processBeforeDownload.push(redirectDownloadLink, dropResource);
 lifeCycle.processAfterDownload.unshift(
-  redirectUrlAfterFetch, processHtml(preProcessHtml));
-lifeCycle.processAfterDownload.push(processHtml(postProcessHtml));
+  redirectUrlAfterFetch,
+  processHtml(preProcessHtml),
+  processHtml(preProcessInteractiveExample)
+);
+lifeCycle.processAfterDownload.push(processHtml(postProcessHtml),
+  processHtml(postProcessInteractiveExample));
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.logSubDir = 'developer.mozilla.org';
