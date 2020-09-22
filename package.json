@@ -20,7 +20,7 @@
     "@types/jest": "^26.0.14",
     "@types/json5": "0.0.30",
     "@types/mkdirp": "^1.0.1",
-    "@types/node": "^14.11.1",
+    "@types/node": "^14.11.2",
     "@types/tough-cookie": "^4.0.0",
     "@types/urijs": "^1.19.12",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
