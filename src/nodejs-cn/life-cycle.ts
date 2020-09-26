@@ -86,7 +86,26 @@ const hardCodedRedirect: Record<string, string> = {
   '/api/dgram/errors.html': '/api/errors.html',
   '/api/net/stream.html': '/api/stream.html',
   '/api/process/stream.html': '/api/stream.html',
-  '/api/worker_threads/fs.html': '/api/fs.html'
+  '/api/worker_threads/fs.html': '/api/fs.html',
+  // 14.12.0
+  '/api/synopsis/cli.html': '/api/cli.html'
+};
+
+const hardCodedRedirectFullPath: Record<string, string> = {
+  // 14.9.0
+  // http://nodejs.cn/api/module.html
+  'http://nodejs.cn/api/modules_cjs.html#modules_cjs_the_module_wrapper':
+    'http://nodejs.cn/api/modules.html#modules_the_module_wrapper',
+  // 14.9.0
+  // http://nodejs.cn/api/module.html
+  'http://nodejs.cn/api/modules_module.html#modules_module_class_module_sourcemap':
+    'http://nodejs.cn/api/module.html#module_class_module_sourcemap',
+  // 14.9.0
+  // http://nodejs.cn/api/module.html
+  'http://nodejs.cn/api/modules/modules_module.html#modules_module_the_module_object':
+    'http://nodejs.cn/api/module.html#module_the_module_object',
+  'http://nodejs.cn/api/wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options':
+    'https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options'
 };
 
 const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Resource | null) => {
@@ -100,8 +119,9 @@ const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Reso
       link = await cachedGetRedirectLocation(link);
     }
   }
-  if (link === 'http://nodejs.cn/api/wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options') {
-    link = 'https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options';
+  const redirectLink = hardCodedRedirectFullPath[link];
+  if (redirectLink) {
+    link = redirectLink;
   }
   let u = URI(link);
   if (u.is('relative')) {
