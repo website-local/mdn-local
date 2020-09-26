@@ -39,8 +39,9 @@
     "clean": "rimraf lib/*",
     "tsc": "tsc",
     "build": "npm run lint && npm run tsc && npm run copy",
-    "copy": "node copy-src",
-    "prepack": "npm run clean && npm run build"
+    "copy": "node copy-src.js",
+    "prepack": "npm run clean && npm run build",
+    "postshrinkwrap": "node package-lock-resolved.js"
   },
   "repository": {
     "type": "git",
