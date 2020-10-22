@@ -16,7 +16,7 @@
     "website-scrap-engine": "^0.1.7"
   },
   "devDependencies": {
-    "@types/cheerio": "^0.22.21",
+    "@types/cheerio": "^0.22.22",
     "@types/jest": "^26.0.15",
     "@types/json5": "0.0.30",
     "@types/mkdirp": "^1.0.1",
