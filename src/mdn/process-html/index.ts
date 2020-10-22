@@ -17,6 +17,7 @@ import {
   postProcessReplaceExternalMediaWithLink,
   preProcessAddIconToExternalLinks
 } from './process-external';
+import {CheerioStatic} from 'website-scrap-engine/lib/types';
 
 
 export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic => {

@@ -1,4 +1,5 @@
 import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
+import {Cheerio} from 'website-scrap-engine/lib/types';
 
 export interface MdnReactData {
   locale?: string;

@@ -14,6 +14,7 @@ import {
   defaultDownloadOptions,
   DownloadOptions
 } from 'website-scrap-engine/lib/options';
+import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 const gotNoRedirect = got.extend({
   followRedirect: false

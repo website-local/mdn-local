@@ -1,12 +1,13 @@
 import {complete as log} from 'website-scrap-engine/lib/logger/logger';
+import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 export const preProcessAddIconToExternalLinks = ($: CheerioStatic): void => {
   if ($('script[src*="build/js/wiki"]').length) {
     return;
   }
   // original script form developer.mozilla.org/static/build/js/wiki.62ddb187a9d0.js
-  $('.external').each(function (this: CheerioElement) {
-    const $link = $(this);
+  $('.external').each(function (index, element) {
+    const $link = $(element);
     if (!$link.find('img').length) {
       $link.addClass('external-icon');
     }

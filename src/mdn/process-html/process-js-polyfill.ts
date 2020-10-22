@@ -1,5 +1,6 @@
 const JS_POLYFILL_CLASS = 'js-polyfill-temp-script';
 const SCRIPT_PREFIX = '<script src="';
+import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 export const preProcessJsPolyFill = ($: CheerioStatic, text: string): void => {
   let beginIndex = text.indexOf(SCRIPT_PREFIX);

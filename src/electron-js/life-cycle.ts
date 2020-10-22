@@ -15,6 +15,7 @@ import {
   defaultDownloadOptions,
   DownloadOptions
 } from 'website-scrap-engine/lib/options';
+import {CheerioStatic} from 'website-scrap-engine/lib/types';
 
 export const HOST = 'www.electronjs.org';
 

@@ -2,6 +2,7 @@ import {skipExternal as skipExternalLogger} from 'website-scrap-engine/lib/logge
 import URI from 'urijs';
 import { downloadableHosts } from './consts';
 import {Resource} from 'website-scrap-engine/lib/resource';
+import {Cheerio} from 'website-scrap-engine/lib/types';
 
 // https://github.com/myfreeer/mdn-local/issues/34
 const remoteFavicon = new Set([

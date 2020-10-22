@@ -1,3 +1,5 @@
+import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+
 export const preProcessRemoveCompatibilityTableWarning = ($: CheerioStatic): void => {
   let i = 0,
     item: Cheerio,

@@ -12,6 +12,7 @@ import {
   DownloadResource,
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
+import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 const remapHosts: Set<string> = new Set([
   'cdn.jsdelivr.net',

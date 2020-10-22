@@ -1,5 +1,6 @@
 import {arrayToMap} from 'website-scrap-engine/lib/util';
 import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
+import {Cheerio} from 'website-scrap-engine/lib/types';
 
 // manually collected
 const validExtensionName = arrayToMap([

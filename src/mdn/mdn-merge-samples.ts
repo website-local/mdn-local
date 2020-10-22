@@ -5,6 +5,7 @@ import path from 'path';
 import {mkdirRetry} from 'website-scrap-engine/lib/io';
 import {sources} from 'website-scrap-engine/lib/sources';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
+import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 export interface MdnSampleItem {
   cwd: string;

@@ -16,6 +16,7 @@ import {
 } from './redirect-path';
 import URI from 'urijs';
 import {processPathWithMultiLocale} from './process-path-with-multi-locale';
+import {Cheerio} from 'website-scrap-engine/lib/types';
 
 const cache: Record<string, Record<string, string>> = {};
 const getMdnRedirectPath = (locale: string): Record<string, string> => {

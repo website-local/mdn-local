@@ -1,5 +1,6 @@
 import JSON5 from 'json5';
 import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
+import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 export interface MdnAssets {
   css?: {
