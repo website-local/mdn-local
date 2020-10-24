@@ -11,6 +11,7 @@ export interface MdnReactData {
   documentData?: {
     absoluteURL?: string;
     bodyHTML?: string;
+    editURL?: string;
     enSlug?: string;
     hrefLang?: string;
     id?: number | string;
@@ -42,12 +43,15 @@ export interface MdnReactData {
 }
 
 const uselessStringCatalogsForLocalUsage = [
+  '$5',
   'A newer version of this article',
   'All payment information goes through',
   'An error happened trying to',
+  'An unhandled error occurred',
   'Because we aren’t looking for a lump sum.',
   'Browser documentation and release notes',
   'By clicking this button, I authorize',
+  'Check back for invitations to',
   'Compare this date to the latest',
   'Currently, Mozilla pays for site operations',
   'Deleting your account loses any preferences',
@@ -64,18 +68,25 @@ const uselessStringCatalogsForLocalUsage = [
   'Our goal is to provide accurate',
   'Our team will review your report.',
   'Our user base has grown exponentially in the last few years',
+  'Please <signInLink /> ',
+  'Please read our ',
   'Publishing failed.',
   'Separately, the Mozilla',
   'Sign in to support MDN',
   'Sorry, we can’t seem to reach',
   'Support MDN with a %(amount)s',
+  'The <mozillaLink />',
   'The Mozilla Corporation, which funds MDN',
   'The money collected through MDN',
   'To find out more about',
+  'To see your member perks',
+  'We\'re sorry,',
   'When you request to delete your account',
   'Would you answer 4 questions for us',
   'You can cancel your monthly',
   'You can join the GitHub',
+  'You have no active subscription.',
+  'You need to be ',
   '👋 Do you use Chrome’s automatic'
 ];
 
