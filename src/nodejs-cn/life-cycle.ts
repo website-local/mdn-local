@@ -128,6 +128,12 @@ const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Reso
   if (u.is('relative')) {
     u = u.absoluteTo(parent.url).normalizePath();
   }
+  const pathArr = u.path().split('/');
+  if (pathArr.length === 3 && pathArr[1] === 'api' && pathArr[2].endsWith('.md')) {
+    pathArr[2] = pathArr[2].replace(/\.md$/i, '.html');
+    u.path(pathArr.join('/'));
+    link = u.toString();
+  }
   if (hardCodedRedirect[u.path()]) {
     u = u.path(hardCodedRedirect[u.path()]);
     link = u.toString();
