@@ -104,6 +104,8 @@ export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic 
   });
   // join community
   $('.communitybox').remove();
+  // active-banner.jsx
+  $('.developer-needs.mdn-cta-container').remove();
   // popup at bottom
   $('#contribution-popover-container').remove();
   // translation
