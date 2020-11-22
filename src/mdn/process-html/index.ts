@@ -53,6 +53,8 @@ export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic 
   $('.contributors-sub').remove();
   // script errors in this page
   $('#kserrors').remove();
+  // login-related
+  $('#auth-modal').remove();
   // head link to alternate lang
   $('link[rel="alternate"]').remove();
   $('link[rel="preconnect"]').remove();
