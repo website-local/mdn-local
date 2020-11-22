@@ -13,11 +13,8 @@ export default function createDownloader(
   if (!overrideOptions.meta.host) {
     overrideOptions.meta.host = host ?? 'vuejs.org';
   }
-  // hack here
-  // to be fixed in next website-scrap-engine version
-  if (!Reflect.get(overrideOptions, 'initialUrl')) {
-    Reflect.set(overrideOptions, 'initialUrl',
-      [`https://${overrideOptions.meta.host}/`]);
+  if (!overrideOptions.initialUrl) {
+    overrideOptions.initialUrl = [`https://${overrideOptions.meta.host}/`];
   }
   if (!Reflect.get(overrideOptions, 'logSubDir')) {
     Reflect.set(overrideOptions, 'logSubDir',
