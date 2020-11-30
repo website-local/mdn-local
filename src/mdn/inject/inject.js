@@ -83,4 +83,30 @@
       }
     });
   };
+
+  /// region URL constructor workaround for firefox with file protocol
+  // TypeError: URL constructor: null is not a valid URL.
+  // In firefox, location.origin for file:// urls could be 'null'
+  // noinspection ES6ConvertVarToLetConst
+  var URL = window.URL;
+  if (URL && (
+    window.location.origin === 'null' ||
+    window.location.origin === null)) {
+    window.URL = function (url, base) {
+      if (base === null || base === 'null') {
+        return new URL(url, window.location.href);
+      }
+      return new URL(url, base);
+    };
+    if (URL.createObjectURL) {
+      window.URL.createObjectURL = URL.createObjectURL;
+    }
+    if (URL.revokeObjectURL) {
+      window.URL.revokeObjectURL = URL.revokeObjectURL;
+    }
+    if (URL.prototype) {
+      window.URL.prototype = URL.prototype;
+    }
+  }
+  /// endregion URL constructor workaround for firefox with file protocol
 }();
