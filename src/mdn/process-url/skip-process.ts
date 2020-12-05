@@ -1,4 +1,7 @@
-import {skipExternal as skipExternalLogger} from 'website-scrap-engine/lib/logger/logger';
+import {
+  skipExternal as skipExternalLogger,
+  error as errorLogger
+} from 'website-scrap-engine/lib/logger/logger';
 import URI from 'urijs';
 import { downloadableHosts } from './consts';
 import {Resource} from 'website-scrap-engine/lib/resource';
@@ -42,9 +45,18 @@ export const skipProcess = (
   }
   const uri = URI(url), host = uri.host();
   if (host && !downloadableHosts[host]) {
-    skipExternalLogger.debug('skipped external link', host, url, parent && parent.url);
+    skipExternalLogger.debug('skipped external link', host, url, parent?.url);
     return;
   }
+  // incorrectly parsed url
+  // localhost:3000
+  // from https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/
+  // Client-side_JavaScript_frameworks/React_getting_started
+  if (uri.is('absolute') && !host) {
+    errorLogger.info('skipped incorrectly parsed url', url, parent?.url);
+    return;
+  }
+
   const path = uri.path();
   if (path.startsWith('/presentations/') ||
     // very large file
@@ -54,7 +66,7 @@ export const skipProcess = (
     path.startsWith('/files/5243/IconsCommunications_20130401.psd') ||
     path.startsWith('/files/5245/IconsSettings_20130415.psd') ||
     path.startsWith('/files/5247/IconsPrimaryAction_20130501.psd')) {
-    skipExternalLogger.debug('skipped link to large file', url, parent && parent.url);
+    skipExternalLogger.debug('skipped link to large file', url, parent?.url);
     return;
   }
   return url;

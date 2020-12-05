@@ -60,4 +60,9 @@ describe('skip-process', function () {
     expect(skipProcess('http://www.mozilla.org/favicon.ico', null, null))
       .toBe('https://developer.mozilla.org/static/img/favicon32.png');
   });
+
+  test('skip incorrectly-parsed url', () => {
+    // https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started
+    exceptSkipped('localhost:3000');
+  });
 });
