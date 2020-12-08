@@ -203,6 +203,7 @@ const postProcessHtml = ($: CheerioStatic) => {
   const array = $('a[href]');
   for (let i = 0, a, attr, href; i < array.length; i++) {
     if ((a = array[i]) &&
+      a.type === 'tag' &&
       (attr = a.attribs) &&
       (href = attr.href) &&
       (href = cache[href])) {
