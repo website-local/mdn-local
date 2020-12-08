@@ -68,7 +68,9 @@ export const largeMp4Videos = arrayToMap([
   '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.mp4',
   '/html-examples/link-rel-preload/video/sintel-short.mp4',
   '/imsc/videos/coffee.mp4',
-  '/imsc/videos/stars.mp4'
+  '/imsc/videos/stars.mp4',
+  '/dom-examples/fullscreen-api/assets/bigbuckbunny.mp4',
+  '/dom-examples/picture-in-picture/assets/bigbuckbunny.mp4'
 ]);
 
 // manually collected
