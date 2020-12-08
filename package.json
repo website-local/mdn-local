@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.22",
-    "@types/jest": "^26.0.16",
+    "@types/jest": "^26.0.17",
     "@types/json5": "0.0.30",
     "@types/mkdirp": "^1.0.1",
     "@types/node": "^14.14.10",
