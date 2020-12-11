@@ -45,7 +45,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/myfreeer/mdn-local.git"
+    "url": "git+https://github.com/website-local/mdn-local.git"
   },
   "keywords": [
     "mdn"
