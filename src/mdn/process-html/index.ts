@@ -15,6 +15,7 @@ import {
   postProcessReplaceExternalIframeWithLink,
   postProcessReplaceExternalImgWithLink,
   postProcessReplaceExternalMediaWithLink,
+  postProcessReplaceExternalScriptWithLink,
   preProcessAddIconToExternalLinks
 } from './process-external';
 import {CheerioStatic} from 'website-scrap-engine/lib/types';
@@ -190,6 +191,8 @@ export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
   postProcessReplaceExternalImgWithLink($);
   // replace external audio and video with external links
   postProcessReplaceExternalMediaWithLink($);
+  // replace external script with external links
+  postProcessReplaceExternalScriptWithLink($);
   return $;
 };
 

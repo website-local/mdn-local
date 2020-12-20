@@ -1,4 +1,4 @@
-import {complete as log} from 'website-scrap-engine/lib/logger/logger';
+import {complete as log, skipExternal} from 'website-scrap-engine/lib/logger/logger';
 import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 export const preProcessAddIconToExternalLinks = ($: CheerioStatic): void => {
@@ -44,7 +44,24 @@ export const postProcessReplaceExternalIframeWithLink = ($: CheerioStatic): void
     item = $(result[i]);
     src = item.attr('src');
     if (src && (src.startsWith('https://') || src.startsWith('http://'))) {
+      skipExternal.warn('skipped external iframe', src);
       replaceExternalItemWithLink($, item, src, 'iframe');
+    }
+  }
+};
+
+export const postProcessReplaceExternalScriptWithLink = ($: CheerioStatic): void => {
+  let i = 0,
+    item: Cheerio,
+    src: string | void;
+  const result = $('script'),
+    len = result.length;
+  for (; i < len; i++) {
+    item = $(result[i]);
+    src = item.attr('src');
+    if (src && (src.startsWith('https://') || src.startsWith('http://'))) {
+      skipExternal.warn('skipped external script', src);
+      replaceExternalItemWithLink($, item, src, 'script');
     }
   }
 };
@@ -60,6 +77,7 @@ export const postProcessReplaceExternalImgWithLink = ($: CheerioStatic): void =>
     src = item.attr('src');
     // TODO: srcset
     if (src && (src.startsWith('https://') || src.startsWith('http://'))) {
+      skipExternal.warn('skipped external img', src);
       replaceExternalItemWithLink($, item, src, 'img');
     }
   }
@@ -95,6 +113,7 @@ export const postProcessReplaceExternalMediaWithLink = ($: CheerioStatic): void 
       }
     }
     if (foundExternalLink) {
+      skipExternal.warn('skipped external media', src);
       // src must be non-void if foundExternalLink
       replaceExternalItemWithLink($, item, src as string, 'media');
     }
