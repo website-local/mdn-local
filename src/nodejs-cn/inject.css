@@ -800,7 +800,7 @@ body {
   margin-left: 3%;
 }
 
-.link-to-search, .link-to-edit {
+.link-to-search, .link-to-edit, .link-to-run {
   display: none;
 }
 

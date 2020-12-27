@@ -183,6 +183,9 @@ const preProcessHtml = ($: CheerioStatic): CheerioStatic => {
   $('script').remove();
   $('a[href="/"]').remove();
   $('a[href="/search"]').addClass('link-to-search');
+  $('a[href^="/run/"]').addClass('link-to-run');
+  // style sheet, not needed since we re-implemented it
+  $('link[rel="stylesheet"]').remove();
   // style for page and prism.js
   // language=HTML
   $(`<link href="${URL_PREFIX}/api/static/inject.css" rel="stylesheet">`)
