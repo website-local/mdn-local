@@ -7,10 +7,41 @@
 .dropdown-container,
 .bc-data .bc-github-link,
 .signin-link {
-    display: none;
+  display: none;
 }
 
 /* style from article a.new */
 article a.mdn-local-red-link {
-    color: #900;
+  color: #900;
 }
+
+/* region old compatibility table */
+.htab > ul {
+  padding-left: 0;
+}
+
+.htab > ul > li {
+  list-style: none;
+  display: inline-block;
+  border: 1px solid lightblue;
+  padding: 0 0.2em;
+}
+
+.htab > ul > li.selected {
+  color: white;
+  background-color: darkblue;
+}
+
+.htab > ul > li.selected > a {
+  color: white;
+}
+
+.htab > ul > li > a:focus {
+  border: none;
+}
+
+.htab > ul > li > a:active {
+  background-color: inherit;
+  color: inherit;
+}
+/* endregion old compatibility table */
