@@ -60,6 +60,7 @@ export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic 
   $('link[rel="alternate"]').remove();
   $('link[rel="preconnect"]').remove();
   $('link[rel="canonical"]').remove();
+  $('link[rel="manifest"]').remove();
   $('link[rel="search"]').remove();
   $('link[rel="apple-touch-icon-precomposed"]').remove();
   $('a[href$="$translate"]').remove();
@@ -80,10 +81,22 @@ export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic 
   $('script[src*="speedcurve.com"]').remove();
   // google-analytics
   $('script[src*="google-analytics.com"]').remove();
+  // remove main script
+  // /static/js/runtime-main.41503b2a.js
+  $('script[src*="runtime-main."]').remove();
   let assetsData, text;
 
   $('script').each((index, el) => {
     const elem = $(el);
+    const src = elem.attr('src');
+    // remove main script chunk
+    // /static/js/2.bffd2cab.chunk.js
+    // /static/js/main.71bcbe14.chunk.js
+    if (src && src.endsWith('.chunk.js') && (
+      src.match(/\/\d+\./) || src.includes('/main.')
+    )) {
+      return elem.remove();
+    }
     if ((text = elem.html())) {
       // google-analytics
       if (text.includes('google-analytics') ||
