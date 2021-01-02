@@ -45,3 +45,14 @@ article a.mdn-local-red-link {
   color: inherit;
 }
 /* endregion old compatibility table */
+
+/* region yari browser-compatibility-table */
+.bc-history.bc-hidden {
+  display: none;
+}
+.only-icon > i.ic-prefix::before {
+  font-size: 1rem;
+  width: 28px;
+}
+/* endregion yari browser-compatibility-table */
+

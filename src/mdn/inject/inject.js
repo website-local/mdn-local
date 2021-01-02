@@ -1,15 +1,23 @@
 'use strict';
-/* global document window */
+/* global document */
 !function () {
+  /// region top-level vars
+  // noinspection ES6ConvertVarToLetConst
+  var htabs,desktops,mobiles,len, i, j, htab, links, a,
+    // yari new compatibility table
+    newTables, status = null,
+    // yari expandable top menu
+    pageHeader, menuToggleBtn, pageHeaderMain, toggleSearchBtn;
+  /// endregion top-level vars
+
   /// region old compatibility table
   // old compatibility table script, missing from official site
   // implemented with pure js
   // noinspection ES6ConvertVarToLetConst
-  var htabs = document.getElementsByClassName('htab'),
-    desktops = document.querySelectorAll('div[id=compat-desktop]'),
-    mobiles = document.querySelectorAll('div[id=compat-mobile]'),
-    len = htabs.length,
-    i, j, htab, links, a;
+  htabs = document.getElementsByClassName('htab');
+  desktops = document.querySelectorAll('div[id=compat-desktop]');
+  mobiles = document.querySelectorAll('div[id=compat-mobile]');
+  len = htabs.length;
 
   function changeTabListener(e) {
     if (e) {
@@ -72,41 +80,196 @@
   }
   /// endregion old compatibility table
 
-  // mock fetch to avoid script errors
-  window.fetch = function () {
-    return Promise.resolve({
-      json: function () {
-        return Promise.resolve({
-          is_superuser: true,
-          waffle: {flags: {}, samples: {}, switches: {registration_disabled: true}}
-        });
+  /// region yari new compatibility table
+  newTables =
+    document.getElementsByClassName('bc-table');
+  len = newTables.length;
+  for (i = 0; i < len; i++) {
+    newTables[i].onclick = browserCompatibilityTableClickListener;
+  }
+  // compatible with minimal IE9 since it uses parentElement and firstElementChild
+  function browserCompatibilityTableClickListener(e) {
+    // noinspection ES6ConvertVarToLetConst
+    var node, td, button, tdKey, tr, trKey, table, closeTd, section;
+    node = e.target;
+    if (node.tagName === 'TD') {
+      td = node;
+    } else {
+      while (node && (node = node.parentElement)) {
+        if (node.tagName === 'TD') {
+          td = node;
+          break;
+        }
       }
-    });
-  };
+    }
+    if (!td) return;
+    // td.classList.contains('bc-has-history')
+    if (!td.className.match(/(\s|^)bc-has-history(\s|$)/)) {
+      return;
+    }
+    tdKey = td.getAttribute('key');
+    if (!tdKey) return;
+    tr = td.parentElement;
+    if (!tr) return;
+    trKey = tr.getAttribute('key');
+    if (!tdKey) return;
+    node = td;
+    while (node && (node = node.parentElement)) {
+      if (node.tagName === 'TABLE') {
+        table = node;
+        break;
+      }
+    }
+    if (!table) return;
+    if (status !== null) {
+      closeHistory();
+      if (trKey === status[0] && tdKey === status[1]) {
+        status = null;
+        return;
+      }
+    }
+    status = [trKey, tdKey];
+    td.setAttribute('aria-expanded', 'true');
+    button = td.querySelector('.bc-history-link');
+    if (button) {
+      button.className = 'bc-history-link only-icon bc-history-link-inverse';
+    }
+    section = td.querySelector('.bc-history');
+    if (section) {
+      section.className = 'bc-history bc-history-mobile';
+    }
+    tr = table.querySelector('tr.bc-history[key="' + status[0] + '"]');
+    if (tr) {
+      tr.className = 'bc-history';
+      node = tr.querySelector('.bc-history-content');
+      if (node && section.firstElementChild) {
+        node.innerHTML = section.firstElementChild.innerHTML;
+      }
+    }
 
-  /// region URL constructor workaround for firefox with file protocol
-  // TypeError: URL constructor: null is not a valid URL.
-  // In firefox, location.origin for file:// urls could be 'null'
-  // noinspection ES6ConvertVarToLetConst
-  var URL = window.URL;
-  if (URL && (
-    window.location.origin === 'null' ||
-    window.location.origin === null)) {
-    window.URL = function (url, base) {
-      if (base === null || base === 'null') {
-        return new URL(url, window.location.href);
+    function closeHistory() {
+      if (!table) return;
+      tr = table.querySelector('tr.bc-content-row[key="' + status[0] + '"]');
+      if (!tr) return;
+      closeTd = tr.querySelector('td[key="' + status[1] + '"]');
+      if (!closeTd) return;
+      closeTd.setAttribute('aria-expanded', 'false');
+      button = closeTd.querySelector('.bc-history-link');
+      if (button) {
+        button.className = 'bc-history-link only-icon';
       }
-      return new URL(url, base);
-    };
-    if (URL.createObjectURL) {
-      window.URL.createObjectURL = URL.createObjectURL;
-    }
-    if (URL.revokeObjectURL) {
-      window.URL.revokeObjectURL = URL.revokeObjectURL;
-    }
-    if (URL.prototype) {
-      window.URL.prototype = URL.prototype;
+      section = closeTd.querySelector('.bc-history');
+      if (section) {
+        section.className = 'bc-history bc-history-mobile bc-hidden';
+      }
+      tr = table.querySelector('tr.bc-history[key="' + status[0] + '"]');
+      if (tr) {
+        tr.className = 'bc-history bc-hidden';
+      }
+
     }
   }
-  /// endregion URL constructor workaround for firefox with file protocol
+  /// endregion yari new compatibility table
+
+  /// region yari expandable top menu
+  pageHeader = document.querySelector('.page-header');
+  menuToggleBtn = pageHeader && pageHeader.querySelector('.main-menu-toggle');
+  pageHeaderMain = pageHeader && (
+    pageHeader.querySelector('.page-header-main') ||
+    pageHeader.querySelector('.main-menu'));
+  if (menuToggleBtn && pageHeaderMain) {
+    menuToggleBtn.onclick = function menuToggleBtnClick() {
+      // endsWith(' show')
+      if (pageHeaderMain.className.match(/ show$/)) {
+        pageHeaderMain.className = pageHeaderMain.className
+          .replace(/ show$/, '');
+        menuToggleBtn.className = 'ghost main-menu-toggle';
+      } else {
+        pageHeaderMain.className += ' show';
+        menuToggleBtn.className = 'ghost main-menu-toggle expanded';
+      }
+    };
+  }
+  if (pageHeaderMain) {
+    pageHeaderMain.onclick = function pageHeaderMainClick(e) {
+      // noinspection ES6ConvertVarToLetConst
+      var node = e.target, button, li, ul, attr, nodes, i;
+      if (node.tagName === 'LI' &&
+        node.className === 'top-level-entry-container') {
+        li = node;
+        button = li.querySelector('button.top-level-entry');
+      } else if (node.tagName === 'BUTTON' &&
+        node.className === 'top-level-entry') {
+        button = node;
+        li = node.parentElement;
+      } else {
+        return;
+      }
+      if (!button || !li) return;
+      ul = li.querySelector('ul');
+      if (!ul) return;
+      attr = button.getAttribute('aria-expanded');
+      if (attr === 'true') {
+        button.setAttribute('aria-expanded', 'false');
+        // ul.classList.remove('show')
+        ul.className = ul.className.replace(/ show$/, '');
+      } else {
+        button.setAttribute('aria-expanded', 'true');
+        ul.className += ' show';
+        nodes = li.parentElement && li.parentElement.children;
+        if (!nodes) {
+          return;
+        }
+        for (i = 0; i < nodes.length; i++) {
+          if (nodes[i] === li) continue;
+          ul = nodes[i].querySelector('ul');
+          if (ul) {
+            ul.className = ul.className.replace(/ show$/, '');
+          }
+          button = nodes[i].querySelector('button.top-level-entry');
+          if (button) {
+            button.setAttribute('aria-expanded', 'false');
+          }
+        }
+      }
+    };
+  }
+
+  /// endregion yari expandable top menu
+
+  /// region yari expandable mobile search
+  toggleSearchBtn = document.querySelector('.toggle-form');
+  if (toggleSearchBtn) {
+    toggleSearchBtn.onclick = function toggleSearchBtnClick() {
+      // noinspection ES6ConvertVarToLetConst
+      var parent, closeIcon, searchIcon;
+      parent = toggleSearchBtn.parentElement;
+      if (!parent) {
+        return;
+      }
+      closeIcon = toggleSearchBtn.querySelector('.close-icon');
+      searchIcon = toggleSearchBtn.querySelector('.search-icon');
+      if (parent.className.match(/ show-form$/)) {
+        parent.className =
+          parent.className.replace(/ show-form$/, '');
+        if (closeIcon) {
+          // Uncaught TypeError: setting getter-only property "className"
+          // this is a svg
+          closeIcon.setAttribute('class', 'close-icon');
+        }
+        if (searchIcon) {
+          searchIcon.setAttribute('class',  'search-icon hide');
+        }
+      } else {
+        parent.className += ' show-form';
+        if (closeIcon) {
+          closeIcon.setAttribute('class', 'close-icon hide');
+        }
+        if (searchIcon) {
+          searchIcon.setAttribute('class', 'search-icon');
+        }
+      }
+    };
+  }
+  /// endregion yari expandable mobile search
 }();
