@@ -13,7 +13,7 @@
     "mkdirp": "^1.0.4",
     "tough-cookie": "^4.0.0",
     "urijs": "^1.19.5",
-    "website-scrap-engine": "^0.2.0"
+    "website-scrap-engine": "^0.3.0"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.23",
