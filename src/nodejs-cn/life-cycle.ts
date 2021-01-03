@@ -31,8 +31,12 @@ const HOST = 'nodejs.cn',
   PROTOCOL = 'http',
   URL_PREFIX = `${PROTOCOL}://${HOST}`;
 
+const LOCATION_REPLACE_LITERAL = 'location.replace(\'',
+  LOCATION_REPLACE_LITERAL_END = '\')';
+
 const getRedirectLocation = async (link: string): Promise<string> => {
-  const redirect = await gotNoRedirect(URL_PREFIX + link);
+  const redirect = await gotNoRedirect(
+    link.startsWith('/s') ? URL_PREFIX + link : link);
   if (redirect.statusCode === 302 && redirect.headers && redirect.headers.location) {
     cache[link] = redirect.headers.location;
     link = redirect.headers.location;
@@ -58,7 +62,15 @@ const getRedirectLocation = async (link: string): Promise<string> => {
         errorLogger.error('Error resolving redirect result', link, html, e);
       }
     } else {
-      errorLogger.warn('Unknown redirect result format', link, html);
+      // the new redirect page since 2021
+      const literalBegin = html.indexOf(LOCATION_REPLACE_LITERAL),
+        literalEnd = literalBegin > 0 ?
+          html.indexOf(LOCATION_REPLACE_LITERAL_END, literalBegin) : -1;
+      if (literalBegin > 0 && literalEnd > 0) {
+        link = html.slice(literalBegin + LOCATION_REPLACE_LITERAL.length, literalEnd);
+      } else {
+        errorLogger.warn('Unknown redirect result format', link, html);
+      }
     }
   }
   return link;
@@ -113,7 +125,8 @@ const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Reso
   if (!parent) {
     return link;
   }
-  if (link && link.startsWith('/s/')) {
+  if (link && (link.startsWith('/s/') ||
+    link.startsWith('http://url.nodejs.cn/'))) {
     if (cache[link]) {
       link = cache[link];
     } else {
