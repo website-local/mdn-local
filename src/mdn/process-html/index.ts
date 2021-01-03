@@ -57,6 +57,9 @@ export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic 
   // $('.auth-container').remove();
   // This is an archived page. It's not actively maintained.
   $('.archived').remove();
+  // Found a problem with this page?
+  // Source on GitHub
+  $('#on-github').remove();
   $('script[src*="perf."]').remove();
   // bcd-signal script, not needed for offline usage
   $('script[src*="react-bcd-signal"]').remove();
