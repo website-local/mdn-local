@@ -123,7 +123,7 @@ const PLACE_HOLDER_QUICK_HTML = '@#!PLACE_HOLDER_QUICK_HTML!#@';
 const PLACE_HOLDER_TOC_HTML = '@#!%PLACE_HOLDER_TOC_HTML!#%@';
 const PLACE_HOLDER_SUMMARY_HTML = '@#!%$PLACE_HOLDER_SUMMARY_HTML!$#%@';
 
-export const postProcessReactData = (text: string, elem: Cheerio): void => {
+export const preProcessReactData = (text: string, elem: Cheerio): void => {
   let jsonStrBeginIndex: number = text.indexOf(JSON_PARSE_STR),
     jsonStrEndIndex: number,
     escapedJsonText: string,
@@ -145,7 +145,7 @@ export const postProcessReactData = (text: string, elem: Cheerio): void => {
     jsonText = JSON.parse(escapedJsonText);
     data = /** @type MdnReactData */ JSON.parse(jsonText);
   } catch (e) {
-    errorLogger.warn('postProcessReactData: json parse fail', e);
+    errorLogger.warn('preProcessReactData: json parse fail', e);
   }
   if (!data) {
     return;

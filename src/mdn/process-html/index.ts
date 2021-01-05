@@ -1,16 +1,23 @@
+import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import {
+  DownloadResource,
+  SubmitResourceFunc
+} from 'website-scrap-engine/lib/life-cycle/types';
+import {ResourceType} from 'website-scrap-engine/lib/resource';
+import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
 import {
   extractMdnAssets,
   postProcessMdnAssets,
   preProcessMdnAssets
 } from './process-mdn-assets';
-import {Resource} from 'website-scrap-engine/lib/resource';
-import URI from 'urijs';
-import {postProcessReactData} from './process-react-data';
+import {preProcessReactData} from './process-react-data';
 import {
   postProcessJsPolyFill,
   preProcessJsPolyFill
 } from './process-js-polyfill';
-import {preProcessRemoveCompatibilityTableWarning} from './process-compatibility-table';
+import {
+  preProcessRemoveCompatibilityTableWarning
+} from './process-compatibility-table';
 import {
   postProcessReplaceExternalIframeWithLink,
   postProcessReplaceExternalImgWithLink,
@@ -18,74 +25,94 @@ import {
   postProcessReplaceExternalScriptWithLink,
   preProcessAddIconToExternalLinks
 } from './process-external';
-import {CheerioStatic} from 'website-scrap-engine/lib/types';
+import {preProcessRemoveElements} from './process-remove-elements';
+import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 
+const INJECT_JS_PATH = '/static/build/js/inject.js';
+const INJECT_CSS_PATH = '/static/build/styles/inject.css';
 
-export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic => {
-  $('.bc-github-link').remove();
-  if (!html.uri) {
-    html.uri = URI(html.url);
+export const preProcessHtml = async (
+  res: DownloadResource,
+  submit: SubmitResourceFunc,
+  options: StaticDownloadOptions
+): Promise<DownloadResource> => {
+  if (res.type !== ResourceType.Html) {
+    return res;
   }
-  if (!html.uri.path().startsWith('/interactive-examples/')) {
-    $('.hidden').remove();
+  if (!res.meta.doc) {
+    res.meta.doc = parseHtml(res, options);
   }
-  $('meta[name^="twitter"]').remove();
-  $('meta[name^="og"]').remove();
-  // head link to alternate lang
-  $('link[rel="alternate"]').remove();
-  $('link[rel="preconnect"]').remove();
-  $('link[rel="canonical"]').remove();
-  $('link[rel="manifest"]').remove();
-  $('link[rel="search"]').remove();
-  $('link[rel="apple-touch-icon-precomposed"]').remove();
-  // notice on top of page
-  $('.global-notice').remove();
-  // page footer
-  $('#nav-footer').remove();
-  // newsletter box
-  $('.newsletter-box').remove();
-  $('.newsletter-container').remove();
-  // Hacks Blog
-  $('.column-hacks').remove();
-  // login link
-  $('#toolbox').remove();
-  // locale
-  $('.locale-container').remove();
-  // script errors in this page
-  $('#kserrors').remove();
-  // login-related - not needed
-  // $('.auth-container').remove();
-  // This is an archived page. It's not actively maintained.
-  $('.archived').remove();
-  // Found a problem with this page?
-  // Source on GitHub
-  $('#on-github').remove();
-  $('script[src*="perf."]').remove();
-  // bcd-signal script, not needed for offline usage
-  $('script[src*="react-bcd-signal"]').remove();
-  $('script[src*="speedcurve.com"]').remove();
-  // google-analytics
-  $('script[src*="google-analytics.com"]').remove();
+  const $: CheerioStatic = res.meta.doc;
+  preProcessRemoveElements($);
+  // the script containing inline data
+  let dataScript: Cheerio | null = null;
+  let assetsData;
+  const scripts = $('script');
+  for (let i = 0; i < scripts.length; i++) {
+    const elem: Cheerio = $(scripts[i]);
+
+    let text: string | null;
+    if ((text = elem.html())) {
+      // google-analytics
+      if (text.includes('google-analytics') ||
+        text.includes('mdn.analytics.trackOutboundLinks') ||
+        text.includes('Mozilla.dntEnabled()') ||
+        text.includes('LUX=') ||
+        // fetch polyfill not needed since it's mocked.
+        text.includes('fetch-polyfill')) {
+        elem.remove();
+        continue;
+      }
+      // mdn.assets
+      if ((assetsData = extractMdnAssets(text)) &&
+        ({assetsData} = assetsData) && assetsData) {
+        preProcessMdnAssets($, text, assetsData);
+        dataScript = elem;
+        continue;
+      }
+      // js polyfill
+      if (text.includes('document.write') && text.includes('js-polyfill')) {
+        preProcessJsPolyFill($, text);
+        continue;
+      }
+      if (text.includes('window._react_data')) {
+        preProcessReactData(text, elem);
+        dataScript = elem;
+      }
+    }
+  }
+
+  // We're converting our compatibility data into a machine-readable JSON format.
+  preProcessRemoveCompatibilityTableWarning($);
+  // Add icon to external links for new ui
+  preProcessAddIconToExternalLinks($);
+
+  /// region inject external script and style
+  if (dataScript?.length) {
+    // language=HTML
+    $(`<script class="mdn-local-inject-js" src="${INJECT_JS_PATH}"></script>`)
+      .insertAfter(dataScript);
+    // language=HTML
+    $(`<link href="${INJECT_CSS_PATH}" rel="stylesheet" \
+type="text/css" class="mdn-local-inject-css">`)
+      .appendTo($('head'));
+  }
+  /// endregion inject external script and style
+
+  return res;
+};
+
+export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
+  // remove scripts in postProcessHtml,
+  // to keep a copy of scripts and source maps
   // remove main script
   // /static/js/runtime-main.41503b2a.js
   $('script[src*="runtime-main."]').remove();
   // react-main script, still on index page
   $('script[src*="react-main."]').remove();
-  // newsletter script, on the index page
-  $('script[src*="newsletter"]').remove();
-  // login box script, on the index page
-  $('script[src*="auth-modal."]').remove();
-  // remove styles on the index page
-  $('link[rel="stylesheet"][href*="auth-modal."]').remove();
-  $('link[rel="stylesheet"][href*="home_newsletter."]').remove();
-  $('link[rel="stylesheet"][href*="subscriptions."]').remove();
-  $('link[rel="stylesheet"][href*="home_featured."]').remove();
-  $('link[rel="stylesheet"][href*="mdn-subscriptions."]').remove();
-  $('link[rel="stylesheet"][href*="banners."]').remove();
-
-  let assetsData, text;
 
   $('script').each((index, el) => {
+    let text: string | null;
     const elem = $(el);
     const src = elem.attr('src');
     // remove main script chunk
@@ -96,57 +123,7 @@ export const preProcessHtml = ($: CheerioStatic, html: Resource): CheerioStatic 
     )) {
       return elem.remove();
     }
-    if ((text = elem.html())) {
-      // google-analytics
-      if (text.includes('google-analytics') ||
-        text.includes('mdn.analytics.trackOutboundLinks') ||
-        text.includes('Mozilla.dntEnabled()') ||
-        text.includes('LUX=') ||
-        // fetch polyfill not needed since it's mocked.
-        text.includes('fetch-polyfill')) {
-        return elem.remove();
-      }
-      // mdn.assets
-      if ((assetsData = extractMdnAssets(text)) &&
-        ({assetsData} = assetsData) && assetsData) {
-        return preProcessMdnAssets($, text, assetsData);
-      }
-      // js polyfill
-      if (text.includes('document.write') && text.includes('js-polyfill')) {
-        preProcessJsPolyFill($, text);
-      }
-    }
-  });
-  // join community
-  $('.communitybox').remove();
-  // active-banner.jsx
-  $('.developer-needs.mdn-cta-container').remove();
-  // popup at bottom
-  $('#contribution-popover-container').remove();
-  // translation
-  $('.translationInProgress').remove();
-  // translation
-  $('#doc-pending-fallback').remove();
-  // We're converting our compatibility data into a machine-readable JSON format.
-  preProcessRemoveCompatibilityTableWarning($);
-  // Add icon to external links for new ui
-  preProcessAddIconToExternalLinks($);
-  // remove google cdn stuff
-  $('link[href*="googleapis.com"]').remove();
-  $('script[src*="googleapis.com"]').remove();
-  return $;
-};
-
-export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
-  $('script').each((index, el) => {
-    let text: string | null;
-    const elem = $(el);
     if (!(text = elem.html())) {
-      return;
-    }
-    if (text.includes('window._react_data')) {
-      postProcessReactData(text, elem);
-      // $('#react-container').removeAttr('id');
       return;
     }
     if (text.includes('document.write') && text.includes('js-polyfill')) {
@@ -154,29 +131,6 @@ export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
     }
     postProcessMdnAssets(text, $, elem);
   });
-
-  /// region inject external script and style
-  const reactMainScript = $('script[src*="react-main"]');
-  let src: string | void, pathArr: string[];
-  if (reactMainScript && reactMainScript.length &&
-    (src = reactMainScript.attr('src')) &&
-    (pathArr = src.split('/')) && pathArr.length) {
-    pathArr.pop();
-    pathArr.push('inject.js');
-    // sync script
-    // language=HTML
-    $(`<script class="mdn-local-inject-js" src="${pathArr.join('/')}"></script>`)
-      .insertBefore(reactMainScript);
-    pathArr.pop();
-    pathArr.pop();
-    pathArr.push('styles');
-    pathArr.push('inject.css');
-    // language=HTML
-    $(`<link href="${pathArr.join('/')}" rel="stylesheet"\
- type="text/css" class="mdn-local-inject-css">`)
-      .appendTo($('head'));
-  }
-  /// endregion inject external script and style
 
   // replace external iframe with external links
   postProcessReplaceExternalIframeWithLink($);

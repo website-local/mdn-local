@@ -22,7 +22,7 @@ lifeCycle.detectResourceType.push(detectLinkType);
 lifeCycle.processBeforeDownload.push(redirectDownloadLink, dropResource);
 lifeCycle.processAfterDownload.unshift(
   redirectUrlAfterFetch,
-  processHtml(preProcessHtml),
+  preProcessHtml,
   processHtml(preProcessInteractiveExample)
 );
 lifeCycle.processAfterDownload.push(processHtml(postProcessHtml),
