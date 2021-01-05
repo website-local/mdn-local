@@ -71,3 +71,14 @@ export default function BrowserCompatibilityTable({
         </table>
         ${Legend({compat: data})}`;
 }
+
+/// region mdn-local helpers
+
+export type YariCompatibilityDataJson =
+  Parameters<typeof BrowserCompatibilityTable>[0];
+
+export function renderYariCompatibilityTable(json: YariCompatibilityDataJson): string {
+  return BrowserCompatibilityTable(json);
+}
+
+/// endregion mdn-local helpers

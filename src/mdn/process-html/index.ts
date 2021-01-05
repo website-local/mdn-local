@@ -3,8 +3,12 @@ import {
   DownloadResource,
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
+import {
+  PipelineExecutor
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
+import {error} from 'website-scrap-engine/lib/logger/logger';
 import {
   extractMdnAssets,
   postProcessMdnAssets,
@@ -26,6 +30,10 @@ import {
   preProcessAddIconToExternalLinks
 } from './process-external';
 import {preProcessRemoveElements} from './process-remove-elements';
+import {
+  preProcessYariData,
+  downloadAndRenderYariCompatibilityData, ProcessYariDataResult
+} from './process-yari-data';
 import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 
 const INJECT_JS_PATH = '/static/build/js/inject.js';
@@ -34,7 +42,8 @@ const INJECT_CSS_PATH = '/static/build/styles/inject.css';
 export const preProcessHtml = async (
   res: DownloadResource,
   submit: SubmitResourceFunc,
-  options: StaticDownloadOptions
+  options: StaticDownloadOptions,
+  pipeline: PipelineExecutor
 ): Promise<DownloadResource> => {
   if (res.type !== ResourceType.Html) {
     return res;
@@ -46,6 +55,7 @@ export const preProcessHtml = async (
   preProcessRemoveElements($);
   // the script containing inline data
   let dataScript: Cheerio | null = null;
+  let yariCompatibilityData: ProcessYariDataResult;
   let assetsData;
   const scripts = $('script');
   for (let i = 0; i < scripts.length; i++) {
@@ -78,6 +88,14 @@ export const preProcessHtml = async (
       if (text.includes('window._react_data')) {
         preProcessReactData(text, elem);
         dataScript = elem;
+        continue;
+      }
+      if (text.includes('window.__data__')) {
+        if (yariCompatibilityData) {
+          error.warn('preProcessHtml: multiple yari data found', res.url);
+        }
+        yariCompatibilityData = preProcessYariData(text, elem);
+        dataScript = elem;
       }
     }
   }
@@ -99,6 +117,14 @@ type="text/css" class="mdn-local-inject-css">`)
   }
   /// endregion inject external script and style
 
+  // download and render yari browser-compatibility-table
+  try {
+    await downloadAndRenderYariCompatibilityData(
+      res, submit, pipeline,
+      $, dataScript, yariCompatibilityData);
+  } catch (e) {
+    error.error('Error processing yari browser-compatibility-table', e, res.url);
+  }
   return res;
 };
 
