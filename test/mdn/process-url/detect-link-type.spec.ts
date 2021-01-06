@@ -31,6 +31,12 @@ describe('detect-link-type', function () {
       ResourceType.Binary, null, null)).toBe(ResourceType.Binary);
     expect(detectLinkType('https://mdn.mozillademos.org/files/15838/places-erd.png',
       ResourceType.Html, a, null)).toBe(ResourceType.Binary);
+    // contributors.txt should not be parsed as html
+    // https://github.com/website-local/mdn-local/issues/205
+    expect(detectLinkType('https://developer.mozilla.org/zh-CN/docs/Web/CSS/Reference/contributors.txt',
+      ResourceType.Html, a, null)).toBe(ResourceType.Binary);
+    expect(detectLinkType('https://developer.mozilla.org/zh-CN/docs/Web/CSS/Reference/index.json',
+      ResourceType.Html, a, null)).toBe(ResourceType.Binary);
   });
   test('css', () => {
 

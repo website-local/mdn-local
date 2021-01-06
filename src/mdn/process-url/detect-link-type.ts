@@ -39,12 +39,15 @@ export const detectLinkType = (
   if (url.includes('/@api/deki/files/') && !url.endsWith('.html')) {
     return ResourceType.Binary;
   }
-  if (url.includes('/docs/') ||
+  if ((url.includes('/docs/') ||
     url.includes('Add-ons/WebExtensions') ||
     url.includes('Add-ons/Firefox_for_Android') ||
     url.includes('Apps/Build') ||
     url.includes('JavaScript_code_modules/') ||
-    url.includes('Creating_XPCOM_Components/Building_the_WebLock_UI')) {
+    url.includes('Creating_XPCOM_Components/Building_the_WebLock_UI')) &&
+    // https://github.com/website-local/mdn-local/issues/205
+    !url.endsWith('/contributors.txt') &&
+    !url.endsWith('/index.json')) {
     return ResourceType.Html;
   }
 
