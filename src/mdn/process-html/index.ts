@@ -36,8 +36,8 @@ import {
 } from './process-yari-data';
 import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 
-const INJECT_JS_PATH = '/static/build/js/inject.js';
-const INJECT_CSS_PATH = '/static/build/styles/inject.css';
+const INJECT_JS_PATH = '/static/js/inject.js';
+const INJECT_CSS_PATH = '/static/css/inject.css';
 
 export const preProcessHtml = async (
   res: DownloadResource,

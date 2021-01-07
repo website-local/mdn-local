@@ -96,9 +96,9 @@ export default async function createDownloader(
     overrideOptions.initialUrl = defaultInitialUrl(locale);
   }
   const basePath = path.join(overrideOptions.localRoot,
-      'developer.mozilla.org', 'static', 'build'),
+      'developer.mozilla.org', 'static'),
     jsPath = path.join(basePath, 'js'),
-    cssPath = path.join(basePath, 'styles');
+    cssPath = path.join(basePath, 'css');
   mkdir(jsPath);
   mkdir(cssPath);
   await fs.copyFile(path.join(__dirname, 'inject', 'inject.js'),

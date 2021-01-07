@@ -670,8 +670,8 @@ export const hardCodedRedirectUrl: Record<string, string> = {
     'https://developer.mozilla.org/files/2917/fxlogo.png',
   // fake url, prevent external downloads
   'http://weloveiconfonts.com/api/?family=entypo':
-    'https://developer.mozilla.org/static/build/styles/inject.css',
+    'https://developer.mozilla.org/static/css/inject.css',
   // fake url, prevent external downloads
   'https://weloveiconfonts.com/api/?family=entypo':
-    'https://developer.mozilla.org/static/build/styles/inject.css'
+    'https://developer.mozilla.org/static/css/inject.css'
 };

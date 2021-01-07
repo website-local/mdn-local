@@ -39,8 +39,8 @@ export function dropResource(
     path.startsWith(locale + '/search') ||
     path.startsWith('search') ||
     // fake url
-    path.startsWith('/static/build/styles/inject.css') ||
-    path.startsWith('/static/build/js/inject.js') ||
+    path.startsWith('/static/css/inject.css') ||
+    path.startsWith('/static/js/inject.js') ||
     path.endsWith('$history') ||
     path.endsWith('$children') ||
     path.endsWith('$json') ||
