@@ -152,6 +152,11 @@ export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
     if (!(text = elem.html())) {
       return;
     }
+    // See https://github.com/mdn/yari/pull/2387
+    if (text.includes('polyfill.io/v3/polyfill.min.js')) {
+      elem.remove();
+      return;
+    }
     if (text.includes('document.write') && text.includes('js-polyfill')) {
       return postProcessJsPolyFill($, elem, text);
     }
