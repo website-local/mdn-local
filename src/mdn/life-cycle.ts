@@ -15,6 +15,7 @@ import {
   postProcessInteractiveExample,
   preProcessInteractiveExample
 } from './process-html/process-interactive-examples';
+import {processYariSourceMap} from './process-source-maps';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);
@@ -25,8 +26,11 @@ lifeCycle.processAfterDownload.unshift(
   preProcessHtml,
   processHtml(preProcessInteractiveExample)
 );
-lifeCycle.processAfterDownload.push(processHtml(postProcessHtml),
-  processHtml(postProcessInteractiveExample));
+lifeCycle.processAfterDownload.push(
+  processHtml(postProcessHtml),
+  processHtml(postProcessInteractiveExample),
+  processYariSourceMap
+);
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.logSubDir = 'developer.mozilla.org';
