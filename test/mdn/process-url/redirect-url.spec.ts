@@ -245,19 +245,21 @@ describe('redirect-url', function () {
   });
 
   // https://github.com/myfreeer/mdn-local/issues/34
+  // https://github.com/mdn/yari/pull/39
+  // https://github.com/website-local/mdn-local/issues/211
   test('redirect unexpected favicon #34', () => {
     expect(redirectUrl('https://developer.cdn.mozilla.net/media/redesign/img/favicon32.png',
       null, null, opt('zh-CN')))
-      .toBe('https://developer.mozilla.org/static/img/favicon32.png');
+      .toBe('https://developer.mozilla.org/favicon.ico');
     expect(redirectUrl('http://www.mozilla.org/favicon.ico',
       null, null, opt('zh-CN')))
-      .toBe('https://developer.mozilla.org/static/img/favicon32.png');
+      .toBe('https://developer.mozilla.org/favicon.ico');
     expect(redirectUrl('https://mozorg.cdn.mozilla.net/media/img/favicon.ico',
       null, null, opt('zh-CN')))
-      .toBe('https://developer.mozilla.org/static/img/favicon32.png');
+      .toBe('https://developer.mozilla.org/favicon.ico');
     expect(redirectUrl('http://w3c.org/2008/site/images/favicon.ico',
       null, null, opt('zh-CN')))
-      .toBe('https://developer.mozilla.org/static/img/favicon32.png');
+      .toBe('https://developer.mozilla.org/favicon.ico');
   });
 
   // https://github.com/myfreeer/mdn-local/issues/38

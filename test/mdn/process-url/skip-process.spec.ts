@@ -56,9 +56,11 @@ describe('skip-process', function () {
   });
 
   // https://github.com/myfreeer/mdn-local/issues/34
+  // https://github.com/mdn/yari/pull/39
+  // https://github.com/website-local/mdn-local/issues/211
   test('keep remote favicon #34', () => {
     expect(skipProcess('http://www.mozilla.org/favicon.ico', null, null))
-      .toBe('https://developer.mozilla.org/static/img/favicon32.png');
+      .toBe('https://developer.mozilla.org/favicon.ico');
   });
 
   test('skip incorrectly-parsed url', () => {

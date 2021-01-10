@@ -1,6 +1,8 @@
 export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
   // https://github.com/myfreeer/mdn-local/issues/34
-  '/media/redesign/img/favicon32.png': '/static/img/favicon32.png',
+  // https://github.com/mdn/yari/pull/39
+  // https://github.com/website-local/mdn-local/issues/211
+  '/media/redesign/img/favicon32.png': '/favicon.ico',
   // https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/Places/Using_the_Places_keywords_AP
   [`/${locale}/docs/Bookmark_Keywords`]:
     `/${locale}/docs/Archive/Mozilla/Bookmark_keywords`,
@@ -640,22 +642,23 @@ export const mdnLocaleRedirectPath = (locale: string): Record<string, string> =>
 };
 
 export const hardCodedRedirectUrl: Record<string, string> = {
+  // https://github.com/mdn/yari/pull/39
   'http://w3c.org/2008/site/images/favicon.ico':
-    'https://developer.mozilla.org/static/img/favicon32.png',
+    'https://developer.mozilla.org/favicon.ico',
   'https://w3c.org/2008/site/images/favicon.ico':
-    'https://developer.mozilla.org/static/img/favicon32.png',
+    'https://developer.mozilla.org/favicon.ico',
   'https://mozorg.cdn.mozilla.net/media/img/favicon.ico':
-    'https://developer.mozilla.org/static/img/favicon32.png',
+    'https://developer.mozilla.org/favicon.ico',
   'http://mozorg.cdn.mozilla.net/media/img/favicon.ico':
-    'https://developer.mozilla.org/static/img/favicon32.png',
+    'https://developer.mozilla.org/favicon.ico',
   'http://www.mozilla.org/favicon.ico':
-    'https://developer.mozilla.org/static/img/favicon32.png',
+    'https://developer.mozilla.org/favicon.ico',
   'https://www.mozilla.org/favicon.ico':
-    'https://developer.mozilla.org/static/img/favicon32.png',
+    'https://developer.mozilla.org/favicon.ico',
   'https://developer.cdn.mozilla.net/media/redesign/img/favicon32.png':
-    'https://developer.mozilla.org/static/img/favicon32.png',
+    'https://developer.mozilla.org/favicon.ico',
   'http://developer.cdn.mozilla.net/media/redesign/img/favicon32.png':
-    'https://developer.mozilla.org/static/img/favicon32.png',
+    'https://developer.mozilla.org/favicon.ico',
   // just an alternative, not original pic
   'https://i.picsum.photos/id/1080/6858/4574.jpg':
     'https://developer.mozilla.org/files/16869/new-york-skyline-4by3.jpg',

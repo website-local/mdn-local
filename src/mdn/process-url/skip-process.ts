@@ -35,8 +35,10 @@ export const skipProcess = (
     return;
   }
   // https://github.com/myfreeer/mdn-local/issues/34
+  // https://github.com/mdn/yari/pull/39
+  // https://github.com/website-local/mdn-local/issues/211
   if (remoteFavicon.has(url)) {
-    return 'https://developer.mozilla.org/static/img/favicon32.png';
+    return 'https://developer.mozilla.org/favicon.ico';
   }
   // https:\\google.com
   // from https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Introduction
