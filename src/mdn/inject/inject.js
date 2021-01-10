@@ -272,4 +272,25 @@
     };
   }
   /// endregion yari expandable mobile search
+
+  /// region yari lowercase all anchor IDs and recover if not lowercase
+  // https://github.com/mdn/yari/pull/2266
+  function lowerCaseLocationHash() {
+    // noinspection ES6ConvertVarToLetConst
+    var location = document.location;
+    // Did you arrive on this page with a location hash?
+    if (location.hash && location.hash !== location.hash.toLowerCase()) {
+      // The location hash isn't lowercase. That probably means it's from before
+      // we made all `<h2 id>` and `<h3 id>` values always lowercase.
+      // Let's see if it can easily be fixed, but let's be careful and
+      // only do this if there is an element that matches.
+      if (document.querySelector(location.hash.toLowerCase())) {
+        location.hash = location.hash.toLowerCase();
+      }
+    }
+  }
+  // probably should listen to window.onhashchange
+  lowerCaseLocationHash();
+
+  /// endregion yari lowercase all anchor IDs and recover if not lowercase
 }();
