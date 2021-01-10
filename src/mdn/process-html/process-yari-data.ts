@@ -278,7 +278,10 @@ export async function downloadAndRenderYariCompatibilityData(
         data, contexts[i].index, res.url);
       continue;
     }
-    if (data.id && el.prev().attr('id') !== data.id) {
+    if (data.id &&
+      // case insensitive string comparison for id
+      // https://github.com/mdn/yari/pull/2266
+      el.prev().attr('id')?.toLowerCase() !== data.id.toLowerCase()) {
       errorLogger.warn(
         'yari bcd: rendering the table into wrong place',
         data, contexts[i].index, el.prev().attr('id'), res.url);
