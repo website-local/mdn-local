@@ -16,6 +16,7 @@ import {
   preProcessInteractiveExample
 } from './process-html/process-interactive-examples';
 import {processYariSourceMap} from './process-source-maps';
+import {decompressSitemap} from './decompress-sitemap';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);
@@ -24,7 +25,8 @@ lifeCycle.processBeforeDownload.push(redirectDownloadLink, dropResource);
 lifeCycle.processAfterDownload.unshift(
   redirectUrlAfterFetch,
   preProcessHtml,
-  processHtml(preProcessInteractiveExample)
+  processHtml(preProcessInteractiveExample),
+  decompressSitemap
 );
 lifeCycle.processAfterDownload.push(
   processHtml(postProcessHtml),

@@ -48,4 +48,12 @@ describe('detect-link-type', function () {
     expect(detectLinkType('https://mdn.github.io/css-examples/learn/styles.css',
       ResourceType.Binary, a, null)).toBe(ResourceType.Css);
   });
+
+  // https://github.com/website-local/mdn-local/issues/214
+  test('sitemap', () => {
+    expect(detectLinkType('https://developer.mozilla.org/sitemaps/en-US/sitemap.xml.gz',
+      ResourceType.Binary, null, null)).toBe(ResourceType.SiteMap);
+    expect(detectLinkType('https://developer.mozilla.org/sitemaps/zh-CN/sitemap.xml.gz',
+      ResourceType.Binary, null, null)).toBe(ResourceType.SiteMap);
+  });
 });

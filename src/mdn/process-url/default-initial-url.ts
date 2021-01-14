@@ -20,10 +20,11 @@ export function defaultInitialUrl(locale: string): string[] {
     `https://developer.mozilla.org/${locale}/docs/Learn`,
     `https://developer.mozilla.org/${locale}/docs/Games`,
     `https://developer.mozilla.org/${locale}/docs/Glossary`,
-    `https://developer.mozilla.org/sitemaps/${locale}/sitemap.xml`
+    // https://github.com/website-local/mdn-local/issues/214
+    `https://developer.mozilla.org/sitemaps/${locale}/sitemap.xml.gz`
   ];
   if (locale !== 'en-US') {
-    strings.push('https://developer.mozilla.org/sitemaps/en-US/sitemap.xml');
+    strings.push('https://developer.mozilla.org/sitemaps/en-US/sitemap.xml.gz');
   }
   return strings;
 }

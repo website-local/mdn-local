@@ -32,6 +32,10 @@ export const detectLinkType = (
   elem: Cheerio | null,
   parent: Resource | null
 ): ResourceType => {
+  // https://github.com/website-local/mdn-local/issues/214
+  if (url.includes('/sitemaps/') && url.endsWith('/sitemap.xml.gz')) {
+    return ResourceType.SiteMap;
+  }
   if (!((elem && (elem.is('a') || elem.is('iframe'))) ||
     (parent && parent.type === ResourceType.SiteMap))) {
     return type;
