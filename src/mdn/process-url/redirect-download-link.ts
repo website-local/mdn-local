@@ -55,6 +55,16 @@ export const redirectDownloadLink = (res: Resource): Resource => {
         .toString();
       return res;
     }
+
+    // https://github.com/website-local/mdn-local/issues/208
+    if (path.startsWith('/mdn.mozit.cloud/')) {
+      const pathArr = path.split('/');
+      res.downloadLink = uri.search('')
+        .host(pathArr[2])
+        .path(path.slice('/mdn.mozit.cloud/'.length + pathArr[2].length))
+        .toString();
+      return res;
+    }
   }
   return res;
 };

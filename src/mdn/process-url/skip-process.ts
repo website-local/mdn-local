@@ -46,7 +46,8 @@ export const skipProcess = (
     url = url.replace('\\\\', '//');
   }
   const uri = URI(url), host = uri.host();
-  if (host && !downloadableHosts[host]) {
+  // https://github.com/website-local/mdn-local/issues/208
+  if (host && !downloadableHosts[host] && !host.endsWith('.mdn.mozit.cloud')) {
     skipExternalLogger.debug('skipped external link', host, url, parent?.url);
     return;
   }

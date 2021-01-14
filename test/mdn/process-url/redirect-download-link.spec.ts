@@ -152,4 +152,29 @@ describe('redirect-download-link', function () {
       expect(resource.downloadLink).toBe(url);
     }
   });
+
+  // https://github.com/website-local/mdn-local/issues/208
+  test('redirect mdn.mozit.cloud', () => {
+    const urls = [
+      'https://yari-demos.prod.mdn.mozit.cloud/en-US/docs/Web/' +
+      'API/CanvasRenderingContext2D/quadraticCurveTo/_samples_/' +
+      'How_quadraticCurveTo_works',
+      'https://yari-demos.prod.mdn.mozit.cloud/en-US/docs/Learn/CSS/' +
+      'CSS_layout/Positioning/_samples_/Introducing_top_bottom_left_and_right',
+      'https://yari-demos.prod.mdn.mozit.cloud/en-us/' +
+      'docs/web/api/htmlformelement/_samples_/inheritance_diagram',
+      'https://yari-demos.prod.mdn.mozit.cloud/en-US/docs/' +
+      'Web/CSS/blend-mode/_samples_/normal_example',
+      'https://media.prod.mdn.mozit.cloud/attachments/' +
+      '2012/07/09/3075/89b1e0a26e8421e19f907e0522b188bd/svgdemo1.xml'
+    ];
+
+    for (const url of urls) {
+      const resource = res(url);
+      redirectDownloadLink(resource);
+      expect(resource.uri?.path().startsWith('/mdn.mozit.cloud/')).toBeTruthy();
+      expect(resource.uri?.host()).toBe('developer.mozilla.org');
+      expect(resource.downloadLink).toBe(url);
+    }
+  });
 });

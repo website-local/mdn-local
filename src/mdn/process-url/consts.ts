@@ -48,7 +48,10 @@ export const mdnHosts = arrayToMap([
   'mdn.mozillademos.org',
   'wiki.developer.mozilla.org',
   'developer.cdn.mozilla.net',
-  'developer.allizom.org'
+  'developer.allizom.org',
+  // https://github.com/website-local/mdn-local/issues/208
+  'developer-stage.mdn.mozit.cloud',
+  'developer-prod.mdn.mozit.cloud'
 ]);
 
 export const downloadableHosts = arrayToMap([
@@ -60,7 +63,10 @@ export const downloadableHosts = arrayToMap([
   'developer.cdn.mozilla.net',
   'developer.allizom.org',
   'unpkg.com',
-  'mdn.github.io'
+  'mdn.github.io',
+  // https://github.com/website-local/mdn-local/issues/208
+  'developer-stage.mdn.mozit.cloud',
+  'developer-prod.mdn.mozit.cloud'
 ]);
 
 // manually collected

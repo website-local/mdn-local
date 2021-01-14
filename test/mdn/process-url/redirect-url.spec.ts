@@ -407,4 +407,75 @@ describe('redirect-url', function () {
       opt('en-US')))
       .toBe('https://wiki.mozilla.org/Labs/Jetpack/JEP/30');
   });
+
+  // https://github.com/website-local/mdn-local/issues/208
+  test('redirect mdn.mozit.cloud', () => {
+    expect(redirectUrl(
+      'https://yari-demos.prod.mdn.mozit.cloud/en-US/docs/Web/' +
+      'API/CanvasRenderingContext2D/quadraticCurveTo/_samples_/' +
+      'How_quadraticCurveTo_works',
+      null,
+      // the real url with this link
+      fakeRes('https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/quadraticCurveTo'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn.mozit.cloud/' +
+        'yari-demos.prod.mdn.mozit.cloud/en-US/' +
+        'docs/Web/API/CanvasRenderingContext2D/quadraticCurveTo/' +
+        '_samples_/How_quadraticCurveTo_works');
+
+    expect(redirectUrl(
+      'https://yari-demos.prod.mdn.mozit.cloud/en-US/docs/Learn/CSS/' +
+      'CSS_layout/Positioning/_samples_/Introducing_top_bottom_left_and_right',
+      null,
+      // the real url with this link
+      fakeRes('https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Positioning'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn.mozit.cloud/' +
+        'yari-demos.prod.mdn.mozit.cloud/en-US/docs/Learn/CSS/' +
+        'CSS_layout/Positioning/_samples_/Introducing_top_bottom_left_and_right');
+
+    expect(redirectUrl(
+      'https://yari-demos.prod.mdn.mozit.cloud/en-us/' +
+      'docs/web/api/htmlformelement/_samples_/inheritance_diagram',
+      null,
+      // the real url with this link
+      fakeRes('https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn.mozit.cloud/' +
+        'yari-demos.prod.mdn.mozit.cloud/en-us/docs/' +
+        'web/api/htmlformelement/_samples_/inheritance_diagram');
+
+    expect(redirectUrl(
+      'https://yari-demos.prod.mdn.mozit.cloud/en-US/docs/' +
+      'Web/CSS/blend-mode/_samples_/normal_example',
+      null,
+      // the real url with this link
+      fakeRes('https://developer.mozilla.org/en-US/docs/Web/CSS/blend-mode'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn.mozit.cloud/' +
+        'yari-demos.prod.mdn.mozit.cloud/en-US/docs/Web/CSS/' +
+        'blend-mode/_samples_/normal_example');
+
+    expect(redirectUrl(
+      'https://media.prod.mdn.mozit.cloud/attachments/' +
+      '2012/07/09/3075/89b1e0a26e8421e19f907e0522b188bd/svgdemo1.xml',
+      null,
+      // the real url with this link
+      fakeRes('https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Getting_Started'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn.mozit.cloud/' +
+        'media.prod.mdn.mozit.cloud/attachments/2012/07/09/' +
+        '3075/89b1e0a26e8421e19f907e0522b188bd/svgdemo1.xml');
+
+    // There seems no http links currently, this is only for test
+    expect(redirectUrl(
+      'http://media.prod.mdn.mozit.cloud/attachments/' +
+      '2012/07/09/3075/89b1e0a26e8421e19f907e0522b188bd/svgdemo1.xml',
+      null,
+      fakeRes('https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Getting_Started'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn.mozit.cloud/' +
+        'media.prod.mdn.mozit.cloud/attachments/2012/07/09/' +
+        '3075/89b1e0a26e8421e19f907e0522b188bd/svgdemo1.xml');
+  });
 });

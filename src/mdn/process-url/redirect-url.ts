@@ -93,12 +93,11 @@ export function redirectUrl(
     }
     switch (host) {
     case 'mdn.mozillademos.org': // should be automatically redirected back
-      u = u.host('developer.mozilla.org');
-      needToRebuildUrl = true;
-      break;
     case 'wiki.developer.mozilla.org':
     case 'developer.cdn.mozilla.net':
     case 'developer.allizom.org':
+    case 'developer-stage.mdn.mozit.cloud':
+    case 'developer-prod.mdn.mozit.cloud':
       u = u.host('developer.mozilla.org');
       needToRebuildUrl = true;
       break;
@@ -121,6 +120,17 @@ export function redirectUrl(
       shouldReturnEarly = true;
       break;
     default:
+      // https://github.com/website-local/mdn-local/issues/208
+      if (host.endsWith('.mdn.mozit.cloud')) {
+        if (u.protocol() === 'http') {
+          u.protocol('https');
+        }
+        // fake url, redirected back in requestRedirectFunc
+        u = u.host('developer.mozilla.org')
+          .path('/mdn.mozit.cloud/' + host + u.path());
+        shouldReturnEarly = true;
+        break;
+      }
       if (hardCodedRedirectUrl[url]) {
         return hardCodedRedirectUrl[url];
       }
