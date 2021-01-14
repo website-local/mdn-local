@@ -1,5 +1,5 @@
 'use strict';
-/* global document */
+/* global document window */
 !function () {
   /// region top-level vars
   // noinspection ES6ConvertVarToLetConst
@@ -285,12 +285,13 @@
       // Let's see if it can easily be fixed, but let's be careful and
       // only do this if there is an element that matches.
       if (document.querySelector(location.hash.toLowerCase())) {
-        location.hash = location.hash.toLowerCase();
+        // use location.replace to perform better in forward/back actions
+        location.replace(location.hash.toLowerCase());
       }
     }
   }
-  // probably should listen to window.onhashchange
   lowerCaseLocationHash();
+  window.onhashchange = lowerCaseLocationHash;
 
   /// endregion yari lowercase all anchor IDs and recover if not lowercase
 }();
