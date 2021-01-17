@@ -4,7 +4,8 @@ export const preProcessRemoveCompatibilityTableWarning = ($: CheerioStatic): voi
   let i = 0,
     item: Cheerio,
     html: string | null;
-  const result = $('.blockIndicator.warning'),
+  // #content >.article .warning.notecard in introduced in yari
+  const result = $('.blockIndicator.warning,#content >.article .warning.notecard'),
     len = result.length;
   for (; i < len; i++) {
     item = $(result[i]);

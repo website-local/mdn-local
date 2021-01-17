@@ -9,17 +9,15 @@ import {
 } from 'website-scrap-engine/lib/life-cycle/types';
 import {Resource} from 'website-scrap-engine/lib/resource';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
+import {toString} from 'website-scrap-engine/lib/util';
 import {
   renderYariCompatibilityTable,
   YariCompatibilityDataJson
 } from '../browser-compatibility-table';
-import {toString} from 'website-scrap-engine/lib/util';
 
 /// region type def
-// See https://github.com/mdn/yari/blob/
-// 8eb1172fc348e8a36969a86bf2c7484e93f288f2/client/src/document/types.tsx
-// https://github.com/mdn/yari/blob/
-// 596bc1906fd86b55055bb46ff6ceabe3a5567cf4/client/src/document/index.tsx
+// See https://github.com/mdn/yari/blob/v0.2.28/client/src/document/types.tsx
+// https://github.com/mdn/yari/blob/v0.2.28/client/src/document/index.tsx
 type MdnYariFlaws = Record<string, unknown>;
 
 export type MdnYariTranslation = {
