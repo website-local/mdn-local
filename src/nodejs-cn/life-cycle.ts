@@ -1,8 +1,10 @@
 import URI from 'urijs';
 import got from 'got';
-import {Resource} from 'website-scrap-engine/lib/resource';
+import type {Resource} from 'website-scrap-engine/lib/resource';
 import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
-import {ProcessingLifeCycle} from 'website-scrap-engine/lib/life-cycle/types';
+import type {
+  ProcessingLifeCycle
+} from 'website-scrap-engine/lib/life-cycle/types';
 import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle';
 import {
   dropResource,
@@ -14,7 +16,7 @@ import {
   defaultDownloadOptions,
   DownloadOptions
 } from 'website-scrap-engine/lib/options';
-import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 const gotNoRedirect = got.extend({
   followRedirect: false

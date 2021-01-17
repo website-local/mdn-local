@@ -1,6 +1,6 @@
-import {DownloadResource} from 'website-scrap-engine/lib/life-cycle/types';
+import type {DownloadResource} from 'website-scrap-engine/lib/life-cycle/types';
 import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
-import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 interface InteractiveExampleResource extends Resource {
   type: ResourceType.Html,

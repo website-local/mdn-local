@@ -1,13 +1,15 @@
 import {
   error as errorLogger
 } from 'website-scrap-engine/lib/logger/logger';
-import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
-import {PipelineExecutor} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
-import {
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {
+  PipelineExecutor
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
+import type {
   DownloadResource,
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
-import {Resource} from 'website-scrap-engine/lib/resource';
+import type {Resource} from 'website-scrap-engine/lib/resource';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {toString} from 'website-scrap-engine/lib/util';
 import {

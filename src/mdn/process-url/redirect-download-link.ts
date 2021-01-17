@@ -1,4 +1,4 @@
-import {Resource} from 'website-scrap-engine/lib/resource';
+import type {Resource} from 'website-scrap-engine/lib/resource';
 import {largeMp4Videos, largeWebmVideos} from './consts';
 import URI from 'urijs';
 

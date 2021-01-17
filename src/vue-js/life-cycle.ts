@@ -1,5 +1,5 @@
 import URI from 'urijs';
-import {ProcessingLifeCycle} from 'website-scrap-engine/lib/life-cycle/types';
+import type {ProcessingLifeCycle} from 'website-scrap-engine/lib/life-cycle/types';
 import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle/default-life-cycle';
 import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
 import {
@@ -7,12 +7,12 @@ import {
   DownloadOptions
 } from 'website-scrap-engine/lib/options';
 import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
-import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import {
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {
   DownloadResource,
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
-import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 const remapHosts: Set<string> = new Set([
   'cdn.jsdelivr.net',

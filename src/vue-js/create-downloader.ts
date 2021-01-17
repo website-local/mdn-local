@@ -1,4 +1,4 @@
-import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import path from 'path';
 import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
 import HttpAgent, {HttpsAgent} from 'agentkeepalive';

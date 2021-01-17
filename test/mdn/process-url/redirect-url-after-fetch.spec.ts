@@ -1,9 +1,9 @@
-import {
+import type {
   DownloadResource,
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
 import {redirectUrl} from '../../../src/mdn/process-url/redirect-url';
-import {
+import type {
   DownloadOptions,
   StaticDownloadOptions
 } from 'website-scrap-engine/lib/options';

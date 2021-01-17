@@ -1,6 +1,6 @@
 import {redirectUrl} from '../../../src/mdn/process-url/redirect-url';
-import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import {DownloadOptions} from 'website-scrap-engine/lib/options';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {DownloadOptions} from 'website-scrap-engine/lib/options';
 import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
 
 const opt = (locale: string): StaticDownloadOptions => ({

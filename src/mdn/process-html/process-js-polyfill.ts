@@ -1,4 +1,4 @@
-import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 const JS_POLYFILL_CLASS = 'js-polyfill-temp-script';
 const SCRIPT_PREFIX = '<script src="';

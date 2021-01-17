@@ -1,9 +1,9 @@
 import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
-import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import {CookieJar} from 'tough-cookie';
 import HttpAgent, {HttpsAgent} from 'agentkeepalive';
 import {localesMap, redirectLocale} from './process-url/consts';
-import {NormalizedOptions} from 'got/dist/source/core';
+import type {NormalizedOptions} from 'got/dist/source/core';
 import path from 'path';
 import {defaultInitialUrl} from './process-url/default-initial-url';
 import {sync as mkdir} from 'mkdirp';

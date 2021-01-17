@@ -4,8 +4,8 @@ import {
 } from 'website-scrap-engine/lib/logger/logger';
 import URI from 'urijs';
 import { downloadableHosts } from './consts';
-import {Resource} from 'website-scrap-engine/lib/resource';
-import {Cheerio} from 'website-scrap-engine/lib/types';
+import type {Resource} from 'website-scrap-engine/lib/resource';
+import type {Cheerio} from 'website-scrap-engine/lib/types';
 
 // https://github.com/myfreeer/mdn-local/issues/34
 const remoteFavicon = new Set([

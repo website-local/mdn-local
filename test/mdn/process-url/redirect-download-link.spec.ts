@@ -1,7 +1,7 @@
-import {Resource} from 'website-scrap-engine/lib/resource';
+import type {Resource} from 'website-scrap-engine/lib/resource';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {redirectUrl} from '../../../src/mdn/process-url/redirect-url';
-import {
+import type {
   DownloadOptions,
   StaticDownloadOptions
 } from 'website-scrap-engine/lib/options';

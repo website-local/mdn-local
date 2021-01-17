@@ -1,6 +1,7 @@
-import {Resource} from 'website-scrap-engine/lib/resource';
-import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {Resource} from 'website-scrap-engine/lib/resource';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
+import type {Cheerio} from 'website-scrap-engine/lib/types';
 import {
   appendDocsPath,
   appendDocsWebPath,
@@ -16,7 +17,6 @@ import {
 } from './redirect-path';
 import URI from 'urijs';
 import {processPathWithMultiLocale} from './process-path-with-multi-locale';
-import {Cheerio} from 'website-scrap-engine/lib/types';
 
 const cache: Record<string, Record<string, string>> = {};
 const getMdnRedirectPath = (locale: string): Record<string, string> => {

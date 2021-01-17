@@ -1,5 +1,5 @@
-import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import {
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {
   DownloadResource,
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';

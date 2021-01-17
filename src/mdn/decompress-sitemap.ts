@@ -1,4 +1,4 @@
-import {DownloadResource} from 'website-scrap-engine/lib/life-cycle/types';
+import type {DownloadResource} from 'website-scrap-engine/lib/life-cycle/types';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {promisify} from 'util';
 import {gunzip, InputType} from 'zlib';

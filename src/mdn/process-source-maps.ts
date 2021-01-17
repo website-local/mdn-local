@@ -1,11 +1,13 @@
 import {processSourceMap} from 'website-scrap-engine/lib/life-cycle/process-source-map';
-import {
+import type {
   DownloadResource,
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
-import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import {PipelineExecutor} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
-import {AsyncResult} from 'website-scrap-engine/lib/life-cycle/types';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {
+  PipelineExecutor
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
+import type {AsyncResult} from 'website-scrap-engine/lib/life-cycle/types';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 
 export function processYariSourceMap(

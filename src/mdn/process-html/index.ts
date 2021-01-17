@@ -1,16 +1,16 @@
-import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
-import {
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {
   DownloadResource,
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
-import {
+import type {
   PipelineExecutor
 } from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
 import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {error} from 'website-scrap-engine/lib/logger/logger';
-import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import {Resource} from 'website-scrap-engine/src/resource';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {Resource} from 'website-scrap-engine/src/resource';
 import {
   extractMdnAssets,
   postProcessMdnAssets,
@@ -35,7 +35,8 @@ import {
 import {preProcessRemoveElements} from './process-remove-elements';
 import {
   preProcessYariData,
-  downloadAndRenderYariCompatibilityData, ProcessYariDataResult
+  downloadAndRenderYariCompatibilityData,
+  ProcessYariDataResult
 } from './process-yari-data';
 
 const INJECT_JS_PATH = '/static/js/inject.js';

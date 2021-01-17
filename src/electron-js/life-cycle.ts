@@ -1,5 +1,7 @@
 import URI from 'urijs';
-import {ProcessingLifeCycle} from 'website-scrap-engine/lib/life-cycle/types';
+import type {
+  ProcessingLifeCycle
+} from 'website-scrap-engine/lib/life-cycle/types';
 import {
   defaultLifeCycle
 } from 'website-scrap-engine/lib/life-cycle/default-life-cycle';
@@ -15,7 +17,7 @@ import {
   defaultDownloadOptions,
   DownloadOptions
 } from 'website-scrap-engine/lib/options';
-import {CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {CheerioStatic} from 'website-scrap-engine/lib/types';
 
 export const HOST = 'www.electronjs.org';
 

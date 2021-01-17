@@ -1,11 +1,15 @@
-import {complete as log, skipExternal} from 'website-scrap-engine/lib/logger/logger';
-import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import {
+  complete as log,
+  skipExternal
+} from 'website-scrap-engine/lib/logger/logger';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
 export const preProcessAddIconToExternalLinks = ($: CheerioStatic): void => {
   if ($('script[src*="build/js/wiki"]').length) {
     return;
   }
   // original script form developer.mozilla.org/static/build/js/wiki.62ddb187a9d0.js
+  // not applied to yari
   $('.external').each(function (index, element) {
     const $link = $(element);
     if (!$link.find('img').length) {
