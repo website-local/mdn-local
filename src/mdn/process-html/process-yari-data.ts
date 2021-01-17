@@ -218,7 +218,8 @@ export async function downloadAndRenderYariCompatibilityData(
   pipeline: PipelineExecutor,
   $: CheerioStatic,
   dataScript: Cheerio | null,
-  result: ProcessYariDataResult
+  result: ProcessYariDataResult,
+  locale: string
 ): Promise<void> {
   if (!result || !result.length) {
     return;
@@ -289,6 +290,10 @@ export async function downloadAndRenderYariCompatibilityData(
     // note: keep the original body of resource
     const jsonData: YariCompatibilityDataJson =
       JSON.parse(toString(r.body, r.encoding));
+    //
+    if (!jsonData.locale) {
+      jsonData.locale = locale;
+    }
     const html = renderYariCompatibilityTable(jsonData);
     el.html(html);
   }

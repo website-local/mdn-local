@@ -230,12 +230,20 @@ function FlagsNote({
 function getNotes(
   browserInfo: bcd.Browsers,
   browser: bcd.BrowserNames,
-  support: bcd.SupportStatement
+  support: bcd.SupportStatement,
+  // It seems that yari is adding locale support to compatibility table
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  locale: string
 ): string[] {
   return asList(support)
     .flatMap((item, i) => {
       const supportNotes = [
-        item.prefix ? { iconName: 'prefix', label: 'prefix' } : null,
+        item.prefix
+          ? {
+            iconName: 'prefix',
+            label: `Implemented with the vendor prefix: ${item.prefix}`,
+          }
+          : null,
         item.notes
           ? (Array.isArray(item.notes)
             ? item.notes
@@ -285,11 +293,13 @@ function CompatCell({
   browser,
   support,
   showNotes,
+  locale,
 }: {
   browserInfo: bcd.Browsers,
   browser: bcd.BrowserNames;
   support: bcd.SupportStatement | undefined;
   showNotes: boolean;
+  locale: string;
 }) {
   const supportClassName = getSupportClassName(support);
   const browserReleaseDate = getSupportBrowserReleaseDate(support);
@@ -318,9 +328,9 @@ function CompatCell({
     </button>`
     ) || ''}
   ${hasNotes && showNotes && support && (
-      `<section class="bc-history bc-history-mobile bc-hidden">
-      <dl>${getNotes(browserInfo, browser, support).join('')}</dl>
-  </section>`
+      `<dl class="bc-history bc-history-mobile bc-hidden">
+        ${getNotes(browserInfo, browser, support, locale).join('')}
+      </dl>`
     ) || ''}
   </td>`
   );
@@ -331,6 +341,7 @@ export const FeatureRow = ({
   index,
   feature,
   browsers,
+  locale,
 }: {
   browserInfo: bcd.Browsers;
   index: number;
@@ -340,6 +351,7 @@ export const FeatureRow = ({
     isRoot: boolean;
   };
   browsers: bcd.BrowserNames[];
+  locale: string;
 }): string => {
   const { name, compat, isRoot } = feature;
   const title = compat.description ? (
@@ -380,13 +392,14 @@ export const FeatureRow = ({
       CompatCell({
         browserInfo, browser,
         support: compat.support[browser],
-        showNotes: true
+        showNotes: true,
+        locale
       })
     )).join('')}
     </tr>
     <tr class="bc-history bc-hidden" key="${index}">
       <td colSpan="${browsers.length + 1}">
-        <dl class="bc-history-content"></dl>
+        <dl><div class="bc-notes-wrapper"></div></dl>
       </td>
     </tr>`);
 };

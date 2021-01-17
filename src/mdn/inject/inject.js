@@ -141,7 +141,7 @@
     tr = table.querySelector('tr.bc-history[key="' + status[0] + '"]');
     if (tr) {
       tr.className = 'bc-history';
-      node = tr.querySelector('.bc-history-content');
+      node = tr.querySelector('dl>.bc-notes-wrapper');
       if (node && section.firstElementChild) {
         node.innerHTML = section.firstElementChild.innerHTML;
       }

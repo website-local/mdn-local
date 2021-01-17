@@ -26,14 +26,17 @@ function FeatureListAccordion({
   browserInfo,
   features,
   browsers,
+  locale,
 }: {
   browserInfo: bcd.Browsers;
   features: ReturnType<typeof listFeatures>;
   browsers: bcd.BrowserNames[];
+  locale: string;
 }) {
   return features.map((feature, i) =>
     FeatureRow({
-      browserInfo, feature, browsers, index: i
+      browserInfo, feature, browsers, index: i,
+      locale
     })).join('');
 }
 
@@ -41,10 +44,12 @@ export default function BrowserCompatibilityTable({
   query,
   data,
   browsers: browserInfo,
+  locale,
 }: {
   query: string;
   data: bcd.Identifier;
   browsers: bcd.Browsers;
+  locale: string;
 }): string {
 
   if (!data || !Object.keys(data).length) {
@@ -65,7 +70,8 @@ export default function BrowserCompatibilityTable({
           ${FeatureListAccordion({
     browserInfo,
     browsers,
-    features: listFeatures(data, '', name)
+    features: listFeatures(data, '', name),
+    locale
   })}
           </tbody>
         </table>

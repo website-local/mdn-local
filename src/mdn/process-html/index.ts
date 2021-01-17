@@ -129,7 +129,9 @@ type="text/css" class="mdn-local-inject-css">`)
   try {
     await downloadAndRenderYariCompatibilityData(
       res, submit, pipeline,
-      $, dataScript, yariCompatibilityData);
+      $, dataScript, yariCompatibilityData,
+      options.meta.locale as string
+    );
   } catch (e) {
     error.error('Error processing yari browser-compatibility-table', e, res.url);
   }
