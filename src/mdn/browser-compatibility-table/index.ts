@@ -69,7 +69,7 @@ export default function BrowserCompatibilityTable({
   })}
           </tbody>
         </table>
-        ${Legend({compat: data})}`;
+        ${Legend({compat: data, name})}`;
 }
 
 /// region mdn-local helpers
