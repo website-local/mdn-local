@@ -6,9 +6,11 @@ import {
 import {
   PipelineExecutor
 } from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
+import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {error} from 'website-scrap-engine/lib/logger/logger';
+import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import {Resource} from 'website-scrap-engine/src/resource';
 import {
   extractMdnAssets,
   postProcessMdnAssets,
@@ -23,6 +25,7 @@ import {
   preProcessRemoveCompatibilityTableWarning
 } from './process-compatibility-table';
 import {
+  postProcessAddIconToExternalLinks,
   postProcessReplaceExternalIframeWithLink,
   postProcessReplaceExternalImgWithLink,
   postProcessReplaceExternalMediaWithLink,
@@ -34,7 +37,6 @@ import {
   preProcessYariData,
   downloadAndRenderYariCompatibilityData, ProcessYariDataResult
 } from './process-yari-data';
-import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 
 const INJECT_JS_PATH = '/static/js/inject.js';
 const INJECT_CSS_PATH = '/static/css/inject.css';
@@ -56,6 +58,7 @@ export const preProcessHtml = async (
   // the script containing inline data
   let dataScript: Cheerio | null = null;
   let yariCompatibilityData: ProcessYariDataResult;
+  let isYariDocs = false;
   let assetsData;
   const scripts = $('script');
   for (let i = 0; i < scripts.length; i++) {
@@ -96,14 +99,18 @@ export const preProcessHtml = async (
         }
         yariCompatibilityData = preProcessYariData(text, elem);
         dataScript = elem;
+        isYariDocs = true;
       }
     }
   }
 
   // We're converting our compatibility data into a machine-readable JSON format.
   preProcessRemoveCompatibilityTableWarning($);
-  // Add icon to external links for new ui
-  preProcessAddIconToExternalLinks($);
+  // not needed in yari
+  if (!isYariDocs) {
+    // Add icon to external links
+    preProcessAddIconToExternalLinks($);
+  }
 
   /// region inject external script and style
   if (dataScript?.length) {
@@ -128,7 +135,9 @@ type="text/css" class="mdn-local-inject-css">`)
   return res;
 };
 
-export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
+export const postProcessHtml = (
+  $: CheerioStatic, res: Resource
+): CheerioStatic => {
   // remove scripts in postProcessHtml,
   // to keep a copy of scripts and source maps
   // remove main script
@@ -136,6 +145,7 @@ export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
   $('script[src*="runtime-main."]').remove();
   // react-main script, still on index page
   $('script[src*="react-main."]').remove();
+  let isYariDocs = false;
 
   $('script').each((index, el) => {
     let text: string | null;
@@ -160,17 +170,24 @@ export const postProcessHtml = ($: CheerioStatic): CheerioStatic => {
     if (text.includes('document.write') && text.includes('js-polyfill')) {
       return postProcessJsPolyFill($, elem, text);
     }
+    if (text.includes('window.__data__')) {
+      isYariDocs = true;
+      return;
+    }
     postProcessMdnAssets(text, $, elem);
   });
 
+  if (isYariDocs) {
+    postProcessAddIconToExternalLinks($);
+  }
   // replace external iframe with external links
-  postProcessReplaceExternalIframeWithLink($);
+  postProcessReplaceExternalIframeWithLink($, res.url);
   // replace external img with external links
-  postProcessReplaceExternalImgWithLink($);
+  postProcessReplaceExternalImgWithLink($, res.url);
   // replace external audio and video with external links
-  postProcessReplaceExternalMediaWithLink($);
+  postProcessReplaceExternalMediaWithLink($, res.url);
   // replace external script with external links
-  postProcessReplaceExternalScriptWithLink($);
+  postProcessReplaceExternalScriptWithLink($, res.url);
   return $;
 };
 

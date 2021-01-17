@@ -14,6 +14,12 @@ export const preProcessAddIconToExternalLinks = ($: CheerioStatic): void => {
   });
 };
 
+export const postProcessAddIconToExternalLinks = ($: CheerioStatic): void => {
+  // no need to add class external-icon for yari
+  $('#content > .article a[href^="http://"]').addClass('external');
+  $('#content > .article a[href^="https://"]').addClass('external');
+};
+
 export const replaceExternalItemWithLink = (
   $: CheerioStatic,
   elem: Cheerio,
@@ -34,7 +40,9 @@ export const replaceExternalItemWithLink = (
   log.debug('replace external', type, url);
 };
 
-export const postProcessReplaceExternalIframeWithLink = ($: CheerioStatic): void => {
+export const postProcessReplaceExternalIframeWithLink = (
+  $: CheerioStatic, resUrl: string
+): void => {
   let i = 0,
     item: Cheerio,
     src: string | void;
@@ -44,13 +52,15 @@ export const postProcessReplaceExternalIframeWithLink = ($: CheerioStatic): void
     item = $(result[i]);
     src = item.attr('src');
     if (src && (src.startsWith('https://') || src.startsWith('http://'))) {
-      skipExternal.warn('skipped external iframe', src);
+      skipExternal.warn('skipped external iframe', src, resUrl);
       replaceExternalItemWithLink($, item, src, 'iframe');
     }
   }
 };
 
-export const postProcessReplaceExternalScriptWithLink = ($: CheerioStatic): void => {
+export const postProcessReplaceExternalScriptWithLink = (
+  $: CheerioStatic, resUrl: string
+): void => {
   let i = 0,
     item: Cheerio,
     src: string | void;
@@ -60,13 +70,15 @@ export const postProcessReplaceExternalScriptWithLink = ($: CheerioStatic): void
     item = $(result[i]);
     src = item.attr('src');
     if (src && (src.startsWith('https://') || src.startsWith('http://'))) {
-      skipExternal.warn('skipped external script', src);
+      skipExternal.warn('skipped external script', src, resUrl);
       replaceExternalItemWithLink($, item, src, 'script');
     }
   }
 };
 
-export const postProcessReplaceExternalImgWithLink = ($: CheerioStatic): void => {
+export const postProcessReplaceExternalImgWithLink = (
+  $: CheerioStatic, resUrl: string
+): void => {
   let i = 0,
     item: Cheerio,
     src: string | void;
@@ -77,13 +89,15 @@ export const postProcessReplaceExternalImgWithLink = ($: CheerioStatic): void =>
     src = item.attr('src');
     // TODO: srcset
     if (src && (src.startsWith('https://') || src.startsWith('http://'))) {
-      skipExternal.warn('skipped external img', src);
+      skipExternal.warn('skipped external img', src, resUrl);
       replaceExternalItemWithLink($, item, src, 'img');
     }
   }
 };
 
-export const postProcessReplaceExternalMediaWithLink = ($: CheerioStatic): void => {
+export const postProcessReplaceExternalMediaWithLink = (
+  $: CheerioStatic, resUrl: string
+): void => {
   let i = 0,
     item: Cheerio,
     sources: Cheerio,
@@ -113,7 +127,7 @@ export const postProcessReplaceExternalMediaWithLink = ($: CheerioStatic): void 
       }
     }
     if (foundExternalLink) {
-      skipExternal.warn('skipped external media', src);
+      skipExternal.warn('skipped external media', src, resUrl);
       // src must be non-void if foundExternalLink
       replaceExternalItemWithLink($, item, src as string, 'media');
     }
