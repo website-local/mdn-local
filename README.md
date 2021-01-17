@@ -3,6 +3,7 @@ download localized mozilla developer docs to local device
 
 ### Not included
 * Multiple locale docs (only one of them included)
+* `https://developer.mozilla.org/presentations/`
 * Large files
     * <https://mdn.mozillademos.org/files/5237/CommonControls_20130305.psd>
     * <https://mdn.mozillademos.org/files/5239/IconsMedia_20130305.psd>
