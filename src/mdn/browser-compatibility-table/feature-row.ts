@@ -399,7 +399,7 @@ export const FeatureRow = ({
     </tr>
     <tr class="bc-history bc-hidden" key="${index}">
       <td colSpan="${browsers.length + 1}">
-        <dl><div class="bc-notes-wrapper"></div></dl>
+        <dl class="bc-history-content"></dl>
       </td>
     </tr>`);
 };
