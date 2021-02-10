@@ -14,7 +14,8 @@ const packageLock =
 processDependency(packageLock);
 
 fs.writeFileSync(path.join(__dirname, 'package-lock.json'),
-  JSON.stringify(packageLock, null, 2));
+  // to make github dependabot happy
+  JSON.stringify(packageLock, null, 2) + '\n');
 
 /**
  * @param {string} resolved
