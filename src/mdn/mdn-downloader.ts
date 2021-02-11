@@ -47,19 +47,8 @@ export class MdnDownloader extends SingleThreadDownloader {
     if (!this.options.req.headers['accept-language']) {
       this.options.req.headers['accept-language'] = locale;
     }
-    // http2 not supported yet, use http 1.1 keep-alive by default
+    // use http 1.1 keep-alive by default
     if (this.options.meta?.keepAlive !== false) {
-      if (!this.options.req.agent) {
-        this.options.req.agent = {};
-      }
-      this.options.req.agent.http = new HttpAgent();
-      this.options.req.agent.https = new HttpsAgent();
-    }
-    // http2 by default
-    if (this.options.meta?.http2 !== false) {
-      this.options.req.http2 = true;
-    } else if (this.options.meta?.keepAlive !== false) {
-      // enable keep-alive if http2 disabled
       if (!this.options.req.agent) {
         this.options.req.agent = {};
       }
@@ -69,6 +58,9 @@ export class MdnDownloader extends SingleThreadDownloader {
       if (!this.options.req.agent.https) {
         this.options.req.agent.https = new HttpsAgent();
       }
+    } else if (this.options.meta?.http2 !== false) {
+      // enable http2
+      this.options.req.http2 = true;
     }
   }
 }
