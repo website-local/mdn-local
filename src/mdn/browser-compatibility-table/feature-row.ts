@@ -32,16 +32,20 @@ function getSupportClassName(
     return 'unknown';
   }
 
-  const { version_added, version_removed, partial_implementation } = getFirst(
-    support
-  );
+  const {
+    flags,
+    version_added,
+    version_removed,
+    partial_implementation,
+  } = getFirst(support);
+
 
   let className;
   if (version_added === null) {
     className = 'unknown';
   } else if (version_added) {
     className = 'yes';
-    if (version_removed) {
+    if (version_removed || (flags && flags.length)) {
       className = 'no';
     }
   } else {
@@ -97,6 +101,22 @@ function NonBreakingSpace() {
   return '\u00A0';
 }
 
+function labelFromString(version: string | boolean | null | undefined) {
+  if (typeof version !== 'string') {
+    return '?';
+  }
+  if (!version.startsWith('≤')) {
+    return version;
+  }
+  const title = `Supported in version ${version.slice(1)} or earlier.`;
+  return (
+    `<span title=${title}>
+      <sup>≤&#xA0;</sup>
+  ${version.slice(1)}
+  </span>`
+  );
+}
+
 const CellText =({ support }: { support: bcd.SupportStatement | undefined }): string => {
   const currentSupport = getFirst(support);
 
@@ -118,20 +138,20 @@ const CellText =({ support }: { support: bcd.SupportStatement | undefined }): st
     status = { isSupported: 'no' };
     break;
   default:
-    status = { isSupported: 'yes', label: added };
+    status = { isSupported: 'yes', label: labelFromString(added) };
     break;
   }
 
   if (removed) {
     status = {
       isSupported: 'no',
-      label: (`${typeof added === 'string' ? added : '?'}
-          ${NonBreakingSpace()}— ${typeof removed === 'string' ? removed : '?'}`),
+      label: (`${labelFromString(added)}
+          ${NonBreakingSpace()}— ${labelFromString(removed)}`),
     };
   } else if (currentSupport && currentSupport.partial_implementation) {
     status = {
       isSupported: 'partial',
-      label: typeof added === 'string' ? added : 'Partial',
+      label: typeof added === 'string' ? labelFromString(added) : 'Partial',
     };
   }
 
@@ -269,7 +289,7 @@ function getNotes(
       const hasNotes = supportNotes.length > 0;
       return ((i === 0 || hasNotes) && (
         `<div key="${i}" class="bc-notes-wrapper">
-      <dt class="bc-supports-${getSupportClassName(support)} bc-supports">
+      <dt class="bc-supports-${getSupportClassName(item)} bc-supports">
       ${CellText({support: item})}
       ${CellIcons({support: item})}
       </dt>
