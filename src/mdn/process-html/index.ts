@@ -10,7 +10,7 @@ import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {error} from 'website-scrap-engine/lib/logger/logger';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import type {Resource} from 'website-scrap-engine/src/resource';
+import type {Resource} from 'website-scrap-engine/lib/resource';
 import {
   extractMdnAssets,
   postProcessMdnAssets,
