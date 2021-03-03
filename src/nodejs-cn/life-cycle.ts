@@ -197,7 +197,8 @@ const preProcessHtml = ($: CheerioStatic): CheerioStatic => {
   // remove all scripts
   $('script').remove();
   $('a[href="/"]').remove();
-  $('a[href="/search"]').addClass('link-to-search');
+  $('a[href="/search"],a[href="http://api.nodejs.cn/"]')
+    .addClass('link-to-search');
   $('a[href^="/run/"]').addClass('link-to-run');
   // style sheet, not needed since we re-implemented it
   $('link[rel="stylesheet"]').remove();

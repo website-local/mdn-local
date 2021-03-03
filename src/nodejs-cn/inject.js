@@ -806,20 +806,7 @@ Prism.highlightAll();
 !function () {
   var contentLeft, contentRight, alignLength, i, l, r, tl, tr, d,
     detailsLeft, detailsRight;
-  if (!(contentLeft = document.getElementById('content_left')) ||
-    !(contentRight = document.getElementById('content_right')) ||
-    !(contentLeft = contentLeft.children) ||
-    !contentLeft.length ||
-    !(contentRight = contentRight.children) ||
-    !contentRight.length ||
-    !((alignLength = Math.min(contentLeft.length, contentRight.length)) > 0)) {
-    return;
-  }
-  for (i = 0; i < alignLength; i++) {
-    if (!(l = contentLeft[i]) || !(r = contentRight[i]) ||
-      !(tl = l.offsetTop) || !(tr = r.offsetTop)) {
-      continue;
-    }
+  function align() {
     if ((d = tl - tr) !== 0) {
       // 1-pass
       if (d > 0) {
@@ -837,6 +824,45 @@ Prism.highlightAll();
           l.style.marginTop = (-d) + 'px';
         }
       }
+    }
+  }
+  function alignUl() {
+    var contentLeft = l.children, contentRight = r.children,
+      j = 0,
+      alignLength = contentLeft.length;
+    if (!alignLength || alignLength !== contentRight.length) return;
+    for (j = 0; j < alignLength; j++) {
+      if (!(l = contentLeft[j]) || !(r = contentRight[j]) ||
+        !(tl = l.offsetTop) || !(tr = r.offsetTop)) {
+        continue;
+      }
+      align();
+      if ((l.tagName === 'UL' && r.tagName === 'UL') ||
+        (l.tagName === 'OL' && r.tagName === 'OL') ||
+        (l.tagName === 'LI' && r.tagName === 'LI')) {
+        alignUl();
+      }
+    }
+  }
+  if (!(contentLeft = document.getElementById('content_left')) ||
+    !(contentRight = document.getElementById('content_right')) ||
+    !(contentLeft = contentLeft.children) ||
+    !contentLeft.length ||
+    !(contentRight = contentRight.children) ||
+    !contentRight.length ||
+    !((alignLength = contentLeft.length) > 0) ||
+    (alignLength !== contentRight.length)) {
+    return;
+  }
+  for (i = 0; i < alignLength; i++) {
+    if (!(l = contentLeft[i]) || !(r = contentRight[i]) ||
+      !(tl = l.offsetTop) || !(tr = r.offsetTop)) {
+      continue;
+    }
+    align();
+    if ((l.tagName === 'UL' && r.tagName === 'UL') ||
+      (l.tagName === 'OL' && r.tagName === 'OL')) {
+      alignUl();
     }
   }
   if (!contentLeft[0] ||
