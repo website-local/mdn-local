@@ -103,7 +103,10 @@ const skipProcessFunc = (url: string) => {
     url.startsWith('data:') ||
     url.startsWith('javascript:') ||
     url.startsWith('about:') ||
-    url.startsWith('chrome:')) {
+    url.startsWith('chrome:') ||
+    // since before 2021-03
+    // https://www.electronjs.org/docs/api/command-line-switches
+    url === 'http://host:port/json/list') {
     return true;
   }
   const uri = URI(url);
