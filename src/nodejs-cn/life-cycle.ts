@@ -129,10 +129,37 @@ const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Reso
   }
   if (link && (link.startsWith('/s/') ||
     link.startsWith('http://url.nodejs.cn/'))) {
+    // workaround for broken links to source code on github
+    // since v14.16.1, 2021-04-22
+    if (elem) {
+      const text = elem.text();
+      if (text?.startsWith('lib/') && text.endsWith('.js') &&
+        elem.prev().is('strong') &&
+        elem.prev().text()?.includes('源代码')) {
+        const versionText = elem.parents('.interior')
+          .find('header>h1')
+          .text();
+        const regExp = /v\d{2,}\.\d+\.\d+/;
+        const match = versionText?.match(regExp);
+        const version = match?.[0];
+        if (version) {
+          return cache[link] =
+            `https://github.com/nodejs/node/blob/${version}/${text}`;
+        }
+      }
+    }
     if (cache[link]) {
       link = cache[link];
     } else {
-      link = await cachedGetRedirectLocation(link);
+      try {
+        link = await cachedGetRedirectLocation(link);
+      } catch (e) {
+        // log the error and pass on since links can be broken
+        errorLogger.warn(
+          'Broken redirected link', link,
+          'with text', elem?.text(), 'from', parent?.rawUrl);
+        return;
+      }
     }
   }
   const redirectLink = hardCodedRedirectFullPath[link];
