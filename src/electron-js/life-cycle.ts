@@ -92,6 +92,8 @@ const preProcessHtml = ($: CheerioStatic) => {
   $('.ais-search-box,.nav-search').addClass('hidden');
   $('footer.footer').remove();
   $('.announcement-banner').remove();
+  $('.announcement-banner-contrast').remove();
+  $('.docs__actions-bar').addClass('hidden');
   return $;
 };
 
