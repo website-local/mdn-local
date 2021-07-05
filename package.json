@@ -20,7 +20,7 @@
     "@types/mkdirp": "^1.0.1",
     "@types/node": "^16.0.0",
     "@types/tough-cookie": "^4.0.1",
-    "@types/urijs": "^1.19.15",
+    "@types/urijs": "^1.19.16",
     "@typescript-eslint/eslint-plugin": "^4.28.1",
     "@typescript-eslint/parser": "^4.28.1",
     "eslint": "^7.30.0",
