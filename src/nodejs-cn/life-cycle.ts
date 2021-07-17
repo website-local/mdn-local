@@ -103,7 +103,9 @@ const hardCodedRedirect: Record<string, string> = {
   '/api/process/stream.html': '/api/stream.html',
   '/api/worker_threads/fs.html': '/api/fs.html',
   // 14.12.0
-  '/api/synopsis/cli.html': '/api/cli.html'
+  '/api/synopsis/cli.html': '/api/cli.html',
+  // since 16.3.0
+  '/api/modules/esm.md': '/api/esm.html'
 };
 
 const hardCodedRedirectFullPath: Record<string, string> = {
@@ -120,7 +122,10 @@ const hardCodedRedirectFullPath: Record<string, string> = {
   'http://nodejs.cn/api/modules/modules_module.html#modules_module_the_module_object':
     'http://nodejs.cn/api/module.html#module_the_module_object',
   'http://nodejs.cn/api/wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options':
-    'https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options'
+    'https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options',
+  // 16.4.0
+  '/api/http_new_agent_options':
+    'http://nodejs.cn/api/http.html#http_new_agent_options'
 };
 
 const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Resource | null) => {
@@ -136,11 +141,15 @@ const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Reso
       if (text?.startsWith('lib/') && text.endsWith('.js') &&
         elem.prev().is('strong') &&
         elem.prev().text()?.includes('源代码')) {
-        const versionText = elem.parents('.interior')
-          .find('header>h1')
-          .text();
+        let header = elem.parents('.interior')
+          .find('header>h1');
+        if (!header?.length) {
+          // since 16.4.1
+          header = elem.parents('.interior')
+            .find('header>.header-container>h1');
+        }
         const regExp = /v\d{2,}\.\d+\.\d+/;
-        const match = versionText?.match(regExp);
+        const match = header?.text()?.match(regExp);
         const version = match?.[0];
         if (version) {
           return cache[link] =
