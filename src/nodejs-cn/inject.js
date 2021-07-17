@@ -2,6 +2,40 @@
 /* global document window */
 /* eslint-disable no-useless-escape */
 
+/* dark mode */
+!function () {
+  var body, btn, mode;
+  body = document.body || document.getElementsByTagName('body')[0];
+  if (!body) {
+    return;
+  }
+  btn = document.getElementById('theme-toggle-btn');
+  if (!btn) {
+    return;
+  }
+  mode = undefined;
+  btn.onclick = function () {
+    if (mode) {
+      body.className = body.className.replace(' dark-mode', '');
+      mode = undefined;
+      if (window.sessionStorage) {
+        window.sessionStorage.removeItem('customDarkTheme');
+      }
+    } else {
+      body.className += ' dark-mode';
+      mode = '1';
+      if (window.sessionStorage) {
+        window.sessionStorage.setItem('customDarkTheme', mode);
+      }
+    }
+  };
+  if (window.sessionStorage &&
+    window.sessionStorage.getItem('customDarkTheme')) {
+    btn.click();
+  }
+  btn.removeAttribute('hidden');
+}();
+
 !function () {
   var activeElem = document.querySelector('#column2 .active'),
     titleElem, text, text2, leftElem, i, t;
