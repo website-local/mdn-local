@@ -2,12 +2,43 @@
 /* global document window */
 /* eslint-disable no-useless-escape */
 
-var activeElem = document.querySelector('#column2 .active');
-if (activeElem && activeElem.scrollIntoView) {
-  activeElem.scrollIntoView({
-    block: 'center'
-  });
-}
+!function () {
+  var activeElem = document.querySelector('#column2 .active'),
+    titleElem, text, text2, leftElem, i, t;
+  if (!activeElem) {
+    // since 16.4.0
+    titleElem = document.querySelector('#toc>ul>li>span');
+    if (!titleElem) {
+      // process
+      titleElem = document.querySelector('#toc>ul>li>a');
+    }
+    if (!titleElem) {
+      return;
+    }
+    text = titleElem.innerText.trim();
+    text2 = text.replace(' ', '');
+    // N-API
+    if (text === 'Node-API') {
+      text2 = 'N-API';
+    }
+    leftElem = document.querySelectorAll('#column2.interior>ul>li');
+    for (i = 0; i < leftElem.length; i++) {
+      t = leftElem[i].innerText.trim();
+      if (t === text || t === text2) {
+        activeElem = leftElem[i];
+        break;
+      }
+    }
+    if (activeElem) {
+      activeElem.className += ' active';
+    }
+  }
+  if (activeElem && activeElem.scrollIntoView) {
+    activeElem.scrollIntoView({
+      block: 'center'
+    });
+  }
+}();
 
 /* PrismJS 1.20.0 */
 /**
