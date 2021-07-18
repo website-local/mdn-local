@@ -329,7 +329,7 @@
       // noinspection JSDeprecatedSymbols
       e = e || window.event;
       // noinspection ES6ConvertVarToLetConst JSDeprecatedSymbols
-      var node = e.target, el;
+      var node = e.target;
       if (!node) {
         // noinspection JSDeprecatedSymbols
         node = e.srcElement;
