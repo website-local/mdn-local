@@ -8,10 +8,14 @@ import { listFeatures } from './utils';
 // It's done in the component that lazy-loads this component.
 
 function gatherPlatformsAndBrowsers(
-  category: string
+  category: string,
+  data: bcd.Identifier
 ): [string[], bcd.BrowserNames[]] {
   let platforms = ['desktop', 'mobile'];
-  if (category === 'javascript') {
+  if (
+    category === 'javascript' ||
+    (data.__compat && data.__compat.support.nodejs)
+  ) {
     platforms.push('server');
   } else if (category === 'webextensions') {
     platforms = ['webextensions-desktop', 'webextensions-mobile'];
@@ -21,6 +25,7 @@ function gatherPlatformsAndBrowsers(
     platforms.map((platform) => PLATFORM_BROWSERS[platform] || []).flat(),
   ];
 }
+
 
 function FeatureListAccordion({
   browserInfo,
@@ -62,7 +67,7 @@ export default function BrowserCompatibilityTable({
   const category = breadcrumbs[0];
   const name = breadcrumbs[breadcrumbs.length - 1];
 
-  const [platforms, browsers] = gatherPlatformsAndBrowsers(category);
+  const [platforms, browsers] = gatherPlatformsAndBrowsers(category, data);
 
   return `<table key="bc-table" class="bc-table bc-table-web">
         ${Headers({browserInfo, platforms, browsers})}
