@@ -36,7 +36,8 @@ import {preProcessRemoveElements} from './process-remove-elements';
 import {
   preProcessYariData,
   downloadAndRenderYariCompatibilityData,
-  ProcessYariDataResult
+  ProcessYariDataResult,
+  preProcessYariHydrationData
 } from './process-yari-data';
 
 const INJECT_JS_PATH = '/static/js/inject.js';
@@ -99,6 +100,15 @@ export const preProcessHtml = async (
           error.warn('preProcessHtml: multiple yari data found', res.url);
         }
         yariCompatibilityData = preProcessYariData(text, elem);
+        dataScript = elem;
+        isYariDocs = true;
+      }
+      if (elem.attr('id') === 'hydration' &&
+        elem.attr('type') === 'application/json') {
+        if (yariCompatibilityData) {
+          error.warn('preProcessHtml: multiple yari data found', res.url);
+        }
+        yariCompatibilityData = preProcessYariHydrationData(text, elem);
         dataScript = elem;
         isYariDocs = true;
       }

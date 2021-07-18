@@ -109,46 +109,11 @@ export type ProcessYariDataResult = MdnYariCompatibilityDataWithUrl[] | void;
 
 /// endregion type def
 
-const JSON_PARSE_STR = 'JSON.parse(';
 
-/**
- * Process yari window.__data__ to reduce its size
- * and extract browser_compatibility info
- * Note: a page can have multiple browser_compatibility section
- * @param text elem.text()
- * @param elem the script element
- * @return the browser_compatibility data
- */
-export const preProcessYariData = (
-  text: string, elem: Cheerio
-): ProcessYariDataResult => {
-  let jsonStrBeginIndex: number = text.indexOf(JSON_PARSE_STR),
-    jsonStrEndIndex: number,
-    escapedJsonText: string,
-    jsonText: string,
-    data: MdnYariDoc | void;
-  const browserCompatibilityData: MdnYariCompatibilityData[] = [];
-  if (jsonStrBeginIndex < 1 ||
-    jsonStrBeginIndex + JSON_PARSE_STR.length > text.length) {
-    return;
-  }
-  jsonStrBeginIndex += JSON_PARSE_STR.length;
-  if (!((jsonStrEndIndex = text.lastIndexOf('")')) > 0 &&
-    ++jsonStrEndIndex < text.length &&
-    (escapedJsonText = text.slice(jsonStrBeginIndex, jsonStrEndIndex)))) {
-    return;
-  }
+export function preProcessYariDocData(
+  data: MdnYariDoc
+): MdnYariCompatibilityDataWithUrl[] | void {
 
-  try {
-    // unescape string for json
-    jsonText = JSON.parse(escapedJsonText);
-    data = JSON.parse(jsonText);
-  } catch (e) {
-    errorLogger.warn('postProcessYariData: json parse fail', e);
-  }
-  if (!data) {
-    return;
-  }
   if (data.sidebarHTML) {
     data.sidebarHTML = '';
   }
@@ -163,6 +128,7 @@ export const preProcessYariData = (
     data.other_translations = [];
   }
 
+  const browserCompatibilityData: MdnYariCompatibilityData[] = [];
   if (data.body?.length) {
     for (let i = 0, item: MdnYariDocBody; i < data.body.length; i++) {
       item = data.body[i];
@@ -193,6 +159,83 @@ export const preProcessYariData = (
       }
     }
   }
+  return resultVal;
+}
+
+/**
+ * Process yari hydration script to reduce its size
+ * and extract browser_compatibility info
+ * Note: a page can have multiple browser_compatibility section
+ * https://github.com/mdn/yari/commit/107cf0ec5555405fe723d3b914ffd8246cac004c
+ * @param text elem.text()
+ * @param elem the script element
+ * @return the browser_compatibility data
+ */
+export const preProcessYariHydrationData = (
+  text: string, elem: Cheerio
+): ProcessYariDataResult => {
+
+  let data: { doc?: MdnYariDoc } | void;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    errorLogger.warn('postProcessYariData: json parse fail', e);
+  }
+
+  if (!data || !data.doc) {
+    return;
+  }
+  const resultVal = preProcessYariDocData(data.doc);
+
+  text = JSON.stringify(data)
+    // escape html for js
+    .replace(/</g, '\\x3c')
+    .replace(/>/g, '\\x3e');
+  elem.html(text);
+
+  return resultVal;
+};
+
+const JSON_PARSE_STR = 'JSON.parse(';
+
+/**
+ * Process yari window.__data__ to reduce its size
+ * and extract browser_compatibility info
+ * Note: a page can have multiple browser_compatibility section
+ * @param text elem.text()
+ * @param elem the script element
+ * @return the browser_compatibility data
+ */
+export const preProcessYariData = (
+  text: string, elem: Cheerio
+): ProcessYariDataResult => {
+  let jsonStrBeginIndex: number = text.indexOf(JSON_PARSE_STR),
+    jsonStrEndIndex: number,
+    escapedJsonText: string,
+    jsonText: string,
+    data: MdnYariDoc | void;
+  if (jsonStrBeginIndex < 1 ||
+    jsonStrBeginIndex + JSON_PARSE_STR.length > text.length) {
+    return;
+  }
+  jsonStrBeginIndex += JSON_PARSE_STR.length;
+  if (!((jsonStrEndIndex = text.lastIndexOf('")')) > 0 &&
+    ++jsonStrEndIndex < text.length &&
+    (escapedJsonText = text.slice(jsonStrBeginIndex, jsonStrEndIndex)))) {
+    return;
+  }
+  try {
+    // unescape string for json
+    jsonText = JSON.parse(escapedJsonText);
+    data = JSON.parse(jsonText);
+  } catch (e) {
+    errorLogger.warn('postProcessYariData: json parse fail', e);
+  }
+
+  if (!data) {
+    return;
+  }
+  const resultVal = preProcessYariDocData(data);
 
   // language=JavaScript
   text = `window.__data__ = ${JSON.stringify(data)
@@ -250,7 +293,7 @@ export async function downloadAndRenderYariCompatibilityData(
   const downloadResources =
     await Promise.all(contexts.map(c => pipeline.download(c.res)));
   const placeholders: Cheerio[] = [];
-  const elements = $('#content>.article>p');
+  const elements = $('#content>.article>p,#content>.main-page-content>p');
   for (let i = 0; i < elements.length; i++) {
     const el = $(elements[i]);
     const text = el.text();
