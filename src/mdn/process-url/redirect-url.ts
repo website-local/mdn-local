@@ -85,7 +85,9 @@ export function redirectUrl(
   }
   if (!url) return url;
   let u = URI(url).normalize(), host, needToRebuildUrl = false;
-  if ((host = u.host()) && host !== 'developer.mozilla.org') {
+  const mdnHost: string = options.meta.host as string | void
+    || 'developer.mozilla.org';
+  if ((host = u.host()) && host !== mdnHost) {
     let shouldReturnEarly = false;
     if (downloadableHosts[host] && u.protocol() === 'http') {
       u = u.protocol('https');
@@ -98,24 +100,25 @@ export function redirectUrl(
     case 'developer.allizom.org':
     case 'developer-stage.mdn.mozit.cloud':
     case 'developer-prod.mdn.mozit.cloud':
-      u = u.host('developer.mozilla.org');
+    case 'developer.mozilla.org':
+      u = u.host(mdnHost);
       needToRebuildUrl = true;
       break;
     case 'interactive-examples.mdn.mozilla.net': // interactive-examples
       // fake url, redirected back in requestRedirectFunc
-      u = u.host('developer.mozilla.org')
+      u = u.host(mdnHost)
         .path('/interactive-examples' + u.path());
       shouldReturnEarly = true;
       break;
     case 'mdn.github.io': // mdn.github.io
       // fake url, redirected back in requestRedirectFunc
-      u = u.host('developer.mozilla.org')
+      u = u.host(mdnHost)
         .path('/mdn-github-io' + u.path());
       shouldReturnEarly = true;
       break;
     case 'unpkg.com': // unpkg.com
       // fake url, redirected back in requestRedirectFunc
-      u = u.host('developer.mozilla.org')
+      u = u.host(mdnHost)
         .path('/unpkg-com' + u.path());
       shouldReturnEarly = true;
       break;
@@ -126,7 +129,7 @@ export function redirectUrl(
           u.protocol('https');
         }
         // fake url, redirected back in requestRedirectFunc
-        u = u.host('developer.mozilla.org')
+        u = u.host(mdnHost)
           .path('/mdn.mozit.cloud/' + host + u.path());
         shouldReturnEarly = true;
         break;
@@ -176,7 +179,7 @@ export function redirectUrl(
       !u.path().includes('/interactive-examples/')) {
       // interactive-examples
       // fake url, redirected back in requestRedirectFunc
-      return u.host('developer.mozilla.org')
+      return u.host(mdnHost)
         .path('/interactive-examples' + u.path())
         .toString();
     }
@@ -184,7 +187,7 @@ export function redirectUrl(
       !u.path().includes('/mdn-github-io/')) {
       // mdn.github.io
       // fake url, redirected back in requestRedirectFunc
-      return u.host('developer.mozilla.org')
+      return u.host(mdnHost)
         .path('/mdn-github-io' + u.path())
         .toString();
     }
@@ -192,7 +195,7 @@ export function redirectUrl(
       !u.path().includes('/unpkg-com/')) {
       // mdn.github.io
       // fake url, redirected back in requestRedirectFunc
-      return u.host('developer.mozilla.org')
+      return u.host(mdnHost)
         .path('/unpkg-com' + u.path())
         .toString();
     }
