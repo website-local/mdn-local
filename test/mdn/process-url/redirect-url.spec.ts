@@ -349,6 +349,39 @@ describe('redirect-url', function () {
       .toBe('https://developer.mozilla.org/unpkg-com/imsc@1.1.0-beta.2/build/umd/imsc.all.min.js');
   });
 
+  // https://github.com/website-local/mdn-local/issues/361
+  // 2021/07/18
+  test('redirect cdnjs.cloudflare.com', () => {
+    expect(redirectUrl('https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js',
+      null,
+      {
+        url: 'https://developer.mozilla.org/mdn-github-io/webgl-examples/sample8/index.html',
+        downloadLink: 'https://mdn.github.io/webgl-examples/sample8/index.html'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/cdnjs-cloudflare-com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js');
+
+    // absolute url, not likely to happen
+    expect(redirectUrl('/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js',
+      null,
+      {
+        url: 'https://developer.mozilla.org/cdnjs-cloudflare-com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js',
+        downloadLink: 'https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/cdnjs-cloudflare-com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js');
+
+    // relative url, not likely to happen
+    expect(redirectUrl('gl-matrix-min.js',
+      null,
+      {
+        url: 'https://developer.mozilla.org/cdnjs-cloudflare-com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js',
+        downloadLink: 'https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/cdnjs-cloudflare-com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js');
+  });
+
   // commit 2ee5f6baa338c4edd621f02c77169d651461a10e
   // 2020/3/28 16:20
   // commit 154a73daead1eb2af1a744af432580e0f6ff6b9d

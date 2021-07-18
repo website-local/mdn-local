@@ -56,6 +56,18 @@ export const redirectDownloadLink = (res: Resource): Resource => {
       return res;
     }
 
+    // https://github.com/website-local/mdn-local/issues/361
+    // cdnjs.cloudflare.com
+    if (path.startsWith('/cdnjs-cloudflare-com/')) {
+      // unpkg.com
+      // redirect back to real url
+      res.downloadLink = uri.search('')
+        .host('cdnjs.cloudflare.com')
+        .path(path.slice('/cdnjs-cloudflare-com'.length))
+        .toString();
+      return res;
+    }
+
     // https://github.com/website-local/mdn-local/issues/208
     if (path.startsWith('/mdn.mozit.cloud/')) {
       const pathArr = path.split('/');

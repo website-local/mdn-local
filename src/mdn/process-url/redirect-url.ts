@@ -101,6 +101,7 @@ export function redirectUrl(
     case 'developer-stage.mdn.mozit.cloud':
     case 'developer-prod.mdn.mozit.cloud':
     case 'developer.mozilla.org':
+    case mdnHost:
       u = u.host(mdnHost);
       needToRebuildUrl = true;
       break;
@@ -120,6 +121,13 @@ export function redirectUrl(
       // fake url, redirected back in requestRedirectFunc
       u = u.host(mdnHost)
         .path('/unpkg-com' + u.path());
+      shouldReturnEarly = true;
+      break;
+    // https://github.com/website-local/mdn-local/issues/361
+    case 'cdnjs.cloudflare.com': // cdnjs.cloudflare.com
+      // fake url, redirected back in requestRedirectFunc
+      u = u.host(mdnHost)
+        .path('/cdnjs-cloudflare-com' + u.path());
       shouldReturnEarly = true;
       break;
     default:
@@ -193,10 +201,19 @@ export function redirectUrl(
     }
     if (parent && parent.downloadLink.includes('//unpkg.com/') &&
       !u.path().includes('/unpkg-com/')) {
-      // mdn.github.io
+      // unpkg.com
       // fake url, redirected back in requestRedirectFunc
       return u.host(mdnHost)
         .path('/unpkg-com' + u.path())
+        .toString();
+    }
+    // https://github.com/website-local/mdn-local/issues/361
+    if (parent && parent.downloadLink.includes('//cdnjs.cloudflare.com/') &&
+      !u.path().includes('/cdnjs-cloudflare-com/')) {
+      // cdnjs.cloudflare.com
+      // fake url, redirected back in requestRedirectFunc
+      return u.host(mdnHost)
+        .path('/cdnjs-cloudflare-com' + u.path())
         .toString();
     }
     needToRebuildUrl = true;

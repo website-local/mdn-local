@@ -153,6 +153,23 @@ describe('redirect-download-link', function () {
     }
   });
 
+  // https://github.com/website-local/mdn-local/issues/361
+  // 2021/07/18
+  test('cdnjs.cloudflare.com', () => {
+    const urls = [
+      'https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/crafty/0.5.4/crafty-min.js'
+    ];
+    for (const url of urls) {
+      const resource = res(url);
+      redirectDownloadLink(resource);
+      expect(resource.uri?.path().startsWith('/cdnjs-cloudflare-com/')).toBeTruthy();
+      expect(resource.uri?.host()).toBe('developer.mozilla.org');
+      expect(resource.downloadLink).toBe(url);
+    }
+  });
+
   // https://github.com/website-local/mdn-local/issues/208
   test('redirect mdn.mozit.cloud', () => {
     const urls = [
