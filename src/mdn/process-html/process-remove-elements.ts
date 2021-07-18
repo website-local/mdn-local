@@ -63,4 +63,11 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   // remove google cdn stuff
   $('link[href*="googleapis.com"]').remove();
   $('script[src*="googleapis.com"]').remove();
+  // This page was translated from English by the community.
+  // Learn more and join the MDN Web Docs community.
+  $('.localized-content-note').remove();
+  // Change your language (bottom)
+  $('.language-menu').remove();
+  // Change language | View in English
+  $('.language-toggle').remove();
 };
