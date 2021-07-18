@@ -315,6 +315,32 @@
         }
       }
     };
+    // https://github.com/website-local/mdn-local/issues/360
+    window.onblur = function windowOnBlurCloseHeaderMenu() {
+      // noinspection ES6ConvertVarToLetConst JSDeprecatedSymbols
+      var el = pageHeader.querySelector(
+        '.top-level-entry[aria-expanded="true"]');
+      if (el) {
+        el.click();
+      }
+    };
+    window.onclick = function windowOnClickCloseHeaderMenu(e) {
+
+      // noinspection JSDeprecatedSymbols
+      e = e || window.event;
+      // noinspection ES6ConvertVarToLetConst JSDeprecatedSymbols
+      var node = e.target, el;
+      if (!node) {
+        // noinspection JSDeprecatedSymbols
+        node = e.srcElement;
+      }
+      do {
+        if (node === pageHeader) {
+          return;
+        }
+      } while ((node = node.parentNode));
+      window.onblur(e);
+    };
   }
 
   /// endregion yari expandable top menu
