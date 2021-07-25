@@ -1,5 +1,5 @@
-import {downloadableHosts, localeArr} from './consts';
-import type {Resource} from 'website-scrap-engine/lib/resource';
+import {downloadableHosts, localeArr, mdnHosts} from './consts';
+import {Resource} from 'website-scrap-engine/lib/resource';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import URI from 'urijs';
 import type {Cheerio} from 'website-scrap-engine/lib/types';
@@ -28,6 +28,10 @@ export function dropResource(
     path = res.uri.path(),
     host = res.uri.host();
   if (host === 'mdn.mozillademos.org' && path.startsWith('/files')) {
+    return res;
+  }
+  // https://github.com/website-local/mdn-local/issues/372
+  if (mdnHosts[host] && path === `/${locale}/search-index.json`) {
     return res;
   }
   if (!downloadableHosts[host] ||

@@ -21,7 +21,9 @@ export function defaultInitialUrl(locale: string): string[] {
     `https://developer.mozilla.org/${locale}/docs/Games`,
     `https://developer.mozilla.org/${locale}/docs/Glossary`,
     // https://github.com/website-local/mdn-local/issues/214
-    `https://developer.mozilla.org/sitemaps/${locale}/sitemap.xml.gz`
+    `https://developer.mozilla.org/sitemaps/${locale}/sitemap.xml.gz`,
+    // https://github.com/website-local/mdn-local/issues/372
+    `https://developer.mozilla.org/${locale}/search-index.json`,
   ];
   if (locale !== 'en-US') {
     strings.push('https://developer.mozilla.org/sitemaps/en-US/sitemap.xml.gz');
