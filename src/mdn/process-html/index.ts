@@ -170,7 +170,8 @@ export const postProcessHtml = (
     if (src && src.endsWith('.chunk.js') && (
       src.match(/\/\d+\./) || src.includes('/main.')
     )) {
-      return elem.remove();
+      elem.remove();
+      return;
     }
     if (!(text = elem.html())) {
       return;
@@ -181,7 +182,8 @@ export const postProcessHtml = (
       return;
     }
     if (text.includes('document.write') && text.includes('js-polyfill')) {
-      return postProcessJsPolyFill($, elem, text);
+      postProcessJsPolyFill($, elem, text);
+      return;
     }
     if (text.includes('window.__data__')) {
       isYariDocs = true;
