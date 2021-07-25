@@ -13,7 +13,7 @@
     "mkdirp": "^1.0.4",
     "tough-cookie": "^4.0.0",
     "urijs": "^1.19.7",
-    "website-scrap-engine": "^0.3.2"
+    "website-scrap-engine": "^0.4.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.24",
