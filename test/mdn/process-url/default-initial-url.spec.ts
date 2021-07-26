@@ -28,7 +28,9 @@ describe('default-initial-url', function () {
       'https://developer.mozilla.org/en-US/docs/Games',
       'https://developer.mozilla.org/en-US/docs/Glossary',
       // https://github.com/website-local/mdn-local/issues/214
-      'https://developer.mozilla.org/sitemaps/en-US/sitemap.xml.gz'
+      'https://developer.mozilla.org/sitemaps/en-US/sitemap.xml.gz',
+      // https://github.com/website-local/mdn-local/issues/372
+      'https://developer.mozilla.org/en-US/search-index.json',
     ]);
   });
   test('non-en-US', () => {
@@ -55,7 +57,9 @@ describe('default-initial-url', function () {
       'https://developer.mozilla.org/zh-CN/docs/Glossary',
       // https://github.com/website-local/mdn-local/issues/214
       'https://developer.mozilla.org/sitemaps/zh-CN/sitemap.xml.gz',
-      'https://developer.mozilla.org/sitemaps/en-US/sitemap.xml.gz'
+      'https://developer.mozilla.org/zh-CN/search-index.json',
+      // https://github.com/website-local/mdn-local/issues/372
+      'https://developer.mozilla.org/sitemaps/en-US/sitemap.xml.gz',
     ]);
   });
 });
