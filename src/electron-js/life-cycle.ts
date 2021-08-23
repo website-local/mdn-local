@@ -28,7 +28,8 @@ const remapHosts = new Set([
   'help.ubuntu.com',
   'mdn.mozillademos.org',
   'i-msdn.sec.s-msft.com',
-  'cdn.rawgit.com'
+  'cdn.rawgit.com',
+  'cdn.jsdelivr.net'
 ]);
 
 const requestRedirectFunc = (url: string, res: Resource) => {
@@ -129,8 +130,15 @@ lifeCycle.processAfterDownload.unshift(processHtml(preProcessHtml));
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.logSubDir = HOST;
-options.maxDepth = 5;
-options.concurrency = 12;
+options.maxDepth = 7;
+options.concurrency = 15;
+if (typeof options.req.retry === 'object') {
+  options.req.retry.limit = 35;
+}
+if (typeof options.req.timeout === 'object') {
+  options.req.timeout.send = 3500;
+  options.req.timeout.connect = 4670;
+}
 options.initialUrl = [`https://${HOST}/docs`];
 options.req.headers = {
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
