@@ -65,6 +65,10 @@
     }
     if (activeElem) {
       activeElem.className += ' active';
+      if (activeElem.firstElementChild &&
+        activeElem.firstElementChild.tagName === 'A') {
+        activeElem.firstElementChild.className += ' active';
+      }
     }
   }
   if (activeElem && activeElem.scrollIntoView) {
