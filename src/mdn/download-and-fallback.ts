@@ -35,7 +35,9 @@ export async function downloadAndFallback(
   try {
     return await downloadResource(res, requestOptions, options);
   } catch (err) {
-    if (err && err.name === 'HTTPError' &&
+    // force cast for typescript 4.4
+    // can we use an instanceof check here?
+    if (err && (err as {name?: string | void}).name === 'HTTPError' &&
       (err as HTTPError)?.response?.statusCode === 404) {
       notFound.warn('falling back localized 404 resource to en-US',
         res.downloadLink, res.refUrl);

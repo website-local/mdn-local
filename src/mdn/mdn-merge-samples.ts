@@ -37,7 +37,9 @@ const MAX_EMPTY_FILE_SIZE = 600;
 const mkdirCache: Record<string, ReturnType<typeof mkdirRetry>> = {};
 
 const mkdir = (dir: string): ReturnType<typeof mkdirRetry> => {
-  if (mkdirCache[dir]) return mkdirCache[dir];
+  if (mkdirCache[dir] !== undefined) {
+    return mkdirCache[dir];
+  }
   if (fs.existsSync(dir)) {
     return mkdirCache[dir] = Promise.resolve();
   }
@@ -51,7 +53,8 @@ const copyAndMkdir = async (src: string, dest: string) => {
     await fs.promises.access(src, fs.constants.O_RDONLY);
   } catch (e) {
     // skip unreadable file
-    if (e?.code != 'ENOENT') {
+    // force cast for typescript 4.4
+    if (e && (e as {code?: string | void}).code != 'ENOENT') {
       console.error('copy', src, dest, e);
     }
     return;

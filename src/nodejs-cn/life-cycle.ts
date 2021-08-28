@@ -82,7 +82,7 @@ const cachedGetRedirectLocation = (link: string): string | Promise<string> => {
   if (cache[link]) {
     return cache[link];
   }
-  if (asyncRedirectCache[link]) {
+  if (asyncRedirectCache[link] !== undefined) {
     return asyncRedirectCache[link];
   }
   return asyncRedirectCache[link] = getRedirectLocation(link);
