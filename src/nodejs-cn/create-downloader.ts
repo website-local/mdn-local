@@ -7,12 +7,16 @@ import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 export default function createDownloader(
   overrideOptions: Partial<StaticDownloadOptions>
 ): Promise<SingleThreadDownloader> {
+  const api = overrideOptions?.meta?.nodeApiPath as string || 'api';
+  if (api !== 'api') {
+    overrideOptions.initialUrl = [`http://nodejs.cn/${api}/`];
+  }
   const downloader: SingleThreadDownloader =
     new SingleThreadDownloader(path.join(__dirname, 'life-cycle'), overrideOptions);
   return downloader.init.then(() => {
     downloader.start();
     const staticPath: string = path.join(downloader.options.localRoot,
-      'nodejs.cn', 'api', 'static');
+      'nodejs.cn', api, 'static');
     mkdir(staticPath);
     const arr: Promise<void>[] = [
       'favicon.png',

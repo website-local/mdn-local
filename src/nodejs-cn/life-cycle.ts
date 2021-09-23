@@ -1,20 +1,28 @@
 import URI from 'urijs';
 import got from 'got';
 import type {Resource} from 'website-scrap-engine/lib/resource';
+import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
 import type {
-  ProcessingLifeCycle
+  ProcessingLifeCycle,
+  ProcessResourceAfterDownloadFunc
+} from 'website-scrap-engine/lib/life-cycle/types';
+import {
+  DownloadResource,
+  ProcessResourceBeforeDownloadFunc,
+  SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
 import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle';
 import {
-  dropResource,
+  parseHtml,
   preProcess,
   processHtml,
   skipProcess
 } from 'website-scrap-engine/lib/life-cycle/adapters';
 import {
   defaultDownloadOptions,
-  DownloadOptions
+  DownloadOptions,
+  StaticDownloadOptions
 } from 'website-scrap-engine/lib/options';
 import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 
@@ -36,10 +44,18 @@ const HOST = 'nodejs.cn',
 const LOCATION_REPLACE_LITERAL = 'location.replace(\'',
   LOCATION_REPLACE_LITERAL_END = '\')';
 
-const getRedirectLocation = async (link: string): Promise<string> => {
-  const redirect = await gotNoRedirect(
+
+const getRedirectLocation = async (
+  link: string,
+  options: StaticDownloadOptions
+): Promise<string> => {
+  // make sure that followRedirect is false here
+  const theGot = options?.req ? got.extend(options.req, {
+    followRedirect: false
+  }) : gotNoRedirect;
+  const redirect = await theGot(
     link.startsWith('/s') ? URL_PREFIX + link : link);
-  if (redirect.statusCode === 302 && redirect.headers && redirect.headers.location) {
+  if (redirect.statusCode === 302 && redirect.headers?.location) {
     cache[link] = redirect.headers.location;
     link = redirect.headers.location;
   } else if (redirect.body) {
@@ -52,8 +68,10 @@ const getRedirectLocation = async (link: string): Promise<string> => {
       arrIndex = html.indexOf(KW_ARR_INDEX_BEGIN, arrEnd);
     if (arrBegin > 0 && arrEnd > 0 && arrIndex > 0) {
       try {
-        const arr = JSON.parse(html.slice(arrBegin + KW_ARR_BEGIN.length - 1, arrEnd + 1));
-        const i = parseInt(html.slice(arrIndex + KW_ARR_INDEX_BEGIN.length), 10);
+        const arr = JSON.parse(html.slice(
+          arrBegin + KW_ARR_BEGIN.length - 1, arrEnd + 1));
+        const i = parseInt(html.slice(
+          arrIndex + KW_ARR_INDEX_BEGIN.length), 10);
         if (arr && !isNaN(i) && arr[i]) {
           cache[link] = arr[i];
           link = arr[i];
@@ -69,23 +87,31 @@ const getRedirectLocation = async (link: string): Promise<string> => {
         literalEnd = literalBegin > 0 ?
           html.indexOf(LOCATION_REPLACE_LITERAL_END, literalBegin) : -1;
       if (literalBegin > 0 && literalEnd > 0) {
-        link = html.slice(literalBegin + LOCATION_REPLACE_LITERAL.length, literalEnd);
+        link = html.slice(
+          literalBegin + LOCATION_REPLACE_LITERAL.length, literalEnd);
       } else {
         errorLogger.warn('Unknown redirect result format', link, html);
       }
     }
   }
+  // replace the api to required version
+  if (options?.meta?.nodeApiPath) {
+    link = link.replace(`${URL_PREFIX}/api/`,
+      `${URL_PREFIX}/${options.meta.nodeApiPath}/`);
+  }
   return link;
 };
 
-const cachedGetRedirectLocation = (link: string): string | Promise<string> => {
+const cachedGetRedirectLocation = (
+  link: string, options: StaticDownloadOptions
+): string | Promise<string> => {
   if (cache[link]) {
     return cache[link];
   }
   if (asyncRedirectCache[link] !== undefined) {
     return asyncRedirectCache[link];
   }
-  return asyncRedirectCache[link] = getRedirectLocation(link);
+  return asyncRedirectCache[link] = getRedirectLocation(link, options);
 };
 
 // the 404-not-found links
@@ -128,7 +154,40 @@ const hardCodedRedirectFullPath: Record<string, string> = {
     'http://nodejs.cn/api/http.html#http_new_agent_options'
 };
 
-const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Resource | null) => {
+const redirectCache: Record<string, Record<string, string>> = {};
+const redirectFullPathCache: Record<string, Record<string, string>> = {};
+
+const getRedirectCached = (
+  cache: typeof redirectCache, base: Record<string, string>
+) => (options?: StaticDownloadOptions): Record<string, string> => {
+  const nodeApiPath = options?.meta?.nodeApiPath as string | undefined;
+  let result: Record<string, string>;
+  if (nodeApiPath) {
+    result = cache[nodeApiPath];
+    if (!result) {
+      result = {};
+      const search = /\/api\//;
+      const replace = `/${nodeApiPath}/`;
+      for (const [k, v] of Object.entries(base)) {
+        result[k.replace(search, replace)] = v.replace(search, replace);
+      }
+      cache[nodeApiPath] = result;
+    }
+    return result;
+  }
+  return base;
+};
+
+const getRedirect = getRedirectCached(redirectCache, hardCodedRedirect);
+const getRedirectFullPath = getRedirectCached(
+  redirectFullPathCache, hardCodedRedirectFullPath);
+
+const linkRedirectFunc = async (
+  link: string,
+  elem: Cheerio | null,
+  parent: Resource | null,
+  options: StaticDownloadOptions
+) => {
   if (!parent) {
     return link;
   }
@@ -161,7 +220,7 @@ const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Reso
       link = cache[link];
     } else {
       try {
-        link = await cachedGetRedirectLocation(link);
+        link = await cachedGetRedirectLocation(link, options);
       } catch (e) {
         // log the error and pass on since links can be broken
         errorLogger.warn(
@@ -171,35 +230,68 @@ const linkRedirectFunc = async (link: string, elem: Cheerio | null, parent: Reso
       }
     }
   }
-  const redirectLink = hardCodedRedirectFullPath[link];
+  const redirectLink = getRedirectFullPath(options)[link];
   if (redirectLink) {
     link = redirectLink;
+  }
+  let api = 'api';
+  if (options?.meta?.nodeApiPath) {
+    api = options.meta.nodeApiPath as string;
+    if (link[0] === '/') {
+      link = link.replace(/^\/api\//, `/${api}/`);
+    } else {
+      link = link.replace(/^http:\/\/nodejs.cn\/api\//,
+        `http://nodejs.cn/${api}/`);
+    }
   }
   let u = URI(link);
   if (u.is('relative')) {
     u = u.absoluteTo(parent.url).normalizePath();
   }
   const pathArr = u.path().split('/');
-  if (pathArr.length === 3 && pathArr[1] === 'api' && pathArr[2].endsWith('.md')) {
+  if (pathArr.length === 3 && pathArr[1] === api && pathArr[2].endsWith('.md')) {
     pathArr[2] = pathArr[2].replace(/\.md$/i, '.html');
     u.path(pathArr.join('/'));
     link = u.toString();
   }
-  if (hardCodedRedirect[u.path()]) {
-    u = u.path(hardCodedRedirect[u.path()]);
+  const redirect = getRedirect(options);
+  if (redirect[u.path()]) {
+    u = u.path(redirect[u.path()]);
     link = u.toString();
   }
   return link;
 };
 
-const dropResourceFunc = (res: Resource): boolean => {
-  return !(res.uri?.host() === HOST && res.uri.path().startsWith('/api')) ||
-    res.uri.path() === '/api/static/inject.css' ||
-    res.uri.path() === '/api/static/favicon.png' ||
-    res.uri.path() === '/api/static/inject.js';
+const dropResource: ProcessResourceBeforeDownloadFunc = (
+  res,
+  element,
+  parent,
+  options
+): Resource => {
+  let shouldDrop: boolean;
+  const api = options?.meta?.nodeApiPath;
+  if (options?.meta?.nodeApiPath) {
+    shouldDrop = !(res.uri?.host() === HOST &&
+        res.uri.path().startsWith(`/${api}`)) ||
+      res.uri.path() === `/${api}/static/inject.css` ||
+      res.uri.path() === `/${api}/static/favicon.png` ||
+      res.uri.path() === `/${api}/static/inject.js`;
+  } else {
+    shouldDrop = !(res.uri?.host() === HOST &&
+        res.uri.path().startsWith('/api')) ||
+      res.uri.path() === '/api/static/inject.css' ||
+      res.uri.path() === '/api/static/favicon.png' ||
+      res.uri.path() === '/api/static/inject.js';
+  }
+  if (shouldDrop) {
+    res.shouldBeDiscardedFromDownload = true;
+  }
+  return res;
 };
 
-const preProcessResource = (link: string, elem: Cheerio | null, res: Resource | null) => {
+const preProcessResource = (
+  link: string, elem: Cheerio | null, res: Resource | null
+) => {
   if (!res) {
     return;
   }
@@ -220,7 +312,18 @@ const preProcessResource = (link: string, elem: Cheerio | null, res: Resource | 
   }
 };
 
-const preProcessHtml = ($: CheerioStatic): CheerioStatic => {
+const preProcessHtml: ProcessResourceAfterDownloadFunc = (
+  res: DownloadResource,
+  submit: SubmitResourceFunc,
+  options: StaticDownloadOptions
+): DownloadResource => {
+  if (res.type !== ResourceType.Html) {
+    return res;
+  }
+  if (!res.meta.doc) {
+    res.meta.doc = parseHtml(res, options);
+  }
+  const $ = res.meta.doc;
   const head = $('head'), body = $('body');
   // remove comments in body
   // note the 'this' hack, nodeType is actually defined
@@ -238,20 +341,25 @@ const preProcessHtml = ($: CheerioStatic): CheerioStatic => {
   $('a[href^="/run/"]').addClass('link-to-run');
   // style sheet, not needed since we re-implemented it
   $('link[rel="stylesheet"]').remove();
+  const api = options?.meta?.nodeApiPath as string | void || 'api';
   // style for page and prism.js
   // language=HTML
-  $(`<link href="${URL_PREFIX}/api/static/inject.css" rel="stylesheet">`)
+  $(`
+    <link href="${URL_PREFIX}/${api}/static/inject.css" rel="stylesheet">`)
     .appendTo(head);
   // better code highlighting with prism.js
   // language=HTML
-  $(`<script src="${URL_PREFIX}/api/static/inject.js" defer></script>`)
+  $(`
+    <script src="${URL_PREFIX}/${api}/static/inject.js" defer></script>`)
     .appendTo(body);
   // replace favicon
   $('link[rel="icon"]').remove();
+  // 查看其他版本 ▼
+  $('li.version-picker').remove();
   $('<link rel="icon" sizes="32x32" type="image/png" ' +
-    `href="${URL_PREFIX}/api/static/favicon.png">`).appendTo(head);
+    `href="${URL_PREFIX}/${api}/static/favicon.png">`).appendTo(head);
 
-  return $;
+  return res;
 };
 
 const postProcessHtml = ($: CheerioStatic) => {
@@ -275,9 +383,9 @@ const lifeCycle: ProcessingLifeCycle = defaultLifeCycle();
 lifeCycle.linkRedirect.push(skipProcess(
   (link: string) => !link || link.startsWith('https://github.com/')));
 lifeCycle.linkRedirect.push(linkRedirectFunc);
-lifeCycle.processBeforeDownload.push(dropResource(dropResourceFunc));
+lifeCycle.processBeforeDownload.push(dropResource);
 lifeCycle.processBeforeDownload.push(preProcess(preProcessResource));
-lifeCycle.processAfterDownload.unshift(processHtml(preProcessHtml));
+lifeCycle.processAfterDownload.unshift(preProcessHtml);
 lifeCycle.processAfterDownload.push(processHtml(postProcessHtml));
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
@@ -287,7 +395,7 @@ options.concurrency = 12;
 options.initialUrl = [URL_PREFIX + '/api/'];
 options.req.headers = {
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
-    '(KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'
+    '(KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'
 };
 
 export default options;
