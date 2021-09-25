@@ -37,7 +37,10 @@ export const detectLinkType = (
     return ResourceType.SiteMap;
   }
   if (!((elem && (elem.is('a') || elem.is('iframe'))) ||
-    (parent && parent.type === ResourceType.SiteMap))) {
+    (parent && (
+      parent.type === ResourceType.SiteMap ||
+      parent.meta?.mdnIsSearchJson)
+    ))) {
     return type;
   }
   if (url.includes('/@api/deki/files/') && !url.endsWith('.html')) {

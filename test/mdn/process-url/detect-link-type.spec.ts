@@ -1,6 +1,7 @@
 import {detectLinkType} from '../../../src/mdn/process-url/detect-link-type';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
+import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
 import cheerio from 'cheerio';
+import URI from 'urijs';
 
 describe('detect-link-type', function () {
   test('html', () => {
@@ -55,5 +56,37 @@ describe('detect-link-type', function () {
       ResourceType.Binary, null, null)).toBe(ResourceType.SiteMap);
     expect(detectLinkType('https://developer.mozilla.org/sitemaps/zh-CN/sitemap.xml.gz',
       ResourceType.Binary, null, null)).toBe(ResourceType.SiteMap);
+  });
+
+  // https://github.com/website-local/mdn-local/issues/372
+  test('search-json', () => {
+    const parentUrl = 'https://developer.mozilla.org/en-US/search-index.json';
+    const parent = {
+      type: ResourceType.Binary,
+      url: parentUrl,
+      uri: URI(parentUrl),
+      refUrl: parentUrl,
+      rawUrl: parentUrl,
+      downloadLink: parentUrl,
+
+    } as Resource;
+    const url1 = 'https://developer.mozilla.org/en-US/docs/Games/' +
+      'Techniques/3D_on_the_web/Building_up_a_basic_demo_with_Three.js';
+    const url2 = 'https://developer.mozilla.org/en-US/docs/Games/Techniques';
+    expect(detectLinkType(url1, ResourceType.Binary, null, parent))
+      .toBe(ResourceType.Binary);
+    expect(detectLinkType(url1, ResourceType.Html, null, parent))
+      .toBe(ResourceType.Html);
+    expect(detectLinkType(url2, ResourceType.Html, null, parent))
+      .toBe(ResourceType.Html);
+    parent.meta = {mdnIsSearchJson: true};
+    expect(detectLinkType(url1, ResourceType.Html, null, parent))
+      .toBe(ResourceType.Html);
+    expect(detectLinkType(url2, ResourceType.Html, null, parent))
+      .toBe(ResourceType.Html);
+    expect(detectLinkType(url1, ResourceType.Binary, null, parent))
+      .toBe(ResourceType.Html);
+    expect(detectLinkType(url2, ResourceType.Binary, null, parent))
+      .toBe(ResourceType.Html);
   });
 });

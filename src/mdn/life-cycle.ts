@@ -21,6 +21,7 @@ import {
 import {processYariSourceMap} from './process-source-maps';
 import {decompressSitemap} from './decompress-sitemap';
 import {downloadAndFallback} from './download-and-fallback';
+import {processSearchJson} from './process-search-json';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);
@@ -40,7 +41,8 @@ for (let i = 0; i < lifeCycle.download.length; i++) {
 lifeCycle.processAfterDownload.push(
   processHtml(postProcessHtml),
   processHtml(postProcessInteractiveExample),
-  processYariSourceMap
+  processYariSourceMap,
+  processSearchJson
 );
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
