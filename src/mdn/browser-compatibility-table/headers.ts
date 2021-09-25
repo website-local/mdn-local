@@ -11,21 +11,29 @@ export const PLATFORM_BROWSERS: { [key: string]: bcd.BrowserNames[] } = {
     'safari_ios',
     'samsunginternet_android',
   ],
-  server: ['nodejs'],
+  server: ['deno', 'nodejs'],
   'webextensions-desktop': ['chrome', 'edge', 'firefox', 'opera', 'safari'],
   'webextensions-mobile': ['firefox_android'],
 };
 
-function PlatformHeaders({ platforms }: { platforms: string[] }) {
+function PlatformHeaders({ platforms, browsers }: {
+  platforms: string[];
+  browsers: bcd.BrowserNames[];
+}) {
   return (
     `<tr class="bc-platforms">
       <td></td>
       ${platforms.map((platform) => {
-      const platformCount = Object.keys(PLATFORM_BROWSERS[platform]).length;
+      // Get the intersection of browsers in the \`browsers\` array and the
+      // \`PLATFORM_BROWSERS[platform]\`.
+      const browsersInPlatform = PLATFORM_BROWSERS[platform].filter(
+        (browser) => browsers.includes(browser)
+      );
+      const browserCount = Object.keys(browsersInPlatform).length;
       const platformId = platform.replace('webextensions-', '');
       return (
         `<th key="${platform}" class="bc-platform-${platformId}"
-            colSpan="${platformCount}">
+            colSpan="${browserCount}">
             <span>${platform}</span>
           </th>`
       );
@@ -59,7 +67,7 @@ export function Headers({ browserInfo, platforms, browsers }: {
 }): string {
   return (
     `<thead>
-      ${PlatformHeaders({platforms})}
+      ${PlatformHeaders({platforms, browsers})}
       ${BrowserHeaders({browserInfo, browsers})}
     </thead>`
   );
