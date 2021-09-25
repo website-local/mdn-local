@@ -1,5 +1,5 @@
 import type * as bcd from './types';
-import { BrowserName } from './browser-info';
+import { BrowserName, BrowserPreviewName } from './browser-info';
 import { asList, getFirst, isTruthy } from './utils';
 
 // Yari builder will attach extra keys from the compat data
@@ -38,6 +38,8 @@ function getSupportClassName(
   let className;
   if (version_added === null) {
     className = 'unknown';
+  } else if (version_added === 'preview') {
+    className = 'preview';
   } else if (version_added) {
     className = 'yes';
     if (version_removed || (flags && flags.length)) {
@@ -92,7 +94,11 @@ function StatusIcons({ status }: { status: bcd.StatusBlock }): string {
   );
 }
 
-function labelFromString(version: string | boolean | null | undefined) {
+function labelFromString(
+  version: string | boolean | null | undefined,
+  browser: bcd.BrowserNames,
+  browserInfo: bcd.Browsers,
+) {
   if (typeof version !== 'string') {
     return '?';
   }
@@ -101,10 +107,24 @@ function labelFromString(version: string | boolean | null | undefined) {
   if (version.startsWith('≤')) {
     return version.slice(1);
   }
+  if (version === 'preview') {
+    return BrowserPreviewName({
+      id:browser,
+      browserInfo
+    });
+  }
   return version;
 }
 
-const CellText =({ support }: { support: bcd.SupportStatement | undefined }): string => {
+const CellText =({
+  support,
+  browser,
+  browserInfo,
+}: {
+  support: bcd.SupportStatement | undefined;
+  browser: bcd.BrowserNames;
+  browserInfo: bcd.Browsers;
+}): string => {
   const currentSupport = getFirst(support);
 
   const added = currentSupport && currentSupport.version_added;
@@ -112,7 +132,10 @@ const CellText =({ support }: { support: bcd.SupportStatement | undefined }): st
 
   let status:
       | { isSupported: 'unknown' }
-      | { isSupported: 'no' | 'yes' | 'partial'; label?: string };
+      | {
+          isSupported: 'no' | 'yes' | 'partial' | 'preview';
+          label?: string;
+        };
 
   switch (added) {
   case null:
@@ -125,7 +148,7 @@ const CellText =({ support }: { support: bcd.SupportStatement | undefined }): st
     status = { isSupported: 'no' };
     break;
   default:
-    status = { isSupported: 'yes', label: labelFromString(added) };
+    status = { isSupported: 'yes', label: labelFromString(added, browser, browserInfo) };
     break;
   }
 
@@ -133,13 +156,13 @@ const CellText =({ support }: { support: bcd.SupportStatement | undefined }): st
     status = {
       isSupported: 'no',
       label: `${
-        labelFromString(added)
-      }&#8202;&ndash;&#8202;${labelFromString(removed)}`,
+        labelFromString(added, browser, browserInfo)
+      }&#8202;&ndash;&#8202;${labelFromString(removed, browser, browserInfo)}`,
     };
   } else if (currentSupport && currentSupport.partial_implementation) {
     status = {
       isSupported: 'partial',
-      label: typeof added === 'string' ? labelFromString(added) : 'Partial',
+      label: typeof added === 'string' ? labelFromString(added, browser, browserInfo) : 'Partial',
     };
   }
 
@@ -161,6 +184,14 @@ const CellText =({ support }: { support: bcd.SupportStatement | undefined }): st
     label = status.label || 'No';
     break;
 
+  case 'preview':
+    title = 'Preview browser support';
+    label = BrowserPreviewName({
+      id:browser,
+      browserInfo
+    });
+    break;
+
   case 'unknown':
     title = 'Compatibility unknown; please update this.';
     label = '?';
@@ -172,7 +203,7 @@ const CellText =({ support }: { support: bcd.SupportStatement | undefined }): st
   )} only-icon" title="${title}">
           <span>${title}</span>
         </abbr>
-        ${label}`);
+        <span>${label}</span>`);
 };
 
 function Icon({ name }: { name: string }): string {
@@ -249,7 +280,9 @@ function getNotes(
         item.version_removed
           ? {
             iconName: 'footnote',
-            label: `Removed in version ${item.version_removed} and later`,
+            label: `Removed in version ${
+              labelFromString(item.version_removed, browser, browserInfo)
+            } and later`,
           }
           : null,
         item.partial_implementation
@@ -283,11 +316,17 @@ function getNotes(
             (note) => ({ iconName: 'footnote', label: note })
           )
           : null,
+        item.version_added === 'preview'
+          ? {
+            iconName: 'footnote',
+            label: 'Preview browser support',
+          }
+          : null,
         // If we encounter nothing else than the required `version_added` and
         // `release_date` properties, assume full support
         Object.keys(item).filter(
           (x) => !['version_added', 'release_date'].includes(x)
-        ).length === 0
+        ).length === 0 && item.version_added !== 'preview'
           ? {
             iconName: 'footnote',
             label: 'Full support',
@@ -299,7 +338,7 @@ function getNotes(
       return ((i === 0 || hasNotes) && (
         `<div key="${i}" class="bc-notes-wrapper">
       <dt class="bc-supports-${getSupportClassName(item)} bc-supports">
-      ${CellText({support: item})}
+      ${CellText({support: item, browser, browserInfo})}
       ${CellIcons({support: item})}
       </dt>
       ${supportNotes.map(({iconName, label}, i) => (
@@ -351,7 +390,7 @@ function CompatCell({
   <span class="bc-browser-name">
   ${BrowserName({browserInfo, id: browser})}
   </span>
-  ${CellText({support})}
+  ${CellText({support, browser, browserInfo})}
   ${CellIcons({support})}
   ${hasNotes && (
     // class="${ showNotes ? 'bc-history-link-inverse' : '' }"
