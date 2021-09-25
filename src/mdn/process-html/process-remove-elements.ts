@@ -39,6 +39,7 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   $('script[src*="speedcurve.com"]').remove();
   // google-analytics
   $('script[src*="google-analytics.com"]').remove();
+  $('script[src*="/ga.js"]').remove();
   // newsletter script, on the index page
   $('script[src*="newsletter"]').remove();
   // login box script, on the index page
