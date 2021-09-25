@@ -1,15 +1,13 @@
 /* Any copyright is dedicated to the Public Domain.
  * http://creativecommons.org/publicdomain/zero/1.0/ */
 
-// https://github.com/mdn/browser-compat-data
-// 8056d8b7bfccb33d176165b8153f7ce5eea91ad0
-
 /**
  * The names of the known browsers.
  */
 export type BrowserNames =
   | 'chrome'
   | 'chrome_android'
+  | 'deno'
   | 'edge'
   | 'firefox'
   | 'firefox_android'
@@ -47,6 +45,12 @@ export interface BrowserStatement {
    * `"Firefox"`, `"Firefox Android"`, `"Safari"`, `"iOS Safari"`, etc.
    */
   name: string;
+
+  /**
+   * The preview browser's name, for example:
+   * `"Nightly"`, `"Canary"`, `"TP"`, etc.
+   */
+  preview_name: string;
 
   /**
    * The known versions of this browser.
@@ -379,16 +383,4 @@ interface CompatDataIdentifiers
    * JavaScript APIs and manifest keys.
    */
   webextensions: PrimaryIdentifier;
-
-  /**
-   * Contains data for [XPath](https://developer.mozilla.org/docs/Web/XPath)
-   * axes, and functions.
-   */
-  xpath: PrimaryIdentifier;
-
-  /**
-   * Contains data for [XSLT](https://developer.mozilla.org/docs/Web/XSLT)
-   * elements, attributes, and global attributes.
-   */
-  xslt: PrimaryIdentifier;
 }

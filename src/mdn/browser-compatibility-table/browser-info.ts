@@ -9,3 +9,13 @@ export function BrowserName({ browserInfo, id }: {
   }
   return browserInfo[id].name || '';
 }
+
+export function BrowserPreviewName({ browserInfo, id }: {
+  browserInfo: bcd.Browsers,
+  id: bcd.BrowserNames
+}): string {
+  if (!browserInfo) {
+    throw new Error('Missing browser info');
+  }
+  return browserInfo[id].preview_name || '';
+}
