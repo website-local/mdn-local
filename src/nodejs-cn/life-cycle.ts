@@ -1,3 +1,4 @@
+import { join } from 'path';
 import URI from 'urijs';
 import got from 'got';
 import type {Resource} from 'website-scrap-engine/lib/resource';
@@ -7,7 +8,7 @@ import type {
   ProcessingLifeCycle,
   ProcessResourceAfterDownloadFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
-import {
+import type {
   DownloadResource,
   ProcessResourceBeforeDownloadFunc,
   SubmitResourceFunc
@@ -270,7 +271,7 @@ const dropResource: ProcessResourceBeforeDownloadFunc = (
 ): Resource => {
   let shouldDrop: boolean;
   const api = options?.meta?.nodeApiPath;
-  if (options?.meta?.nodeApiPath) {
+  if (api) {
     shouldDrop = !(res.uri?.host() === HOST &&
         res.uri.path().startsWith(`/${api}`)) ||
       res.uri.path() === `/${api}/static/inject.css` ||
@@ -379,14 +380,32 @@ const postProcessHtml = ($: CheerioStatic) => {
   return $;
 };
 
+const postProcessSavePath = (
+  res: DownloadResource,
+  submit: SubmitResourceFunc,
+  options: StaticDownloadOptions
+): DownloadResource => {
+  const api = options?.meta?.nodeApiPath;
+  // res.savePath = "nodejs.cn\api-v14\index.html"
+  // api = "api-v14"
+  if (api && typeof api === 'string' && options?.meta?.replaceNodeApiPath) {
+    const expectedPrefix = join(HOST, api);
+    if (res.savePath.startsWith(expectedPrefix)) {
+      res.savePath = res.savePath.replace(expectedPrefix, join(HOST, 'api'));
+    }
+  }
+  return res;
+};
+
 const lifeCycle: ProcessingLifeCycle = defaultLifeCycle();
 lifeCycle.linkRedirect.push(skipProcess(
   (link: string) => !link || link.startsWith('https://github.com/')));
 lifeCycle.linkRedirect.push(linkRedirectFunc);
-lifeCycle.processBeforeDownload.push(dropResource);
-lifeCycle.processBeforeDownload.push(preProcess(preProcessResource));
+lifeCycle.processBeforeDownload.push(
+  dropResource, preProcess(preProcessResource));
 lifeCycle.processAfterDownload.unshift(preProcessHtml);
-lifeCycle.processAfterDownload.push(processHtml(postProcessHtml));
+lifeCycle.processAfterDownload.push(
+  processHtml(postProcessHtml), postProcessSavePath);
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.logSubDir = HOST;

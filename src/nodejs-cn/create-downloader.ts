@@ -7,7 +7,7 @@ import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 export default function createDownloader(
   overrideOptions: Partial<StaticDownloadOptions>
 ): Promise<SingleThreadDownloader> {
-  const api = overrideOptions?.meta?.nodeApiPath as string || 'api';
+  let api = overrideOptions?.meta?.nodeApiPath as string || 'api';
   if (api !== 'api') {
     overrideOptions.initialUrl = [`http://nodejs.cn/${api}/`];
   }
@@ -15,6 +15,9 @@ export default function createDownloader(
     new SingleThreadDownloader(path.join(__dirname, 'life-cycle'), overrideOptions);
   return downloader.init.then(() => {
     downloader.start();
+    if (overrideOptions?.meta?.replaceNodeApiPath) {
+      api = 'api';
+    }
     const staticPath: string = path.join(downloader.options.localRoot,
       'nodejs.cn', api, 'static');
     mkdir(staticPath);
