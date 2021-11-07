@@ -42,12 +42,6 @@ export class MdnDownloader extends SingleThreadDownloader {
       options.url.search = '';
     });
 
-    if (!this.options.req.headers) {
-      this.options.req.headers = {};
-    }
-    if (!this.options.req.headers['accept-language']) {
-      this.options.req.headers['accept-language'] = locale;
-    }
     // use http 1.1 keep-alive by default
     if (this.options.meta?.keepAlive !== false) {
       if (!this.options.req.agent) {
