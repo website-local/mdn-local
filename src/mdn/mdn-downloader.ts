@@ -16,7 +16,7 @@ export class MdnDownloader extends SingleThreadDownloader {
     const locale: string = this.options.meta.locale as string || 'en-US';
     const cookieJar = this.options.req.cookieJar = new CookieJar();
     cookieJar.setCookieSync(
-      'django_language=' + locale,
+      'preferredlocale=' + locale,
       'https://developer.mozilla.org');
 
     if (!this.options.req.hooks) {
