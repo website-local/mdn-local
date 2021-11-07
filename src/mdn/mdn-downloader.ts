@@ -8,6 +8,7 @@ import path from 'path';
 import {defaultInitialUrl} from './process-url/default-initial-url';
 import {sync as mkdir} from 'mkdirp';
 import {promises as fs} from 'fs';
+import {CustomDnsLookup} from './custom-dns-lookup';
 
 export class MdnDownloader extends SingleThreadDownloader {
   constructor(public pathToOptions: string,
@@ -61,6 +62,16 @@ export class MdnDownloader extends SingleThreadDownloader {
     } else if (this.options.meta?.http2 !== false) {
       // enable http2
       this.options.req.http2 = true;
+    }
+
+    // optional prefer ipv6 config
+    if (this.options.meta.preferIpv6) {
+      let dnsCache = this.options.req.dnsCache;
+      if (!(dnsCache instanceof CustomDnsLookup)) {
+        dnsCache = new CustomDnsLookup();
+        this.options.req.dnsCache = dnsCache;
+      }
+      (dnsCache as CustomDnsLookup).preferIpv6 = true;
     }
   }
 }

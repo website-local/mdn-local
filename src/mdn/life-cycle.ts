@@ -22,6 +22,7 @@ import {processYariSourceMap} from './process-source-maps';
 import {decompressSitemap} from './decompress-sitemap';
 import {downloadAndFallback} from './download-and-fallback';
 import {processSearchJson} from './process-search-json';
+import {CustomDnsLookup} from './custom-dns-lookup';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);
@@ -54,5 +55,8 @@ options.req.headers = {
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
     '(KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'
 };
+
+const lookup = new CustomDnsLookup();
+options.req.dnsCache = lookup;
 
 export default options;
