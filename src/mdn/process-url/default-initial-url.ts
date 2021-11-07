@@ -15,7 +15,6 @@ export function defaultInitialUrl(locale: string): string[] {
     `https://developer.mozilla.org/${locale}/docs/Web/MathML`,
     `https://developer.mozilla.org/${locale}/docs/Web`,
     `https://developer.mozilla.org/${locale}/docs/Mozilla`,
-    `https://developer.mozilla.org/${locale}/docs/Mozilla/Tech`,
     `https://developer.mozilla.org/${locale}/docs/Mozilla/Add-ons/WebExtensions`,
     `https://developer.mozilla.org/${locale}/docs/Learn`,
     `https://developer.mozilla.org/${locale}/docs/Games`,
