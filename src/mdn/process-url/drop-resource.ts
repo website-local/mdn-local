@@ -36,6 +36,7 @@ export function dropResource(
   }
   if (!downloadableHosts[host] ||
     testLocaleRegExp(locale).test(path) ||
+    path === '/events' ||
     path.startsWith('/search') ||
     path.startsWith('/presentations/') ||
     path.startsWith('/devnews/') ||

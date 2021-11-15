@@ -66,6 +66,8 @@ export const downloadableHosts = arrayToMap([
   'mdn.github.io',
   // https://github.com/website-local/mdn-local/issues/361
   'cdnjs.cloudflare.com',
+  // https://github.com/website-local/mdn-local/issues/448
+  'cdn.jsdelivr.net',
   // https://github.com/website-local/mdn-local/issues/208
   'developer-stage.mdn.mozit.cloud',
   'developer-prod.mdn.mozit.cloud'

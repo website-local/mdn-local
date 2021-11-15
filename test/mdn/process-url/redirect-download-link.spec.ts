@@ -170,6 +170,21 @@ describe('redirect-download-link', function () {
     }
   });
 
+  // https://github.com/website-local/mdn-local/issues/448
+  // 2021/11/15
+  test('cdn.jsdelivr.net', () => {
+    const urls = [
+      'https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js'
+    ];
+    for (const url of urls) {
+      const resource = res(url);
+      redirectDownloadLink(resource);
+      expect(resource.uri?.path().startsWith('/cdn-jsdelivr-net/')).toBeTruthy();
+      expect(resource.uri?.host()).toBe('developer.mozilla.org');
+      expect(resource.downloadLink).toBe(url);
+    }
+  });
+
   // https://github.com/website-local/mdn-local/issues/208
   test('redirect mdn.mozit.cloud', () => {
     const urls = [

@@ -106,28 +106,35 @@ export function redirectUrl(
       needToRebuildUrl = true;
       break;
     case 'interactive-examples.mdn.mozilla.net': // interactive-examples
-      // fake url, redirected back in requestRedirectFunc
+      // fake url, redirected back in redirectDownloadLink
       u = u.host(mdnHost)
         .path('/interactive-examples' + u.path());
       shouldReturnEarly = true;
       break;
     case 'mdn.github.io': // mdn.github.io
-      // fake url, redirected back in requestRedirectFunc
+      // fake url, redirected back in redirectDownloadLink
       u = u.host(mdnHost)
         .path('/mdn-github-io' + u.path());
       shouldReturnEarly = true;
       break;
     case 'unpkg.com': // unpkg.com
-      // fake url, redirected back in requestRedirectFunc
+      // fake url, redirected back in redirectDownloadLink
       u = u.host(mdnHost)
         .path('/unpkg-com' + u.path());
       shouldReturnEarly = true;
       break;
     // https://github.com/website-local/mdn-local/issues/361
     case 'cdnjs.cloudflare.com': // cdnjs.cloudflare.com
-      // fake url, redirected back in requestRedirectFunc
+      // fake url, redirected back in redirectDownloadLink
       u = u.host(mdnHost)
         .path('/cdnjs-cloudflare-com' + u.path());
+      shouldReturnEarly = true;
+      break;
+    // https://github.com/website-local/mdn-local/issues/448
+    case 'cdn.jsdelivr.net': // cdn.jsdelivr.net
+      // fake url, redirected back in redirectDownloadLink
+      u = u.host(mdnHost)
+        .path('/cdn-jsdelivr-net' + u.path());
       shouldReturnEarly = true;
       break;
     default:
@@ -136,7 +143,7 @@ export function redirectUrl(
         if (u.protocol() === 'http') {
           u.protocol('https');
         }
-        // fake url, redirected back in requestRedirectFunc
+        // fake url, redirected back in redirectDownloadLink
         u = u.host(mdnHost)
           .path('/mdn.mozit.cloud/' + host + u.path());
         shouldReturnEarly = true;
@@ -186,7 +193,7 @@ export function redirectUrl(
     if (parent && parent.downloadLink.includes('//interactive-examples.mdn.mozilla.net/') &&
       !u.path().includes('/interactive-examples/')) {
       // interactive-examples
-      // fake url, redirected back in requestRedirectFunc
+      // fake url, redirected back in redirectDownloadLink
       return u.host(mdnHost)
         .path('/interactive-examples' + u.path())
         .toString();
@@ -194,7 +201,7 @@ export function redirectUrl(
     if (parent && parent.downloadLink.includes('//mdn.github.io/') &&
       !u.path().includes('/mdn-github-io/')) {
       // mdn.github.io
-      // fake url, redirected back in requestRedirectFunc
+      // fake url, redirected back in redirectDownloadLink
       return u.host(mdnHost)
         .path('/mdn-github-io' + u.path())
         .toString();
@@ -202,7 +209,7 @@ export function redirectUrl(
     if (parent && parent.downloadLink.includes('//unpkg.com/') &&
       !u.path().includes('/unpkg-com/')) {
       // unpkg.com
-      // fake url, redirected back in requestRedirectFunc
+      // fake url, redirected back in redirectDownloadLink
       return u.host(mdnHost)
         .path('/unpkg-com' + u.path())
         .toString();
@@ -211,9 +218,18 @@ export function redirectUrl(
     if (parent && parent.downloadLink.includes('//cdnjs.cloudflare.com/') &&
       !u.path().includes('/cdnjs-cloudflare-com/')) {
       // cdnjs.cloudflare.com
-      // fake url, redirected back in requestRedirectFunc
+      // fake url, redirected back in redirectDownloadLink
       return u.host(mdnHost)
         .path('/cdnjs-cloudflare-com' + u.path())
+        .toString();
+    }
+    // https://github.com/website-local/mdn-local/issues/448
+    if (parent && parent.downloadLink.includes('//cdn.jsdelivr.net/') &&
+      !u.path().includes('/cdn-jsdelivr-net/')) {
+      // unpkg.com
+      // fake url, redirected back in redirectDownloadLink
+      return u.host(mdnHost)
+        .path('/cdn-jsdelivr-net' + u.path())
         .toString();
     }
     needToRebuildUrl = true;

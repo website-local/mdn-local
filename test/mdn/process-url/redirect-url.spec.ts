@@ -382,6 +382,44 @@ describe('redirect-url', function () {
       .toBe('https://developer.mozilla.org/cdnjs-cloudflare-com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js');
   });
 
+  // https://github.com/website-local/mdn-local/issues/448
+  // 2021/11/15
+  test('redirect cdn.jsdelivr.net', () => {
+    // https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/JavaScript#cross-browser_javascript_problems
+    // -> https://mdn.github.io/learning-area/tools-testing/cross-browser-testing/javascript/fetch-polyfill-finished.html
+    // ->    https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js
+
+    expect(redirectUrl('https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js',
+      null,
+      {
+        url: 'https://developer.mozilla.org/mdn-github-io/learning-area/tools-testing/cross-browser-testing/javascript/fetch-polyfill-finished.html',
+        downloadLink: 'https://mdn.github.io/learning-area/tools-testing/cross-browser-testing/javascript/fetch-polyfill-finished.html'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/cdn-jsdelivr-net/npm/es6-promise@4/dist/es6-promise.min.js');
+
+    // absolute path url, not likely to happen
+    expect(redirectUrl('/npm/es6-promise@4/dist/es6-promise.min.js',
+      null,
+      {
+        url: 'https://developer.mozilla.org/cdn-jsdelivr-net/npm/es6-promise@4/dist/es6-promise.min.js',
+        downloadLink: 'https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/cdn-jsdelivr-net/npm/es6-promise@4/dist/es6-promise.min.js');
+
+    // relative url, not likely to happen
+    expect(redirectUrl('../dist/es6-promise.min.js',
+      null,
+      {
+        url: 'https://developer.mozilla.org/cdn-jsdelivr-net/npm/es6-promise@4/dist/es6-promise.min.js',
+        downloadLink: 'https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/cdn-jsdelivr-net/npm/es6-promise@4/dist/es6-promise.min.js');
+
+  });
+
   // commit 2ee5f6baa338c4edd621f02c77169d651461a10e
   // 2020/3/28 16:20
   // commit 154a73daead1eb2af1a744af432580e0f6ff6b9d

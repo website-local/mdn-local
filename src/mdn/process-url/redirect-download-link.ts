@@ -68,6 +68,18 @@ export const redirectDownloadLink = (res: Resource): Resource => {
       return res;
     }
 
+    // https://github.com/website-local/mdn-local/issues/448
+    // cdn.jsdelivr.net
+    if (path.startsWith('/cdn-jsdelivr-net/')) {
+      // cdn.jsdelivr.net
+      // redirect back to real url
+      res.downloadLink = uri.search('')
+        .host('cdn.jsdelivr.net')
+        .path(path.slice('/cdn-jsdelivr-net'.length))
+        .toString();
+      return res;
+    }
+
     // https://github.com/website-local/mdn-local/issues/208
     if (path.startsWith('/mdn.mozit.cloud/')) {
       const pathArr = path.split('/');
