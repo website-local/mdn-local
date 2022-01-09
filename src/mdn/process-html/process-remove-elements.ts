@@ -20,6 +20,8 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   $('.newsletter-container').remove();
   // Hacks Blog
   $('.column-hacks').remove();
+  // Hacks Blog, new since maybe 20220109
+  $('.home-content-container > .blog-feed').remove();
   // login link
   $('#toolbox').remove();
   // locale
