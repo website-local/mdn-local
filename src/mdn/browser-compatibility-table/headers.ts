@@ -33,7 +33,8 @@ function PlatformHeaders({ platforms, browsers }: {
       const platformId = platform.replace('webextensions-', '');
       return (
         `<th key="${platform}" class="bc-platform-${platformId}"
-            colSpan="${browserCount}">
+            colSpan="${browserCount}"
+            title=${platform}>
             <span>${platform}</span>
           </th>`
       );
