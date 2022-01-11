@@ -22,7 +22,7 @@
     "@types/tough-cookie": "^4.0.1",
     "@types/urijs": "^1.19.17",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
-    "@typescript-eslint/parser": "^5.9.0",
+    "@typescript-eslint/parser": "^5.9.1",
     "eslint": "^8.6.0",
     "jest": "^27.4.7",
     "ts-jest": "^27.1.2",
