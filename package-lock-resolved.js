@@ -56,6 +56,36 @@ function processDependencyUrl(resolved, dependency) {
         dependency.resolved = `https://registry.npmjs.org/${packageName}/-/${fileName}`;
       }
     }
+  } else if (resolved.includes('://registry.npmmirror.com/')) {
+    const resolvedParts = resolved.split('/');
+    let status = 0, lastIndex = 0, packageName, fileName;
+    for (let i = 0; i < resolvedParts.length; i++) {
+      switch (resolvedParts[i]) {
+      case 'registry.npmmirror.com':
+        status = 1;
+        lastIndex = i;
+        break;
+      case 'download':
+        if (status === 1 && lastIndex &&
+          // note that there is a package called download
+          (resolvedParts[lastIndex + 1] === resolvedParts[i + 1] ||
+            resolvedParts[i + 1].startsWith(resolvedParts[lastIndex + 1] + '-'))) {
+          packageName = resolvedParts.slice(lastIndex + 1, i).join('/');
+          status = 2;
+        }
+        break;
+      }
+    }
+    if (status === 2) {
+      fileName = resolvedParts[resolvedParts.length - 1];
+      let idx = fileName.indexOf('?');
+      if (packageName && idx > 0) {
+        fileName = fileName.slice(0, idx);
+      }
+      if (fileName.endsWith('.tgz')) {
+        dependency.resolved = `https://registry.npmjs.org/${packageName}/-/${fileName}`;
+      }
+    }
   }
 }
 
