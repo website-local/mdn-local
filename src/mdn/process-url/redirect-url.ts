@@ -80,7 +80,7 @@ export function redirectUrl(
   options: StaticDownloadOptions
 ): string | void {
   const locale = options.meta.locale as string;
-  if (url && url.trim) {
+  if (url) {
     url = fixUrlWithBadFormat(url);
   }
   if (!url) return url;
