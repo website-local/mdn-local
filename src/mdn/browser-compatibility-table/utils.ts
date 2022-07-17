@@ -50,6 +50,7 @@ export function listFeatures(
     if (subName !== '__compat' && (subIdentifier as BCD.Identifier).__compat) {
       features.push({
         name: parentName ? `${parentName}.${subName}` : subName,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         compat: (subIdentifier as BCD.Identifier).__compat!,
         depth: depth + 1,
       });

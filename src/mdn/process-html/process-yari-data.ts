@@ -248,6 +248,7 @@ export const preProcessYariData = (
 };
 
 const BCD_PLACE_HOLDER = 'BCD tables only load in the browser';
+const BCD_PLACE_HOLDER_2022 = 'BCD tables only load in the browser <!-- -->with JavaScript enabled. Enable JavaScript to view data.';
 
 export interface MdnYariCompatibilityRenderingContext {
   res: Resource;
@@ -297,7 +298,8 @@ export async function downloadAndRenderYariCompatibilityData(
   for (let i = 0; i < elements.length; i++) {
     const el = $(elements[i]);
     const text = el.text();
-    if (text && text.trim() === BCD_PLACE_HOLDER) {
+    if (text && (text.trim() === BCD_PLACE_HOLDER ||
+      text.trim() === BCD_PLACE_HOLDER_2022)) {
       placeholders.push(el);
     }
   }
