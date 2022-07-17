@@ -424,7 +424,7 @@ function CompatCell({
   const notes = getNotes(browserInfo, support!);
   const content = (`${CellText({support, browser: browserInfo})}
   ${showNotes && (
-      `<dl class="bc-notes-list bc-history bc-history-mobile">${notes}</dl>`
+      `<dl class="bc-notes-list bc-history bc-history-mobile bc-hidden">${notes}</dl>`
     )}
   </>
 `);

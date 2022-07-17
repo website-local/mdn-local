@@ -131,6 +131,12 @@ table.compat-table th {
   display: none;
 }
 
+@media screen and (min-width: 426px) {
+  .bc-table tr.bc-history-desktop.bc-hidden {
+    display: none;
+  }
+}
+
 .only-icon > i.ic-prefix::before {
   font-size: 1rem;
   width: 28px;
