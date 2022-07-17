@@ -83,4 +83,6 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   $('.contributor-spotlight').remove();
   // 20220717 language menu
   $('.languages-switcher-menu').remove();
+  // 20220717 Recent contributions
+  $('.recent-contributions').remove();
 };
