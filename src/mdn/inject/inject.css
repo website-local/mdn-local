@@ -7,13 +7,19 @@
 .newsletter-container,
 .dropdown-container,
 .bc-data .bc-github-link,
-.signin-link {
+.signin-link,
+.homepage-hero .homepage-hero-search.hide {
   display: none;
 }
 
 /* style from article a.new */
 article a.mdn-local-red-link {
   color: #900;
+}
+
+/* margin-top of Last modified is not needed */
+.metadata-content-container .last-modified-date {
+  margin-top: 0;
 }
 
 /* region old compatibility table */

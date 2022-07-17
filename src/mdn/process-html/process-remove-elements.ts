@@ -73,4 +73,14 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   $('.language-menu').remove();
   // Change language | View in English
   $('.language-toggle').remove();
+  // 20220717 Latest news from hacks.mozilla.org on index page
+  $('.latest-news').remove();
+  // 20220717 Already a subscriber? Get MDN Plus
+  $('.auth-container').remove();
+  // 20220717 MDN Plus > FAQ
+  $('#mdn-plus-button').parent().remove();
+  // 20220717 Contributor Spotlight
+  $('.contributor-spotlight').remove();
+  // 20220717 language menu
+  $('.languages-switcher-menu').remove();
 };

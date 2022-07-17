@@ -57,7 +57,8 @@ export const preProcessHtml = async (
   }
   const $: CheerioStatic = res.meta.doc;
   // keep the copyright notice
-  $('#license.footer-license')
+  // class name updated on 2022
+  $('#license.page-footer-legal-text')
     .insertAfter($('.metadata-content-container>.last-modified-date'));
   preProcessRemoveElements($);
   // the script containing inline data
@@ -173,6 +174,12 @@ export const postProcessHtml = (
     if (src && src.endsWith('.chunk.js') && (
       src.match(/\/\d+\./) || src.includes('/main.')
     )) {
+      elem.remove();
+      return;
+    }
+    // /static/js/main.e9205f9f.js
+    // new since 20220717
+    if (src && src.match(/\/main\.[0-9a-fA-F]+\.js$/)) {
       elem.remove();
       return;
     }

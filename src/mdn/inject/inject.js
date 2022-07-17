@@ -9,7 +9,9 @@
     // yari expandable top menu
     pageHeader, menuToggleBtn, pageHeaderMain, toggleSearchBtn,
     // yari main-menu nojs
-    mainMenuNoJs;
+    mainMenuNoJs,
+    // yari search box on main page
+    searchBox;
 
   /// endregion top-level vars
 
@@ -344,6 +346,11 @@
   }
 
   /// endregion yari expandable top menu
+
+  searchBox = document.querySelector('.homepage-hero-search');
+  if (searchBox) {
+    addClass(searchBox, 'hide');
+  }
 
   /// region yari expandable mobile search
   toggleSearchBtn = document.querySelector('.toggle-form');
