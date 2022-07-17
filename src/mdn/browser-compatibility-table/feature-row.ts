@@ -1,11 +1,24 @@
-import type * as bcd from './types';
-import { BrowserName, BrowserPreviewName } from './browser-info';
-import { asList, getFirst, isTruthy } from './utils';
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import type * as BCD from './types';
+import {
+  asList,
+  getCurrentSupport,
+  hasNoteworthyNotes,
+  isFullySupportedWithoutLimitation,
+  isNotSupportedAtAll,
+  isOnlySupportedWithAltName,
+  isOnlySupportedWithFlags,
+  isOnlySupportedWithPrefix,
+  isTruthy,
+  versionIsPreview,
+  SupportStatementExtended,
+} from './utils';
+import { LEGEND_LABELS } from './legend';
 
 // Yari builder will attach extra keys from the compat data
 // it gets from @mdn/browser-compat-data. These are "Yari'esque"
 // extras that helps us avoiding to have a separate data structure.
-interface CompatStatementExtended extends bcd.CompatStatement {
+interface CompatStatementExtended extends BCD.CompatStatement {
   // When a compat statement has a .mdn_url but it's actually not a good
   // one, the Yari builder will attach an extra boolean that indicates
   // that it's not a valid link.
@@ -13,32 +26,21 @@ interface CompatStatementExtended extends bcd.CompatStatement {
   bad_url?: true;
 }
 
-// Extended for the fields, beyond the bcd types, that are extra-added
-// exclusively in Yari.
-interface SimpleSupportStatementExtended extends bcd.SimpleSupportStatement {
-  // Known for some support statements where the browser *version* is known,
-  // as opposed to just "true" and if the version release date is known.
-  release_date?: string;
-}
-
-type SupportStatementExtended =
-  | SimpleSupportStatementExtended
-  | SimpleSupportStatementExtended[];
-
 function getSupportClassName(
-  support: SupportStatementExtended | undefined
-): string {
+  support: SupportStatementExtended | undefined,
+  browser: BCD.BrowserStatement
+): 'no' | 'yes' | 'partial' | 'preview' | 'removed-partial' | 'unknown' {
   if (!support) {
     return 'unknown';
   }
 
   const { flags, version_added, version_removed, partial_implementation } =
-    getFirst(support);
+    getCurrentSupport(support)!;
 
-  let className;
+  let className: ReturnType<typeof getSupportClassName>;
   if (version_added === null) {
     className = 'unknown';
-  } else if (version_added === 'preview') {
+  } else if (versionIsPreview(version_added, browser)) {
     className = 'preview';
   } else if (version_added) {
     className = 'yes';
@@ -48,8 +50,8 @@ function getSupportClassName(
   } else {
     className = 'no';
   }
-  if (partial_implementation && !version_removed) {
-    className = 'partial';
+  if (partial_implementation) {
+    className = version_removed ? 'removed-partial' : 'partial';
   }
 
   return className;
@@ -61,34 +63,33 @@ function getSupportBrowserReleaseDate(
   if (!support) {
     return undefined;
   }
-  return getFirst(support).release_date;
+  return getCurrentSupport(support)!.release_date;
 }
 
-function StatusIcons({ status }: { status: bcd.StatusBlock }): string {
+function StatusIcons({ status }: { status: BCD.StatusBlock }) {
   const icons = [
     status.experimental && {
       title: 'Experimental. Expect behavior to change in the future.',
       text: 'Experimental',
-      iconClassName: 'ic-experimental',
+      iconClassName: 'icon-experimental',
     },
     status.deprecated && {
       title: 'Deprecated. Not for use in new websites.',
       text: 'Deprecated',
-      iconClassName: 'ic-deprecated',
+      iconClassName: 'icon-deprecated',
     },
     !status.standard_track && {
       title: 'Non-standard. Expect poor cross-browser support.',
       text: 'Non-standard',
-      iconClassName: 'ic-non-standard',
+      iconClassName: 'icon-nonstandard',
     },
   ].filter(isTruthy);
 
   return icons.length === 0 ? '' : (
-    `<div class="bc-icons">
+    `<div class="bc-icons" data-test="${icons.length}">
       ${icons.map((icon) =>
-      (`<abbr key="${icon.iconClassName}" class="only-icon" title="${icon.title}">
+      (`<abbr key="${icon.iconClassName}" class="only-icon icon ${icon.iconClassName}" title="${icon.title}">
           <span>${icon.text}</span>
-          <i class="${icon.iconClassName}"></i>
         </abbr>`)).join('')}
     </div>`
   );
@@ -96,8 +97,7 @@ function StatusIcons({ status }: { status: bcd.StatusBlock }): string {
 
 function labelFromString(
   version: string | boolean | null | undefined,
-  browser: bcd.BrowserNames,
-  browserInfo: bcd.Browsers,
+  browser: BCD.BrowserStatement,
 ) {
   if (typeof version !== 'string') {
     return '?';
@@ -108,35 +108,47 @@ function labelFromString(
     return version.slice(1);
   }
   if (version === 'preview') {
-    return BrowserPreviewName({
-      id:browser,
-      browserInfo
-    });
+    return browser.preview_name;
   }
   return version;
+}
+
+function versionLabelFromSupport(
+  added: string | boolean | null | undefined,
+  removed: string | boolean | null | undefined,
+  browser: BCD.BrowserStatement
+) {
+  if (typeof removed !== 'string') {
+    return labelFromString(added, browser);
+  }
+  return (`${labelFromString(added, browser)}&#8202;&ndash;&#8202;
+  ${labelFromString(removed, browser)}`);
 }
 
 const CellText =({
   support,
   browser,
-  browserInfo,
+  timeline = false,
 }: {
-  support: bcd.SupportStatement | undefined;
-  browser: bcd.BrowserNames;
-  browserInfo: bcd.Browsers;
+  support: BCD.SupportStatement | undefined;
+  browser: BCD.BrowserStatement;
+  timeline?: boolean;
 }): string => {
-  const currentSupport = getFirst(support);
 
-  const added = currentSupport && currentSupport.version_added;
-  const removed = currentSupport && currentSupport.version_removed;
+  const currentSupport = getCurrentSupport(support);
+
+  const added = currentSupport?.version_added ?? null;
+  const removed = currentSupport?.version_removed ?? null;
+
+  const browserReleaseDate = getSupportBrowserReleaseDate(support);
+  const supportClassName = getSupportClassName(support, browser);
 
   let status:
-      | { isSupported: 'unknown' }
-      | {
-          isSupported: 'no' | 'yes' | 'partial' | 'preview';
-          label?: string;
-        };
-
+    | { isSupported: 'unknown' }
+    | {
+    isSupported: 'no' | 'yes' | 'partial' | 'preview' | 'removed-partial';
+    label?: string;
+  };
   switch (added) {
   case null:
     status = { isSupported: 'unknown' };
@@ -147,26 +159,18 @@ const CellText =({
   case false:
     status = { isSupported: 'no' };
     break;
+  case 'preview':
+    status = { isSupported: 'preview' };
+    break;
   default:
-    status = { isSupported: 'yes', label: labelFromString(added, browser, browserInfo) };
+    status = {
+      isSupported: supportClassName,
+      label: versionLabelFromSupport(added, removed, browser),
+    };
     break;
   }
 
-  if (removed) {
-    status = {
-      isSupported: 'no',
-      label: `${
-        labelFromString(added, browser, browserInfo)
-      }&#8202;&ndash;&#8202;${labelFromString(removed, browser, browserInfo)}`,
-    };
-  } else if (currentSupport && currentSupport.partial_implementation) {
-    status = {
-      isSupported: 'partial',
-      label: typeof added === 'string' ? labelFromString(added, browser, browserInfo) : 'Partial',
-    };
-  }
-
-  let label: string;
+  let label: string | undefined;
   let title = '';
   switch (status.isSupported) {
   case 'yes':
@@ -179,6 +183,16 @@ const CellText =({
     label = status.label || 'Partial';
     break;
 
+  case 'removed-partial':
+    if (timeline) {
+      title = 'Partial support';
+      label = status.label || 'Partial';
+    } else {
+      title = 'No support';
+      label = status.label || 'No';
+    }
+    break;
+
   case 'no':
     title = 'No support';
     label = status.label || 'No';
@@ -186,10 +200,7 @@ const CellText =({
 
   case 'preview':
     title = 'Preview browser support';
-    label = BrowserPreviewName({
-      id:browser,
-      browserInfo
-    });
+    label = status.label || browser.preview_name;
     break;
 
   case 'unknown':
@@ -198,51 +209,68 @@ const CellText =({
     break;
   }
 
-  return (`<abbr class="bc-level-${getSupportClassName(
-    currentSupport
-  )} only-icon" title="${title}">
-          <span>${title}</span>
-        </abbr>
-        <span>${label}</span>`);
+  return (`<div class="bcd-cell-text-wrapper">
+        <div class="bcd-cell-icons">
+          <span class="icon-wrap">
+            <abbr
+              class="bc-level-${supportClassName} icon icon-${supportClassName}"
+              title="${title}"
+            >
+              <span class="bc-support-level">${title}</span>
+            </abbr>
+          </span>
+        </div>
+        <div class="bcd-cell-text-copy">
+          <span class="bc-browser-name">{browser.name}</span>
+          <span
+            class="bc-version-label"
+            title=${
+    browserReleaseDate ? `Released ${browserReleaseDate}` : undefined
+    }>
+            ${label}
+          </span>
+        </div>
+        ${CellIcons({support})}
+      </div>`);
 };
 
-function Icon({ name }: { name: string }): string {
-  return (`
-  <abbr class="only-icon" title="${name}">
+function Icon({ name }: { name: string }) {
+  const title = LEGEND_LABELS[name as keyof typeof LEGEND_LABELS] ?? name;
+
+  return (
+    `<abbr class="only-icon" title="${title}">
     <span>${name}</span>
-    <i class="ic-${name}"></i>
-  </abbr>`
-  );
+    <i class"icon icon-${name}" />
+  </abbr>`);
 }
 
-function CellIcons({ support }: { support: bcd.SupportStatement | undefined }): string {
-  const supportItem = getFirst(support);
+function CellIcons({ support }: { support: BCD.SupportStatement | undefined }) {
+  const supportItem = getCurrentSupport(support);
   if (!supportItem) {
-    return '';
+    return null;
   }
-  return (`
-<div class="bc-icons">
-${supportItem.prefix && Icon({name: 'prefix'}) || ''}
-${supportItem.alternative_name && Icon({name: 'altname'}) || ''}
-${supportItem.flags && Icon({name: 'disabled'}) || ''}
-${supportItem.notes && Icon({name: 'footnote'}) || ''}
-</div>`);
+
+  const icons = [
+    // TODO: key?
+    isOnlySupportedWithPrefix(support) && Icon({name: 'prefix'}),
+    hasNoteworthyNotes(supportItem) && Icon({name: 'footnote'}),
+    isOnlySupportedWithAltName(support) && (
+      Icon({name: 'altname'})),
+    isOnlySupportedWithFlags(support) && (
+      Icon({name: 'disabled'})
+    ),
+  ].filter(Boolean);
+
+  return icons.length ? `<div class="bc-icons">${icons.join('')}</div>` : '';
 }
 
 function FlagsNote({
-  browserInfo,
   supportItem,
   browser,
 }: {
-  browserInfo: bcd.Browsers;
-  supportItem: bcd.SimpleSupportStatement;
-  browser: bcd.BrowserNames;
-}): string {
-  if (!browserInfo) {
-    throw new Error('Missing browser info');
-  }
-  const info = browserInfo[browser];
-
+  supportItem: BCD.SimpleSupportStatement;
+  browser: BCD.BrowserStatement;
+}) {
   const hasAddedVersion = typeof supportItem.version_added === 'string';
   const hasRemovedVersion = typeof supportItem.version_removed === 'string';
   const flags = supportItem.flags || [];
@@ -260,29 +288,32 @@ function FlagsNote({
         ${flag.type === 'preference' && `preferences${valueToSet}` || ''}
         ${flag.type === 'runtime_flag' && `runtime flag${valueToSet}` || ''}
         ${i < flags.length - 1 && ' and the ' || ''}`);
-    }).join('')}.${info.pref_url &&
+    }).join('')}.${browser.pref_url &&
   flags.some((flag) => flag.type === 'preference') &&
-  ` To change preferences in ${info.name}, visit ${info.pref_url}.` || ''}
+  ` To change preferences in ${browser.name}, visit ${browser.pref_url}.` || ''}
 `);
 }
 
 function getNotes(
-  browserInfo: bcd.Browsers,
-  browser: bcd.BrowserNames,
-  support: bcd.SupportStatement,
-  // It seems that yari is adding locale support to compatibility table
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  locale: string
-): string[] {
+  browser: BCD.BrowserStatement,
+  support: BCD.SupportStatement
+) {
+  if (!support) {
+    return [''];
+  }
   return asList(support)
+    .slice()
+    .reverse()
     .flatMap((item, i) => {
+
       const supportNotes = [
-        item.version_removed
+        item.version_removed &&
+        !asList(support).some(
+          (otherItem) => otherItem.version_added === item.version_removed
+        )
           ? {
-            iconName: 'footnote',
-            label: `Removed in version ${
-              labelFromString(item.version_removed, browser, browserInfo)
-            } and later`,
+            iconName: 'disabled',
+            label: (`Removed in ${labelFromString(item.version_removed, browser)} and later`),
           }
           : null,
         item.partial_implementation
@@ -293,22 +324,20 @@ function getNotes(
           : null,
         item.prefix
           ? {
-            iconName: 'footnote',
+            iconName: 'prefix',
             label: `Implemented with the vendor prefix: ${item.prefix}`,
           }
           : null,
         item.alternative_name
           ? {
-            iconName: 'footnote',
+            iconName: 'altname',
             label: `Alternate name: ${item.alternative_name}`,
           }
           : null,
         item.flags
           ? {
-            iconName: 'footnote',
-            label: FlagsNote({
-              browserInfo, browser, supportItem: item
-            }),
+            iconName: 'disabled',
+            label: FlagsNote({browser, supportItem :item}) ,
           }
           : null,
         item.notes
@@ -316,33 +345,39 @@ function getNotes(
             (note) => ({ iconName: 'footnote', label: note })
           )
           : null,
-        item.version_added === 'preview'
+        versionIsPreview(item.version_added, browser)
           ? {
             iconName: 'footnote',
             label: 'Preview browser support',
           }
           : null,
         // If we encounter nothing else than the required `version_added` and
-        // `release_date` properties, assume full support
-        Object.keys(item).filter(
-          (x) => !['version_added', 'release_date'].includes(x)
-        ).length === 0 && item.version_added !== 'preview'
+        // `release_date` properties, assume full support.
+        // EDIT 1-5-21: if item.version_added doesn't exist, assume no support.
+        isFullySupportedWithoutLimitation(item) &&
+        !versionIsPreview(item.version_added, browser)
           ? {
             iconName: 'footnote',
             label: 'Full support',
           }
-          : null,
-      ].flat().filter(isTruthy);
+          : isNotSupportedAtAll(item)
+            ? {
+              iconName: 'footnote',
+              label: 'No support',
+            }
+            : null,
+      ]
+        .flat()
+        .filter(isTruthy);
 
       const hasNotes = supportNotes.length > 0;
       return ((i === 0 || hasNotes) && (
         `<div key="${i}" class="bc-notes-wrapper">
-      <dt class="bc-supports-${getSupportClassName(item)} bc-supports">
-      ${CellText({support: item, browser, browserInfo})}
-      ${CellIcons({support: item})}
+      <dt class="bc-supports-${getSupportClassName(item, browser)} bc-supports">
+      ${CellText({support: item, browser, timeline: true})}
       </dt>
       ${supportNotes.map(({iconName, label}, i) => (
-          `<dd key="${i}">
+          `<dd class="bc-supports-dd" key="${i}">
         ${Icon({name: iconName})}
         ${typeof label === 'string' ? (
             `<span>${label}</span>`
@@ -357,55 +392,54 @@ function getNotes(
 }
 
 function CompatCell({
+  browserId,
   browserInfo,
-  browser,
   support,
   showNotes,
+  // onToggle,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   locale,
 }: {
-  browserInfo: bcd.Browsers,
-  browser: bcd.BrowserNames;
-  support: bcd.SupportStatement | undefined;
+  browserId: BCD.BrowserName;
+  browserInfo: BCD.BrowserStatement;
+  support: BCD.SupportStatement | undefined;
   showNotes: boolean;
+  // onToggle: () => void;
   locale: string;
 }) {
-  const supportClassName = getSupportClassName(support);
-  const browserReleaseDate = getSupportBrowserReleaseDate(support);
+
+  const supportClassName = getSupportClassName(support, browserInfo);
+  // NOTE: 1-5-21, I've forced hasNotes to return true, in order to
+  // make the details view open all the time.
   // Whenever the support statement is complex (array with more than one entry)
   // or if a single entry is complex (prefix, notes, etc.),
   // we need to render support details in `bc-history`
-  const hasNotes =
-    support &&
-    (asList(support).length > 1 ||
-      asList(support).some(
-        (item) =>
-          item.prefix || item.notes || item.alternative_name || item.flags
-      ));
-  return (
-    `<td key="${browser}" class="bc-browser-${browser} bc-supports-${supportClassName} ${
-      hasNotes ? 'bc-has-history' : ''
-    }" aria-expanded="false" tabIndex="${hasNotes ? 0 : ''}" title="${
-      browserReleaseDate ? `Released ${browserReleaseDate}` : ''
-    }">
-  <span class="bc-browser-name">
-  ${BrowserName({browserInfo, id: browser})}
-  </span>
-  ${CellText({support, browser, browserInfo})}
-  ${CellIcons({support})}
-  ${hasNotes && (
-    // class="${ showNotes ? 'bc-history-link-inverse' : '' }"
-      `<button type="button" title="Open implementation notes"
-    class="bc-history-link only-icon">
-    <span>Open</span>
-    <i class="ic-history" aria-hidden="true"></i>
-    </button>`
-    ) || ''}
-  ${hasNotes && showNotes && support && (
-      `<dl class="bc-notes-list bc-history bc-history-mobile bc-hidden">
-        ${getNotes(browserInfo, browser, support, locale).join('')}
-      </dl>`
-    ) || ''}
-  </td>`
+  // const hasNotes =
+  //   support &&
+  //   (asList(support).length > 1 ||
+  //     asList(support).some(
+  //       (item) =>
+  //         item.prefix || item.notes || item.alternative_name || item.flags
+  //     ));
+  const notes = getNotes(browserInfo, support!);
+  const content = (`${CellText({support, browser: browserInfo})}
+  ${showNotes && (
+      `<dl class="bc-notes-list bc-history bc-history-mobile">${notes}</dl>`
+    )}
+  </>
+`);
+
+  return (`<td
+        class="bc-support bc-browser-${browserId} bc-supports-${supportClassName} ${
+      notes ? 'bc-has-history' : ''
+    }"
+        aria-expanded="false"
+      >
+        <button type="button" disabled=${!notes} title="Toggle history">
+          ${content}
+          <span class="offscreen">Toggle history</span>
+        </button>
+      </td>`
   );
 }
 
@@ -414,24 +448,30 @@ export const FeatureRow = ({
   index,
   feature,
   browsers,
+  // activeCell,
+  // onToggleCell,
   locale,
 }: {
-  browserInfo: bcd.Browsers;
+  browserInfo: BCD.Browsers;
   index: number;
   feature: {
     name: string;
     compat: CompatStatementExtended;
-    isRoot: boolean;
+    depth: number;
   };
-  browsers: bcd.BrowserNames[];
+  browsers: BCD.BrowserName[];
+  // activeCell: number | null;
+  // onToggleCell: ([row, column]: [number, number]) => void;
   locale: string;
 }): string => {
-  const { name, compat, isRoot } = feature;
+  const { name, compat, depth } = feature;
   const title = compat.description ? (
     `<span>${compat.description}</span>`
   ) : (
     `<code>${name}</code>`
   );
+
+  // const activeBrowser = activeCell !== null ? browsers[activeCell] : null;
 
   let titleNode: string;
 
@@ -439,40 +479,43 @@ export const FeatureRow = ({
     titleNode = (
       `<div class="bc-table-row-header">
         <abbr class="new" title="${compat.mdn_url} does not exist">
-        ${title}
+          ${title}
         </abbr>
-        ${compat.status && StatusIcons({status: compat.status}) || ''}
-      </div>`);
-  } else if (compat.mdn_url && !isRoot) {
+        ${compat.status && StatusIcons( {status: compat.status}) || ''}
+      </div>`
+    );
+  } else if (compat.mdn_url && depth > 0) {
     titleNode = (
-      `<a href="${compat.mdn_url}" class="bc-table-row-header">
+      `<a href={compat.mdn_url} class="bc-table-row-header">
         ${title}
-        ${compat.status && StatusIcons({status: compat.status}) || ''}
+        ${compat.status && StatusIcons( {status: compat.status}) || ''}
       </a>`
     );
   } else {
     titleNode = (
       `<div class="bc-table-row-header">
         ${title}
-        ${compat.status && StatusIcons({status: compat.status}) || ''}
+        ${compat.status && StatusIcons( {status: compat.status}) || ''}
       </div>`
     );
   }
 
   return (`<tr class="bc-content-row" key="${index}">
-          <th scope="row">${titleNode}</th>
+          <th class="bc-feature bc-feature-depth-${depth}" scope="row">${titleNode}</th>
     ${browsers.map((browser) => (
       CompatCell({
-        browserInfo, browser,
+        // key: browser,
+        browserId: browser,
+        browserInfo: browserInfo[browser],
         support: compat.support[browser],
         showNotes: true,
         locale
       })
     )).join('')}
     </tr>
-    <tr class="bc-history bc-hidden" key="${index}">
-      <td colSpan="${browsers.length + 1}">
-        <dl class="bc-history-content"></dl>
+    <tr class="bc-history bc-history-desktop bc-hidden">
+      <td colSpan=${browsers.length + 1}>
+        <dl class="bc-notes-list"></dl>
       </td>
     </tr>`);
 };

@@ -1,21 +1,11 @@
-import type * as bcd from './types';
+import type * as BCD from './types';
 
 export function BrowserName({ browserInfo, id }: {
-  browserInfo: bcd.Browsers,
-  id: bcd.BrowserNames
+  browserInfo: BCD.Browsers,
+  id: BCD.BrowserName
 }): string {
   if (!browserInfo) {
     throw new Error('Missing browser info');
   }
   return browserInfo[id].name || '';
-}
-
-export function BrowserPreviewName({ browserInfo, id }: {
-  browserInfo: bcd.Browsers,
-  id: bcd.BrowserNames
-}): string {
-  if (!browserInfo) {
-    throw new Error('Missing browser info');
-  }
-  return browserInfo[id].preview_name || '';
 }

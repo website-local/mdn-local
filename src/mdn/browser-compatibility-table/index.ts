@@ -1,6 +1,7 @@
-import type * as bcd from './types';
+import * as bcd from './browsers';
+import type * as BCD from './types';
 import { FeatureRow } from './feature-row';
-import { Headers, PLATFORM_BROWSERS } from './headers';
+import { Headers } from './headers';
 import { Legend } from './legend';
 import { listFeatures } from './utils';
 
@@ -19,31 +20,45 @@ import { listFeatures } from './utils';
  */
 function gatherPlatformsAndBrowsers(
   category: string,
-  data: bcd.Identifier
-): [string[], bcd.BrowserNames[]] {
+  data: BCD.Identifier
+): [string[], BCD.BrowserName[]] {
   const hasNodeJSData = data.__compat && 'nodejs' in data.__compat.support;
   const hasDenoData = data.__compat && 'deno' in data.__compat.support;
 
-  let platforms = ['desktop', 'mobile'];
+  const platforms = ['desktop', 'mobile'];
   if (category === 'javascript' || hasNodeJSData || hasDenoData) {
     platforms.push('server');
-  } else if (category === 'webextensions') {
-    platforms = ['webextensions-desktop', 'webextensions-mobile'];
   }
 
-  const browsers = new Set(
-    platforms.map((platform) => PLATFORM_BROWSERS[platform] || []).flat()
-  );
+  let browsers: BCD.BrowserName[] = [];
+
+  // Add browsers in platform order to align table cells
+  for (const platform of platforms) {
+    browsers.push(
+      ...(Object.keys(bcd.browsers).filter(
+        (browser) => bcd.browsers[
+          browser as keyof typeof bcd.browsers].type === platform
+      ) as BCD.BrowserName[])
+    );
+  }
+
+  // Filter WebExtension browsers in corresponding tables.
+  if (category === 'webextensions') {
+    browsers = browsers.filter(
+      (browser) => bcd.browsers[browser].accepts_webextensions
+    );
+  }
 
   // If there is no Node.js data for a category outside of "javascript", don't
   // show it. It ended up in the browser list because there is data for Deno.
   if (category !== 'javascript' && !hasNodeJSData) {
-    browsers.delete('nodejs');
+    browsers = browsers.filter((browser) => browser !== 'nodejs');
   }
 
   return [platforms, [...browsers]];
 }
 
+// type CellIndex = [number, number];
 
 function FeatureListAccordion({
   browserInfo,
@@ -51,9 +66,9 @@ function FeatureListAccordion({
   browsers,
   locale,
 }: {
-  browserInfo: bcd.Browsers;
+  browserInfo: BCD.Browsers;
   features: ReturnType<typeof listFeatures>;
-  browsers: bcd.BrowserNames[];
+  browsers: BCD.BrowserName[];
   locale: string;
 }) {
   return features.map((feature, i) =>
@@ -70,8 +85,8 @@ export default function BrowserCompatibilityTable({
   locale,
 }: {
   query: string;
-  data: bcd.Identifier;
-  browsers: bcd.Browsers;
+  data: BCD.Identifier;
+  browsers: BCD.Browsers;
   locale: string;
 }): string {
 
@@ -87,7 +102,9 @@ export default function BrowserCompatibilityTable({
 
   const [platforms, browsers] = gatherPlatformsAndBrowsers(category, data);
 
-  return `<table key="bc-table" class="bc-table bc-table-web">
+  return `<div class="table-scroll">
+          <div class="table-scroll-inner">
+            <table key="bc-table" class="bc-table bc-table-web">
         ${Headers({browserInfo, platforms, browsers})}
           <tbody>
           ${FeatureListAccordion({
@@ -98,7 +115,9 @@ export default function BrowserCompatibilityTable({
   })}
           </tbody>
         </table>
-        ${Legend({compat: data, name})}`;
+        </div>
+      </div>
+      ${Legend({compat: data, name, browserInfo})}`;
 }
 
 /// region mdn-local helpers
