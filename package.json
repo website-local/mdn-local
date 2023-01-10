@@ -21,7 +21,7 @@
     "@types/node": "^18.11.18",
     "@types/tough-cookie": "^4.0.2",
     "@types/urijs": "^1.19.19",
-    "@typescript-eslint/eslint-plugin": "^5.48.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
     "@typescript-eslint/parser": "^5.48.1",
     "eslint": "^8.31.0",
     "jest": "^27.5.1",
