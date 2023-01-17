@@ -10,7 +10,7 @@
     "agentkeepalive": "^4.2.1",
     "fast-glob": "^3.2.12",
     "json5": "^2.2.3",
-    "mkdirp": "^1.0.4",
+    "mkdirp": "^2.1.1",
     "tough-cookie": "^4.1.2",
     "urijs": "^1.19.11",
     "website-scrap-engine": "^0.5.0"
