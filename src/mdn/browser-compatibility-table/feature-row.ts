@@ -234,7 +234,7 @@ function Icon({ name }: { name: string }) {
   return (
     `<abbr class="only-icon" title="${title}">
     <span>${name}</span>
-    <i class"icon icon-${name}" />
+    <i class="icon icon-${name}" />
   </abbr>`);
 }
 
