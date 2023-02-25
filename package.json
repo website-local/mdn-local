@@ -17,7 +17,6 @@
   },
   "devDependencies": {
     "@types/jest": "^27.5.0",
-    "@types/mkdirp": "^1.0.2",
     "@types/node": "^18.14.1",
     "@types/tough-cookie": "^4.0.2",
     "@types/urijs": "^1.19.19",

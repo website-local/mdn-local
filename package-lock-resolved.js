@@ -79,6 +79,9 @@ function processDependencyUrl(resolved, dependency) {
     // console.log(resolved, replaced);
     if (replaced) {
       dependency.resolved = replaced;
+    } else {
+      dependency.resolved = resolved.replace(
+        '://registry.npmmirror.com/', '://registry.npmjs.org/');
     }
   }
 }
