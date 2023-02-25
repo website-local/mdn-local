@@ -254,21 +254,29 @@
   /// endregion yari new compatibility table
 
   /// region yari expandable top menu
-  pageHeader = document.querySelector('.page-header');
+  pageHeader = document.querySelector('.main-document-header-container');
   menuToggleBtn = pageHeader && pageHeader.querySelector('.main-menu-toggle');
   pageHeaderMain = pageHeader && (
     pageHeader.querySelector('.page-header-main') ||
     pageHeader.querySelector('.main-menu'));
   if (menuToggleBtn && pageHeaderMain) {
     menuToggleBtn.onclick = function menuToggleBtnClick() {
-      // endsWith(' show')
-      if (hasClass(pageHeaderMain,'show')) {
-        removeClass(pageHeaderMain, 'show');
-        removeClass(menuToggleBtn, 'expanded');
+      // noinspection ES6ConvertVarToLetConst JSDeprecatedSymbols
+      var spanIcon = menuToggleBtn.querySelector('span.icon'),
+        spanText = menuToggleBtn.querySelector('span.visually-hidden');
+      if (hasClass(pageHeader,'show-nav')) {
+        removeClass(pageHeader, 'show-nav');
+        menuToggleBtn.title = 'Open main menu';
+        removeClass(spanIcon, 'icon-cancel');
+        addClass(spanIcon, 'icon-menu');
       } else {
-        addClass(pageHeaderMain, 'show');
-        addClass(menuToggleBtn, 'expanded');
+        addClass(pageHeader, 'show-nav');
+        menuToggleBtn.title = 'Close main menu';
+        addClass(spanIcon, 'icon-cancel');
+        removeClass(spanIcon, 'icon-menu');
       }
+      menuToggleBtn.setAttribute('aria-label', menuToggleBtn.title);
+      spanText.innerText = menuToggleBtn.title;
     };
   }
   if (pageHeaderMain) {
@@ -282,11 +290,11 @@
         node = e.srcElement;
       }
       if (node.tagName === 'LI' &&
-        node.className === 'top-level-entry-container') {
+        hasClass(node, 'top-level-entry-container')) {
         li = node;
         button = li.querySelector('button.top-level-entry');
       } else if (node.tagName === 'BUTTON' &&
-        node.className === 'top-level-entry') {
+        hasClass(node, 'top-level-entry')) {
         button = node;
         li = node.parentNode;
       } else {
@@ -299,10 +307,10 @@
       if (attr === 'true') {
         button.setAttribute('aria-expanded', 'false');
         // ul.classList.remove('show')
-        removeClass(ul, 'show');
+        addClass(ul, 'hidden');
       } else {
         button.setAttribute('aria-expanded', 'true');
-        addClass(ul, 'show');
+        removeClass(ul, 'hidden');
         nodes = li.parentNode && li.parentNode.children;
         if (!nodes) {
           return;
@@ -311,7 +319,7 @@
           if (nodes[i] === li) continue;
           ul = nodes[i].querySelector('ul');
           if (ul) {
-            removeClass(ul, 'show');
+            addClass(ul, 'hidden');
           }
           button = nodes[i].querySelector('button.top-level-entry');
           if (button) {
