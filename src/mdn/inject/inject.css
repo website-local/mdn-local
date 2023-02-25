@@ -21,6 +21,10 @@ article a.mdn-local-red-link {
 .metadata-content-container .last-modified-date {
   margin-top: 0;
 }
+/* Article actions, with only the language switcher inside */
+.button.action.has-icon.article-actions-toggle {
+  display: none;
+}
 
 /* region old compatibility table */
 
