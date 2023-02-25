@@ -167,7 +167,7 @@
     // noinspection JSDeprecatedSymbols
     e = e || window.event;
     // noinspection ES6ConvertVarToLetConst
-    var node, td, button, tdKey, tr, trKey, table, closeTd, section;
+    var node, td, button, onToggle, index, i, tr, table, closeTd, section;
     // noinspection JSDeprecatedSymbols
     node = e.target || e.srcElement;
     if (node.tagName === 'TD') {
@@ -185,12 +185,11 @@
     if (!hasClass(td, 'bc-has-history')) {
       return;
     }
-    tdKey = td.getAttribute('key');
-    if (!tdKey) return;
-    tr = td.parentNode;
-    if (!tr) return;
-    trKey = tr.getAttribute('key');
-    if (!tdKey) return;
+    onToggle = td.getAttribute('data-on-toggle');
+    if (!onToggle) return;
+    onToggle = onToggle.split(',');
+    index = onToggle[0];
+    i = onToggle[1];
     node = td;
     while (node && (node = node.parentNode)) {
       if (node.tagName === 'TABLE') {
@@ -201,25 +200,26 @@
     if (!table) return;
     if (status !== null) {
       closeHistory();
-      if (trKey === status[0] && tdKey === status[1]) {
+      if (index === status[0] && i === status[1]) {
         status = null;
         return;
       }
     }
-    status = [trKey, tdKey];
+    status = onToggle;
     td.setAttribute('aria-expanded', 'true');
+    // this might be removed
     button = td.querySelector('.bc-history-link');
     if (button) {
       addClass(button, 'bc-history-link-inverse');
     }
-    section = td.querySelector('.bc-history');
+    section = td.querySelector('.bc-notes-list');
     if (section) {
       removeClass(section, 'bc-hidden');
     }
     tr = table.querySelector('tr.bc-history[key="' + status[0] + '"]');
     if (tr) {
       removeClass(tr, 'bc-hidden');
-      node = tr.querySelector('.bc-history-content');
+      node = tr.querySelector('.bc-notes-list');
       if (node && section) {
         node.innerHTML = section.innerHTML;
       }
@@ -229,7 +229,8 @@
       if (!table) return;
       tr = table.querySelector('tr.bc-content-row[key="' + status[0] + '"]');
       if (!tr) return;
-      closeTd = tr.querySelector('td[key="' + status[1] + '"]');
+      closeTd = tr.querySelector(
+        'td[data-on-toggle="' + status.join(',') + '"]');
       if (!closeTd) return;
       closeTd.setAttribute('aria-expanded', 'false');
       button = closeTd.querySelector('.bc-history-link');
