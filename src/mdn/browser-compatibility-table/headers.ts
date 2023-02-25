@@ -1,10 +1,14 @@
 import type * as BCD from './types';
-import * as bcd from './browsers';
 import { BrowserName } from './browser-info';
 
-function PlatformHeaders({ platforms, browsers }: {
+function PlatformHeaders({
+  platforms,
+  browsers,
+  browserInfo,
+}: {
   platforms: string[];
   browsers: BCD.BrowserName[];
+  browserInfo: BCD.Browsers;
 }) {
   return (
     `<tr class="bc-platforms">
@@ -13,7 +17,7 @@ function PlatformHeaders({ platforms, browsers }: {
       // Get the intersection of browsers in the `browsers` array and the
       // `PLATFORM_BROWSERS[platform]`.
       const browsersInPlatform = browsers.filter(
-        (browser) => bcd.browsers[browser].type === platform
+        (browser) => browserInfo[browser].type === platform
       );
       const browserCount = browsersInPlatform.length;
       const platformId = platform.replace('webextensions-', '');
@@ -38,15 +42,14 @@ function BrowserHeaders({ browserInfo, browsers }: {
     `<tr class="bc-browsers">
       <td></td>
       ${browsers.map((browser) => {
-      const browserStart = browser.split('_')[0];
-      const browserIcon =
-        browserStart === 'firefox' ? 'simple-firefox' : browserStart;
       return (
         `<th key="${browser}" class="bc-browser bc-browser-${browser}">
          <div class="bc-head-txt-label bc-head-icon-${browser}">
            ${BrowserName({browserInfo, id: browser})}
          </div>
-         <div class="bc-head-icon-symbol icon icon-${browserIcon}"></div>
+         <div class="bc-head-icon-symbol icon icon-${browserToIconName(
+          browser
+        )}"></div>
        </th>`
       );
     }).join('')}
@@ -54,14 +57,23 @@ function BrowserHeaders({ browserInfo, browsers }: {
   );
 }
 
-export function Headers({ browserInfo, platforms, browsers }: {
-  browserInfo: BCD.Browsers;
+export function browserToIconName(browser: string) {
+  const browserStart = browser.split('_')[0];
+  return browserStart === 'firefox' ? 'simple-firefox' : browserStart;
+}
+
+export function Headers({
+  platforms,
+  browsers,
+  browserInfo,
+}: {
+  platforms: string[];
   browsers: BCD.BrowserName[];
-  platforms: string[]
+  browserInfo: BCD.Browsers;
 }): string {
   return (
     `<thead>
-      ${PlatformHeaders({platforms, browsers})}
+      ${PlatformHeaders({platforms, browsers, browserInfo})}
       ${BrowserHeaders({browserInfo, browsers})}
     </thead>`
   );

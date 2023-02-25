@@ -3,28 +3,15 @@ import type * as BCD from './types';
 import {
   asList,
   getCurrentSupport,
+  hasMore,
   hasNoteworthyNotes,
   isFullySupportedWithoutLimitation,
   isNotSupportedAtAll,
-  isOnlySupportedWithAltName,
-  isOnlySupportedWithFlags,
-  isOnlySupportedWithPrefix,
   isTruthy,
   versionIsPreview,
   SupportStatementExtended,
 } from './utils';
 import { LEGEND_LABELS } from './legend';
-
-// Yari builder will attach extra keys from the compat data
-// it gets from @mdn/browser-compat-data. These are "Yari'esque"
-// extras that helps us avoiding to have a separate data structure.
-interface CompatStatementExtended extends BCD.CompatStatement {
-  // When a compat statement has a .mdn_url but it's actually not a good
-  // one, the Yari builder will attach an extra boolean that indicates
-  // that it's not a valid link.
-  // Note, it's only 'true' if it's present, hence this interface definition.
-  bad_url?: true;
-}
 
 function getSupportClassName(
   support: SupportStatementExtended | undefined,
@@ -138,7 +125,7 @@ const CellText =({
   const currentSupport = getCurrentSupport(support);
 
   const added = currentSupport?.version_added ?? null;
-  const removed = currentSupport?.version_removed ?? null;
+  const lastVersion = currentSupport?.version_last ?? null;
 
   const browserReleaseDate = getSupportBrowserReleaseDate(support);
   const supportClassName = getSupportClassName(support, browser);
@@ -154,7 +141,7 @@ const CellText =({
     status = { isSupported: 'unknown' };
     break;
   case true:
-    status = { isSupported: 'yes' };
+    status = { isSupported: lastVersion ? 'no' : 'yes' };
     break;
   case false:
     status = { isSupported: 'no' };
@@ -165,7 +152,7 @@ const CellText =({
   default:
     status = {
       isSupported: supportClassName,
-      label: versionLabelFromSupport(added, removed, browser),
+      label: versionLabelFromSupport(added, lastVersion, browser),
     };
     break;
   }
@@ -209,7 +196,9 @@ const CellText =({
     break;
   }
 
-  return (`<div class="bcd-cell-text-wrapper">
+  return (`<div class="${
+    timeline ? 'bcd-timeline-cell-text-wrapper' : 'bcd-cell-text-wrapper'
+  }">
         <div class="bcd-cell-icons">
           <span class="icon-wrap">
             <abbr
@@ -225,9 +214,14 @@ const CellText =({
           <span
             class="bc-version-label"
             title=${
-    browserReleaseDate ? `Released ${browserReleaseDate}` : undefined
+    browserReleaseDate && !timeline
+      ? `Released ${browserReleaseDate}`
+      : undefined
     }>
             ${label}
+            ${browserReleaseDate && timeline
+      ? ` (Released ${browserReleaseDate})`
+      : ''}
           </span>
         </div>
         ${CellIcons({support})}
@@ -252,13 +246,11 @@ function CellIcons({ support }: { support: BCD.SupportStatement | undefined }) {
 
   const icons = [
     // TODO: key?
-    isOnlySupportedWithPrefix(support) && Icon({name: 'prefix'}),
+    supportItem.prefix && Icon({name: 'prefix'}),
     hasNoteworthyNotes(supportItem) && Icon({name: 'footnote'}),
-    isOnlySupportedWithAltName(support) && (
-      Icon({name: 'altname'})),
-    isOnlySupportedWithFlags(support) && (
-      Icon({name: 'disabled'})
-    ),
+    supportItem.alternative_name && Icon({name: 'altname'}),
+    supportItem.flags && Icon({name: 'disabled'}),
+    hasMore(support) && Icon({name: 'more'}),
   ].filter(Boolean);
 
   return icons.length ? `<div class="bc-icons">${icons.join('')}</div>` : '';
@@ -456,7 +448,7 @@ export const FeatureRow = ({
   index: number;
   feature: {
     name: string;
-    compat: CompatStatementExtended;
+    compat: BCD.CompatStatement;
     depth: number;
   };
   browsers: BCD.BrowserName[];
@@ -475,16 +467,7 @@ export const FeatureRow = ({
 
   let titleNode: string;
 
-  if (compat.bad_url && compat.mdn_url) {
-    titleNode = (
-      `<div class="bc-table-row-header">
-        <abbr class="new" title="${compat.mdn_url} does not exist">
-          ${title}
-        </abbr>
-        ${compat.status && StatusIcons( {status: compat.status}) || ''}
-      </div>`
-    );
-  } else if (compat.mdn_url && depth > 0) {
+  if (compat.mdn_url && depth > 0) {
     titleNode = (
       `<a href={compat.mdn_url} class="bc-table-row-header">
         ${title}

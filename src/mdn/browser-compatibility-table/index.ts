@@ -1,4 +1,3 @@
-import * as bcd from './browsers';
 import type * as BCD from './types';
 import { FeatureRow } from './feature-row';
 import { Headers } from './headers';
@@ -7,6 +6,8 @@ import { listFeatures } from './utils';
 
 // Note! Don't import any SCSS here inside *this* component.
 // It's done in the component that lazy-loads this component.
+
+export const HIDDEN_BROWSERS = ['ie'];
 
 /**
  * Return a list of platforms and browsers that are relevant for this category &
@@ -20,7 +21,8 @@ import { listFeatures } from './utils';
  */
 function gatherPlatformsAndBrowsers(
   category: string,
-  data: BCD.Identifier
+  data: BCD.Identifier,
+  browserInfo: BCD.Browsers
 ): [string[], BCD.BrowserName[]] {
   const hasNodeJSData = data.__compat && 'nodejs' in data.__compat.support;
   const hasDenoData = data.__compat && 'deno' in data.__compat.support;
@@ -35,9 +37,9 @@ function gatherPlatformsAndBrowsers(
   // Add browsers in platform order to align table cells
   for (const platform of platforms) {
     browsers.push(
-      ...(Object.keys(bcd.browsers).filter(
-        (browser) => bcd.browsers[
-          browser as keyof typeof bcd.browsers].type === platform
+      ...(Object.keys(browserInfo).filter(
+        (browser) => browserInfo[
+          browser as keyof typeof browserInfo].type === platform
       ) as BCD.BrowserName[])
     );
   }
@@ -45,7 +47,7 @@ function gatherPlatformsAndBrowsers(
   // Filter WebExtension browsers in corresponding tables.
   if (category === 'webextensions') {
     browsers = browsers.filter(
-      (browser) => bcd.browsers[browser].accepts_webextensions
+      (browser) => browserInfo[browser].accepts_webextensions
     );
   }
 
@@ -54,6 +56,9 @@ function gatherPlatformsAndBrowsers(
   if (category !== 'javascript' && !hasNodeJSData) {
     browsers = browsers.filter((browser) => browser !== 'nodejs');
   }
+
+  // Hide Internet Explorer compatibility data
+  browsers = browsers.filter((browser) => !HIDDEN_BROWSERS.includes(browser));
 
   return [platforms, [...browsers]];
 }
@@ -100,12 +105,16 @@ export default function BrowserCompatibilityTable({
   const category = breadcrumbs[0];
   const name = breadcrumbs[breadcrumbs.length - 1];
 
-  const [platforms, browsers] = gatherPlatformsAndBrowsers(category, data);
+  const [platforms, browsers] = gatherPlatformsAndBrowsers(
+    category,
+    data,
+    browserInfo
+  );
 
-  return `<div class="table-scroll">
-          <div class="table-scroll-inner">
+  return `<figure class="table-container">
+          <figure class="table-container-inner">
             <table key="bc-table" class="bc-table bc-table-web">
-        ${Headers({browserInfo, platforms, browsers})}
+        ${Headers({platforms, browsers, browserInfo})}
           <tbody>
           ${FeatureListAccordion({
     browserInfo,
@@ -115,8 +124,8 @@ export default function BrowserCompatibilityTable({
   })}
           </tbody>
         </table>
-        </div>
-      </div>
+        </figure>
+      </figure>
       ${Legend({compat: data, name, browserInfo})}`;
 }
 
