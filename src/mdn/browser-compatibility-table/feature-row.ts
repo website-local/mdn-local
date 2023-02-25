@@ -388,7 +388,7 @@ function CompatCell({
   browserInfo,
   support,
   showNotes,
-  // onToggle,
+  onToggle,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   locale,
 }: {
@@ -396,7 +396,7 @@ function CompatCell({
   browserInfo: BCD.BrowserStatement;
   support: BCD.SupportStatement | undefined;
   showNotes: boolean;
-  // onToggle: () => void;
+  onToggle: { index: number, i: number };
   locale: string;
 }) {
 
@@ -426,8 +426,9 @@ function CompatCell({
       notes ? 'bc-has-history' : ''
     }"
         aria-expanded="false"
+        data-on-toggle="${onToggle.index},${onToggle.i}"
       >
-        <button type="button" disabled=${!notes} title="Toggle history">
+        <button type="button" ${notes ? '' : 'disabled'} title="Toggle history">
           ${content}
           <span class="offscreen">Toggle history</span>
         </button>
@@ -485,18 +486,19 @@ export const FeatureRow = ({
 
   return (`<tr class="bc-content-row" key="${index}">
           <th class="bc-feature bc-feature-depth-${depth}" scope="row">${titleNode}</th>
-    ${browsers.map((browser) => (
+    ${browsers.map((browser, i) => (
       CompatCell({
         // key: browser,
         browserId: browser,
         browserInfo: browserInfo[browser],
         support: compat.support[browser],
         showNotes: true,
+        onToggle: {index, i},
         locale
       })
     )).join('')}
     </tr>
-    <tr class="bc-history bc-history-desktop bc-hidden">
+    <tr class="bc-history bc-history-desktop bc-hidden" key="${index}">
       <td colSpan=${browsers.length + 1}>
         <dl class="bc-notes-list"></dl>
       </td>
