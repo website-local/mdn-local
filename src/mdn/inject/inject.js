@@ -15,7 +15,7 @@
     // yari theme menu
     themeBtn, themeMenu, currentTheme,
     // yari mobile left sidebar
-    sidebarBtn, sidebarContainer, sidebarFirstOpen = true;
+    sidebarBtn, sidebarContainer, sidebarCurrentElem;
 
   /// endregion top-level vars
 
@@ -569,8 +569,6 @@
   sidebarContainer = document.getElementById('sidebar-quicklinks');
   if (sidebarBtn && sidebarContainer) {
     sidebarBtn.onclick = function () {
-      // noinspection ES6ConvertVarToLetConst
-      var em;
       if (hasClass(sidebarContainer, 'is-expanded')) {
         removeClass(sidebarContainer, 'is-expanded');
         removeClass(document.body, 'mobile-overlay-active');
@@ -581,15 +579,13 @@
         addClass(document.body, 'mobile-overlay-active');
         sidebarBtn.setAttribute('aria-label', 'Collapse sidebar');
         sidebarBtn.setAttribute('aria-expanded', 'true');
-        if (sidebarFirstOpen) {
-          sidebarFirstOpen = false;
-          em = sidebarContainer.querySelector('.sidebar em');
-          if (em && typeof em.scrollIntoView === 'function') {
-            em.scrollIntoView({ block: 'center' });
-          }
-        }
       }
     };
+    sidebarCurrentElem = sidebarContainer.querySelector('.sidebar em');
+    if (sidebarCurrentElem &&
+      typeof sidebarCurrentElem.scrollIntoView === 'function') {
+      sidebarCurrentElem.scrollIntoView({ block: 'center' });
+    }
 
   }
   /// endregion yari mobile left sidebar
