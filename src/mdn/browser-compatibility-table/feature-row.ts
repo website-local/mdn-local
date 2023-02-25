@@ -210,7 +210,7 @@ const CellText =({
           </span>
         </div>
         <div class="bcd-cell-text-copy">
-          <span class="bc-browser-name">{browser.name}</span>
+          <span class="bc-browser-name">${browser.name}</span>
           <span
             class="bc-version-label"
             title=${

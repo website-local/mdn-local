@@ -153,6 +153,12 @@ export function preProcessYariDocData(
       const value = browserCompatibilityData[i];
       if (value && value.dataURL) {
         resultVal.push(value as MdnYariCompatibilityDataWithUrl);
+      } else if (value && value.query) {
+        // https://github.com/mdn/yari/commit/c61564abf5e818fa6adbd801d8021a6fde38fb53
+        resultVal.push({
+          ...value,
+          dataURL: `https://developer.mozilla.org/bcd/api/v0/current/${value.query}.json`,
+        });
       } else {
         errorLogger.info('incomplete browser_compatibility data',
           value, data.mdn_url);
