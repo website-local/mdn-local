@@ -1,5 +1,6 @@
+import type {HTTPError} from 'got';
 import {
-  error as errorLogger
+  error as errorLogger, notFound
 } from 'website-scrap-engine/lib/logger/logger';
 import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 import type {
@@ -12,9 +13,11 @@ import type {
 import type {Resource} from 'website-scrap-engine/lib/resource';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {toString} from 'website-scrap-engine/lib/util';
-import {
-  renderYariCompatibilityTable,
+import type {
   YariCompatibilityDataJson
+} from '../browser-compatibility-table';
+import {
+  renderYariCompatibilityTable
 } from '../browser-compatibility-table';
 
 /// region type def
@@ -254,7 +257,9 @@ export const preProcessYariData = (
 };
 
 const BCD_PLACE_HOLDER = 'BCD tables only load in the browser';
-const BCD_PLACE_HOLDER_2022 = 'BCD tables only load in the browser <!-- -->with JavaScript enabled. Enable JavaScript to view data.';
+const BCD_PLACE_HOLDER_2022 =
+  'BCD tables only load in the browser <!-- -->with JavaScript enabled.' +
+  ' Enable JavaScript to view data.';
 
 export interface MdnYariCompatibilityRenderingContext {
   res: Resource;
@@ -297,8 +302,23 @@ export async function downloadAndRenderYariCompatibilityData(
     return;
   }
 
-  const downloadResources =
-    await Promise.all(contexts.map(c => pipeline.download(c.res)));
+  const downloadResources = await Promise.all(contexts.map(c => {
+    return Promise.resolve(pipeline.download(c.res)).catch(err => {
+      if (err && (err as {name?: string | void}).name === 'HTTPError' &&
+          (err as HTTPError)?.response?.statusCode === 404) {
+        notFound.warn('Not found yari bcd',
+          c.data?.id,
+          c.data?.query,
+          c.data?.dataURL);
+      } else {
+        errorLogger.warn('Error downloading yari bcd',
+          c.data?.id,
+          c.data?.query,
+          c.data?.dataURL, err.code);
+      }
+      return c;
+    });
+  }));
   const placeholders: Cheerio[] = [];
   const elements = $('#content>.article>p,#content>.main-page-content>p');
   for (let i = 0; i < elements.length; i++) {
@@ -315,15 +335,27 @@ export async function downloadAndRenderYariCompatibilityData(
       'yari bcd: can not find a place to render the table', res.url);
   }
 
-  for (let i = 0, r: DownloadResource | void, el: Cheerio,
-    data: MdnYariCompatibilityDataWithUrl; i < downloadResources.length; i++) {
-    r = downloadResources[i];
+  for (let i = 0, el: Cheerio, data: MdnYariCompatibilityDataWithUrl;
+    i < downloadResources.length; i++) {
+    const r = downloadResources[i];
     data = contexts[i]?.data;
     el = placeholders[contexts[i].index];
-    if (!(r && r.body && data)) {
+    if (!r) {
       continue;
     }
-    submit(r);
+    if ((r as MdnYariCompatibilityRenderingContext)?.data?.dataURL) {
+      // fail to download, is MdnYariCompatibilityRenderingContext
+      el.html(`<div class="notecard warning"><p>No compatibility data found for <code>${
+        (r as MdnYariCompatibilityRenderingContext)?.data?.query
+      }</code>.</p></div>`);
+      continue;
+    }
+    if (!(r && (r as DownloadResource).body && data)) {
+      // not DownloadResource
+      continue;
+    }
+    const bcdRes = r as DownloadResource;
+    submit(bcdRes);
     if (!el) {
       errorLogger.warn(
         'yari bcd: can not find a place to render the table',
@@ -340,7 +372,7 @@ export async function downloadAndRenderYariCompatibilityData(
     }
     // note: keep the original body of resource
     const jsonData: YariCompatibilityDataJson =
-      JSON.parse(toString(r.body, r.encoding));
+      JSON.parse(toString(bcdRes.body, bcdRes.encoding));
     //
     if (!jsonData.locale) {
       jsonData.locale = locale;
