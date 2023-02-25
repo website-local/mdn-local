@@ -1,7 +1,7 @@
 import {
   processPathWithMultiLocale
 } from '../../../src/mdn/process-url/process-path-with-multi-locale';
-import URI from 'urijs';
+import URI = require('urijs');
 
 const testCases = [
   [
