@@ -13,7 +13,9 @@
     // yari search box on main page
     searchBox,
     // yari theme menu
-    themeBtn, themeMenu, currentTheme;
+    themeBtn, themeMenu, currentTheme,
+    // yari mobile left sidebar
+    sidebarBtn, sidebarContainer, sidebarFirstOpen = true;
 
   /// endregion top-level vars
 
@@ -156,6 +158,7 @@
   /// endregion old compatibility table
 
   /// region yari new compatibility table
+  // https://github.com/website-local/mdn-local/issues/630
   newTables ='getElementsByClassName' in document ?
     document.getElementsByClassName('bc-table') :
     document.querySelectorAll('.bc-table');
@@ -164,7 +167,6 @@
     newTables[i].onclick = browserCompatibilityTableClickListener;
   }
 
-  // compatible with minimal IE9 since it uses firstElementChild
   function browserCompatibilityTableClickListener(e) {
     // noinspection JSDeprecatedSymbols
     e = e || window.event;
@@ -254,6 +256,7 @@
   /// endregion yari new compatibility table
 
   /// region yari expandable top menu
+  // https://github.com/website-local/mdn-local/issues/783
   pageHeader = document.querySelector('.main-document-header-container');
   menuToggleBtn = pageHeader && pageHeader.querySelector('.main-menu-toggle');
   pageHeaderMain = pageHeader && (
@@ -440,6 +443,7 @@
   /// endregion yari main-menu nojs
 
   /// region yari theme menu
+  // https://github.com/website-local/mdn-local/issues/782
   themeBtn = document.querySelector('button.theme-switcher-menu');
   if (themeBtn) {
     themeMenu = document.createElement('ul');
@@ -558,4 +562,36 @@
     }
   }
   /// endregion yari theme menu
+
+  /// region yari mobile left sidebar
+  // https://github.com/website-local/mdn-local/issues/784
+  sidebarBtn = document.querySelector('.sidebar-button');
+  sidebarContainer = document.getElementById('sidebar-quicklinks');
+  if (sidebarBtn && sidebarContainer) {
+    sidebarBtn.onclick = function () {
+      // noinspection ES6ConvertVarToLetConst
+      var em;
+      if (hasClass(sidebarContainer, 'is-expanded')) {
+        removeClass(sidebarContainer, 'is-expanded');
+        removeClass(document.body, 'mobile-overlay-active');
+        sidebarBtn.setAttribute('aria-label', 'Expand sidebar');
+        sidebarBtn.setAttribute('aria-expanded', 'false');
+      } else {
+        addClass(sidebarContainer, 'is-expanded');
+        addClass(document.body, 'mobile-overlay-active');
+        sidebarBtn.setAttribute('aria-label', 'Collapse sidebar');
+        sidebarBtn.setAttribute('aria-expanded', 'true');
+        if (sidebarFirstOpen) {
+          sidebarFirstOpen = false;
+          em = sidebarContainer.querySelector('.sidebar em');
+          if (em && typeof em.scrollIntoView === 'function') {
+            em.scrollIntoView({ block: 'center' });
+          }
+        }
+      }
+    };
+
+  }
+  /// endregion yari mobile left sidebar
+
 }();
