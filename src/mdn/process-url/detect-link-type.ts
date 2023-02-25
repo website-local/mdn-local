@@ -16,15 +16,29 @@ const validExtensionName = arrayToMap([
   'xul',
   'zip',
   'mp3', 'ogg',
-  'mp4', 'flv', 'm4v', 'mkv', 'webm',
+  'ogv', 'mp4', 'flv', 'm4v', 'mkv', 'webm',
   'msi',
   'xpi',
   'rdf',
   'pdf',
   'dia',
   'eot',
-  'psd'
+  'psd',
+  'vtt',
 ]);
+
+const forceBinarySuffix = [
+  '/Learn/CSS/CSS_layout/Flexbox/flexbox_first-child_flex-end.png',
+  '/Learn/CSS/CSS_layout/Flexbox/flexbox-example7.png',
+  '/Basic_animations/capitan_meadows,_yosemite_national_park.jpg',
+  '/docs/Learn/HTML/Cheatsheet/beast.png',
+  '/Web/API/HTMLImageElement/sizes/new-york-skyline-wide.jpg',
+  '/Web/API/HTMLImageElement/sizes/new-york-skyline-tall.jpg',
+  '/Web/API/HTMLImageElement/sizes/new-york-skyline-4by3.jpg',
+  '/Web/API/HTMLImageElement/src/grapefruit-slice-332-332.jpg',
+  '/Web/API/HTMLMediaElement/textTracks/sample.mp4',
+  '/Web/API/HTMLMediaElement/textTracks/sample.ogv',
+];
 
 export const detectLinkType = (
   url: string,
@@ -36,6 +50,15 @@ export const detectLinkType = (
   if (url.includes('/sitemaps/') && url.endsWith('/sitemap.xml.gz')) {
     return ResourceType.SiteMap;
   }
+  for (let len = forceBinarySuffix.length, i = 0; i < len; i++) {
+    if (url.endsWith(forceBinarySuffix[i])) {
+      return ResourceType.Binary;
+    }
+  }
+  if (url.endsWith('/Add-ons/WebExtensions/manifest.json')) {
+    return ResourceType.Html;
+  }
+
   if (!((elem && (elem.is('a') || elem.is('iframe'))) ||
     (parent && (
       parent.type === ResourceType.SiteMap ||

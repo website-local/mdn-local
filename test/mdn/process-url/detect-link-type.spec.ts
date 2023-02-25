@@ -23,6 +23,18 @@ describe('detect-link-type', function () {
       ResourceType.Html, a, null)).toBe(ResourceType.Html);
     expect(detectLinkType('https://developer.mozilla.org/@api/deki/files/2935/=webfont-sample.html',
       ResourceType.Binary, a, null)).toBe(ResourceType.Html);
+    expect(detectLinkType('https://developer.mozilla.org/Add-ons/WebExtensions/manifest.json',
+      ResourceType.Binary, a, null)).toBe(ResourceType.Html);
+    expect(detectLinkType('https://developer.mozilla.org/Add-ons/WebExtensions/manifest.json',
+      ResourceType.Html, a, null)).toBe(ResourceType.Html);
+    expect(detectLinkType('https://developer.mozilla.org/Add-ons/WebExtensions/manifest.json',
+      ResourceType.Binary, null, null)).toBe(ResourceType.Html);
+    expect(detectLinkType('https://developer.mozilla.org/Add-ons/WebExtensions/manifest.json',
+      ResourceType.Html, null, null)).toBe(ResourceType.Html);
+    expect(detectLinkType('https://developer.mozilla.org/zh-CN/docs/Mozilla/Add-ons/WebExtensions/manifest.json',
+      ResourceType.Binary, null, null)).toBe(ResourceType.Html);
+    expect(detectLinkType('https://developer.mozilla.org/zh-CN/docs/Mozilla/Add-ons/WebExtensions/manifest.json',
+      ResourceType.Html, null, null)).toBe(ResourceType.Html);
   });
   test('binary', () => {
     const a = cheerio.load('<a></a>')('a');
