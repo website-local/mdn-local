@@ -70,6 +70,17 @@ export class MdnDownloader extends SingleThreadDownloader {
   }
 }
 
+function makeIndexPagePlaceholder(locale: string) {
+  return `<html lang="en">
+<head>
+<meta charset="utf8">
+<meta http-equiv="refresh" content="0; url=${locale}/index.html">
+<script>location.replace('${locale}/index.html' + location.hash);</script>
+<title>Redirecting</title>
+</head>
+</html>`;
+}
+
 export default async function createDownloader(
   overrideOptions: Partial<StaticDownloadOptions>,
   locale?: string
@@ -98,12 +109,20 @@ export default async function createDownloader(
     cssPath = path.join(basePath, 'css');
   mkdir(jsPath);
   mkdir(cssPath);
-  await fs.copyFile(path.join(__dirname, 'inject', 'inject.js'),
-    path.join(jsPath, 'inject.js'));
-  await fs.copyFile(path.join(__dirname, 'inject', 'inject.css'),
-    path.join(cssPath, 'inject.css'));
+  await Promise.all([
+    fs.copyFile(path.join(__dirname, 'inject', 'inject.js'),
+      path.join(jsPath, 'inject.js')),
+    fs.copyFile(path.join(__dirname, 'inject', 'inject.css'),
+      path.join(cssPath, 'inject.css')),
+    fs.writeFile(path.join(
+      overrideOptions.localRoot,
+      'developer.mozilla.org',
+      'index.html'), makeIndexPagePlaceholder(locale)),
+  ]);
   const downloader: MdnDownloader =
     new MdnDownloader(path.join(__dirname, 'life-cycle'), overrideOptions);
+  downloader.queuedUrl.add('https://developer.mozilla.org/');
+  downloader.queuedUrl.add('https://developer.mozilla.org/index.html');
   await downloader.init;
   downloader.start();
   return downloader;
