@@ -1,6 +1,6 @@
 {
   "name": "mdn-local",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "create offline mozilla developer network documents",
   "main": "index.js",
   "engines": {
