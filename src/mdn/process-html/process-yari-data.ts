@@ -307,11 +307,13 @@ export async function downloadAndRenderYariCompatibilityData(
       if (err && (err as {name?: string | void}).name === 'HTTPError' &&
           (err as HTTPError)?.response?.statusCode === 404) {
         notFound.warn('Not found yari bcd',
+          res.url,
           c.data?.id,
           c.data?.query,
           c.data?.dataURL);
       } else {
         errorLogger.warn('Error downloading yari bcd',
+          res.url,
           c.data?.id,
           c.data?.query,
           c.data?.dataURL, err.code);
