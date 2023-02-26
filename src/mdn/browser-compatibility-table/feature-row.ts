@@ -213,16 +213,13 @@ const CellText =({
           <span class="bc-browser-name">${browser.name}</span>
           <span
             class="bc-version-label"
-            title=${
+            title="${
     browserReleaseDate && !timeline
       ? `Released ${browserReleaseDate}`
-      : undefined
-    }>
-            ${label}
-            ${browserReleaseDate && timeline
+      : ''
+    }"> ${label} ${browserReleaseDate && timeline
       ? ` (Released ${browserReleaseDate})`
-      : ''}
-          </span>
+      : ''}</span>
         </div>
         ${CellIcons({support})}
       </div>`);
@@ -234,7 +231,7 @@ function Icon({ name }: { name: string }) {
   return (
     `<abbr class="only-icon" title="${title}">
     <span>${name}</span>
-    <i class="icon icon-${name}" />
+    <i class="icon icon-${name}"></i>
   </abbr>`);
 }
 
@@ -245,7 +242,6 @@ function CellIcons({ support }: { support: BCD.SupportStatement | undefined }) {
   }
 
   const icons = [
-    // TODO: key?
     supportItem.prefix && Icon({name: 'prefix'}),
     hasNoteworthyNotes(supportItem) && Icon({name: 'footnote'}),
     supportItem.alternative_name && Icon({name: 'altname'}),
@@ -291,7 +287,7 @@ function getNotes(
   support: BCD.SupportStatement
 ) {
   if (!support) {
-    return [''];
+    return undefined;
   }
   return asList(support)
     .slice()
@@ -416,7 +412,7 @@ function CompatCell({
   const notes = getNotes(browserInfo, support!);
   const content = (`${CellText({support, browser: browserInfo})}
   ${showNotes && (
-      `<dl class="bc-notes-list bc-history bc-history-mobile bc-hidden">${notes}</dl>`
+      `<dl class="bc-notes-list bc-history bc-history-mobile bc-hidden">${notes || ''}</dl>`
     )}
   </>
 `);
