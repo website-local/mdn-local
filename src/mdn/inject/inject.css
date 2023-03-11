@@ -148,3 +148,142 @@ table.compat-table th {
 
 /* endregion yari browser-compatibility-table */
 
+
+/* region yari mask-image to background fix */
+/* https://github.com/website-local/mdn-local/issues/785 */
+
+.mask-fix a.external::after {
+  background-size: cover;
+  filter: invert(1) contrast(0.5);
+  background-color: transparent;
+}
+
+.dark .mask-fix a.external::after {
+  filter: none;
+}
+
+@media screen and (min-width: 1200px) {
+  .mask-fix .main-wrapper .toc {
+    background-image: none;
+    mask-image: linear-gradient(180deg,transparent 0,#000 10% 90%,transparent);
+  }
+}
+
+/* icons in sidebars */
+.mask-fix .icon-experimental,
+.mask-fix .icon-nonstandard {
+  background-color: transparent;
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(200deg) brightness(0.9);
+}
+
+.mask-fix .icon-deprecated {
+  background-color: transparent;
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(340deg) brightness(0.9);
+}
+
+.mask-fix .notecard::before {
+  background-color: transparent;
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(200deg) brightness(0.9);
+}
+
+.mask-fix .notecard.warning::before,
+.mask-fix .notecard.error::before,
+.mask-fix .notecard.negative::before,
+.mask-fix .notecard.deprecated::before,
+.mask-fix .notecard.nonstandard::before {
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(340deg) brightness(0.9);
+}
+
+.mask-fix .notecard.success::before{
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(340deg) brightness(0.9);
+}
+
+.mask-fix .bc-legend-item-dt .icon,
+.mask-fix .bc-table .icon {
+  background-color: transparent;
+}
+.dark .mask-fix .bc-legend-item-dt .icon,
+.dark .mask-fix .bc-table .icon {
+  filter: invert(1);
+}
+.mask-fix .icon.icon-no {
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(340deg) brightness(0.9) !important;
+}
+.mask-fix .bc-notes-list .bc-supports-dd .icon {
+  background-color: revert;
+  filter: invert(0.5);
+}
+.mask-fix .bc-level-preview.icon {
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(200deg) brightness(0.9) !important;
+}
+.mask-fix .bc-notes-list .bc-level-yes.icon.icon-yes {
+  background-color: transparent;
+}
+.dark .mask-fix .bc-notes-list .bc-level-yes.icon.icon-yes {
+  filter: none;
+}
+.mask-fix .example-bad::after,
+.mask-fix .example-good::after {
+  background-color: transparent;
+  background-size: cover;
+}
+.mask-fix .example-bad::after {
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(340deg) brightness(0.9);
+}
+.mask-fix .example-good::after {
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(150deg);
+}
+.mask-fix .breadcrumbs-container li .breadcrumb::after {
+  filter: invert(1);
+  background-color: transparent;
+}
+.dark .mask-fix .breadcrumbs-container li .breadcrumb::after {
+  filter: none;
+}
+.mask-fix .icon.icon-theme-os-default,
+.mask-fix .icon.icon-theme-light,
+.mask-fix .icon.icon-theme-dark,
+.mask-fix .icon.icon-sidebar,
+.mask-fix .icon.icon-cancel,
+.mask-fix .icon.icon-sidebar {
+  background-color: transparent;
+}
+.mask-fix .icon.icon-cancel {
+  filter: invert(1);
+}
+.dark .mask-fix .icon.icon-theme-os-default,
+.dark .mask-fix .icon.icon-theme-light,
+.dark .mask-fix .icon.icon-theme-dark,
+.dark .mask-fix .icon.icon-sidebar,
+.dark .mask-fix .icon.icon-sidebar {
+  filter: invert(1);
+}
+.dark .mask-fix .icon.icon-cancel {
+  filter: none;
+}
+.mask-fix .icon.icon-unknown {
+  filter: invert(0.2);
+}
+.dark .mask-fix .icon.icon-unknown {
+  filter: invert(1);
+}
+.mask-fix .icon.icon-unknown {
+  filter: invert(0.2);
+}
+.mask-fix .languages-switcher-menu > .button .button-wrap::after,
+.mask-fix .theme-switcher-menu > .button .button-wrap::after {
+  background-color: transparent;
+  filter: invert(1);
+}
+.dark .mask-fix .languages-switcher-menu > .button .button-wrap::after,
+.dark .mask-fix .theme-switcher-menu > .button .button-wrap::after {
+  filter: none;
+}
+.mask-fix .top-navigation-main .menu-toggle::after {
+  background-color: transparent;
+  filter: invert(1);
+}
+.dark .mask-fix .top-navigation-main .menu-toggle::after {
+  filter: none;
+}
+/* endregion yari mask-image to background fix */
