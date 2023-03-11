@@ -23,6 +23,7 @@ import {decompressSitemap} from './decompress-sitemap';
 import {downloadAndFallback} from './download-and-fallback';
 import {processSearchJson} from './process-search-json';
 import {CustomDnsLookup} from './custom-dns-lookup';
+import {processYariMainCss} from './process-html/process-yari-main-css';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);
@@ -43,7 +44,8 @@ lifeCycle.processAfterDownload.push(
   processHtml(postProcessHtml),
   processHtml(postProcessInteractiveExample),
   processYariSourceMap,
-  processSearchJson
+  processSearchJson,
+  processYariMainCss
 );
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
