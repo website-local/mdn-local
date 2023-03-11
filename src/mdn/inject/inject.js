@@ -15,7 +15,9 @@
     // yari theme menu
     themeBtn, themeMenu, currentTheme,
     // yari mobile left sidebar
-    sidebarBtn, sidebarContainer, sidebarCurrentElem;
+    sidebarBtn, sidebarContainer, sidebarCurrentElem,
+    // yari mask-image to background fix
+    linkCss, linkPreload;
 
   /// endregion top-level vars
 
@@ -590,4 +592,23 @@
   }
   /// endregion yari mobile left sidebar
 
+  /// region yari mask-image to background fix
+  // https://github.com/website-local/mdn-local/issues/785
+  if (window.location.protocol === 'file:') {
+    addClass(document.body ||
+      document.getElementsByTagName('body')[0], 'mask-fix');
+    linkCss = document.querySelector('link[rel="stylesheet"][href*="main."]');
+    if (linkCss) {
+      linkPreload = document.createElement('link');
+      linkPreload.href = linkCss.href.replace(/\.css$/, '_file.css');
+      linkPreload.rel = 'preload';
+      linkPreload.as = 'style';
+      document.head.appendChild(linkPreload);
+      setTimeout(function () {
+        linkCss.href =  linkPreload.href;
+      }, 15);
+
+    }
+  }
+  /// endregion yari mask-image to background fix
 }();
