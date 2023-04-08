@@ -6,7 +6,7 @@ import {localesMap, redirectLocale} from './process-url/consts';
 import type {NormalizedOptions} from 'got/dist/source/core';
 import path from 'path';
 import {defaultInitialUrl} from './process-url/default-initial-url';
-import {sync as mkdir} from 'mkdirp';
+import {mkdirpSync as mkdir} from 'mkdirp';
 import {promises as fs} from 'fs';
 import {CustomDnsLookup} from './custom-dns-lookup';
 
