@@ -8,10 +8,10 @@ import {
   isFullySupportedWithoutLimitation,
   isNotSupportedAtAll,
   isTruthy,
-  versionIsPreview,
   SupportStatementExtended,
+  versionIsPreview,
 } from './utils';
-import { LEGEND_LABELS } from './legend';
+import {LEGEND_LABELS} from './legend';
 
 function getSupportClassName(
   support: SupportStatementExtended | undefined,
@@ -273,7 +273,7 @@ function FlagsNote({
       const valueToSet = flag.value_to_set &&
       (`  (needs to be set to <code>${flag.value_to_set}</code>)`) || '';
       return (`<code key="${flag.name}">${flag.name}</code>
-        ${flag.type === 'preference' && `preferences${valueToSet}` || ''}
+        ${flag.type === 'preference' && `preference${valueToSet}` || ''}
         ${flag.type === 'runtime_flag' && `runtime flag${valueToSet}` || ''}
         ${i < flags.length - 1 && ' and the ' || ''}`);
     }).join('')}.${browser.pref_url &&
