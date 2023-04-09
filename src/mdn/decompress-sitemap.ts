@@ -2,6 +2,7 @@ import type {DownloadResource} from 'website-scrap-engine/lib/life-cycle/types';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {promisify} from 'util';
 import {gunzip, InputType} from 'zlib';
+
 const gunzipAsync = promisify(gunzip);
 
 /**
@@ -27,6 +28,27 @@ export const decompressSitemap = async (
   } else {
     body = Buffer.from(res.body.buffer,
       res.body.byteOffset, res.body.byteLength);
+  }
+  let isGzip = true;
+  if (body instanceof ArrayBuffer) {
+    body = Buffer.from(body);
+  }
+  if (Buffer.isBuffer(body)) {
+    isGzip = body.readUint8(0) === 0x1f &&
+      body.readUint8(1) === 0x8b;
+  } else if (body instanceof Uint8Array) {
+    isGzip = body[0] === 0x1f &&
+      body[1] === 0x8b;
+  } else if (typeof body === 'string') {
+    isGzip = body.charCodeAt(0) === 0x1f &&
+      body.charCodeAt(1) === 0x8b;
+  }
+  if (!isGzip) {
+    // already decompressed
+    // make it xml
+    res.savePath =
+      res.savePath.replace(/.xml.gz$/, '.xml');
+    return res;
   }
   const decompressedBody = await gunzipAsync(body);
   if (decompressedBody) {
