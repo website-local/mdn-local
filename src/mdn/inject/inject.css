@@ -167,6 +167,10 @@ table.compat-table th {
     background-image: none;
     mask-image: linear-gradient(180deg,transparent 0,#000 10% 90%,transparent);
   }
+  .mask-fix .sidebar-container .toc-container {
+    background-image: none;
+    mask-image: linear-gradient(180deg,transparent 0,#000 3rem calc(100% - 3rem),transparent);
+  }
 }
 
 /* icons in sidebars */
@@ -286,4 +290,13 @@ table.compat-table th {
 .dark .mask-fix .top-navigation-main .menu-toggle::after {
   filter: none;
 }
+.mask-fix .featured-articles .article-tile p::after {
+  background-image: none;
+  mask-image: linear-gradient(90deg,transparent,#000 75%);
+}
 /* endregion yari mask-image to background fix */
+
+/* This padding is not needed */
+div > section.place {
+  min-height: 0;
+}
