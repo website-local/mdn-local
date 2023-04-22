@@ -1,5 +1,4 @@
 import type {Resource} from 'website-scrap-engine/lib/resource';
-import {largeMp4Videos, largeWebmVideos} from './consts';
 import URI from 'urijs';
 
 export const redirectDownloadLink = (res: Resource): Resource => {
@@ -31,15 +30,6 @@ export const redirectDownloadLink = (res: Resource): Resource => {
       // mdn.github.io
       // redirect back to real url
       path = path.slice('/mdn-github-io'.length);
-      // redirect large videos to small ones
-      // https://github.com/myfreeer/mdn-local/issues/46
-      if (largeMp4Videos[path]) {
-        path = '/learning-area/html/multimedia-and-embedding/' +
-          'video-and-audio-content/rabbit320.mp4';
-      } else if (largeWebmVideos[path]) {
-        path = '/learning-area/html/multimedia-and-embedding/' +
-          'video-and-audio-content/rabbit320.webm';
-      }
       res.downloadLink = uri.search('')
         .host('mdn.github.io')
         .path(path)

@@ -5,7 +5,9 @@ import type {
   DownloadOptions,
   StaticDownloadOptions
 } from 'website-scrap-engine/lib/options';
-import {redirectDownloadLink} from '../../../src/mdn/process-url/redirect-download-link';
+import {
+  redirectDownloadLink
+} from '../../../src/mdn/process-url/redirect-download-link';
 import URI = require('urijs');
 
 const opt = (locale: string): StaticDownloadOptions => ({
@@ -98,42 +100,6 @@ describe('redirect-download-link', function () {
       expect(resource.uri?.path().startsWith('/mdn-github-io/')).toBeTruthy();
       expect(resource.uri?.host()).toBe('developer.mozilla.org');
       expect(resource.downloadLink).toBe(url);
-    }
-  });
-
-  // https://github.com/myfreeer/mdn-local/issues/46
-  test('mdn.github.io large mp4 video', () => {
-    const urls = [
-      'https://mdn.github.io//learning-area/javascript/apis/video-audio/finished/video/sintel-short.mp4',
-      'https://mdn.github.io/html-examples//link-rel-preload/video/sintel-short.mp4',
-      'https://mdn.github.io/../imsc/videos/coffee.mp4',
-      'https://mdn.github.io/imsc/videos/stars.mp4'
-    ];
-    for (const url of urls) {
-      const resource = res(url);
-      redirectDownloadLink(resource);
-      expect(resource.uri?.path().startsWith('/mdn-github-io/')).toBeTruthy();
-      expect(resource.uri?.host()).toBe('developer.mozilla.org');
-      expect(resource.downloadLink).toBe('https://mdn.github.io' +
-        '/learning-area/html/multimedia-and-embedding/' +
-        'video-and-audio-content/rabbit320.mp4');
-    }
-  });
-
-  //https://github.com/myfreeer/mdn-local/issues/46
-  test('mdn.github.io large webm video', () => {
-    const urls = [
-      'https://mdn.github.io/learning-area/javascript/apis/video-audio/finished/video/sintel-short.webm',
-      'https://mdn.github.io//html-examples/link-rel-preload/video/sintel-short.webm'
-    ];
-    for (const url of urls) {
-      const resource = res(url);
-      redirectDownloadLink(resource);
-      expect(resource.uri?.path().startsWith('/mdn-github-io/')).toBeTruthy();
-      expect(resource.uri?.host()).toBe('developer.mozilla.org');
-      expect(resource.downloadLink).toBe('https://mdn.github.io' +
-        '/learning-area/html/multimedia-and-embedding/' +
-        'video-and-audio-content/rabbit320.webm');
     }
   });
 

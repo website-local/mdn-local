@@ -1,4 +1,4 @@
-import { arrayToMap } from 'website-scrap-engine/lib/util';
+import {arrayToMap} from 'website-scrap-engine/lib/util';
 
 export const localeArr = [
   'af', 'ar', 'az', 'bg',
@@ -71,20 +71,4 @@ export const downloadableHosts = arrayToMap([
   // https://github.com/website-local/mdn-local/issues/208
   'developer-stage.mdn.mozit.cloud',
   'developer-prod.mdn.mozit.cloud'
-]);
-
-// manually collected
-export const largeMp4Videos = arrayToMap([
-  '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.mp4',
-  '/html-examples/link-rel-preload/video/sintel-short.mp4',
-  '/imsc/videos/coffee.mp4',
-  '/imsc/videos/stars.mp4',
-  '/dom-examples/fullscreen-api/assets/bigbuckbunny.mp4',
-  '/dom-examples/picture-in-picture/assets/bigbuckbunny.mp4'
-]);
-
-// manually collected
-export const largeWebmVideos = arrayToMap([
-  '/learning-area/javascript/apis/video-audio/finished/video/sintel-short.webm',
-  '/html-examples/link-rel-preload/video/sintel-short.webm'
 ]);
