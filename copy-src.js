@@ -42,7 +42,7 @@ const copyIfNewer = async (src, dest) => {
       } else if (dirent.isFile() && !dirent.name.endsWith('.ts')) {
         if (!fs.existsSync(nextDir = path.join(__dirname, 'lib', currentDir))) {
           console.debug(new Date().toLocaleString(), 'mkdir', nextDir);
-          mkdir.sync(nextDir);
+          mkdir.mkdirpSync(nextDir);
         }
         srcFile = path.join(__dirname, 'src', currentDir, dirent.name);
         destFile = path.join(nextDir, dirent.name);
