@@ -1,22 +1,35 @@
 # mdn-local
 download localized mozilla developer docs to local device
 
-### Not included
-* Multiple locale docs (only one of them included)
-* `https://developer.mozilla.org/presentations/`
-* Large files
-    * <https://mdn.mozillademos.org/files/5237/CommonControls_20130305.psd>
-    * <https://mdn.mozillademos.org/files/5239/IconsMedia_20130305.psd>
-    * <https://mdn.mozillademos.org/files/5241/IconsStatusBar_20130122.psd>
-    * <https://mdn.mozillademos.org/files/5243/IconsCommunications_20130401.psd>
-    * <https://mdn.mozillademos.org/files/5245/IconsSettings_20130415.psd>
-    * <https://mdn.mozillademos.org/files/5247/IconsPrimaryAction_20130501.psd>
-* Large videos (a smaller dummy video would be put in-place)
-    * <https://mdn.github.io/learning-area/javascript/apis/video-audio/finished/video/sintel-short.mp4>
-    * <https://mdn.github.io/html-examples/link-rel-preload/video/sintel-short.mp4>
-    * <https://mdn.github.io/imsc/videos/coffee.mp4>
-    * <https://mdn.github.io/imsc/videos/stars.mp4>
-    * <https://mdn.github.io/learning-area/javascript/apis/video-audio/finished/video/sintel-short.webm>
-    * <https://mdn.github.io/html-examples/link-rel-preload/video/sintel-short.webm>
-    * <https://mdn.github.io/dom-examples/fullscreen-api/assets/bigbuckbunny.mp4>
-    * <https://mdn.github.io/dom-examples/picture-in-picture/assets/bigbuckbunny.mp4>
+## Summary
+
+`mdn-local` is a project focusing to download the all the accessible docs and examples on [MDN Web Docs](https://developer.mozilla.org/) for a specified locale, and resources required for running and viewing this in local device, or local-area network, making it (mostly) work without any external network access (meaning the internet).
+
+For locales other than `en-US`, `en-US` docs would be fetched for pages not localized (not found on mdn).
+
+## Quick start
+
+Goto [releases](https://github.com/website-local/mdn-local/releases), download a package (not the source code), extract it to some path of your drive, double-click `index.html` and enjoy your docs.
+
+## Usage
+
+`mdn-local` is based on [website-scrap-engine](https://github.com/website-local/website-scrap-engine), the main entry in [mdn-downloader.ts](https://github.com/website-local/mdn-local/blob/0.4.0/src/mdn/mdn-downloader.ts). Below is an example of using it to download mdn docs:
+
+```typescript
+import createDownloader from './mdn-downloader';
+
+createDownloader({
+  // The path to download docs to
+  localRoot: '/home/user1000/developer.mozilla.org_20230409_zh-CN',
+  meta: {
+    // The locale of MDN docs to get
+    locale: 'zh-CN',
+    // Configure if http2 is enabled for http connection
+    http2: false,
+    // Configure if ipv6 is prefered on dns lookuping
+    preferIpv6: true
+  }
+}).then(d => d.onIdle().then(() => d.dispose()))
+  .catch(console.error);
+
+```
