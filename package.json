@@ -22,7 +22,7 @@
     "@types/urijs": "^1.19.19",
     "@typescript-eslint/eslint-plugin": "^5.60.1",
     "@typescript-eslint/parser": "^5.60.1",
-    "eslint": "^8.43.0",
+    "eslint": "^8.44.0",
     "jest": "^27.5.1",
     "ts-jest": "^27.1.4",
     "typescript": "^5.0.4"
