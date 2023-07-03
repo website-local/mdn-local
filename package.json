@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "agentkeepalive": "^4.3.0",
-    "fast-glob": "^3.2.12",
+    "fast-glob": "^3.3.0",
     "json5": "^2.2.3",
     "mkdirp": "^3.0.0",
     "tough-cookie": "^4.1.3",
