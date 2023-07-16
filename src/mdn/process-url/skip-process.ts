@@ -1,9 +1,9 @@
 import {
-  skipExternal as skipExternalLogger,
-  error as errorLogger
+  error as errorLogger,
+  skipExternal as skipExternalLogger
 } from 'website-scrap-engine/lib/logger/logger';
 import URI from 'urijs';
-import { downloadableHosts } from './consts';
+import {downloadableHosts} from './consts';
 import type {Resource} from 'website-scrap-engine/lib/resource';
 import type {Cheerio} from 'website-scrap-engine/lib/types';
 
@@ -47,7 +47,10 @@ export const skipProcess = (
   }
   const uri = URI(url), host = uri.host();
   // https://github.com/website-local/mdn-local/issues/208
-  if (host && !downloadableHosts[host] && !host.endsWith('.mdn.mozit.cloud')) {
+  if (host && !downloadableHosts[host] &&
+    !host.endsWith('.mdn.mozit.cloud')&&
+    // https://github.com/website-local/mdn-local/issues/891
+    !host.endsWith('.mdnplay.dev')) {
     skipExternalLogger.debug('skipped external link', host, url, parent?.url);
     return;
   }
