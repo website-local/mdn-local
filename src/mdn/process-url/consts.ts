@@ -70,5 +70,8 @@ export const downloadableHosts = arrayToMap([
   'cdn.jsdelivr.net',
   // https://github.com/website-local/mdn-local/issues/208
   'developer-stage.mdn.mozit.cloud',
-  'developer-prod.mdn.mozit.cloud'
+  'developer-prod.mdn.mozit.cloud',
+  // https://github.com/website-local/mdn-local/issues/890
+  'bcd.developer.mozilla.org',
+  'bcd.developer.allizom.org',
 ]);
