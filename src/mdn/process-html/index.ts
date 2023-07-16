@@ -7,10 +7,10 @@ import type {
   PipelineExecutor
 } from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
 import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
+import type {Resource} from 'website-scrap-engine/lib/resource';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {error} from 'website-scrap-engine/lib/logger/logger';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import type {Resource} from 'website-scrap-engine/lib/resource';
 import {
   extractMdnAssets,
   postProcessMdnAssets,
@@ -34,11 +34,15 @@ import {
 } from './process-external';
 import {preProcessRemoveElements} from './process-remove-elements';
 import {
-  preProcessYariData,
   downloadAndRenderYariCompatibilityData,
-  ProcessYariDataResult,
-  preProcessYariHydrationData
+  preProcessYariData,
+  preProcessYariHydrationData,
+  ProcessYariDataResult
 } from './process-yari-data';
+import {
+  postProcessPlayground,
+  preProcessPlayground
+} from './process-playground';
 
 const INJECT_JS_PATH = '/static/js/inject.js';
 const INJECT_CSS_PATH = '/static/css/inject.css';
@@ -127,6 +131,9 @@ export const preProcessHtml = async (
     preProcessAddIconToExternalLinks($);
   }
 
+  // https://github.com/website-local/mdn-local/issues/888
+  preProcessPlayground($);
+
   /// region inject external script and style
   if (dataScript?.length) {
     // language=HTML
@@ -162,6 +169,8 @@ export const postProcessHtml = (
   $('script[src*="runtime-main."]').remove();
   // react-main script, still on index page
   $('script[src*="react-main."]').remove();
+  // https://github.com/website-local/mdn-local/issues/888
+  postProcessPlayground($);
   let isYariDocs = false;
 
   $('script').each((index, el) => {
