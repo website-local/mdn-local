@@ -175,4 +175,20 @@ describe('redirect-download-link', function () {
       expect(resource.downloadLink).toBe(url);
     }
   });
+
+  // https://github.com/mdn/yari/commit/6e9fb23dad1571a463e06db7e280e6479b2582bd
+  // https://github.com/website-local/mdn-local/issues/890
+  // 20230716
+  test('bcd.developer.mozilla.org', () => {
+    const urls = [
+      'https://developer.mozilla.org/bcd/api/v0/current/css.properties.grid.json'
+    ];
+    for (const url of urls) {
+      const resource = res(url);
+      redirectDownloadLink(resource);
+      expect(resource.uri?.host()).toBe('developer.mozilla.org');
+      expect(resource.downloadLink).toBe('https://bcd.developer.mozilla.org/bcd/api/v0/current/css.properties.grid.json');
+    }
+  });
+
 });

@@ -79,6 +79,15 @@ export const redirectDownloadLink = (res: Resource): Resource => {
         .toString();
       return res;
     }
+    // https://github.com/mdn/yari/commit/6e9fb23dad1571a463e06db7e280e6479b2582bd
+    // https://github.com/website-local/mdn-local/issues/890
+    // 20230716
+    if (path.startsWith('/bcd/api/v0/')) {
+      res.downloadLink = uri.search('')
+        .host('bcd.developer.mozilla.org')
+        .toString();
+      return res;
+    }
   }
   return res;
 };
