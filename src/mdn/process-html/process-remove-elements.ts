@@ -85,4 +85,10 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   $('.languages-switcher-menu').remove();
   // 20220717 Recent contributions
   $('.recent-contributions').remove();
+  // 20230716 sidebar Filter
+  $('.sidebar-filter-container').remove();
+  // 20230716 top nav
+  $('a.top-level-entry.menu-link[href*="plus/ai-help"]').parent().remove();
+  // 20230716 top banner
+  $('.top-banner.loading').remove();
 };
