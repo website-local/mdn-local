@@ -294,6 +294,15 @@ table.compat-table th {
   background-image: none;
   mask-image: linear-gradient(90deg,transparent,#000 75%);
 }
+/* 20230716 baseline icons */
+/* https://github.com/website-local/mdn-local/issues/848 */
+.mask-fix .baseline-indicator summary .browsers .engine .browser::after {
+  background-color: transparent;
+}
+.mask-fix .icon.icon-chevron {
+  background-color: transparent;
+  filter: invert(1);
+}
 /* endregion yari mask-image to background fix */
 
 /* This padding is not needed */
