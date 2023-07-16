@@ -307,6 +307,9 @@ table.compat-table th {
 .mask-fix .code-example .copy-icon {
   background-color: transparent;
 }
+.dark .mask-fix .code-example .copy-icon {
+  filter: invert(1);
+}
 /* 20230716 process: masked icons in blogs */
 @media screen and (min-width: 769px) {
   .mask-fix .blog-container .previous-next a.next::after,
