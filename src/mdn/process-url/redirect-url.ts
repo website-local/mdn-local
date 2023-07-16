@@ -101,6 +101,9 @@ export function redirectUrl(
     case 'developer-stage.mdn.mozit.cloud':
     case 'developer-prod.mdn.mozit.cloud':
     case 'developer.mozilla.org':
+    // https://github.com/website-local/mdn-local/issues/890
+    case 'bcd.developer.mozilla.org':
+    case 'bcd.developer.allizom.org':
     case mdnHost:
       u = u.host(mdnHost);
       needToRebuildUrl = true;
@@ -146,6 +149,17 @@ export function redirectUrl(
         // fake url, redirected back in redirectDownloadLink
         u = u.host(mdnHost)
           .path('/mdn.mozit.cloud/' + host + u.path());
+        shouldReturnEarly = true;
+        break;
+      }
+      // https://github.com/website-local/mdn-local/issues/891
+      if (host.endsWith('.mdnplay.dev')) {
+        if (u.protocol() === 'http') {
+          u.protocol('https');
+        }
+        // fake url, redirected back in redirectDownloadLink
+        u = u.host(mdnHost)
+          .path('/live.mdnplay.dev' + u.path());
         shouldReturnEarly = true;
         break;
       }

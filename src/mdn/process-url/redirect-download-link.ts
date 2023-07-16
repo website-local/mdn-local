@@ -88,6 +88,15 @@ export const redirectDownloadLink = (res: Resource): Resource => {
         .toString();
       return res;
     }
+    // https://github.com/website-local/mdn-local/issues/891
+    // 20230716
+    if (path.startsWith('/live.mdnplay.dev/')) {
+      res.downloadLink = uri.search('')
+        .host('live.mdnplay.dev')
+        .path(path.slice('/live.mdnplay.dev'.length))
+        .toString();
+      return res;
+    }
   }
   return res;
 };

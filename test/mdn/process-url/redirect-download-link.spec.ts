@@ -191,4 +191,24 @@ describe('redirect-download-link', function () {
     }
   });
 
+  // https://github.com/website-local/mdn-local/issues/891
+  // 20230716
+  test('live.mdnplay.dev', () => {
+    const urls = [
+      'https://3b2c6cbd-0e90-4934-8c02-8e8c4b08e767.mdnplay.dev/runner.html',
+      'https://live.mdnplay.dev/en-US/docs/Web/CSS/grid/runner.html?id=creating_a_grid_layout'
+    ];
+    const expected = [
+      'https://live.mdnplay.dev/runner.html',
+      'https://live.mdnplay.dev/en-US/docs/Web/CSS/grid/runner.html'
+    ];
+    for (let i = 0; i < urls.length; i++){
+      const url = urls[i];
+      const resource = res(url);
+      redirectDownloadLink(resource);
+      expect(resource.uri?.host()).toBe('developer.mozilla.org');
+      expect(resource.downloadLink).toBe(expected[i]);
+    }
+  });
+
 });
