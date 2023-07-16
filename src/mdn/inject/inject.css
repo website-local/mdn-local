@@ -307,6 +307,21 @@ table.compat-table th {
 .mask-fix .code-example .copy-icon {
   background-color: transparent;
 }
+/* 20230716 process: masked icons in blogs */
+@media screen and (min-width: 769px) {
+  .mask-fix .blog-container .previous-next a.next::after,
+  .mask-fix .blog-container .previous-next a.next::before,
+  .mask-fix .blog-container .previous-next a.previous::after,
+  .mask-fix .blog-container .previous-next a.previous::before {
+    background-color: transparent;
+  }
+  .dark .mask-fix .blog-container .previous-next a.next::after,
+  .dark .mask-fix .blog-container .previous-next a.next::before,
+  .dark .mask-fix .blog-container .previous-next a.previous::after,
+  .dark .mask-fix .blog-container .previous-next a.previous::before {
+    filter: invert(1);
+  }
+}
 /* endregion yari mask-image to background fix */
 
 /* This padding is not needed */
