@@ -101,8 +101,7 @@ export function redirectUrl(
     case 'developer-stage.mdn.mozit.cloud':
     case 'developer-prod.mdn.mozit.cloud':
     case 'developer.mozilla.org':
-    // https://github.com/website-local/mdn-local/issues/890
-    case 'bcd.developer.mozilla.org':
+    case 'bcd.developer.mozilla.org': // https://github.com/website-local/mdn-local/issues/890
     case 'bcd.developer.allizom.org':
     case mdnHost:
       u = u.host(mdnHost);
