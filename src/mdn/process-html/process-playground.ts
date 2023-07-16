@@ -90,7 +90,7 @@ function sectionForHeading($: CheerioStatic, heading: Cheerio | null): Cheerio[]
     return [...heading.children().map((_, el) => $(el))];
   }
   let next = heading.next();
-  while (next && partOfSection(heading, next)) {
+  while (next.length && partOfSection(heading, next)) {
     nodes.push(next);
     if (next.next().length === 0) {
       next = next.parent().next().children().first() || null;
