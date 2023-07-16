@@ -612,3 +612,59 @@
   }
   /// endregion yari mask-image to background fix
 }();
+
+// playground code, maybe make it less modern later
+!function () {
+  document.querySelectorAll('iframe[data-mdn-local-pg-id]').forEach((iframe) => {
+    // must have it
+    const localId = iframe.getAttribute('data-mdn-local-pg-id');
+    const elements =
+      document.querySelectorAll('[data-mdn-local-pg-id="' + localId + '"]');
+    if (elements.length <= 1) {
+      return;
+    }
+
+    const r = {
+      code: {
+        css: '',
+        html: '',
+        js: '',
+      }
+    };
+    elements.forEach(el => {
+      if (el.classList.contains('css')) {
+        r.code.css += el.innerText + '\n';
+      }
+      if (el.classList.contains('js')) {
+        r.code.js += el.innerText + '\n';
+      }
+      if (el.classList.contains('html')) {
+        r.code.html += el.innerText + '\n';
+      }
+    });
+    initPlayIframe(iframe, r.code);
+  });
+
+  function initPlayIframe(iframe, editorContent) {
+    if (!iframe || !editorContent) {
+      return;
+    }
+
+    const message = {
+      typ: 'init',
+      state: editorContent,
+    };
+    iframe.contentWindow?.postMessage?.(message, { targetOrigin: '*' });
+    const deferred = ({ data: { typ = null, prop = {} } = {} } = {}) => {
+      const id = new URL(iframe.src, 'https://example.com').searchParams.get(
+        'id'
+      );
+      if (id === prop['id']) {
+        if (typ === 'ready') {
+          iframe.contentWindow?.postMessage(message, { targetOrigin: '*' });
+        }
+      }
+    };
+    window.addEventListener('message', deferred);
+  }
+}();
