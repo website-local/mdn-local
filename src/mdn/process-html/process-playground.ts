@@ -180,7 +180,7 @@ export function getCodeAndNodesForIframeBySampleClass(
     js: '',
     src,
   };
-
+  cls = cls.replace(/\./g, '\\.');
   let empty = true;
   const nodes: Cheerio[] = [];
   [...$(`.live-sample___${cls}`)].forEach(
