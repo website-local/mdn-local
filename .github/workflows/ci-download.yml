@@ -63,8 +63,12 @@ jobs:
           }).then(d => d.onIdle().then(() => d.dispose()))
             .catch(console.error);
           EOF
+          ls -hl src/mdn/
+          pwd
 
       - run: npm run prepack
+      - name: debug
+        run: ls -hl lib/mdn/
       - name: Running downloader
         run: node ./lib/mdn/run-downloader.js
       - name: Packaging
