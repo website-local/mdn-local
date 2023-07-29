@@ -1,0 +1,98 @@
+name: Download MDN Contents
+defaults:
+  run:
+    shell: bash
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'Run custom command before building'
+        required: false
+        type: string
+
+env:
+  node-version: 18.x
+
+jobs:
+  download:
+    name: Download MDN Contents
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        locale: [en-US, zh-CN]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ env.node-version }}
+        uses: actions/setup-node@v3.7.0
+        with:
+          node-version: ${{ env.node-version }}
+
+      - name: Update package lists and install 7-Zip
+        run: |
+          sudo apt update
+          sudo apt install p7zip-full -y
+          echo "short_date=$(date "+%Y%m%d")" >> $GITHUB_ENV
+
+      - name: Set env
+        run: |
+          echo "build_name=developer.mozilla.org_${{ env.short_date }}_${{ matrix.locale }}" >> $GITHUB_ENV
+
+      - name: Running custom command
+        if: ${{ github.event.inputs.command != '' }}
+        continue-on-error: true
+        run: ${{ github.event.inputs.command }}
+
+      - run: npm ci
+
+      - name: Making download script
+        run: |
+          cat << EOF > src/mdn/run-downloader.ts
+          import createDownloader from './mdn-downloader';
+          createDownloader({
+            localRoot: './dist/${{ env.build_name }}',
+            minConcurrency: 11,
+            req: {
+              retry: 42
+            },
+            meta: {
+              locale: '${{ matrix.locale }}',
+              preferIpv6: true
+            }
+          }).then(d => d.onIdle().then(() => d.dispose()))
+            .catch(console.error);
+          EOF
+
+      - run: npm run prepack
+      - name: Running downloader
+        run: node ./lib/mdn/run-downloader.js
+      - name: Packaging
+        run: |
+          pushd dist
+          7z a -m0=lzma2 -mx=9 -ms=on -myx=9 -mqs=on -md=28 ../${{ env.build_name }}.7z ${{ env.build_name }}
+          popd
+
+      - name: Collecting logs
+        if: always()
+        continue-on-error: true
+        run: |
+          pushd dist
+          7z a -m0=lzma2 -mx=9 -ms=on ../logs_${{ env.build_name }}.7z ${{ env.build_name }}/*/logs/
+          popd
+
+      - name: Uploading logs
+        uses: actions/upload-artifact@master
+        if: always()
+        continue-on-error: true
+        with:
+          name: logs_${{ env.build_name }}
+          path: logs*.7z
+
+      - name: Uploading artifact
+        id: upload_artifact
+        continue-on-error: true
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ env.build_name }}
+          path: ${{ env.build_name }}.7z
