@@ -30,7 +30,7 @@ export function postProcessPlayground($: CheerioStatic): void {
   let iframeId = 0;
   for (let i = 0; i < frames.length; i++) {
     const frame = $(frames[i]);
-    const id = frame.attr(PLAYGROUND_ID_ATTR);
+    let id = frame.attr(PLAYGROUND_ID_ATTR);
     if (!id) {
       continue;
     }
@@ -41,6 +41,7 @@ export function postProcessPlayground($: CheerioStatic): void {
     const uri = URI(src);
     uri.addSearch('id', id);
     frame.attr('src', uri.toString());
+    id = id.replace(/\./g, '\\.');
     const ctx =
       getCodeAndNodesForIframeBySampleClass($, id, src) ||
       getCodeAndNodesForIframe($, id, frame, src);
@@ -180,7 +181,6 @@ export function getCodeAndNodesForIframeBySampleClass(
     js: '',
     src,
   };
-  cls = cls.replace(/\./g, '\\.');
   let empty = true;
   const nodes: Cheerio[] = [];
   [...$(`.live-sample___${cls}`)].forEach(
