@@ -66,9 +66,12 @@ jobs:
           ls -hl src/mdn/
           pwd
 
-      - run: npm run prepack
+      - run: npm run build
       - name: debug
-        run: ls -hl lib/mdn/
+        run: |
+          pwd
+          ls -hl *
+          ls -hl lib/mdn/
       - name: Running downloader
         run: node ./lib/mdn/run-downloader.js
       - name: Packaging
