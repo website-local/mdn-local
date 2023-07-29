@@ -57,8 +57,7 @@ jobs:
               retry: 42
             },
             meta: {
-              locale: '${{ matrix.locale }}',
-              preferIpv6: true
+              locale: '${{ matrix.locale }}'
             }
           }).then(d => d.onIdle().then(() => d.dispose()))
             .catch(console.error);
