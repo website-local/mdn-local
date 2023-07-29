@@ -40,7 +40,7 @@ jobs:
             https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${{ github.event.inputs.run_id }}/artifacts > artifacts.json
           cat artifacts.json
           desired_prefix="developer.mozilla.org_"
-          archive_download_urls=$(echo "$json_contents" | jq -r --arg desired_prefix "$desired_prefix" '.artifacts[] | select(.name | startswith($desired_prefix)).archive_download_url')
+          archive_download_urls=$(cat artifacts.json | jq -r --arg desired_prefix "$desired_prefix" '.artifacts[] | select(.name | startswith($desired_prefix)).archive_download_url')
           echo $archive_download_urls
           echo "archive_download_urls=$archive_download_urls" >> $GITHUB_ENV
 
@@ -66,7 +66,7 @@ jobs:
 
       - name: Empty check
         run: |
-          [ -z "$(ls -A release)" ]
+          [ ! -z "$(ls -A release)" ]
 
       - name: Collect hash
         run: |
