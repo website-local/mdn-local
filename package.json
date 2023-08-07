@@ -7,7 +7,7 @@
     "node": ">=12.16.0"
   },
   "dependencies": {
-    "agentkeepalive": "^4.3.0",
+    "agentkeepalive": "^4.5.0",
     "fast-glob": "^3.3.1",
     "json5": "^2.2.3",
     "mkdirp": "^3.0.1",
