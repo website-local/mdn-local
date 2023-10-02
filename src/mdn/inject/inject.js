@@ -606,26 +606,27 @@
       document.head.appendChild(linkPreload);
       setTimeout(function () {
         linkCss.href =  linkPreload.href;
-      }, 15);
+      }, 30);
 
     }
   }
   /// endregion yari mask-image to background fix
 }();
 
-// playground code from yari codebase, maybe make it less modern later
+// playground code from yari codebase, rewritten to legacy grammar
 // 20230716 yari version v2.28.2 53314f5
+// https://github.com/website-local/mdn-local/issues/888
 !function () {
   document.querySelectorAll('iframe[data-mdn-local-pg-id]').forEach((iframe) => {
     // must have it
-    const localId = iframe.getAttribute('data-mdn-local-pg-id');
-    const elements =
+    var localId = iframe.getAttribute('data-mdn-local-pg-id');
+    var elements =
       document.querySelectorAll('[data-mdn-local-pg-id="' + localId + '"]');
     if (elements.length <= 1) {
       return;
     }
 
-    const r = {
+    var r = {
       code: {
         css: '',
         html: '',
@@ -633,6 +634,9 @@
       }
     };
     elements.forEach(el => {
+      if (!el.classList) {
+        return;
+      }
       if (el.classList.contains('css')) {
         r.code.css += el.innerText + '\n';
       }
@@ -651,21 +655,28 @@
       return;
     }
 
-    const message = {
+    var message = {
       typ: 'init',
       state: editorContent,
     };
-    iframe.contentWindow?.postMessage?.(message, { targetOrigin: '*' });
-    const deferred = ({ data: { typ = null, prop = {} } = {} } = {}) => {
-      const id = new URL(iframe.src, 'https://example.com').searchParams.get(
+    try {
+      iframe.contentWindow.postMessage(message, { targetOrigin: '*' });
+    } catch (e) {
+      console.warn(e);
+      return;
+    }
+
+    function deferred({data: {typ = null, prop = {}} = {}} = {}) {
+      var id = new URL(iframe.src, 'https://example.com').searchParams.get(
         'id'
       );
       if (id === prop['id']) {
         if (typ === 'ready') {
-          iframe.contentWindow?.postMessage(message, { targetOrigin: '*' });
+          iframe.contentWindow?.postMessage(message, {targetOrigin: '*'});
         }
       }
-    };
+    }
+
     window.addEventListener('message', deferred);
   }
 
@@ -687,10 +698,13 @@
     });
   function addCopyToClipboardButton(element, header) {
     if (!header || header.querySelector('.copy-icon')) return;
+    if (typeof navigator !== 'object' || !navigator.clipboard) {
+      return;
+    }
 
-    const button = document.createElement('button');
-    const span = document.createElement('span');
-    const liveregion = document.createElement('span');
+    var button = document.createElement('button');
+    var span = document.createElement('span');
+    var liveregion = document.createElement('span');
 
     span.textContent = 'Copy to Clipboard';
 
@@ -703,44 +717,42 @@
     button.appendChild(span);
     header.appendChild(button);
     header.appendChild(liveregion);
+    button.onclick = function () {
+      return Promise.resolve().then(function () {
+        var text = element.textContent || '';
+        return navigator.clipboard.writeText(text);
+      }).then(function () {
+        return true;
+      }, function () {
+        return false;
+      }).then(function (copiedSuccessfully) {
 
-    button.onclick = async () => {
-      let copiedSuccessfully = true;
-      try {
-        const text = element.textContent || '';
-        await navigator.clipboard.writeText(text);
-      } catch (err) {
-        console.error(
-          'Error when trying to use navigator.clipboard.writeText()',
-          err
+        if (copiedSuccessfully) {
+          button.classList.add('copied');
+          showCopiedMessage(header, 'Copied!');
+        } else {
+          button.classList.add('failed');
+          showCopiedMessage(header, 'Error trying to copy to clipboard!');
+        }
+
+        setTimeout(
+          function () {
+            hideCopiedMessage(header);
+          },
+          copiedSuccessfully ? 1000 : 3000
         );
-        copiedSuccessfully = false;
-      }
-
-      if (copiedSuccessfully) {
-        button.classList.add('copied');
-        showCopiedMessage(header, 'Copied!');
-      } else {
-        button.classList.add('failed');
-        showCopiedMessage(header, 'Error trying to copy to clipboard!');
-      }
-
-      setTimeout(
-        () => {
-          hideCopiedMessage(header);
-        },
-        copiedSuccessfully ? 1000 : 3000
-      );
+      });
     };
+
   }
   function showCopiedMessage(wrapper, msg) {
-    const element = getCopiedMessageElement(wrapper);
+    var element = getCopiedMessageElement(wrapper);
     element.textContent = msg;
     element.classList.remove('visually-hidden');
   }
 
   function hideCopiedMessage(wrapper) {
-    const element = getCopiedMessageElement(wrapper);
+    var element = getCopiedMessageElement(wrapper);
     element.textContent = ''; // ensure contents change, so that they are picked up by the live region
     if (element) {
       element.classList.add('visually-hidden');
@@ -748,8 +760,8 @@
   }
 
   function getCopiedMessageElement(wrapper) {
-    const className = 'copy-icon-message';
-    let element = wrapper.querySelector(`span.${className}`);
+    var className = 'copy-icon-message';
+    var element = wrapper.querySelector(`span.${className}`);
     if (!element) {
       element = document.createElement('span');
       element.classList.add(className);
