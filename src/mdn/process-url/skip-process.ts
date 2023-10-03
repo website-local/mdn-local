@@ -54,6 +54,15 @@ export const skipProcess = (
     skipExternalLogger.debug('skipped external link', host, url, parent?.url);
     return;
   }
+  // special path for peach.blender.org
+  // this site is not a static file cdn
+  // Also referenced here:
+  // https://mdn.github.io/dom-examples/fullscreen-api/index.html
+  if (host === 'peach.blender.org' && (!element ||
+    !element.is('img') && !element.is('video') && !element.is('audio'))) {
+    skipExternalLogger.debug('skipped external link', host, url, parent?.url);
+    return;
+  }
   // incorrectly parsed url
   // localhost:3000
   // from https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/
