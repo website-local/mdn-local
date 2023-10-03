@@ -38,6 +38,12 @@ const forceBinarySuffix = [
   '/Web/API/HTMLImageElement/src/grapefruit-slice-332-332.jpg',
   '/Web/API/HTMLMediaElement/textTracks/sample.mp4',
   '/Web/API/HTMLMediaElement/textTracks/sample.ogv',
+  '/SVG/Attribute/begin/begin-3-event.svg',
+  '/SVG/Attribute/begin/begin-4-repeat.svg',
+  '/SVG/Attribute/begin/begin-1-offset.svg',
+  '/SVG/Attribute/begin/begin-2-syncbase.svg',
+  '/SVG/Attribute/begin/begin-5-accesskey.svg',
+  '/Learn/Forms/Styling_web_forms/background.jpg',
 ];
 
 export const detectLinkType = (
