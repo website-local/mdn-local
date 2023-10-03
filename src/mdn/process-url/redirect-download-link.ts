@@ -5,8 +5,8 @@ import {externalHosts} from './consts';
 const replacements = [
   // https://github.com/website-local/mdn-local/issues/938
   'https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4',
-  // A much smaller file from http://download.blender.org/peach/trailer/trailer_iphone.m4v
-  'https://github.com/website-local/assets/releases/download/mdn-local/trailer_iphone.mp4',
+  // A much smaller file
+  'https://mdn.github.io/dom-examples/picture-in-picture/assets/bigbuckbunny.mp4',
 ];
 
 export const redirectDownloadLink = (res: Resource): Resource => {

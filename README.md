@@ -36,4 +36,4 @@ createDownloader({
 
 ## Large video handling
 
-A large video has been replaced into a much smaller trailer for faster download of the package, get it back from [the original link](https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4) or [here](https://github.com/website-local/assets/releases/download/mdn-local/big_buck_bunny_720p_surround.mp4);
+A large video has been replaced into a much smaller alternative for faster download of the package, get it back from [the original link](https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4) or [here](https://github.com/website-local/assets/releases/download/mdn-local/big_buck_bunny_720p_surround.mp4);
