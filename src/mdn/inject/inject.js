@@ -619,7 +619,7 @@
 // 20230716 yari version v2.28.2 53314f5
 // https://github.com/website-local/mdn-local/issues/888
 !function () {
-  document.querySelectorAll('iframe[data-mdn-local-pg-id]').forEach((iframe) => {
+  document.querySelectorAll('iframe[data-mdn-local-pg-id]').forEach(function (iframe) {
     // must have it
     var localId = iframe.getAttribute('data-mdn-local-pg-id');
     var elements =
@@ -635,7 +635,7 @@
         js: '',
       }
     };
-    elements.forEach(el => {
+    elements.forEach(function (el) {
       if (!el.classList) {
         return;
       }
@@ -684,8 +684,8 @@
 
   document
     .querySelectorAll('div.code-example pre:not(.hidden)')
-    .forEach((element) => {
-      const header = element.parentElement &&
+    .forEach(function (element) {
+      var header = element.parentElement &&
         element.parentElement.querySelector('.example-header');
       // Paused for now
       // addExplainButton(header, element);
@@ -785,19 +785,19 @@
       // old browser
       return 0;
     }
-    const sidebar = document.querySelector('.sidebar-container');
+    var sidebar = document.querySelector('.sidebar-container');
 
     if (sidebar) {
       return parseFloat(window.getComputedStyle(sidebar).top);
     }
 
-    const styles = window.getComputedStyle(document.documentElement);
-    const stickyHeaderHeight = styles
+    var styles = window.getComputedStyle(document.documentElement);
+    var stickyHeaderHeight = styles
       .getPropertyValue('--sticky-header-height')
       .trim();
 
     if (stickyHeaderHeight.endsWith('rem')) {
-      const fontSize = styles.fontSize.trim();
+      var fontSize = styles.fontSize.trim();
       if (fontSize.endsWith('px')) {
         return parseFloat(stickyHeaderHeight) * parseFloat(fontSize);
       } else {
@@ -819,6 +819,7 @@
   }
   var tocElements = document.querySelectorAll(
     '.toc .document-toc-container > .document-toc > ul.document-toc-list > li > a');
+  var tocElementIdMap = {};
   var currentTocId = '', currentTocElementMap;
   function tocFirstVisibleElementChange(element) {
     if (!element) {
@@ -855,24 +856,29 @@
       return;
     }
 
-    const visibilityByElement = new Map();
+    var visibilityByElement = new Map();
 
     function manageVisibility(entries) {
-      for (const entry of entries) {
+      for (var i = 0; i < entries.length; i++) {
+        var entry = entries[i];
         visibilityByElement.set(entry.target, entry.isIntersecting);
       }
     }
 
     function manageFirstVisibleElement() {
-      const visibleElements = Array.from(visibilityByElement.entries())
-        .filter(([, value]) => value)
-        .map(([key]) => key);
+      var visibleElements = Array.from(visibilityByElement.entries())
+        .filter(function (entry) {
+          return entry[1];
+        })
+        .map(function (entry) {
+          return entry[0];
+        });
 
       tocFirstVisibleElementChange(visibleElements[0] || null);
     }
 
-    const observer = new window.IntersectionObserver(
-      (entries) => {
+    var observer = new window.IntersectionObserver(
+      function (entries) {
         manageVisibility(entries);
         manageFirstVisibleElement();
       },
@@ -883,26 +889,26 @@
     );
     tocObserver = observer;
 
-    observedElements.forEach((element) => {
+    observedElements.forEach(function (element) {
       visibilityByElement.set(element, false);
       observer.observe(element);
     });
   }
   function initOrRebuildTocHighlightOnScroll() {
 
-    const stickyHeaderHeight = determineStickyHeaderHeight();
-    const rootMargin = `-${stickyHeaderHeight}px 0px 0px 0px`;
+    var stickyHeaderHeight = determineStickyHeaderHeight();
+    var rootMargin = `-${stickyHeaderHeight}px 0px 0px 0px`;
 
-    const mainElement = document.querySelector('main') || document;
-    const elements = mainElement.querySelectorAll(
+    var mainElement = document.querySelector('main') || document;
+    var elements = mainElement.querySelectorAll(
       'h1, h1 ~ *:not(section), h2:not(.document-toc-heading), h2:not(.document-toc-heading) ~ *:not(section), h3, h3 ~ *:not(section)'
     );
-    const observedElements = Array.from(elements);
-    let lastElementWithId = null;
-    let elementMap = new Map();
-    for (let i = 0; i < elements.length; i++) {
-      let elem =  elements[i];
-      if (elem.id) {
+    var observedElements = Array.from(elements);
+    var lastElementWithId = null;
+    var elementMap = new Map();
+    for (var i = 0; i < elements.length; i++) {
+      var elem =  elements[i];
+      if (tocElementIdMap[elem.id]) {
         elementMap.set(elem, elem);
         lastElementWithId = elem;
       } else {
@@ -919,20 +925,29 @@
   }
 
   function initTocHighlightOnScroll() {
+    tocElementIdMap = {};
+    for (var i = 0; i < tocElements.length; i++) {
+      let tocElement = tocElements[i];
+      let href = tocElement.getAttribute('href');
+      let id = href ? href.slice(1) : '';
+      if (id) {
+        tocElementIdMap[id] = true;
+      }
+    }
 
     var timeout = null;
     // Unfortunately we cannot observe the CSS variable using MutationObserver,
     // but we know that it may change when the width of the window changes.
 
-    const debouncedListener = () => {
+    function debouncedListener() {
       if (timeout) {
         window.clearTimeout(timeout);
       }
-      timeout = setTimeout(() => {
+      timeout = setTimeout(function () {
         initOrRebuildTocHighlightOnScroll();
         timeout = null;
       }, 250);
-    };
+    }
 
     initOrRebuildTocHighlightOnScroll();
     window.addEventListener('resize', debouncedListener);
