@@ -1,3 +1,5 @@
+// noinspection ES6ConvertVarToLetConst
+
 'use strict';
 /* global document window navigator */
 !function () {
@@ -771,4 +773,175 @@
     }
     return element;
   }
+
+  /// region toc-scroll-to-highlight
+  // 20231003 mdn: scroll to highlight on sidebar
+  // https://github.com/website-local/mdn-local/issues/834
+  // https://github.com/mdn/yari/blob/v2.20.2/client/src/document/hooks.ts#L192
+  // https://github.com/mdn/yari/blob/v2.20.2/client/src/document/organisms/toc/index.tsx#L77
+
+  function determineStickyHeaderHeight() {
+    if (typeof getComputedStyle !== 'function') {
+      // old browser
+      return 0;
+    }
+    const sidebar = document.querySelector('.sidebar-container');
+
+    if (sidebar) {
+      return parseFloat(window.getComputedStyle(sidebar).top);
+    }
+
+    const styles = window.getComputedStyle(document.documentElement);
+    const stickyHeaderHeight = styles
+      .getPropertyValue('--sticky-header-height')
+      .trim();
+
+    if (stickyHeaderHeight.endsWith('rem')) {
+      const fontSize = styles.fontSize.trim();
+      if (fontSize.endsWith('px')) {
+        return parseFloat(stickyHeaderHeight) * parseFloat(fontSize);
+      } else {
+        console.warn(
+          `[useStickyHeaderHeight] fontSize has unexpected unit: ${fontSize}`
+        );
+        return 0;
+      }
+    } else if (stickyHeaderHeight.endsWith('px')) {
+      return parseFloat(stickyHeaderHeight);
+    } else {
+      console.warn(
+        `[useStickyHeaderHeight] --sticky-header-height has unexpected unit: ${
+          stickyHeaderHeight
+        }`
+      );
+      return 0;
+    }
+  }
+  var tocElements = document.querySelectorAll(
+    '.toc .document-toc-container > .document-toc > ul.document-toc-list > li > a');
+  var currentTocId = '', currentTocElementMap;
+  function tocFirstVisibleElementChange(element) {
+    if (!element) {
+      return;
+    }
+    if (currentTocElementMap && currentTocElementMap.get) {
+      element = currentTocElementMap.get(element) || element;
+    }
+    var id = element ? '#' + element.id : '',
+      i = 0, len = tocElements.length, el;
+    if (id === currentTocId) {
+      return;
+    }
+    for (; i < len; i++) {
+      el = tocElements[i];
+      if (el) {
+        if (el.getAttribute('href') === id) {
+          el.setAttribute('aria-current', 'true');
+        } else {
+          el.removeAttribute('aria-current');
+        }
+      }
+    }
+    currentTocId = id;
+  }
+
+  var tocObserver;
+  function rebuildIntersectionObserver(observedElements, rootMargin) {
+    if (tocObserver) {
+      tocObserver.disconnect();
+    }
+    if (typeof IntersectionObserver === 'undefined' || typeof Map === 'undefined') {
+      // SSR or old browser.
+      return;
+    }
+
+    const visibilityByElement = new Map();
+
+    function manageVisibility(entries) {
+      for (const entry of entries) {
+        visibilityByElement.set(entry.target, entry.isIntersecting);
+      }
+    }
+
+    function manageFirstVisibleElement() {
+      const visibleElements = Array.from(visibilityByElement.entries())
+        .filter(([, value]) => value)
+        .map(([key]) => key);
+
+      tocFirstVisibleElementChange(visibleElements[0] || null);
+    }
+
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        manageVisibility(entries);
+        manageFirstVisibleElement();
+      },
+      {
+        rootMargin,
+        threshold: [0.0, 1.0],
+      }
+    );
+    tocObserver = observer;
+
+    observedElements.forEach((element) => {
+      visibilityByElement.set(element, false);
+      observer.observe(element);
+    });
+  }
+  function initOrRebuildTocHighlightOnScroll() {
+
+    const stickyHeaderHeight = determineStickyHeaderHeight();
+    const rootMargin = `-${stickyHeaderHeight}px 0px 0px 0px`;
+
+    const mainElement = document.querySelector('main') || document;
+    const elements = mainElement.querySelectorAll(
+      'h1, h1 ~ *:not(section), h2:not(.document-toc-heading), h2:not(.document-toc-heading) ~ *:not(section), h3, h3 ~ *:not(section)'
+    );
+    const observedElements = Array.from(elements);
+    let lastElementWithId = null;
+    let elementMap = new Map();
+    for (let i = 0; i < elements.length; i++) {
+      let elem =  elements[i];
+      if (elem.id) {
+        elementMap.set(elem, elem);
+        lastElementWithId = elem;
+      } else {
+        if (lastElementWithId) {
+          elementMap.set(elem, lastElementWithId);
+        } else {
+          elementMap.set(elem, elem);
+        }
+      }
+    }
+    currentTocElementMap = elementMap;
+    rebuildIntersectionObserver(observedElements, rootMargin);
+
+  }
+
+  function initTocHighlightOnScroll() {
+
+    var timeout = null;
+    // Unfortunately we cannot observe the CSS variable using MutationObserver,
+    // but we know that it may change when the width of the window changes.
+
+    const debouncedListener = () => {
+      if (timeout) {
+        window.clearTimeout(timeout);
+      }
+      timeout = setTimeout(() => {
+        initOrRebuildTocHighlightOnScroll();
+        timeout = null;
+      }, 250);
+    };
+
+    initOrRebuildTocHighlightOnScroll();
+    window.addEventListener('resize', debouncedListener);
+  }
+
+  try {
+    initTocHighlightOnScroll();
+  } catch (e) {
+    console.warn('toc-scroll-highlight', e);
+  }
+  /// endregion toc-scroll-highlight
 }();
