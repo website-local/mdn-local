@@ -43,6 +43,7 @@ import {
   postProcessPlayground,
   preProcessPlayground
 } from './process-playground';
+import {postProcessPlayable, preProcessPlayable} from './process-playable';
 
 const INJECT_JS_PATH = '/static/js/inject.js';
 const INJECT_CSS_PATH = '/static/css/inject.css';
@@ -156,6 +157,11 @@ type="text/css" class="mdn-local-inject-css">`)
   } catch (e) {
     error.error('Error processing yari browser-compatibility-table', e, res.url);
   }
+
+  // https://github.com/website-local/mdn-local/issues/930
+  if (res.url.startsWith('https://developer.mozilla.org/mdn-github-io/')) {
+    preProcessPlayable($);
+  }
   return res;
 };
 
@@ -222,6 +228,11 @@ export const postProcessHtml = (
   postProcessReplaceExternalMediaWithLink($, res.url);
   // replace external script with external links
   postProcessReplaceExternalScriptWithLink($, res.url);
+
+  // https://github.com/website-local/mdn-local/issues/930
+  if (res.url.startsWith('https://developer.mozilla.org/mdn-github-io/')) {
+    postProcessPlayable($);
+  }
   return $;
 };
 
