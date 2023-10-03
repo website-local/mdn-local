@@ -7,6 +7,8 @@ import {
   appendDocsWebPath,
   appendLocalePath,
   downloadableHosts,
+  externalHostMap,
+  externalHosts,
   localesMap,
   redirectLocale
 } from './consts';
@@ -107,39 +109,15 @@ export function redirectUrl(
       u = u.host(mdnHost);
       needToRebuildUrl = true;
       break;
-    case 'interactive-examples.mdn.mozilla.net': // interactive-examples
-      // fake url, redirected back in redirectDownloadLink
-      u = u.host(mdnHost)
-        .path('/interactive-examples' + u.path());
-      shouldReturnEarly = true;
-      break;
-    case 'mdn.github.io': // mdn.github.io
-      // fake url, redirected back in redirectDownloadLink
-      u = u.host(mdnHost)
-        .path('/mdn-github-io' + u.path());
-      shouldReturnEarly = true;
-      break;
-    case 'unpkg.com': // unpkg.com
-      // fake url, redirected back in redirectDownloadLink
-      u = u.host(mdnHost)
-        .path('/unpkg-com' + u.path());
-      shouldReturnEarly = true;
-      break;
-    // https://github.com/website-local/mdn-local/issues/361
-    case 'cdnjs.cloudflare.com': // cdnjs.cloudflare.com
-      // fake url, redirected back in redirectDownloadLink
-      u = u.host(mdnHost)
-        .path('/cdnjs-cloudflare-com' + u.path());
-      shouldReturnEarly = true;
-      break;
-    // https://github.com/website-local/mdn-local/issues/448
-    case 'cdn.jsdelivr.net': // cdn.jsdelivr.net
-      // fake url, redirected back in redirectDownloadLink
-      u = u.host(mdnHost)
-        .path('/cdn-jsdelivr-net' + u.path());
-      shouldReturnEarly = true;
-      break;
     default:
+      if (externalHostMap[host]) {
+        const externalHost = externalHostMap[host];
+        // fake url, redirected back in redirectDownloadLink
+        u = u.host(mdnHost)
+          .path(externalHost.pathPrefix + u.path());
+        shouldReturnEarly = true;
+        break;
+      }
       // https://github.com/website-local/mdn-local/issues/208
       if (host.endsWith('.mdn.mozit.cloud')) {
         if (u.protocol() === 'http') {
@@ -203,47 +181,17 @@ export function redirectUrl(
         .absoluteTo(parent.url)
         .normalizePath();
     }
-    if (parent && parent.downloadLink.includes('//interactive-examples.mdn.mozilla.net/') &&
-      !u.path().includes('/interactive-examples/')) {
-      // interactive-examples
-      // fake url, redirected back in redirectDownloadLink
-      return u.host(mdnHost)
-        .path('/interactive-examples' + u.path())
-        .toString();
-    }
-    if (parent && parent.downloadLink.includes('//mdn.github.io/') &&
-      !u.path().includes('/mdn-github-io/')) {
-      // mdn.github.io
-      // fake url, redirected back in redirectDownloadLink
-      return u.host(mdnHost)
-        .path('/mdn-github-io' + u.path())
-        .toString();
-    }
-    if (parent && parent.downloadLink.includes('//unpkg.com/') &&
-      !u.path().includes('/unpkg-com/')) {
-      // unpkg.com
-      // fake url, redirected back in redirectDownloadLink
-      return u.host(mdnHost)
-        .path('/unpkg-com' + u.path())
-        .toString();
-    }
-    // https://github.com/website-local/mdn-local/issues/361
-    if (parent && parent.downloadLink.includes('//cdnjs.cloudflare.com/') &&
-      !u.path().includes('/cdnjs-cloudflare-com/')) {
-      // cdnjs.cloudflare.com
-      // fake url, redirected back in redirectDownloadLink
-      return u.host(mdnHost)
-        .path('/cdnjs-cloudflare-com' + u.path())
-        .toString();
-    }
-    // https://github.com/website-local/mdn-local/issues/448
-    if (parent && parent.downloadLink.includes('//cdn.jsdelivr.net/') &&
-      !u.path().includes('/cdn-jsdelivr-net/')) {
-      // unpkg.com
-      // fake url, redirected back in redirectDownloadLink
-      return u.host(mdnHost)
-        .path('/cdn-jsdelivr-net' + u.path())
-        .toString();
+    if (parent && parent.downloadLink) {
+      const downloadLink = parent.downloadLink;
+      for (const externalHost of externalHosts) {
+        if (downloadLink.includes(externalHost.pattern) &&
+          !u.path().includes(externalHost.prefix)) {
+          // fake url, redirected back in redirectDownloadLink
+          return u.host(mdnHost)
+            .path(externalHost.pathPrefix + u.path())
+            .toString();
+        }
+      }
     }
     needToRebuildUrl = true;
   }

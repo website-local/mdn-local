@@ -1,5 +1,6 @@
 import type {Resource} from 'website-scrap-engine/lib/resource';
 import URI from 'urijs';
+import {externalHosts} from './consts';
 
 export const redirectDownloadLink = (res: Resource): Resource => {
   const url = res.downloadLink;
@@ -17,57 +18,17 @@ export const redirectDownloadLink = (res: Resource): Resource => {
       res.downloadLink = uri.search('').host('mdn.mozillademos.org').toString();
       return res;
     }
-    if (path.startsWith('/interactive-examples/')) {
-      // interactive-examples
-      // redirect back to real url
-      res.downloadLink = uri.search('')
-        .host('interactive-examples.mdn.mozilla.net')
-        .path(path.slice('/interactive-examples'.length))
-        .toString();
-      return res;
-    }
-    if (path.startsWith('/mdn-github-io/')) {
-      // mdn.github.io
-      // redirect back to real url
-      path = path.slice('/mdn-github-io'.length);
-      res.downloadLink = uri.search('')
-        .host('mdn.github.io')
-        .path(path)
-        .toString();
-      return res;
-    }
-    if (path.startsWith('/unpkg-com/')) {
-      // unpkg.com
-      // redirect back to real url
-      res.downloadLink = uri.search('')
-        .host('unpkg.com')
-        .path(path.slice('/unpkg-com'.length))
-        .toString();
-      return res;
-    }
 
-    // https://github.com/website-local/mdn-local/issues/361
-    // cdnjs.cloudflare.com
-    if (path.startsWith('/cdnjs-cloudflare-com/')) {
-      // unpkg.com
-      // redirect back to real url
-      res.downloadLink = uri.search('')
-        .host('cdnjs.cloudflare.com')
-        .path(path.slice('/cdnjs-cloudflare-com'.length))
-        .toString();
-      return res;
-    }
-
-    // https://github.com/website-local/mdn-local/issues/448
-    // cdn.jsdelivr.net
-    if (path.startsWith('/cdn-jsdelivr-net/')) {
-      // cdn.jsdelivr.net
-      // redirect back to real url
-      res.downloadLink = uri.search('')
-        .host('cdn.jsdelivr.net')
-        .path(path.slice('/cdn-jsdelivr-net'.length))
-        .toString();
-      return res;
+    for (const externalHost of externalHosts) {
+      if (path.startsWith(externalHost.prefix)) {
+        // interactive-examples
+        // redirect back to real url
+        res.downloadLink = uri.search('')
+          .host(externalHost.host)
+          .path(path.slice(externalHost.pathPrefixLength))
+          .toString();
+        return res;
+      }
     }
 
     // https://github.com/website-local/mdn-local/issues/208

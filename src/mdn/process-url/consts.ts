@@ -75,3 +75,34 @@ export const downloadableHosts = arrayToMap([
   'bcd.developer.mozilla.org',
   'bcd.developer.allizom.org',
 ]);
+
+export interface ExternalHost {
+  host: string;
+  prefix: string;
+  pathPrefix: string;
+  pathPrefixLength: number;
+  pattern: string;
+}
+
+export const externalHosts = [
+  ['/interactive-examples/', 'interactive-examples.mdn.mozilla.net'],
+  ['/mdn-github-io/', 'mdn.github.io'],
+  ['/unpkg-com/', 'unpkg.com'],
+  ['/mdn-github-io/', 'mdn.github.io'],
+  // https://github.com/website-local/mdn-local/issues/361
+  ['/cdnjs-cloudflare-com/', 'cdnjs.cloudflare.com'],
+  // https://github.com/website-local/mdn-local/issues/448
+  ['/cdn-jsdelivr-net/', 'cdn.jsdelivr.net'],
+].map(([prefix, host]) => ({
+  host,
+  prefix,
+  pathPrefix: prefix.slice(0, -1),
+  pathPrefixLength: prefix.length - 1,
+  pattern: '//' + host + '/',
+} as ExternalHost));
+
+export const externalHostMap: Record<string, ExternalHost> = {};
+
+for (const externalHost of externalHosts) {
+  externalHostMap[externalHost.host] = externalHost;
+}
