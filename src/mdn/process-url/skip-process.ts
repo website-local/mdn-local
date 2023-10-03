@@ -58,7 +58,8 @@ export const skipProcess = (
   // this site is not a static file cdn
   // Also referenced here:
   // https://mdn.github.io/dom-examples/fullscreen-api/index.html
-  if (host === 'peach.blender.org' && (!element ||
+  // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery
+  if ((host === 'peach.blender.org' || host === 'archive.org') && (!element ||
     !element.is('img') && !element.is('video') && !element.is('audio'))) {
     skipExternalLogger.debug('skipped external link', host, url, parent?.url);
     return;
