@@ -74,6 +74,15 @@ export const downloadableHosts = arrayToMap([
   // https://github.com/website-local/mdn-local/issues/890
   'bcd.developer.mozilla.org',
   'bcd.developer.allizom.org',
+  // https://github.com/website-local/mdn-local/issues/929
+  // 20231003
+  'upload.wikimedia.org',
+  'cdn.aframe.io',
+  'raw.githubusercontent.com',
+  // https://github.com/website-local/mdn-local/issues/930
+  // 20231003
+  'archive.org',
+  'peach.blender.org',
 ]);
 
 export interface ExternalHost {
@@ -93,6 +102,15 @@ export const externalHosts = [
   ['/cdnjs-cloudflare-com/', 'cdnjs.cloudflare.com'],
   // https://github.com/website-local/mdn-local/issues/448
   ['/cdn-jsdelivr-net/', 'cdn.jsdelivr.net'],
+  // https://github.com/website-local/mdn-local/issues/929
+  // 20231003
+  ['/upload.wikimedia.org/', 'upload.wikimedia.org'],
+  ['/cdn.aframe.io/', 'cdn.aframe.io'],
+  ['/raw.githubusercontent.com/', 'raw.githubusercontent.com'],
+  // https://github.com/website-local/mdn-local/issues/930
+  // 20231003
+  ['/archive.org/', 'archive.org'],
+  ['/peach.blender.org/', 'peach.blender.org'],
 ].map(([prefix, host]) => ({
   host,
   prefix,
