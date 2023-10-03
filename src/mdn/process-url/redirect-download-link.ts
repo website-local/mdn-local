@@ -2,6 +2,13 @@ import type {Resource} from 'website-scrap-engine/lib/resource';
 import URI from 'urijs';
 import {externalHosts} from './consts';
 
+const replacements = [
+  // https://github.com/website-local/mdn-local/issues/938
+  'https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4',
+  // A much smaller file from http://download.blender.org/peach/trailer/trailer_iphone.m4v
+  'https://github.com/website-local/assets/releases/download/mdn-local/trailer_iphone.mp4',
+];
+
 export const redirectDownloadLink = (res: Resource): Resource => {
   const url = res.downloadLink;
   let uri, path;
@@ -27,6 +34,9 @@ export const redirectDownloadLink = (res: Resource): Resource => {
           .host(externalHost.host)
           .path(path.slice(externalHost.pathPrefixLength))
           .toString();
+        if (res.downloadLink === replacements[0]) {
+          res.downloadLink = replacements[1];
+        }
         return res;
       }
     }
