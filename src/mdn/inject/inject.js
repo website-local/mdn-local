@@ -774,9 +774,13 @@
     return element;
   }
 
+}();
+
+// 20231003 mdn: scroll to highlight on sidebar
+// https://github.com/website-local/mdn-local/issues/834
+!function () {
+
   /// region toc-scroll-to-highlight
-  // 20231003 mdn: scroll to highlight on sidebar
-  // https://github.com/website-local/mdn-local/issues/834
   // https://github.com/mdn/yari/blob/v2.20.2/client/src/document/hooks.ts#L192
   // https://github.com/mdn/yari/blob/v2.20.2/client/src/document/organisms/toc/index.tsx#L77
 
