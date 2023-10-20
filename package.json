@@ -19,7 +19,7 @@
     "@types/jest": "^28.1.1",
     "@types/node": "^20.8.7",
     "@types/tough-cookie": "^4.0.4",
-    "@types/urijs": "^1.19.20",
+    "@types/urijs": "^1.19.22",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^8.51.0",
