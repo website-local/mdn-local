@@ -1,5 +1,4 @@
 import type {CheerioStatic} from 'website-scrap-engine/lib/types';
-import {sources} from 'website-scrap-engine/lib/sources';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 
 function trimMatch(text1: string, text2: string): boolean {
@@ -51,10 +50,3 @@ export function postProcessPlayable($: CheerioStatic): void {
     textareaCSS.text(editable.html() || '');
   }
 }
-
-// TODO: remove this after upstream update
-sources.push({
-  selector: 'video[poster]',
-  attr: 'poster',
-  type: ResourceType.Binary,
-});
