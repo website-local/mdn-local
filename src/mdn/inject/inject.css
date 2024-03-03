@@ -227,14 +227,18 @@ table.compat-table th {
   filter: none;
 }
 .mask-fix .example-bad::after,
-.mask-fix .example-good::after {
+.mask-fix .example-good::after,
+.mask-fix .example-bad::before,
+.mask-fix .example-good::before {
   background-color: transparent;
   background-size: cover;
 }
-.mask-fix .example-bad::after {
+.mask-fix .example-bad::after,
+.mask-fix .example-bad::before {
   filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(340deg) brightness(0.9);
 }
-.mask-fix .example-good::after {
+.mask-fix .example-good::after,
+.mask-fix .example-good::before {
   filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(150deg);
 }
 .mask-fix .breadcrumbs-container li .breadcrumb::after {
