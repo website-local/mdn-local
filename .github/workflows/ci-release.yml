@@ -57,11 +57,11 @@ jobs:
             if [ -n "$redirect_url" ]; then
                 echo "Redirect URL found: $redirect_url"
                 # Make a new request to the redirect URL without the Authorization header
-                curl -L "$redirect_url" -O
+                curl -L "$redirect_url" --remote-header-name -O
             else
                 echo "No redirect URL found, downloading directly."
                 # If no redirect was found, download the file directly with the Authorization header
-                curl -L --header "$auth_header" "$url" -O
+                curl -L --header "$auth_header" "$url" --remote-header-name -O
             fi
           done
           mkdir -p ../release
