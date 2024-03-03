@@ -13,6 +13,8 @@ import {
 } from './utils';
 import {LEGEND_LABELS} from './legend';
 
+const DEFAULT_LOCALE = 'en-US';
+
 function getSupportClassName(
   support: SupportStatementExtended | undefined,
   browser: BCD.BrowserStatement
@@ -465,8 +467,12 @@ export const FeatureRow = ({
   let titleNode: string;
 
   if (compat.mdn_url && depth > 0) {
+    const href = compat.mdn_url.replace(
+      `/${DEFAULT_LOCALE}/docs`,
+      `/${locale}/docs`
+    );
     titleNode = (
-      `<a href={compat.mdn_url} class="bc-table-row-header">
+      `<a href={href} class="bc-table-row-header">
         ${title}
         ${compat.status && StatusIcons( {status: compat.status}) || ''}
       </a>`
