@@ -2,6 +2,7 @@
 import type * as BCD from './types';
 import {
   asList,
+  bugURLToString,
   getCurrentSupport,
   hasMore,
   hasNoteworthyNotes,
@@ -334,6 +335,17 @@ function getNotes(
           ? (Array.isArray(item.notes) ? item.notes : [item.notes]).map(
             (note) => ({ iconName: 'footnote', label: note })
           )
+          : null,
+        item.impl_url
+          ? (Array.isArray(item.impl_url)
+            ? item.impl_url
+            : [item.impl_url]
+          ).map((impl_url) => ({
+            iconName: 'footnote',
+            label: (
+              `See <a href=${impl_url}>${bugURLToString(impl_url)}</a>.`
+            ),
+          }))
           : null,
         versionIsPreview(item.version_added, browser)
           ? {
