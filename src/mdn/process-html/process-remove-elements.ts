@@ -91,4 +91,8 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   $('a.top-level-entry.menu-link[href*="plus/ai-help"]').parent().remove();
   // 20230716 top banner
   $('.top-banner.loading').remove();
+  // 20240303 baseline
+  // https://github.com/website-local/mdn-local/issues/973
+  $('.baseline-indicator a.learn-more').parent().remove();
+  $('.baseline-indicator a.feedback-link').parent().remove();
 };
