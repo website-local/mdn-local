@@ -484,7 +484,7 @@ export const FeatureRow = ({
       `/${locale}/docs`
     );
     titleNode = (
-      `<a href={href} class="bc-table-row-header">
+      `<a href=${href} class="bc-table-row-header">
         ${title}
         ${compat.status && StatusIcons( {status: compat.status}) || ''}
       </a>`
