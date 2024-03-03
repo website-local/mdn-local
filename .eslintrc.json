@@ -40,6 +40,9 @@
     ],
     "require-atomic-updates": [
       0
+    ],
+    "@typescript-eslint/consistent-type-imports": [
+      "error", { "disallowTypeAnnotations": false }
     ]
   }
 }

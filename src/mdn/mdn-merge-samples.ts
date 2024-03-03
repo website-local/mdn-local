@@ -1,4 +1,5 @@
-import glob, {Entry} from 'fast-glob';
+import type {Entry} from 'fast-glob';
+import glob from 'fast-glob';
 import cheerio from 'cheerio';
 import fs from 'fs';
 import path from 'path';

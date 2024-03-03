@@ -33,11 +33,11 @@ import {
   preProcessAddIconToExternalLinks
 } from './process-external';
 import {preProcessRemoveElements} from './process-remove-elements';
+import type {ProcessYariDataResult} from './process-yari-data';
 import {
   downloadAndRenderYariCompatibilityData,
   preProcessYariData,
-  preProcessYariHydrationData,
-  ProcessYariDataResult
+  preProcessYariHydrationData
 } from './process-yari-data';
 import {
   postProcessPlayground,

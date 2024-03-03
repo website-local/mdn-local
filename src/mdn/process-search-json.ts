@@ -3,8 +3,11 @@ import type {
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import type {PipelineExecutor} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
-import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
+import type {
+  PipelineExecutor
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
+import type {Resource} from 'website-scrap-engine/lib/resource';
+import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {toString} from 'website-scrap-engine/lib/util';
 import {error} from 'website-scrap-engine/lib/logger/logger';
 

@@ -1,5 +1,5 @@
 import {downloadableHosts, localeArr, mdnHosts} from './consts';
-import {Resource} from 'website-scrap-engine/lib/resource';
+import type {Resource} from 'website-scrap-engine/lib/resource';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import URI from 'urijs';
 import type {Cheerio} from 'website-scrap-engine/lib/types';

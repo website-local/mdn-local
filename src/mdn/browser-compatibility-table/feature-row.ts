@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type * as BCD from './types';
+import type {SupportStatementExtended} from './utils';
 import {
   asList,
   bugURLToString,
@@ -9,7 +10,6 @@ import {
   isFullySupportedWithoutLimitation,
   isNotSupportedAtAll,
   isTruthy,
-  SupportStatementExtended,
   versionIsPreview,
 } from './utils';
 import {LEGEND_LABELS} from './legend';

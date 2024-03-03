@@ -1,6 +1,5 @@
-import CacheableLookup, {
-  EntryObject, Options
-} from 'cacheable-lookup';
+import type {EntryObject, Options} from 'cacheable-lookup';
+import CacheableLookup from 'cacheable-lookup';
 
 export function preferIpv6Comparator(a: EntryObject, b: EntryObject): number {
   return b.family - a.family;

@@ -1,6 +1,7 @@
 import type {HTTPError} from 'got';
 import {downloadResource} from 'website-scrap-engine/lib/life-cycle';
-import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
+import type {Resource} from 'website-scrap-engine/lib/resource';
+import {ResourceType} from 'website-scrap-engine/lib/resource';
 import type {
   DownloadResource,
   RequestOptions

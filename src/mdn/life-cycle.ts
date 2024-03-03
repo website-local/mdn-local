@@ -2,10 +2,8 @@ import {
   defaultLifeCycle,
   downloadResource
 } from 'website-scrap-engine/lib/life-cycle';
-import {
-  defaultDownloadOptions,
-  DownloadOptions
-} from 'website-scrap-engine/lib/options';
+import type {DownloadOptions} from 'website-scrap-engine/lib/options';
+import {defaultDownloadOptions} from 'website-scrap-engine/lib/options';
 import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
 import {skipProcess} from './process-url/skip-process';
 import {redirectUrl} from './process-url/redirect-url';
