@@ -95,4 +95,14 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   // https://github.com/website-local/mdn-local/issues/973
   $('.baseline-indicator a.learn-more').parent().remove();
   $('.baseline-indicator a.feedback-link').parent().remove();
+  // 20240303 temporarily remove link to standalone play page
+  // Part of https://github.com/website-local/mdn-local/issues/975
+  // Would be reverted if this fully implemented
+  $('a.top-level-entry.menu-link').each((i, el) => {
+    const e = $(el);
+    const href = e.attr('href');
+    if (href?.endsWith('/play') && e.text().trim() === 'Play') {
+      e.parent().remove();
+    }
+  });
 };
