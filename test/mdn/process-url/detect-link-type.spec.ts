@@ -1,13 +1,13 @@
 import {detectLinkType} from '../../../src/mdn/process-url/detect-link-type';
 import type {Resource} from 'website-scrap-engine/lib/resource';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
-import cheerio from 'cheerio';
+import {load} from 'cheerio';
 import URI = require('urijs');
 
 describe('detect-link-type', function () {
   test('html', () => {
-    const a = cheerio.load('<a></a>')('a');
-    const iframe = cheerio.load('<a></a>')('a');
+    const a = load('<a></a>')('a');
+    const iframe = load('<a></a>')('a');
     expect(detectLinkType('https://developer.mozilla.org/zh-CN/docs/Web/API',
       ResourceType.Css, a, null)).toBe(ResourceType.Html);
     expect(detectLinkType('https://developer.mozilla.org/',
@@ -38,7 +38,7 @@ describe('detect-link-type', function () {
       ResourceType.Html, null, null)).toBe(ResourceType.Html);
   });
   test('binary', () => {
-    const a = cheerio.load('<a></a>')('a');
+    const a = load('<a></a>')('a');
     expect(detectLinkType('https://developer.mozilla.org/@api/deki/files/3783/=codeanalyst4.PNG',
       ResourceType.Html, a, null)).toBe(ResourceType.Binary);
     expect(detectLinkType('https://developer.mozilla.org/files/15838/places-erd.png',
@@ -54,7 +54,7 @@ describe('detect-link-type', function () {
   });
   test('css', () => {
 
-    const a = cheerio.load('<a></a>')('a');
+    const a = load('<a></a>')('a');
     expect(detectLinkType('https://developer.mozilla.org/ecosystem-platform/css/main.css',
       ResourceType.Binary, a, null)).toBe(ResourceType.Css);
     expect(detectLinkType('https://developer.mozilla.org/static/build/styles/samples.37902ba3b7fe.css',

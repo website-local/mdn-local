@@ -1,6 +1,6 @@
 import type {Entry} from 'fast-glob';
 import glob from 'fast-glob';
-import cheerio from 'cheerio';
+import {load} from 'cheerio';
 import fs from 'fs';
 import path from 'path';
 import {mkdirRetry} from 'website-scrap-engine/lib/io';
@@ -126,7 +126,7 @@ const parseResourceAsync = async (item: MdnSampleItem): Promise<void> => {
     delete item.pendingGetResources;
     return;
   } else {
-    parseResourceSync(item, cheerio.load(content));
+    parseResourceSync(item, load(content));
   }
 };
 
@@ -174,7 +174,7 @@ const checkIsEmpty = async (item: MdnSampleItem): Promise<void> => {
     item.resources = [];
     return;
   }
-  const $: CheerioStatic = cheerio.load(content);
+  const $: CheerioStatic = load(content);
   const body: Cheerio = $('body');
   let html;
   if (!body.length ||
