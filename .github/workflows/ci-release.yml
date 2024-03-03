@@ -48,7 +48,21 @@ jobs:
           mkdir -p download
           pushd download
           for url in $archive_download_urls; do
-            wget --header="Authorization: Bearer ${{ secrets.GH_ACTION_TOKEN }}" "$url"
+            auth_header="Authorization: Bearer ${{ secrets.GH_ACTION_TOKEN }}"
+            # Make the initial request with the Authorization header and capture the headers
+            response_headers=$(curl -s -I -L --header "$auth_header" "$url")
+            # Look for a Location header in case of a redirect
+            redirect_url=$(echo "$response_headers" | grep -i Location: | tail -n1 | sed -e 's/Location: //I' | tr -d '\r')
+            # Check if a redirect URL was found
+            if [ -n "$redirect_url" ]; then
+                echo "Redirect URL found: $redirect_url"
+                # Make a new request to the redirect URL without the Authorization header
+                curl -L "$redirect_url" -O
+            else
+                echo "No redirect URL found, downloading directly."
+                # If no redirect was found, download the file directly with the Authorization header
+                curl -L --header "$auth_header" "$url" -O
+            fi
           done
           mkdir -p ../release
           for zip_file in $(ls); do
