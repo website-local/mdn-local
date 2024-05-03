@@ -31,6 +31,7 @@ export const redirectDownloadLink = (res: Resource): Resource => {
         // interactive-examples
         // redirect back to real url
         res.downloadLink = uri.search('')
+          .protocol(externalHost.protocol)
           .host(externalHost.host)
           .path(path.slice(externalHost.pathPrefixLength))
           .toString();
