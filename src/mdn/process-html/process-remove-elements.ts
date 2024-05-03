@@ -110,4 +110,7 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   $('.article-footer-inner > h2').remove();
   $('.article-footer-inner > .feedback').remove();
   $('.article-footer-inner > .contribute').remove();
+  $('.article-footer-inner').contents().filter(function (this) {
+    return this.nodeType === 3 && this.data === '.';
+  }).remove();
 };
