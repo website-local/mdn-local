@@ -329,6 +329,28 @@ table.compat-table th {
     filter: invert(1);
   }
 }
+@media screen and (min-width: 1441px) {
+  .mask-fix .blog-post-container > .toc-container .place.side,
+  .mask-fix .blog-post-container > .toc-container .toc {
+    background: none;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .mask-fix .sidebar-container .toc-container,
+  .mask-fix .sidebar-container.toc-container {
+    background: none;
+  }
+}
+@media screen and (min-width: 769px) {
+  .mask-fix .sidebar-container .sidebar {
+    background: none;
+  }
+}
+
+.mask-fix .category-home .button .icon {
+  background-color: transparent;
+  filter: none;
+}
 /* endregion yari mask-image to background fix */
 
 /* This padding is not needed */
