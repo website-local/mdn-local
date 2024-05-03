@@ -114,6 +114,9 @@ export const externalHosts = [
   // 20231003
   ['/archive.org/', 'archive.org'],
   ['/peach.blender.org/', 'peach.blender.org'],
+  // 20240503
+  ['/download.g63.ru/', 'download.g63.ru'],
+  ['/www.whatwg.org/', 'www.whatwg.org'],
 ].map(([prefix, host]) => ({
   host,
   prefix,
