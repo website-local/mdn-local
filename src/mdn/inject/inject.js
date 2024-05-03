@@ -261,7 +261,8 @@
 
   /// region yari expandable top menu
   // https://github.com/website-local/mdn-local/issues/783
-  pageHeader = document.querySelector('.main-document-header-container');
+  pageHeader = document.querySelector('.main-document-header-container') ||
+    document.querySelector('.sticky-header-container');
   menuToggleBtn = pageHeader && pageHeader.querySelector('.main-menu-toggle');
   pageHeaderMain = pageHeader && (
     pageHeader.querySelector('.page-header-main') ||
