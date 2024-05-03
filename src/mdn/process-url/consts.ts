@@ -89,6 +89,7 @@ export const downloadableHosts = arrayToMap([
 ]);
 
 export interface ExternalHost {
+  protocol: string;
   host: string;
   prefix: string;
   pathPrefix: string;
@@ -115,9 +116,10 @@ export const externalHosts = [
   ['/archive.org/', 'archive.org'],
   ['/peach.blender.org/', 'peach.blender.org'],
   // 20240503
-  ['/download.g63.ru/', 'download.g63.ru'],
+  ['/download.g63.ru/', 'download.g63.ru', 'http'],
   ['/www.whatwg.org/', 'www.whatwg.org'],
-].map(([prefix, host]) => ({
+].map(([prefix, host, protocol]) => ({
+  protocol: protocol || 'https',
   host,
   prefix,
   pathPrefix: prefix.slice(0, -1),
