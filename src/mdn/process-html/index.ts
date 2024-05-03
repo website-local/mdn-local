@@ -63,8 +63,9 @@ export const preProcessHtml = async (
   const $: CheerioStatic = res.meta.doc;
   // keep the copyright notice
   // class name updated on 2022
+  // class name updated again on 2024
   $('#license.page-footer-legal-text')
-    .insertAfter($('.metadata-content-container>.last-modified-date'));
+    .insertAfter($('.article-footer-inner>.last-modified-date'));
   preProcessRemoveElements($);
   // the script containing inline data
   let dataScript: Cheerio | null = null;
