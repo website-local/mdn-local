@@ -54,6 +54,12 @@ export const skipProcess = (
     skipExternalLogger.debug('skipped external link', host, url, parent?.url);
     return;
   }
+  // 20240503 a bad like to https://raw.githubusercontent.com/
+  // src: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API
+  if (element?.is('a') && url === 'https://raw.githubusercontent.com/') {
+    skipExternalLogger.debug('skipped external link', host, url, parent?.url);
+    return;
+  }
   // special path for peach.blender.org
   // this site is not a static file cdn
   // Also referenced here:
