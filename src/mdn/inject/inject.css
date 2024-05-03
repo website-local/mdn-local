@@ -357,3 +357,7 @@ table.compat-table th {
 div > section.place {
   min-height: 0;
 }
+
+.article-footer .article-footer-inner p.last-modified-date {
+  margin: 0;
+}
