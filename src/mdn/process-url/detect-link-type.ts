@@ -26,6 +26,7 @@ const validExtensionName = arrayToMap([
   'eot',
   'psd',
   'vtt',
+  'wasm',
 ]);
 
 const forceBinarySuffix = [
