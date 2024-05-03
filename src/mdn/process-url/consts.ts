@@ -83,6 +83,9 @@ export const downloadableHosts = arrayToMap([
   // 20231003
   'archive.org',
   'peach.blender.org',
+  // 20240503
+  'download.g63.ru',
+  'www.whatwg.org',
 ]);
 
 export interface ExternalHost {
