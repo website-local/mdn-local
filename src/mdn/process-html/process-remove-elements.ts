@@ -105,4 +105,9 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
       e.parent().remove();
     }
   });
+  // 20240503 Help improve MDN
+  $('.article-footer-inner > .svg-container').remove();
+  $('.article-footer-inner > h2').remove();
+  $('.article-footer-inner > .feedback').remove();
+  $('.article-footer-inner > .contribute').remove();
 };
