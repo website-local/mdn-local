@@ -105,7 +105,9 @@ function sectionForHeading($: CheerioStatic, heading: Cheerio | null): Cheerio[]
 function closestHeading(element: Cheerio) {
   let prev = element;
   while (prev.parent().children().first().length) {
-    if (SECTION_RE.test(prev.parent().children().first().prop('tagName'))) {
+    // error TS2345
+    const tagName = prev.parent().children().first().prop('tagName');
+    if (tagName && SECTION_RE.test(tagName)) {
       return prev.parent().children().first();
     }
     prev = prev.parent();
