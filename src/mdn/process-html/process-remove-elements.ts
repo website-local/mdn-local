@@ -105,6 +105,9 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
       e.parent().remove();
     }
   });
+  // 20241005 Tools
+  // https://github.com/website-local/mdn-local/issues/1061
+  $('#tools-button').parent().remove();
   // 20240503 Help improve MDN
   $('.article-footer-inner > .svg-container').remove();
   $('.article-footer-inner > h2').remove();
