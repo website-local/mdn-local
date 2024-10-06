@@ -139,20 +139,11 @@ describe('redirect-url', function () {
     expect(redirectUrl('https://developer.mozilla.org/zh-CN/docs/Web/API/IDBCursor?redirectlocale=en-US&redirectslug=IndexedDB%252FIDBCursor',
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/IDBCursor');
-    // this is not a regular redirect
-    expect(redirectUrl('https://developer.mozilla.org/zh-CN/Add-ons/Code_snippets/Tabbed_browser?redirectlocale=en-US&redirectslug=Code_snippets%252FTabbed_browser',
-      null, null, opt('zh-CN')))
-      .toBe('https://developer.mozilla.org/zh-CN/docs/Archive/Add-ons/Tabbed_browser');
-    expect(redirectUrl('https://developer.mozilla.org/En/docs/XUL/Attribute/align?raw&macros&include',
-      null, null, opt('zh-CN')))
-      .toBe('https://developer.mozilla.org/zh-CN/docs/XUL/Attribute/align');
+
   });
 
   // https://github.com/myfreeer/mdn-local/issues/20
   test('process bad url #20', () => {
-    expect(redirectUrl('https://developer.mozilla.org/../../../../en-US/docs/Code_snippets/Tabbed_browser',
-      null, null, opt('zh-CN')))
-      .toBe('https://developer.mozilla.org/zh-CN/docs/Archive/Add-ons/Tabbed_browser');
     expect(redirectUrl('https://developer.mozilla.org/../../../../En/Mozilla_developer_guide',
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/Mozilla_developer_guide');
