@@ -4,34 +4,16 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
   // https://github.com/website-local/mdn-local/issues/211
   '/media/redesign/img/favicon32.png': '/favicon.ico',
   // https://developer.mozilla.org/zh-CN/docs/Mozilla/Tech/Places/Using_the_Places_keywords_AP
-  [`/${locale}/docs/Bookmark_Keywords`]:
-    `/${locale}/docs/Archive/Mozilla/Bookmark_keywords`,
   [`/${locale}/docs/CSS/CSS_transitions`]:
     `/${locale}/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions`,
   [`/${locale}/docs/Mozilla/Add-ons/WebExtensions/Using_the_JavaScript_APIs`]:
     `/${locale}/docs/Mozilla/Add-ons/WebExtensions/API`,
   [`/${locale}/docs/Web/Reference/Events/ended`]:
     `/${locale}/docs/Web/API/HTMLMediaElement/ended_event`,
-  [`/${locale}/docs/Web/API/SMSEvent`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozSmsEvent`,
   [`/${locale}/docs/Web/Reference/Events/upgradeneeded_indexedDB`]:
     `/${locale}/docs/Web/API/IDBOpenDBRequest/upgradeneeded_event`,
   [`/${locale}/docs/Alternative_style_sheets`]:
     `/${locale}/docs/Web/CSS/Alternative_style_sheets`,
-  [`/${locale}/docs/Apps/Manifest`]:
-    `/${locale}/docs/Archive/B2G_OS/Firefox_OS_apps/Building_apps_for_Firefox_OS/Manifest`,
-  [`/${locale}/Firefox_OS/Developer_phone_guide/Flame`]:
-    `/${locale}/docs/Archive/B2G_OS/Phone_guide/Flame`,
-  [`/${locale}/docs/Web/API/TCPSocket/open`]:
-    `/${locale}/docs/Archive/B2G_OS/API/TCPSocket/open`,
-  [`/${locale}/docs/DOM/MozMobileConnectionInfo.relSignalStrength`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozMobileConnectionInfo/relSignalStrength`,
-  [`/${locale}/docs/Web/API/MozSettingsEvent/settingValue`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozSettingsEvent/settingValue`,
-  [`/${locale}/Apps/Developing/App_permissions`]:
-    `/${locale}/docs/Archive/B2G_OS/Firefox_OS_apps/App_permissions`,
-  [`/${locale}/Apps/Build/Building_apps_for_Firefox_OS/Firefox_OS_app_beginners_tutorial`]:
-    `/${locale}/docs/Archive/B2G_OS/Firefox_OS_apps/Building_apps_for_Firefox_OS/Firefox_OS_app_beginners_tutorial`,
   [`/${locale}/docs/DOM/event.charCode`]:
     `/${locale}/docs/Web/API/KeyboardEvent/charCode`,
   [`/${locale}/WebGL`]:
@@ -40,18 +22,10 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/Element/tagName`,
   [`/${locale}/IndexedDB/IDBObjectStore`]:
     `/${locale}/docs/Web/API/IDBObjectStore`,
-  [`/${locale}/docs/Web/Apps/App_templates`]:
-    `/${locale}/docs/Archive/Apps/Tools_and_frameworks/App_templates`,
   [`/${locale}/docs/Security/MixedContent/fix_website_with_mixed_content`]:
     `/${locale}/docs/Security/MixedContent/How_to_fix_website_with_mixed_content`,
   [`/${locale}/docs/JavaScript/Reference/Global_Objects/Map`]:
     `/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Map`,
-  [`/${locale}/docs/Apps/App_permissions`]:
-    `/${locale}/docs/Archive/B2G_OS/Firefox_OS_apps/App_permissions`,
-  [`/${locale}/Apps/CSP`]:
-    `/${locale}/docs/Archive/B2G_OS/Firefox_OS_apps/Building_apps_for_Firefox_OS/CSP`,
-  [`/${locale}/docs/Web/API/MozAlarmsManager/getAll`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozAlarmsManager/getAll`,
   [`/${locale}/docs/DOM/window.clearTimeout`]:
     `/${locale}/docs/Web/API/WindowTimers/clearTimeout`,
   [`/${locale}/DOM/window.openDialog`]:
@@ -113,185 +87,47 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/CSS/column-gap`,
   [`/${locale}/docs/Web/CSS/-moz-transition`]:
     `/${locale}/docs/Web/CSS/transition`,
-  [`/${locale}/XUL_%E6%95%99%E7%A8%8B/%E5%AE%9A%E4%BD%8D%E5%B1%82`]:
-    `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/Stack_Positioning`,
-  [`/${locale}/XUL_%E6%95%99%E7%A8%8B/%E6%A0%B7%E5%BC%8F%E5%8C%96%E6%A0%91`]:
-    `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/Styling_a_Tree`,
-  [`/${locale}/XUL_%E6%95%99%E7%A8%8B/%E4%BF%AE%E6%94%B9%E9%BB%98%E8%AE%A4%E7%9A%84%E7%9A%AE%E8%82%A4`]:
-    `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/Modifying_the_Default_Skin`,
   [`/${locale}/docs/Web/CSS/-webkit-animation`]:
     `/${locale}/docs/Web/CSS/animation`,
   [`/${locale}/docs/Web/CSS/-webkit-animation-duration`]:
     `/${locale}/docs/Web/CSS/animation-duration`,
-  [`/${locale}/docs/Submitting_an_add-on_to_AMO`]:
-    `/${locale}/docs/Mozilla/Add-ons/Submitting_an_add-on_to_AMO`,
   [`/${locale}/docs/Web/CSS/-webkit-column-rule-color`]:
     `/${locale}/docs/Web/CSS/column-rule-color`,
   [`/${locale}/docs/Web/API/Web_Animations_API/Animation_timing_options`]:
     `/${locale}/docs/Web/API/EffectTiming`,
-  [`/${locale}/docs/Web/API/MozMobileMessageManager/send`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozMobileMessageManager/send`,
-  [`/${locale}/docs/Apps/Updating_apps`]:
-    `/${locale}/docs/Archive/Mozilla/Marketplace/Publishing/Updating_apps`,
-  [`/${locale}/docs/Web/API/DOMCursor/done`]:
-    `/${locale}/docs/Archive/B2G_OS/API/DOMCursor/done`,
-  [`/${locale}/docs/Web/API/DOMCursor/continue`]:
-    `/${locale}/docs/Archive/B2G_OS/API/DOMCursor/continue`,
-  [`/${locale}/docs/Web/API/MozContact/bday`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozContact/bday`,
-  [`/${locale}/docs/Web/API/MozContact/published`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozContact/published`,
-  [`/${locale}/docs/Web/API/PowerManager/getWakeLockState`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozPowerManager/getWakeLockState`,
-  [`/${locale}/docs/Web/API/MozContact/init`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozContact/init`,
-  [`/${locale}/docs/Web/API/MozWifiConnectionInfoEvent/network`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozWifiConnectionInfoEvent/network`,
-  [`/${locale}/docs/Web/API/MozContact/jobTitle`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozContact/jobTitle`,
-  [`/${locale}/docs/Web/API/MozPowerManager/removeWakeLockListener`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozPowerManager/removeWakeLockListener`,
   [`/${locale}/docs/Project:The_Kuma_API`]:
     `/${locale}/docs/MDN/Contribute/Tools/Document_parameters`,
-  [`/${locale}/docs/Mozilla/Firefox_OS/API/MozActivityRequestHandler`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozActivityRequestHandler`,
-  [`/${locale}/docs/NsIInputStream`]:
-    `/${locale}/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIInputStream`,
-  [`/${locale}/docs/Mozilla/Firefox_OS/API/MozActivityOptions`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozActivityOptions`,
-  [`/${locale}/docs/Web/Apps/JavaScript_API/navigator.mozApps.mgmt.clearWatch`]:
-    `/${locale}/docs/Archive/Marketplace/API/DOMApplicationsManager/clearWatch`,
-  [`/${locale}/Apps/JavaScript_API`]:
-    `/${locale}/docs/Archive/Marketplace/API/App_installation_and_management_APIs`,
-  [`/${locale}/docs/Web/API/DeviceStorage/default`]:
-    `/${locale}/docs/Archive/B2G_OS/API/DeviceStorage/default`,
-  [`/${locale}/docs/Web/Apps/JavaScript_API/navigator.mozApps.mgmt.watchUpdates`]:
-    `/${locale}/docs/Archive/Marketplace/API/DOMApplicationsManager/watchUpdates`,
-  [`/${locale}/docs/Web/Apps/JavaScript_API/navigator.mozApps.mgmt.list`]:
-    `/${locale}/docs/Archive/Marketplace/API/DOMApplicationsManager/list`,
-  [`/${locale}/docs/Web/API/Apps.getInstalled`]:
-    `/${locale}/docs/Archive/Marketplace/API/DOMApplicationsRegistry/getInstalled`,
   [`/${locale}/docs/Web/CSS/-moz-transition-duration`]:
     `/${locale}/docs/Web/CSS/transition-duration`,
-  [`/${locale}/docs/Web/API/window.navigator.mozApps`]:
-    `/${locale}/docs/Archive/B2G_OS/API/Navigator/mozApps`,
   [`/${locale}/Apps/Manifest`]:
     `/${locale}/docs/Archive/B2G_OS/Firefox_OS_apps/Building_apps_for_Firefox_OS/Manifest`,
-  [`/${locale}/docs/Web/API/MozContact/email`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozContact/email`,
-  [`/${locale}/docs/Web/API/SmsMessage`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozSmsMessage`,
   [`/${locale}/docs/Mozilla/Firefox_OS/API/MozActivity`]:
     `/${locale}/docs/Archive/B2G_OS/API/MozActivity`,
-  [`/${locale}/XUL_%E6%95%99%E7%A8%8B/Tree_Box_Objects`]:
-    `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/More_Wizards`,
-  [`/${locale}/docs/Web/API/MozWifiConnectionInfoEvent/linkSpeed`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozWifiConnectionInfoEvent/linkSpeed`,
   [`/${locale}/docs/Gecko_User_Agent_Strings`]:
     `/${locale}/docs/Web/HTTP/Headers/User-Agent/Firefox`,
-  [`/${locale}/docs/Web/API/CameraCapabilities/recorderProfiles`]:
-    `/${locale}/docs/Archive/B2G_OS/API/CameraCapabilities/recorderProfiles`,
-  [`/${locale}/docs/Web/API/MozWifiStatusChangeEvent/status`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozWifiStatusChangeEvent/status`,
-  [`/${locale}/docs/Web/API/MozWifiConnectionInfoEvent/signalStrength`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozWifiConnectionInfoEvent/signalStrength`,
-  [`/${locale}/docs/Web/API/MozMobileCFInfo/serviceClass`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozMobileCFInfo/serviceClass`,
-  [`/${locale}/docs/Web/API/MozMobileCFInfo/reason`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozMobileCFInfo/reason`,
-  [`/${locale}/docs/Web/API/MozMobileCellInfo/gsmCellId`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozMobileCellInfo/gsmCellId`,
-  [`/${locale}/docs/Web/API/MozMobileICCInfo/spn`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozMobileCCInfo/spn`,
-  [`/${locale}/docs/Web/API/MozMobileCFInfo/number`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozMobileCFInfo/number`,
-  [`/${locale}/docs/XUL/Property/valueNumber`]:
-    `/${locale}/docs/Archive/Mozilla/XUL/Property/valueNumber`,
   // [`/${locale}/Gecko_Plugin_API_Reference/Plug-in_Development_Overview`]:`404`,
   [`/${locale}/docs/Web/CSS/dominant-baseline`]:
     `/${locale}/docs/Web/SVG/Attribute/dominant-baseline`,
-  [`/${locale}/docs/Web/API/Telephony/active`]:
-    `/${locale}/docs/Archive/B2G_OS/API/Telephony/active`,
-  [`/${locale}/docs/Web/Guide/Telephony`]:
-    `/${locale}/docs/Archive/B2G_OS/Web_Telephony_API`,
   [`/${locale}/docs/Web/CSS/-webkit-perspective`]:
     `/${locale}/docs/Web/CSS/perspective`,
-  [`/${locale}/Apps/Build/installable_apps/App_manifest_FAQ`]:
-    `/${locale}/docs/Archive/B2G_OS/Firefox_OS_apps/App_development_FAQ`,
   [`/${locale}/Apps/app_layout/responsive_design_building_blocks`]:
     `/${locale}/docs/Web/Progressive_web_apps/Responsive/responsive_design_building_blocks`,
-  [`/${locale}/docs/Mozilla/Firefox_OS/Phone`]:
-    `/${locale}/docs/Archive/B2G_OS/Phone_guide/Phone_specs`,
-  [`/${locale}/docs/nsIConsoleService`]:
-    `/${locale}/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIConsoleService`,
-  [`/${locale}/docs/JavaScript/Guide/LiveConnect_Overview`]:
-    `/${locale}/docs/Archive/Web/LiveConnect`,
-  [`/${locale}/docs/Mozilla/Firefox_OS/API/BluetoothGattService`]:
-    `/${locale}/docs/Archive/B2G_OS/API/BluetoothGattService`,
-  [`/${locale}/docs/Web/API/Web_Bluetooth_API/Using_the_Web_Bluetooth_API`]:
-    `/${locale}/docs/Archive/B2G_OS/Bluetooth_API/Using_the_Web_Bluetooth_API`,
-  [`/${locale}/docs/Web/API/BluetoothGattService_%28Firefox_OS%29`]:
-    `/${locale}/docs/Archive/B2G_OS/API/BluetoothGattService`,
-  [`/${locale}/docs/Mozilla/Firefox_OS/API/BluetoothDeviceEvent`]:
-    `/${locale}/docs/Archive/B2G_OS/API/BluetoothDeviceEvent`,
-  [`/${locale}/docs/Mozilla/Firefox_OS/API/BluetoothGattCharacteristic`]:
-    `/${locale}/docs/Archive/B2G_OS/API/BluetoothGattCharacteristic`,
-  [`/${locale}/docs/Mozilla/Firefox_OS/API/BluetoothGattCharacteristicEvent`]:
-    `/${locale}/docs/Archive/B2G_OS/API/BluetoothGattCharacteristicEvent`,
   [`/${locale}/docs/DOM/CSS`]:
     `/${locale}/docs/Web/CSS/Reference`,
   [`/${locale}/docs/Web/CSS/-webkit-transform-style`]:
     `/${locale}/docs/Web/CSS/transform-style`,
-  [`/${locale}/docs/NSPR_API_Reference:Floating_Point_Number_to_String_Conversion`]:
-    `/${locale}/docs/Mozilla/Projects/NSPR/Reference/Floating_Point_Number_to_String_Conversion`,
-  [`/${locale}/docs/Site_Author_Guide_for_Click-To-Activate_Plugins`]:
-    `/${locale}/docs/Plugins/Flash_Activation:_Browser_Comparison`,
-  [`/${locale}/Gecko_Plugin_API_Reference`]:
-    `/${locale}/docs/Mozilla/Add-ons/Plugins/Plugin_API_Reference`,
   [`/${locale}/DOM/document.async`]:
     `/${locale}/docs/Web/API/XMLDocument/async`,
   [`/${locale}/docs/Project:Custom_templates`]:
     `/${locale}/docs/MDN/Contribute/Content/Custom_macros`,
   [`/${locale}/docs/Project:MDN/Contributing/Custom_macros`]:
     `/${locale}/docs/MDN/Contribute/Content/Custom_macros`,
-  [`/${locale}/Add-ons/SDK/Getting_Started_With_cfx`]:
-    `/${locale}/docs/Mozilla/Add-ons/SDK/Tutorials/Getting_started`,
-  [`/${locale}/docs/Code_snippets/Tree`]:
-    `/${locale}/docs/Archive/Add-ons/Code_snippets/Tree`,
-  [`/${locale}/docs/XUL/School_tutorial/Adding_Toolbars_and_Toolbar_Buttons`]:
-    `/${locale}/docs/Mozilla/Add-ons/Overlay_Extensions/XUL_School/Adding_Toolbars_and_Toolbar_Buttons`,
   [`/${locale}/Apps/App_developer_tools`]:
     `/${locale}/docs/Tools`,
-  [`/${locale}/Marketplace/Creating_a_store`]:
-    `/${locale}/docs/Archive/Marketplace/Options/Creating_a_store`,
-  [`/${locale}/Marketplace/Submission/Submitting_an_app`]:
-    `/${locale}/docs/Archive/Mozilla/Marketplace/Publishing/Submit/After_submission`,
-  [`/${locale}/Add-ons/SDK/Tutorials/Getting_Started_With_cfx`]:
-    `/${locale}/docs/Mozilla/Add-ons/SDK/Tutorials/Getting_started`,
-  [`/${locale}/Apps/Build/JavaScript_API`]:
-    `/${locale}/docs/Archive/Marketplace/API/App_installation_and_management_APIs`,
-  [`/${locale}/Marketplace/Publishing/Marketplace_screenshot_criteria`]:
-    `/${locale}/docs/Archive/Mozilla/Marketplace/Publishing/Policies_and_Guidelines/Marketplace_screenshot_criteria`,
-  [`/${locale}/docs/Web/Apps/FAQs/About_app_manifests`]:
-    `/${locale}/docs/Web/Apps/Build/installable_apps_for_Firefox_OS/App_manifest_FAQ`,
-  [`/${locale}/Marketplace/Prepare_For_Success/Getting_to_know_your_users`]:
-    `/${locale}/docs/Archive/Mozilla/Marketplace/Prepare/Getting_to_know_your_users`,
-  [`/${locale}/Apps/Publishing/Marketplace_screenshot_criteria`]:
-    `/${locale}/docs/Archive/Mozilla/Marketplace/Publishing/Policies_and_Guidelines/Marketplace_screenshot_criteria`,
   [`/${locale}/docs/Web/HTML/Canvas/Tutorial/Basic_animations`]:
     `/${locale}/docs/Web/API/Canvas_API/Tutorial/Basic_animations`,
-  [`/${locale}/docs/Web/Accessibility/ATSPI_Support`]:
-    `/${locale}/docs/Mozilla/Tech/Accessibility/AT-APIs`,
   [`/${locale}/docs/Core_JavaScript_1.5_Reference/Operators/Special_Operators/instanceof_Operator`]:
     `/${locale}/docs/Web/JavaScript/Reference/Operators/instanceof`,
-  [`/${locale}/Add-ons/Firefox_for_Android/API/HomeProvider.jsm/HomeStorage`]:
-    `/${locale}/docs/Archive/Add-ons/Legacy_Firefox_for_Android/API/HomeProvider.jsm/HomeStorage`,
-  [`/${locale}/docs/XUL/Property/preferenceElements`]:
-    `/${locale}/docs/Archive/Mozilla/XUL/Property/preferenceElements`,
-  [`/${locale}/docs/Mozilla/Add-ons/SDK/Guides/Getting_Started`]:
-    `/${locale}/docs/Archive/Add-ons/Add-on_SDK/Guides/Contributor_s_Guide/Getting_Started`,
-  [`/${locale}/docs/Extensions/Mobile/API/NativeWindow/pageactions`]:
-    `/${locale}/docs/Archive/Add-ons/Legacy_Firefox_for_Android/API/PageActions.jsm`,
   [`/${locale}/DOM/EventTarget`]:
     `/${locale}/docs/Web/API/EventTarget`,
   [`/${locale}/docs/Web/CSS/-webkit-animation-direction`]:
@@ -306,10 +142,6 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/JavaScript`,
   [`/${locale}/docs/Tools/Responsive_Design_Mode`]:
     `/${locale}/docs/Tools/Responsive_Design_View`,
-  [`/${locale}/docs/nsIXMLHttpRequest`]:
-    `/${locale}/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIXMLHttpRequest`,
-  '/@api/deki/files/272/=Moz_ffx_openStandards_1280x1024.jpg':
-    '/files/559/Moz_ffx_openStandards_1280x1024.jpg',
   [`/${locale}/docs/CSS:text-align`]:
     `/${locale}/docs/Web/CSS/text-align`,
   [`/${locale}/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-invalid_property`]:
@@ -318,50 +150,12 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/CSS/font-size-adjust`,
   [`/${locale}/docs/CSS:border`]:
     `/${locale}/docs/Web/CSS/border`,
-  [`/${locale}/XUL_%E6%95%99%E7%A8%8B/%E5%85%B3%E4%BA%8EContents.rdf`]:
-    `/${locale}/docs/junks/%E5%85%B3%E4%BA%8EContents.rdf`,
-  [`/${locale}/docs/Web/API/DeviceStorage/storageName`]:
-    `/${locale}/docs/Archive/B2G_OS/API/DeviceStorage/storageName`,
-  [`/${locale}/docs/Accessibility/AT-SPI_Support`]:
-    `/${locale}/docs/Mozilla/Tech/Accessibility/AT-APIs`,
-  [`/${locale}/XUL_%E6%95%99%E7%A8%8B/XUL%E7%9A%84%E7%BB%93%E6%9E%84`]:
-    `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/XUL_Structure`,
-  [`/${locale}/docs/API/WebTelephony`]:
-    `/${locale}/docs/Archive/B2G_OS/Web_Telephony_API`,
   [`/${locale}/docs/Accessible_DHTML`]:
     `/${locale}/docs/Web/Accessibility/ARIA`,
-  [`/${locale}/docs/API/WebSMS/Introduction_to_WebSMS`]:
-    `/${locale}/docs/Archive/B2G_OS/API/Mobile_Messaging_API/Introduction_to_Mobile_Message_API`,
-  [`/${locale}/docs/XUL_School/Connecting_to_Remote_Content`]:
-    `/${locale}/docs/Archive/Add-ons/Overlay_Extensions/XUL_School/Connecting_to_Remote_Content`,
   '/en-US/docs/Web/Events/readystatechange':
     `/${locale}/docs/Web/Events/readystatechange_event`,
-  '/en-US/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/ui_button_toggle':
-    `/${locale}/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/ui_button_toggle`,
-  '/En/Mozilla_developer_guide':
-    `/${locale}/docs/Mozilla/Developer_guide`,
-  '/en/XUL_Tutorial/Localization':
-    `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/Localization`,
-  '/en/XUL_Tutorial/Document_Object_Model':
-    `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/Document_Object_Model`,
-  '/En/NsITimer':
-    `/${locale}/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsITimer`,
-  '/en/XUL_Tutorial/More_Event_Handlers':
-    `/${locale}/docs/Mozilla/Tech/XUL/Tutorial/More_Event_Handlers`,
-  '/en/Using_JavaScript_code_modules':
-    `/${locale}/docs/Mozilla/JavaScript_code_modules/Using`,
-  '/En/nsITimer':
-    `/${locale}/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsITimer`,
   '/en/DOM/window.setTimeout':
     `/${locale}/docs/Web/API/Window/setTimeout`,
-  '/En/Publishing_Mercurial_Clones':
-    `/${locale}/docs/Mozilla/Creating_Mercurial_User_Repositories`,
-  '/En/SpiderMonkey':
-    `/${locale}/docs/Mozilla/Projects/SpiderMonkey`,
-  '/en/nsIFeedTextConstruct':
-    `/${locale}/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIFeedTextConstruct`,
-  '/En/NsIAccessible/Parent':
-    `/${locale}/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIAccessible/Parent`,
   '/en-US/docs/DOM/event.charCode':
     `/${locale}/docs/Web/API/KeyboardEvent/charCode`,
   [`/${locale}/docs/Web/CSS/en-US/docs/Web/API/WebVTT_API`]:
@@ -371,22 +165,10 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Glossary/Microsoft_Internet_Explorer`,
   [`/${locale}/docs/Web/API/en-US/docs/Server-sent_events/Using_server-sent_events`]:
     `/${locale}/docs/Server-sent_events/Using_server-sent_events`,
-  [`/${locale}/docs/MDN/Contribute/Localize/en-US/docs/MDN/Contribute/Tools/Template_editing`]:
-    `/${locale}/docs/MDN/Contribute/Tools/Template_editing`,
   [`/${locale}/docs/Web/Accessibility/Understanding_WCAG/en-US/docs/Web/Accessibility/Understanding_WCAG`]:
     `/${locale}/docs/Web/Accessibility/Understanding_WCAG`,
-  [`/${locale}/Firefox/Releases/en-US/Add-ons/SDK/Low-Level_APIs/test_httpd`]:
-    `/${locale}/docs/Archive/Add-ons/Add-on_SDK/Low-Level_APIs/test_httpd`,
   [`/${locale}/docs/Web/CSS/en-US/docs/Web/CSS`]:
     `/${locale}/docs/Web/CSS`,
-  [`/${locale}/docs/@api/deki/files/706/=Groupbox2.png`]:
-    '/@api/deki/files/706/=Groupbox2.png',
-  [`/${locale}/docs/@api/deki/files/568/=Boxfinal2.png`]:
-    '/@api/deki/files/568/=Boxfinal2.png',
-  [`/${locale}/docs/@api/deki/files/567/=Boxfinal1.png`]:
-    '/@api/deki/files/567/=Boxfinal1.png',
-  [`/${locale}/docs/@api/deki/files/891/=Titledbox1.png`]:
-    '/@api/deki/files/891/=Titledbox1.png',
   '/zh-CN/docs/Glossary/%E7%94%A8%E6%88%B7%E4%BB%A3%E7%90%86':
     `/${locale}/docs/Glossary/User_Agent`,
   [`/${locale}/docs/Web/Reference/Events/slotchange`]:
@@ -399,20 +181,14 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/HTMLElement/style`,
   '/zh-CN/docs/Web/Media/Overview':
     `/${locale}/docs/Web/Media`,
-  '/zh-CN/Add-ons/Code_snippets/Tabbed_browser?redirectlocale=en-US&redirectslug=Code_snippets%2FTabbed_browser':
-    `/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
   '/zh-CN/Add-ons/Code_snippets/Tabbed_browser':
     `/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
   [`/${locale}/Add-ons/Code_snippets/Tabbed_browser`]:
-    `/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
-  [`/${locale}/docs/Code_snippets/Tabbed_browser`]:
     `/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
   [`/${locale}/docs/Web/Events/readystatechange`]:
     `/${locale}/docs/Web/API/Document/readystatechange_event`,
   [`/${locale}/docs/Web/API/Document/onreadystatechange`]:
     `/${locale}/docs/Web/API/Document/readystatechange_event`,
-  [`/${locale}/docs/Web/API/BluetoothAdapter/startDiscovery`]:
-    `/${locale}/docs/Archive/B2G_OS/API/BluetoothAdapter/startDiscovery`,
   [`/${locale}/docs/Web/API/Element/childNodes`]:
     `/${locale}/docs/Web/API/Node/childNodes`,
   [`/${locale}/docs/Web/API/Element/blur`]:
@@ -447,8 +223,6 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/HTMLScriptElement`,
   [`/${locale}/SVG/Content_type`]:
     `/${locale}/docs/Web/SVG/Content_type`,
-  [`/${locale}/SVG/FAQ`]:
-    `/${locale}/docs/Web/SVG/FAQ`,
   [`/${locale}/SVG/Content_type`]:
     `/${locale}/docs/Web/SVG/Content_type`,
   [`/${locale}/SVG/Namespaces_Crash_Course`]:
@@ -485,8 +259,6 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/HTMLVideoElement`,
   [`/${locale}/docs/Web/API/Element/NodeList`]:
     `/${locale}/docs/Web/API/NodeList`,
-  [`/${locale}/docs/Web/API/Element/offsetHeight`]:
-    `/${locale}/docs/Web/API/Element/offsetHeight`,
   [`/${locale}/docs/Web/API/Element/dataset`]:
     `/${locale}/docs/Web/API/HTMLElement/dataset`,
   [`/${locale}/docs/Web/API/Element/click`]:
@@ -517,8 +289,6 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/Node/textContent`,
   [`/${locale}/docs/Web/API/Document/en/HTML/Element/a`]:
     `/${locale}/docs/Web/HTML/Element/a`,
-  [`/${locale}/docs/DOM/SVGColorProfileElement`]:
-    `/${locale}/docs/Web/API/SVGColorProfileElement`,
   [`/${locale}/docs/Web/HTML/Element/%3Cvideo%3E`]:
     `/${locale}/docs/Web/HTML/Element/video`,
   [`/${locale}/docs/Web/API/Element/createTextRange`]:
@@ -577,8 +347,6 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/Element/scrollHeight`,
   [`/${locale}/docs/DOM/element.isDefaultNamespace`]:
     `/${locale}/docs/Web/API/Node/isDefaultNamespace`,
-  [`/${locale}/Code_snippets/HTML_to_DOM`]:
-    `/${locale}/Archive/Add-ons/Code_snippets/HTML_to_DOM`,
   [`/${locale}/DOM_Mutation_Observers`]:
     `/${locale}/docs/Web/API/MutationObserver`,
   [`/${locale}/docs/Web/API/DOM_event_reference/input`]:
@@ -589,10 +357,6 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/DOMString`,
   [`/${locale}/DOMParser`]:
     `/${locale}/docs/Web/API/DOMParser`,
-  [`/${locale}/Session_store_API`]:
-    `/${locale}/docs/Archive/Add-ons/Session_store_API`,
-  [`/${locale}/docs/DOM/Using_the_Telephony_API`]:
-    `/${locale}/docs/Archive/B2G_OS/Web_Telephony_API/Using_the_Web_Telephony_API`,
   [`/${locale}/docs/Web/API/Window/DOMPoint`]:
     `/${locale}/docs/Web/API/DOMPoint`,
   [`/${locale}/docs/Web/API/Window/DOMMatrix`]:
@@ -607,8 +371,6 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/DOMRectReadOnly`,
   [`/${locale}/docs/Web/JavaScript/Reference/DOMException`]:
     `/${locale}/docs/Web/API/DOMException`,
-  [`/${locale}/Using_Web_Standards_in_your_Web_Pages/Using_the_W3C_DOM`]:
-    `/${locale}/docs/Archive/Using_Web_Standards_in_your_Web_Pages/Using_the_W3C_DOM`
 });
 
 export const mdnLocaleRedirectPath = (locale: string): Record<string, string> => {
