@@ -116,4 +116,7 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   $('.article-footer-inner').contents().filter(function (this) {
     return this.nodeType === 3 && this.data === '.';
   }).remove();
+  // 20241006 blog newsletter
+  // https://github.com/website-local/mdn-local/issues/1068
+  $('.section-newsletter').remove();
 };
