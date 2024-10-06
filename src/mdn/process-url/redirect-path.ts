@@ -99,10 +99,6 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/MDN/Contribute/Tools/Document_parameters`,
   [`/${locale}/docs/Web/CSS/-moz-transition-duration`]:
     `/${locale}/docs/Web/CSS/transition-duration`,
-  [`/${locale}/Apps/Manifest`]:
-    `/${locale}/docs/Archive/B2G_OS/Firefox_OS_apps/Building_apps_for_Firefox_OS/Manifest`,
-  [`/${locale}/docs/Mozilla/Firefox_OS/API/MozActivity`]:
-    `/${locale}/docs/Archive/B2G_OS/API/MozActivity`,
   [`/${locale}/docs/Gecko_User_Agent_Strings`]:
     `/${locale}/docs/Web/HTTP/Headers/User-Agent/Firefox`,
   // [`/${locale}/Gecko_Plugin_API_Reference/Plug-in_Development_Overview`]:`404`,
@@ -181,10 +177,6 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/HTMLElement/style`,
   '/zh-CN/docs/Web/Media/Overview':
     `/${locale}/docs/Web/Media`,
-  '/zh-CN/Add-ons/Code_snippets/Tabbed_browser':
-    `/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
-  [`/${locale}/Add-ons/Code_snippets/Tabbed_browser`]:
-    `/${locale}/docs/Archive/Add-ons/Tabbed_browser`,
   [`/${locale}/docs/Web/Events/readystatechange`]:
     `/${locale}/docs/Web/API/Document/readystatechange_event`,
   [`/${locale}/docs/Web/API/Document/onreadystatechange`]:
@@ -378,28 +370,17 @@ export const mdnLocaleRedirectPath = (locale: string): Record<string, string> =>
     return {};
   }
   return {
-    [`/${locale}/Configuring_Build_Options`]:
-      `/${locale}/docs/%E9%85%8D%E7%BD%AE%E7%BC%96%E8%AF%91%E9%80%89%E9%A1%B9`,
-    [`/${locale}/docs/Apps/Packaged_apps`]:
-      `/${locale}/docs/Archive/Mozilla/Marketplace/Options/%E6%89%93%E5%8C%85_%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F`,
-    [`/${locale}/docs/Project:MDC_editor_guide`]:
-      `/${locale}/docs/Project:MDN/%E8%B4%A1%E7%8C%AE/Editor_guide/Basics`,
-    [`/${locale}/Apps/Packaged_apps`]:
-      `/${locale}/docs/Archive/Mozilla/Marketplace/Options/%E6%89%93%E5%8C%85_%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F`,
-
-    [`/${locale}/docs/Web/API/SpeechRecognition`]:
-      `/${locale}/docs/Web/API/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB`,
     // readystatechange event
     ['/en-US/docs/Web/Events/readystatechange']:
-      '/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6',
+      '/zh-CN/docs/Web/API/Document/readystatechange_event',
     ['/zh-CN/docs/Web/Events/readystatechange']:
-      '/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6',
+      '/zh-CN/docs/Web/API/Document/readystatechange_event',
     ['/en-US/docs/Web/Reference/Events/readystatechange']:
-      '/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6',
+      '/zh-CN/docs/Web/API/Document/readystatechange_event',
     ['/zh-CN/docs/Web/Reference/Events/readystatechange']:
-      '/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6',
+      '/zh-CN/docs/Web/API/Document/readystatechange_event',
     ['/zh-CN/docs/Web/Events/readystatechange_event']:
-      '/zh-CN/docs/Web/Events/readystatechange%E4%BA%8B%E4%BB%B6'
+      '/zh-CN/docs/Web/API/Document/readystatechange_event'
   };
 };
 
@@ -421,18 +402,6 @@ export const hardCodedRedirectUrl: Record<string, string> = {
     'https://developer.mozilla.org/favicon.ico',
   'http://developer.cdn.mozilla.net/media/redesign/img/favicon32.png':
     'https://developer.mozilla.org/favicon.ico',
-  // just an alternative, not original pic
-  'https://i.picsum.photos/id/1080/6858/4574.jpg':
-    'https://developer.mozilla.org/files/16869/new-york-skyline-4by3.jpg',
-  // just an alternative, not original pic
-  'http://www.mozilla.org/images/mozilla-banner.gif':
-    'https://developer.mozilla.org/files/3811/linear_red_angles.png',
-  // just an alternative, not original pic
-  'https://www.mozilla.org/images/mozilla-banner.gif':
-    'https://developer.mozilla.org/files/3811/linear_red_angles.png',
-  // just an alternative, not original pic
-  'https://www.mozilla.org/media/img/logos/firefox/logo-quantum.9c5e96634f92.png':
-    'https://developer.mozilla.org/files/2917/fxlogo.png',
   // fake url, prevent external downloads
   'http://weloveiconfonts.com/api/?family=entypo':
     'https://developer.mozilla.org/static/css/inject.css',
