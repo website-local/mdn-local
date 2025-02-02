@@ -205,10 +205,11 @@ table.compat-table th {
 .mask-fix .bc-legend-item-dt .icon,
 .mask-fix .bc-table .icon {
   background-color: transparent;
+  filter: opacity(0.6);
 }
 .dark .mask-fix .bc-legend-item-dt .icon,
 .dark .mask-fix .bc-table .icon {
-  filter: invert(1);
+  filter: invert(1) opacity(0.6);
 }
 .mask-fix .icon.icon-no {
   filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(340deg) brightness(0.9) !important;
@@ -275,17 +276,14 @@ table.compat-table th {
 .dark .mask-fix .icon.icon-unknown {
   filter: invert(1);
 }
-.mask-fix .icon.icon-unknown {
-  filter: invert(0.2);
-}
 .mask-fix .languages-switcher-menu > .button .button-wrap::after,
 .mask-fix .theme-switcher-menu > .button .button-wrap::after {
   background-color: transparent;
-  filter: invert(1);
+  filter: invert(1) opacity(0.6);
 }
 .dark .mask-fix .languages-switcher-menu > .button .button-wrap::after,
 .dark .mask-fix .theme-switcher-menu > .button .button-wrap::after {
-  filter: none;
+  filter: opacity(0.6);
 }
 .mask-fix .top-navigation-main .menu-toggle::after {
   background-color: transparent;
@@ -310,9 +308,10 @@ table.compat-table th {
 /* 20230716 playground copy icons */
 .mask-fix .code-example .copy-icon {
   background-color: transparent;
+  filter: opacity(0.6);
 }
 .dark .mask-fix .code-example .copy-icon {
-  filter: invert(1);
+  filter: invert(1) opacity(0.6);
 }
 /* 20230716 process: masked icons in blogs */
 @media screen and (min-width: 769px) {
