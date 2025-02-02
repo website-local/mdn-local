@@ -1,6 +1,6 @@
 browser-compatibility-table
 --------------
-This dir contains code rewritten from [mdn/yari](https://github.com/mdn/yari/tree/v2.44.0/client/src/document/ingredients/browser-compatibility-table), which is licensed [MPL-2.0](https://github.com/mdn/yari/blob/v0.4.123/LICENSE)
+This dir contains code rewritten from [mdn/yari](https://github.com/mdn/yari/tree/v4.3.0/client/src/document/ingredients/browser-compatibility-table), which is licensed [MPL-2.0](https://github.com/mdn/yari/blob/v0.4.123/LICENSE)
 
 `types.ts` is [types.d.ts](https://unpkg.com/@mdn/browser-compat-data@5.2.38/types.d.ts) from [mdn/browser-compat-data](https://github.com/mdn/browser-compat-data), licensed [CC0](https://github.com/mdn/browser-compat-data/blob/v5.2.38/LICENSE)
 

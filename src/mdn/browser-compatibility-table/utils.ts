@@ -116,7 +116,7 @@ export function versionIsPreview(
 
 export function hasNoteworthyNotes(support: BCD.SimpleSupportStatement) {
   return (
-    (support.notes?.length || support.impl_url?.length) &&
+    !!(support.notes?.length || support.impl_url?.length) &&
     !support.version_removed &&
     !support.partial_implementation
   );
