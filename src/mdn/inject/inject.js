@@ -993,4 +993,19 @@
     console.warn('scrim-inline', e);
   }
   /// endregion scrim-inline
+
+  /// region set-html-lang
+  function setHtmlLang() {
+    var meta = document.querySelector('meta[property="og:locale"]');
+    if (meta) {
+      document.documentElement.setAttribute('lang',
+        meta.getAttribute('content').replace('_', '-'));
+    }
+  }
+  try {
+    setHtmlLang();
+  } catch (e) {
+    console.warn('set-html-lang', e);
+  }
+  /// endregion set-html-lang
 }();
