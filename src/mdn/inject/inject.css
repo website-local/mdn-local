@@ -359,5 +359,11 @@ div > section.place {
 }
 
 .article-footer .article-footer-inner p.last-modified-date {
+  font-size: var(--type-tiny-font-size);
   margin: 0;
+}
+
+.curriculum-content-container.curriculum-module .curriculum-content scrim-inline[url],
+.curriculum-content-container.curriculum-overview .curriculum-content scrim-inline[url] {
+  aspect-ratio: auto;
 }
