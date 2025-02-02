@@ -215,17 +215,21 @@ table.compat-table th {
   filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(340deg) brightness(0.9) !important;
 }
 .mask-fix .bc-notes-list .bc-supports-dd .icon {
-  background-color: revert;
-  filter: invert(0.5);
+  background-color: var(--border-primary);
+  filter: none;
 }
 .mask-fix .bc-level-preview.icon {
   filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(200deg) brightness(0.9) !important;
 }
 .mask-fix .bc-notes-list .bc-level-yes.icon.icon-yes {
   background-color: transparent;
+  filter: brightness(0.6);
 }
 .dark .mask-fix .bc-notes-list .bc-level-yes.icon.icon-yes {
   filter: none;
+}
+.mask-fix abbr[title] {
+  text-decoration: none;
 }
 .mask-fix .example-bad::after,
 .mask-fix .example-good::after,
