@@ -363,7 +363,9 @@ div > section.place {
   margin: 0;
 }
 
+/* https://github.com/website-local/mdn-local/issues/1071 */
 .curriculum-content-container.curriculum-module .curriculum-content scrim-inline[url],
 .curriculum-content-container.curriculum-overview .curriculum-content scrim-inline[url] {
   aspect-ratio: auto;
+  margin: 0;
 }

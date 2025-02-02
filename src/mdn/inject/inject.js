@@ -964,4 +964,33 @@
     console.warn('toc-scroll-highlight', e);
   }
   /// endregion toc-scroll-highlight
+
+  /// region scrim-inline
+  // mdn: handle scrim-inline elements #1071
+  // https://github.com/website-local/mdn-local/issues/1071
+  function scrimCustomElement() {
+    // Create a class for the element
+    class ScrimInline extends window.HTMLElement {
+      constructor() {
+        super();
+        var a = document.createElement('a');
+        a.href = this.getAttribute('url');
+        a.innerText = this.getAttribute('scrimtitle');
+        a.className = 'external';
+        a.target = '_blank';
+        this.appendChild(a);
+      }
+    }
+
+    // Define the new element
+    window.customElements.define('scrim-inline', ScrimInline);
+
+  }
+
+  try {
+    scrimCustomElement();
+  } catch (e) {
+    console.warn('scrim-inline', e);
+  }
+  /// endregion scrim-inline
 }();
