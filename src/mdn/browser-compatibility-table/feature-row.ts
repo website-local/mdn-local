@@ -390,7 +390,7 @@ function getNotes(
         )).join('')}
       ${!hasNotes && '<dd></dd>' || ''}
       </div>`) || '');
-    }).filter(isTruthy);
+    }).filter(isTruthy).join('');
 }
 
 function CompatCell({
