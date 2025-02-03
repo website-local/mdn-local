@@ -86,6 +86,9 @@ export const downloadableHosts = arrayToMap([
   // 20240503
   'download.g63.ru',
   'www.whatwg.org',
+  // 20250203
+  'mdn.dev',
+  'resources.whatwg.org',
 ]);
 
 export interface ExternalHost {
@@ -118,6 +121,9 @@ export const externalHosts = [
   // 20240503
   ['/download.g63.ru/', 'download.g63.ru', 'http'],
   ['/www.whatwg.org/', 'www.whatwg.org'],
+  // 20250203
+  ['/mdn.dev/', 'mdn.dev'],
+  ['/resources.whatwg.org/', 'resources.whatwg.org'],
 ].map(([prefix, host, protocol]) => ({
   protocol: protocol || 'https',
   host,
