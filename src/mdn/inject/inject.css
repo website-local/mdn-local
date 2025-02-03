@@ -383,6 +383,11 @@ aside.article-footer {
   background-color: transparent;
 }
 
+.mask-fix .sidebar-filter-container .sidebar-filter.has-input .sidebar-filter-label .icon {
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(200deg) brightness(0.9);
+  background-color: transparent;
+}
+
 .dark .mask-fix .sidebar-filter-container .sidebar-filter-label .icon {
   filter: opacity(0.6);
 }
