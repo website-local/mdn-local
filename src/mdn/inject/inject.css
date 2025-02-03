@@ -391,3 +391,7 @@ aside.article-footer {
 .dark .mask-fix .sidebar-filter-container .sidebar-filter-label .icon {
   filter: opacity(0.6);
 }
+
+.sidebar-inner > section.place:empty {
+  display: none;
+}
