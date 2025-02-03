@@ -39,10 +39,7 @@ import {
   preProcessYariData,
   preProcessYariHydrationData
 } from './process-yari-data';
-import {
-  postProcessPlayground,
-  preProcessPlayground
-} from './process-playground';
+import {preProcessPlayground} from './process-playground';
 import {postProcessPlayable, preProcessPlayable} from './process-playable';
 
 const INJECT_JS_PATH = '/static/js/inject.js';
@@ -134,7 +131,9 @@ export const preProcessHtml = async (
   }
 
   // https://github.com/website-local/mdn-local/issues/888
-  preProcessPlayground($);
+  // https://github.com/website-local/mdn-local/issues/974
+  // https://github.com/website-local/mdn-local/issues/1105
+  await preProcessPlayground(res, submit, options, pipeline, $);
 
   /// region inject external script and style
   if (dataScript?.length) {
@@ -176,8 +175,7 @@ export const postProcessHtml = (
   $('script[src*="runtime-main."]').remove();
   // react-main script, still on index page
   $('script[src*="react-main."]').remove();
-  // https://github.com/website-local/mdn-local/issues/888
-  postProcessPlayground($);
+
   let isYariDocs = false;
 
   $('script').each((index, el) => {

@@ -1,58 +1,73 @@
 import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
-import URI from 'urijs';
+import type {
+  DownloadResource,
+  SubmitResourceFunc
+} from 'website-scrap-engine/lib/life-cycle/types';
+import type {
+  PipelineExecutor
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import {ResourceType} from 'website-scrap-engine/lib/resource';
+import {simpleHashString} from 'website-scrap-engine/lib/util';
 
-const PLAYGROUND_ID_ATTR = 'data-playground-id';
 const PLAYGROUND_LOCAL_ATTR = 'data-mdn-local-pg-id';
 
-export function preProcessPlayground($: CheerioStatic): void {
-  const frames = $('iframe');
-  for (let i = 0; i < frames.length; i++) {
-    const frame = $(frames[i]);
-    const src = frame.attr('src');
-    if (!src) {
-      continue;
-    }
-    const uri = URI(src);
-    if (!uri.pathname()?.endsWith('/runner.html')) {
-      continue;
-    }
-    const searchMap = uri.search(true);
-    const id =searchMap?.id;
-    if (!id) {
-      continue;
-    }
-    frame.attr(PLAYGROUND_ID_ATTR, id);
-  }
-}
-
-export function postProcessPlayground($: CheerioStatic): void {
+export async function preProcessPlayground(
+  res: DownloadResource,
+  submit: SubmitResourceFunc,
+  options: StaticDownloadOptions,
+  pipeline: PipelineExecutor,
+  $: CheerioStatic
+): Promise<void> {
   const frames = $('iframe');
   let iframeId = 0;
   for (let i = 0; i < frames.length; i++) {
     const frame = $(frames[i]);
-    let id = frame.attr(PLAYGROUND_ID_ATTR);
+    const id = frame.attr('data-live-id');
     if (!id) {
       continue;
     }
-    const src = frame.attr('src');
-    if (!src) {
+    const path = frame.attr('data-live-path') || '/';
+
+    const r =
+      getCodeAndNodesForIframeBySampleClass($, id, path) ||
+      getCodeAndNodesForIframe($, id, frame, path);
+    if (r === null) {
       continue;
     }
-    const uri = URI(src);
-    uri.addSearch('id', id);
-    frame.attr('src', uri.toString());
-    id = id.replace(/\./g, '\\.');
-    const ctx =
-      getCodeAndNodesForIframeBySampleClass($, id, src) ||
-      getCodeAndNodesForIframe($, id, frame, src);
-    if (ctx?.nodes?.length) {
+    if (r?.nodes?.length) {
       ++iframeId;
       const localId = String(iframeId);
       frame.attr(PLAYGROUND_LOCAL_ATTR, localId);
-      for (const node of ctx.nodes) {
+      for (const node of r.nodes) {
         node.attr(PLAYGROUND_LOCAL_ATTR, localId);
       }
     }
+    // https://github.com/website-local/mdn-local/issues/974
+    // a fake path here
+    const hash = simpleHashString(JSON.stringify(r.code));
+    const iframeUrl = path.endsWith('/') ?
+      path + 'runner-' + hash + '.html' :
+      path + '/runner-' + hash + '.html';
+    const iframeRes = await pipeline.createAndProcessResource(
+      iframeUrl, ResourceType.Html, res.depth, frame, res);
+    if (!iframeRes) {
+      continue;
+    }
+    const iframeHtml = renderHtml(r.code);
+    iframeRes.body = iframeHtml;
+    iframeRes.meta = {
+      doc: $.load(iframeHtml)
+    };
+    const processed =
+      await pipeline.processAfterDownload(iframeRes as DownloadResource, submit, options);
+    if (!processed) {
+      continue;
+    }
+    frame.removeAttr('srcdoc');
+    frame.attr('src', processed.replacePath);
+    // this resource has to be submitted, since runner path could diff from src page
+    submit(processed);
   }
 }
 
@@ -65,7 +80,7 @@ interface EditorContent {
 
 // https://github.com/mdn/yari/blob/v2.28.1/client/src/document/code/playground.ts
 
-const LIVE_SAMPLE_PARTS = ['html', 'css', 'js'];
+const LIVE_SAMPLE_PARTS: (keyof EditorContent)[] = ['html', 'css', 'js'];
 
 const SECTION_RE = /h[1-6]/i;
 
@@ -150,20 +165,20 @@ function codeForHeading(
 
   const nodes: Cheerio[] = [];
   for (const part of LIVE_SAMPLE_PARTS) {
-    section
+    const src = section
       .flatMap((e) => [...e.find(`pre.${part}`)])
-      .forEach((e) => {
+      .map((e) => {
         nodes.push($(e));
-        // return e.textContent;
-      });
-    // if (src) {
-    //   code[part] += src;
-    // }
+        return $(e).text();
+      }).join('\n');
+    if (src) {
+      code[part] += src;
+    }
   }
   return nodes.length ? { code, nodes } : null;
 }
 
-function getLanguage(node: Cheerio): string | null {
+function getLanguage(node: Cheerio): keyof EditorContent | null {
   for (const part of LIVE_SAMPLE_PARTS) {
     if (node.hasClass(part)) {
       return part;
@@ -194,7 +209,7 @@ export function getCodeAndNodesForIframeBySampleClass(
       }
       empty = false;
       nodes.push(pre);
-      // code[lang] += pre.textContent;
+      code[lang] += pre.text();
     }
   );
   return empty ? null : { code, nodes };
@@ -220,4 +235,117 @@ export function getCodeAndNodesForIframe(
     r = codeForHeading($, heading, src);
   }
   return r;
+}
+
+/**
+ * https://github.com/mdn/yari/blob/v4.3.0/libs/play/index.js#L189
+ * @param {EditorContent | null} state
+ */
+function renderHtml(state: EditorContent | null = null) {
+  const { css, html, js } = state || {
+    css: '',
+    html: '',
+    js: '',
+  };
+  return `
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* Legacy css to support existing live samples */
+      body {
+        padding: 0;
+        margin: 0;
+      }
+
+      svg:not(:root) {
+        display: block;
+      }
+
+      .playable-code {
+        background-color: #f4f7f8;
+        border: none;
+        border-left: 6px solid #558abb;
+        border-width: medium medium medium 6px;
+        color: #4d4e53;
+        height: 100px;
+        width: 90%;
+        padding: 10px 10px 0;
+      }
+
+      .playable-canvas {
+        border: 1px solid #4d4e53;
+        border-radius: 2px;
+      }
+
+      .playable-buttons {
+        text-align: right;
+        width: 90%;
+        padding: 5px 10px 5px 26px;
+      }
+    </style>
+    <style>
+      ${css}
+    </style>
+
+    <script>
+      const consoleProxy = new Proxy(console, {
+        get(target, prop) {
+          if (typeof target[prop] === "function") {
+            return (...args) => {
+              try {
+                window.parent.postMessage({ typ: "console", prop, args }, "*");
+              } catch {
+                try {
+                  window.parent.postMessage(
+                    {
+                      typ: "console",
+                      prop,
+                      args: args.map((x) => JSON.parse(JSON.stringify(x))),
+                    },
+                    "*"
+                  );
+                } catch {
+                  try {
+                    window.parent.postMessage(
+                      {
+                        typ: "console",
+                        prop,
+                        args: args.map((x) => x.toString()),
+                      },
+                      "*"
+                    );
+                  } catch {
+                    window.parent.postMessage(
+                      {
+                        typ: "console",
+                        prop: "warn",
+                        args: [
+                          "[Playground] Unsupported console message (see browser console)",
+                        ],
+                      },
+                      "*"
+                    );
+                  }
+                }
+              }
+              target[prop](...args);
+            };
+          }
+          return target[prop];
+        },
+      });
+
+      window.console = consoleProxy;
+      window.addEventListener("error", (e) => console.log(e.error));
+    </script>
+  </head>
+  <body>
+    ${html}
+    <script>${js}</script>
+  </body>
+</html>
+`;
 }
