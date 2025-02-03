@@ -175,6 +175,8 @@ export const postProcessHtml = (
   $('script[src*="runtime-main."]').remove();
   // react-main script, still on index page
   $('script[src*="react-main."]').remove();
+  // 20250203 gtag.js googletagmanager stuff
+  $('script[src*="gtag.js"]').remove();
 
   let isYariDocs = false;
 
