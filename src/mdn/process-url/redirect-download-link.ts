@@ -7,6 +7,11 @@ const replacements = [
   'https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4',
   // A much smaller file
   'https://mdn.github.io/dom-examples/picture-in-picture/assets/bigbuckbunny.mp4',
+  // This video is only used once, but result in ~40M
+  // https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Solve_HTML_problems/Cheatsheet
+  'https://archive.org/download/ElephantsDream/ed_hd.ogv',
+  // A much smaller ogv file
+  'https://mdn.dev/archives/media/samples/video/chroma-key/video.ogv',
 ];
 
 export const redirectDownloadLink = (res: Resource): Resource => {
@@ -37,6 +42,9 @@ export const redirectDownloadLink = (res: Resource): Resource => {
           .toString();
         if (res.downloadLink === replacements[0]) {
           res.downloadLink = replacements[1];
+        }
+        if (res.downloadLink === replacements[2]) {
+          res.downloadLink = replacements[3];
         }
         return res;
       }
