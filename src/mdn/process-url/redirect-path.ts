@@ -407,5 +407,9 @@ export const hardCodedRedirectUrl: Record<string, string> = {
     'https://developer.mozilla.org/static/css/inject.css',
   // fake url, prevent external downloads
   'https://weloveiconfonts.com/api/?family=entypo':
-    'https://developer.mozilla.org/static/css/inject.css'
+    'https://developer.mozilla.org/static/css/inject.css',
+  // This video is only used once, but result in ~40M
+  // https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Solve_HTML_problems/Cheatsheet
+  'https://archive.org/download/ElephantsDream/ed_hd.ogv':
+    'https://mdn.github.io/dom-examples/picture-in-picture/assets/bigbuckbunny.mp4',
 };
