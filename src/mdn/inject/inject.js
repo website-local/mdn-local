@@ -620,68 +620,7 @@
 // 20230716 yari version v2.28.2 53314f5
 // https://github.com/website-local/mdn-local/issues/888
 !function () {
-  document.querySelectorAll('iframe[data-mdn-local-pg-id]').forEach(function (iframe) {
-    // must have it
-    var localId = iframe.getAttribute('data-mdn-local-pg-id');
-    var elements =
-      document.querySelectorAll('[data-mdn-local-pg-id="' + localId + '"]');
-    if (elements.length <= 1) {
-      return;
-    }
-
-    var r = {
-      code: {
-        css: '',
-        html: '',
-        js: '',
-      }
-    };
-    elements.forEach(function (el) {
-      if (!el.classList) {
-        return;
-      }
-      if (el.classList.contains('css')) {
-        r.code.css += el.innerText + '\n';
-      }
-      if (el.classList.contains('js')) {
-        r.code.js += el.innerText + '\n';
-      }
-      if (el.classList.contains('html')) {
-        r.code.html += el.innerText + '\n';
-      }
-    });
-    initPlayIframe(iframe, r.code);
-  });
-
-  function initPlayIframe(iframe, editorContent) {
-    if (!iframe || !editorContent) {
-      return;
-    }
-
-    var message = {
-      typ: 'init',
-      state: editorContent,
-    };
-    try {
-      iframe.contentWindow.postMessage(message, { targetOrigin: '*' });
-    } catch (e) {
-      console.warn(e);
-      return;
-    }
-
-    function deferred({data: {typ = null, prop = {}} = {}} = {}) {
-      var id = new URL(iframe.src, 'https://example.com').searchParams.get(
-        'id'
-      );
-      if (id === prop['id']) {
-        if (typ === 'ready') {
-          iframe.contentWindow?.postMessage(message, {targetOrigin: '*'});
-        }
-      }
-    }
-
-    window.addEventListener('message', deferred);
-  }
+  // old code not needed since https://github.com/website-local/mdn-local/issues/1105
 
   document
     .querySelectorAll('div.code-example pre:not(.hidden)')
