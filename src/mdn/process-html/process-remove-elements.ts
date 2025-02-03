@@ -86,7 +86,9 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   // 20220717 Recent contributions
   $('.recent-contributions').remove();
   // 20230716 sidebar Filter
-  $('.sidebar-filter-container').remove();
+  // 20250203 hide by default
+  // https://github.com/website-local/mdn-local/issues/1020
+  $('.sidebar-filter-container').addClass('hide');
   // 20230716 top nav
   $('a.top-level-entry.menu-link[href*="plus/ai-help"]').parent().remove();
   // 20230716 top banner
