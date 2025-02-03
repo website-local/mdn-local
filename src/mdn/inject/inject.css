@@ -376,3 +376,13 @@ aside.article-footer {
   aspect-ratio: auto;
   margin: 0;
 }
+
+/* sidebar filter */
+.mask-fix .sidebar-filter-container .sidebar-filter-label .icon {
+  filter: invert(1) opacity(0.6);
+  background-color: transparent;
+}
+
+.dark .mask-fix .sidebar-filter-container .sidebar-filter-label .icon {
+  filter: opacity(0.6);
+}
