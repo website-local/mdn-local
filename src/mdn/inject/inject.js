@@ -3739,15 +3739,30 @@ Prism.languages.py = Prism.languages.python;
     if (trimmedQuery) {
       saveScrollPosition();
     }
-    filterer.applyFilter(trimmedQuery);
-    // TODO: setMatchCount
-    // const items = filterer.applyFilter(trimmedQuery);
-    // setMatchCount(items);
+    const items = filterer.applyFilter(trimmedQuery);
+    setMatchCount(items);
 
     // Restore scroll position.
     if (!trimmedQuery) {
       restoreScrollPosition();
     }
+  }
+  // https://github.com/website-local/mdn-local/issues/1111
+  function setMatchCount(matchCount) {
+    var span = input.parentElement.querySelector('.sidebar-filter-count');
+    if (!span) {
+      span = document.createElement('span');
+      span.className = 'sidebar-filter-count';
+      input.parentElement.insertBefore(span, input.nextElementSibling || input);
+    }
+    if (matchCount === undefined) {
+      span.style.display = 'none';
+      return;
+    }
+    span.style.display = '';
+    span.innerText = matchCount === 0
+      ? 'No matches'
+      : `${matchCount} ${matchCount === 1 ? 'match' : 'matches'}`;
   }
   input.oninput = function () {
     setQuery(input.value);
