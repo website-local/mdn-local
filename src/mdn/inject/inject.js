@@ -3455,3 +3455,311 @@ Prism.languages.py = Prism.languages.python;
   }
   /// endregion set-html-lang
 }();
+
+// 20250203 mdn: sidebar filters
+// https://github.com/website-local/mdn-local/issues/1020
+!function () {
+  /**
+   * Used by quicksearch and sidebar filters.
+   */
+  function splitQuery(term) {
+    return term.trim().toLowerCase().replace('.', ' .') // Allows to find `Map.prototype.get()` via `Map.get`.
+      .split(/[ ,]+/);
+  }
+  class SidebarFilterer {
+    constructor(root) {
+      var _root$closest$querySe, _root$closest;
+      this.allHeadings = void 0;
+      this.allParents = void 0;
+      this.items = void 0;
+      this.toc = void 0;
+      this.allHeadings = Array.from(root.querySelectorAll('li strong'));
+      this.allParents = Array.from(root.querySelectorAll('details'));
+      const links = Array.from(root.querySelectorAll('a[href]'));
+      this.items = links.map(link => {
+        var _link$textContent;
+        return {
+          haystack: ((_link$textContent = link.textContent) != null ? _link$textContent : '').toLowerCase(),
+          link,
+          container: this.getContainerOf(link),
+          heading: this.getHeadingOf(link),
+          parents: this.getParentsOf(link)
+        };
+      });
+      this.toc = (_root$closest$querySe = (_root$closest = root.closest('.sidebar')) == null ? void 0 : _root$closest.querySelector('.in-nav-toc')) != null ? _root$closest$querySe : null;
+    }
+    applyFilter(query) {
+      if (query) {
+        this.toggleTOC(false);
+        return this.showOnlyMatchingItems(query);
+      } else {
+        this.toggleTOC(true);
+        this.showAllItems();
+        return undefined;
+      }
+    }
+    toggleTOC(show) {
+      if (this.toc) {
+        this.toggleElement(this.toc, show);
+      }
+    }
+    toggleElement(el, show) {
+      el.style.display = show ? '' : 'none';
+    }
+    showAllItems() {
+      this.items.forEach(({
+        link
+      }) => this.resetLink(link));
+      this.allHeadings.forEach(heading => this.resetHeading(heading));
+      this.allParents.forEach(parent => this.resetParent(parent));
+    }
+    resetLink(link) {
+      this.resetHighlighting(link);
+      const container = this.getContainerOf(link);
+      this.toggleElement(container, true);
+    }
+    getContainerOf(el) {
+      return el.closest('li') || el;
+    }
+    resetHeading(heading) {
+      const container = this.getContainerOf(heading);
+      this.toggleElement(container, true);
+    }
+    resetParent(parent) {
+      const container = this.getContainerOf(parent);
+      this.toggleElement(container, true);
+      if (parent.dataset.wasOpen) {
+        parent.open = JSON.parse(parent.dataset.wasOpen);
+        delete parent.dataset.wasOpen;
+      }
+    }
+    resetHighlighting(link) {
+      const nodes = Array.from(link.querySelectorAll('span, mark'));
+      const parents = new Set();
+      nodes.forEach(node => {
+        var _node$textContent;
+        const parent = node.parentElement;
+        node.replaceWith(document.createTextNode((_node$textContent = node.textContent) != null ? _node$textContent : ''));
+        if (parent) {
+          parents.add(parent);
+        }
+      });
+      parents.forEach(parent => parent.normalize());
+    }
+    showOnlyMatchingItems(query) {
+      this.allHeadings.forEach(heading => this.hideHeading(heading));
+      this.allParents.forEach(parent => this.collapseParent(parent));
+
+      // Show/hide items (+ show parents).
+      const terms = splitQuery(query);
+      let matchCount = 0;
+      this.items.forEach(({
+        haystack,
+        link,
+        container,
+        heading,
+        parents
+      }) => {
+        this.resetHighlighting(link);
+        const isMatch = terms.every(needle => haystack.includes(needle));
+        this.toggleElement(container, isMatch);
+        if (isMatch) {
+          matchCount++;
+          this.highlightMatches(link, terms);
+          if (heading) {
+            this.showHeading(heading);
+          }
+          for (const parent of parents) {
+            this.expandParent(parent);
+          }
+        }
+      });
+      return matchCount;
+    }
+    hideHeading(heading) {
+      const container = this.getContainerOf(heading);
+      this.toggleElement(container, false);
+    }
+    collapseParent(parent) {
+      var _parent$dataset$wasOp;
+      const container = this.getContainerOf(parent);
+      this.toggleElement(container, false);
+      parent.dataset.wasOpen = (_parent$dataset$wasOp = parent.dataset.wasOpen) != null ? _parent$dataset$wasOp : String(parent.open);
+      parent.open = false;
+    }
+    highlightMatches(el, terms) {
+      const nodes = this.getTextNodesOf(el);
+      nodes.forEach(node => {
+        var _node$textContent2;
+        const haystack = (_node$textContent2 = node.textContent) == null ? void 0 : _node$textContent2.toLowerCase();
+        if (!haystack) {
+          return;
+        }
+        const ranges = new Map();
+        terms.forEach(needle => {
+          const index = haystack.indexOf(needle);
+          if (index !== -1) {
+            ranges.set(index, index + needle.length);
+          }
+        });
+        const sortedRanges = Array.from(ranges.entries()).sort(([x1, y1], [x2, y2]) => x1 - x2 || y1 - y2);
+        const span = this.replaceChildNode(node, 'span');
+        span.className = 'highlight-container';
+        let rest = span.childNodes[0];
+        let cursor = 0;
+        for (const [rangeBegin, rangeEnd] of sortedRanges) {
+          if (rangeBegin < cursor) {
+            // Just ignore conflicting range.
+            continue;
+          }
+
+          // Split.
+          const match = rest.splitText(rangeBegin - cursor);
+          const newRest = match.splitText(rangeEnd - rangeBegin);
+
+          // Convert text node to HTML element.
+          this.replaceChildNode(match, 'mark');
+          rest = newRest;
+          cursor = rangeEnd;
+        }
+      });
+    }
+    getTextNodesOf(node) {
+      const parents = [node];
+      const nodes = [];
+      for (const parent of parents) {
+        for (const childNode of parent.childNodes) {
+          // eslint-disable-next-line no-undef
+          if (childNode.nodeType === Node.TEXT_NODE) {
+            nodes.push(childNode);
+          } else if (childNode.hasChildNodes()) {
+            parents.push(childNode);
+          }
+        }
+      }
+      return nodes;
+    }
+    replaceChildNode(node, tagName) {
+      const text = node.textContent;
+      const newNode = document.createElement(tagName);
+      newNode.innerText = text != null ? text : '';
+      node.replaceWith(newNode);
+      return newNode;
+    }
+    showHeading(heading) {
+      const container = heading && this.getContainerOf(heading);
+      if (container) {
+        this.toggleElement(container, true);
+      }
+    }
+    getHeadingOf(el) {
+      return this.findFirstElementBefore(el, this.allHeadings);
+    }
+    findFirstElementBefore(el, candidates) {
+      // eslint-disable-next-line no-undef
+      return candidates.slice().reverse().find(candidate => candidate.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING);
+    }
+    expandParent(parent) {
+      const container = this.getContainerOf(parent);
+      this.toggleElement(container, true);
+      parent.open = true;
+    }
+    getParentsOf(el) {
+      var _el$parentElement;
+      const parents = [];
+      let parent = (_el$parentElement = el.parentElement) == null ? void 0 : _el$parentElement.closest('details');
+      while (parent) {
+        var _parent$parentElement;
+        // eslint-disable-next-line no-undef
+        if (parent instanceof HTMLDetailsElement) {
+          parents.push(parent);
+        }
+        parent = (_parent$parentElement = parent.parentElement) == null ? void 0 : _parent$parentElement.closest('details');
+      }
+      return parents;
+    }
+  }
+  function usePersistedScrollPosition(refs) {
+    return {
+      saveScrollPosition() {
+        refs.forEach(ref => {
+          const el = ref;
+          if (el && typeof el.dataset.lastScrollTop === 'undefined' && el.scrollTop > 0) {
+            el.dataset.lastScrollTop = String(el.scrollTop);
+            el.scrollTop = 0;
+          }
+        });
+      },
+      restoreScrollPosition() {
+        refs.forEach(ref => {
+          const el = ref;
+          if (el && typeof el.dataset.lastScrollTop === 'string') {
+            el.scrollTop = Number(el.dataset.lastScrollTop);
+            delete el.dataset.lastScrollTop;
+          }
+        });
+      }
+    };
+  }
+  var input = document.getElementById('sidebar-filter-input');
+  var btn = document.querySelector('.clear-sidebar-filter-button');
+  var quicklinks = document.getElementById('sidebar-quicklinks');
+  if (!input || !btn || !quicklinks) {
+    return;
+  }
+  btn.onclick = function () {
+    input.classList.remove('is-active');
+    input.value = '';
+    input.parentElement.classList.remove('has-input');
+    setQuery('');
+  };
+
+  // Scrolls on mobile.
+  var sidebarInnerNav =
+    quicklinks.querySelector('.sidebar-inner-nav');
+  var obj = usePersistedScrollPosition([quicklinks, sidebarInnerNav]);
+  var saveScrollPosition = obj.saveScrollPosition;
+  var restoreScrollPosition = obj.restoreScrollPosition;
+  var filterer;
+  function setQuery(query) {
+    if (!filterer) {
+
+      var root = quicklinks.querySelector('.sidebar-body');
+
+      if (!root) {
+        return;
+      }
+
+      filterer = new SidebarFilterer(root);
+    }
+
+    const trimmedQuery = query.trim();
+
+    // Save scroll position.
+    if (trimmedQuery) {
+      saveScrollPosition();
+    }
+    filterer.applyFilter(trimmedQuery);
+    // TODO: setMatchCount
+    // const items = filterer.applyFilter(trimmedQuery);
+    // setMatchCount(items);
+
+    // Restore scroll position.
+    if (!trimmedQuery) {
+      restoreScrollPosition();
+    }
+  }
+  input.oninput = function () {
+    setQuery(input.value);
+    if (input.value) {
+      input.parentElement.classList.add('has-input');
+    }
+  };
+  input.onfocus = function () {
+    input.classList.add('is-active');
+  };
+  var container = document.querySelector('.sidebar-filter-container');
+  if (container) {
+    container.classList.remove('hide');
+  }
+}();
