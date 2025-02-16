@@ -1,19 +1,21 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
 // true to remove the resolved property from dependencies
 // false to convent the awful registry.npm.taobao.org url to registry.npmjs.org
 const remove = process.env.NPM_PACKAGE_LOCK_REMOVE_RESOLVED || false;
 
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 // since this is the only file reading, using sync io is acceptable
 const packageLock =
-  JSON.parse(fs.readFileSync(path.join(__dirname, 'package-lock.json'), {
+  JSON.parse(fs.readFileSync(path.join(dirname, 'package-lock.json'), {
     encoding: 'utf8'
   }));
 
 processDependency(packageLock);
 
-fs.writeFileSync(path.join(__dirname, 'package-lock.json'),
+fs.writeFileSync(path.join(dirname, 'package-lock.json'),
   // to make github dependabot happy
   JSON.stringify(packageLock, null, 2) + '\n');
 
@@ -93,6 +95,9 @@ function processDependency(dependency) {
   }
   if (dependency.dependencies) {
     processDependencies(dependency.dependencies);
+  }
+  if (dependency.packages) {
+    processDependencies(dependency.packages);
   }
 }
 

@@ -11,12 +11,12 @@ import {
   externalHosts,
   localesMap,
   redirectLocale
-} from './consts';
+} from './consts.js';
 import {
   hardCodedRedirectUrl,
   mdnLocaleRedirectPath,
   mdnRedirectPath
-} from './redirect-path';
+} from './redirect-path.js';
 import URI from 'urijs';
 import {processPathWithMultiLocale} from './process-path-with-multi-locale.js';
 

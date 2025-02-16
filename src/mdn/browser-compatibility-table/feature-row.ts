@@ -10,7 +10,7 @@ import {
   isNotSupportedAtAll,
   isTruthy,
   versionIsPreview,
-} from './utils';
+} from './utils.js';
 import {LEGEND_LABELS} from './legend.js';
 
 const DEFAULT_LOCALE = 'en-US';

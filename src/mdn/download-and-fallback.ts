@@ -1,5 +1,5 @@
 import type {HTTPError} from 'got';
-import {downloadResource} from 'website-scrap-engine/lib/life-cycle.js';
+import {downloadResource} from 'website-scrap-engine/lib/life-cycle/index.js';
 import type {Resource} from 'website-scrap-engine/lib/resource.js';
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import type {

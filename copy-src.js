@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require('fs');
-const path = require('path');
-const mkdir = require('mkdirp');
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {mkdirp as mkdir} from 'mkdirp';
 
-const readDir = dir => fs.promises.readdir(path.join(__dirname, dir), {
+const readDir = dir => fs.promises.readdir(path.join(dirname, dir), {
   withFileTypes: true
 });
 
@@ -27,28 +27,27 @@ const copyIfNewer = async (src, dest) => {
   return fs.promises.copyFile(src, dest);
 };
 
-(async () => {
-  let dir = [''], queue = [], pending = [];
-  queue.push(readDir('src'));
-  let currentDir, currentContent, nextDir, srcFile, destFile;
-  while (dir.length) {
-    currentDir = dir.shift();
-    currentContent = await queue.shift();
-    for (let dirent of currentContent) {
-      if (dirent.isDirectory()) {
-        nextDir = path.join(currentDir, dirent.name);
-        dir.push(nextDir);
-        queue.push(readDir(path.join('src', nextDir)));
-      } else if (dirent.isFile() && !dirent.name.endsWith('.ts')) {
-        if (!fs.existsSync(nextDir = path.join(__dirname, 'lib', currentDir))) {
-          console.debug(new Date().toLocaleString(), 'mkdir', nextDir);
-          mkdir.mkdirpSync(nextDir);
-        }
-        srcFile = path.join(__dirname, 'src', currentDir, dirent.name);
-        destFile = path.join(nextDir, dirent.name);
-        pending.push(copyIfNewer(srcFile, destFile));
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+let dir = [''], queue = [], pending = [];
+queue.push(readDir('src'));
+let currentDir, currentContent, nextDir, srcFile, destFile;
+while (dir.length) {
+  currentDir = dir.shift();
+  currentContent = await queue.shift();
+  for (let dirent of currentContent) {
+    if (dirent.isDirectory()) {
+      nextDir = path.join(currentDir, dirent.name);
+      dir.push(nextDir);
+      queue.push(readDir(path.join('src', nextDir)));
+    } else if (dirent.isFile() && !dirent.name.endsWith('.ts')) {
+      if (!fs.existsSync(nextDir = path.join(dirname, 'lib', currentDir))) {
+        console.debug(new Date().toLocaleString(), 'mkdir', nextDir);
+        mkdir.mkdirpSync(nextDir);
       }
+      srcFile = path.join(dirname, 'src', currentDir, dirent.name);
+      destFile = path.join(nextDir, dirent.name);
+      pending.push(copyIfNewer(srcFile, destFile));
     }
   }
-  return Promise.all(pending);
-})();
+}
+await Promise.all(pending);

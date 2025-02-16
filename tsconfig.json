@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "node16",
+    "moduleResolution": "node16",
     "target": "es2018",
     "lib": ["es2019"],
     "sourceMap": true,
@@ -11,7 +12,9 @@
     "esModuleInterop": true,
     "removeComments": false,
     "strict": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "allowJs": true,
+    "verbatimModuleSyntax": true
   },
   "include": [
     "src"

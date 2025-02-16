@@ -7,7 +7,7 @@ import {
   hasNoteworthyNotes,
   listFeatures,
   versionIsPreview,
-} from './utils';
+} from './utils.js';
 
 // Also specifies the order in which the legend appears
 export const LEGEND_LABELS = {

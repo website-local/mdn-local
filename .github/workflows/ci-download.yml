@@ -54,7 +54,9 @@ jobs:
             localRoot: './dist/${{ env.build_name }}',
             minConcurrency: 11,
             req: {
-              retry: 42
+              retry: {
+                limit: 42
+              }
             },
             meta: {
               locale: '${{ matrix.locale }}'

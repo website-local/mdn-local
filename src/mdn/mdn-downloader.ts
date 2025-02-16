@@ -3,9 +3,9 @@ import {
 } from 'website-scrap-engine/lib/downloader/index.js';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {CookieJar} from 'tough-cookie';
-import HttpAgent, {HttpsAgent} from 'agentkeepalive';
+import {HttpAgent, HttpsAgent} from 'agentkeepalive';
 import {localesMap, redirectLocale} from './process-url/consts.js';
-import type {NormalizedOptions} from 'got';
+import type {Options as NormalizedOptions} from 'got';
 import path from 'path';
 import {defaultInitialUrl} from './process-url/default-initial-url.js';
 import {mkdirpSync as mkdir} from 'mkdirp';
@@ -36,12 +36,18 @@ export class MdnDownloader extends SingleThreadDownloader {
     }
 
     this.options.req.hooks.beforeRedirect.push(function (options: NormalizedOptions) {
-      const {pathname} = options.url, pathArr = pathname.split('/');
+      const optionsUrl = options.url;
+      if (!optionsUrl) {
+        return;
+      }
+      const url = typeof optionsUrl === 'string' ? new URL(optionsUrl) : optionsUrl;
+      const {pathname} = url, pathArr = pathname.split('/');
       if (pathArr && redirectLocale[pathArr[1]]) {
         pathArr[1] = locale;
-        options.url.pathname = pathArr.join('/');
+        url.pathname = pathArr.join('/');
       }
-      options.url.search = '';
+      url.search = '';
+      options.url = url;
     });
 
     // use http 1.1 keep-alive by default

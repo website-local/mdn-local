@@ -3,6 +3,7 @@
   "version": "0.5.0",
   "description": "create offline mozilla developer network documents",
   "main": "index.js",
+  "type": "module",
   "engines": {
     "node": ">=18.17.0"
   },

@@ -15,15 +15,15 @@ import {
   extractMdnAssets,
   postProcessMdnAssets,
   preProcessMdnAssets
-} from './process-mdn-assets';
+} from './process-mdn-assets.js';
 import {preProcessReactData} from './process-react-data.js';
 import {
   postProcessJsPolyFill,
   preProcessJsPolyFill
-} from './process-js-polyfill';
+} from './process-js-polyfill.js';
 import {
   preProcessRemoveCompatibilityTableWarning
-} from './process-compatibility-table';
+} from './process-compatibility-table.js';
 import {
   postProcessAddIconToExternalLinks,
   postProcessReplaceExternalIframeWithLink,
@@ -31,14 +31,14 @@ import {
   postProcessReplaceExternalMediaWithLink,
   postProcessReplaceExternalScriptWithLink,
   preProcessAddIconToExternalLinks
-} from './process-external';
+} from './process-external.js';
 import {preProcessRemoveElements} from './process-remove-elements.js';
 import type {ProcessYariDataResult} from './process-yari-data.js';
 import {
   downloadAndRenderYariCompatibilityData,
   preProcessYariData,
   preProcessYariHydrationData
-} from './process-yari-data';
+} from './process-yari-data.js';
 import {preProcessPlayground} from './process-playground.js';
 import {postProcessPlayable, preProcessPlayable} from './process-playable.js';
 

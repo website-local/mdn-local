@@ -1,7 +1,7 @@
 import {
   defaultLifeCycle,
   downloadResource
-} from 'website-scrap-engine/lib/life-cycle.js';
+} from 'website-scrap-engine/lib/life-cycle/index.js';
 import type {DownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {defaultDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters.js';
@@ -11,11 +11,11 @@ import {detectLinkType} from './process-url/detect-link-type.js';
 import {redirectDownloadLink} from './process-url/redirect-download-link.js';
 import {dropResource} from './process-url/drop-resource.js';
 import {redirectUrlAfterFetch} from './process-url/redirect-url-after-fetch.js';
-import {postProcessHtml, preProcessHtml} from './process-html.js';
+import {postProcessHtml, preProcessHtml} from './process-html/index.js';
 import {
   postProcessInteractiveExample,
   preProcessInteractiveExample
-} from './process-html/process-interactive-examples';
+} from './process-html/process-interactive-examples.js';
 import {processYariSourceMap} from './process-source-maps.js';
 import {decompressSitemap} from './decompress-sitemap.js';
 import {downloadAndFallback} from './download-and-fallback.js';
