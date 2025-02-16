@@ -1,4 +1,4 @@
-import type {CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {CheerioStatic} from 'website-scrap-engine/lib/types.js';
 
 export const preProcessRemoveElements = ($: CheerioStatic): void => {
   $('.bc-github-link').remove();

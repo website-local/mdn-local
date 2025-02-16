@@ -1,14 +1,16 @@
-import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import {
+  SingleThreadDownloader
+} from 'website-scrap-engine/lib/downloader/index.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {CookieJar} from 'tough-cookie';
 import HttpAgent, {HttpsAgent} from 'agentkeepalive';
-import {localesMap, redirectLocale} from './process-url/consts';
-import type {NormalizedOptions} from 'got/dist/source/core';
+import {localesMap, redirectLocale} from './process-url/consts.js';
+import type {NormalizedOptions} from 'got';
 import path from 'path';
-import {defaultInitialUrl} from './process-url/default-initial-url';
+import {defaultInitialUrl} from './process-url/default-initial-url.js';
 import {mkdirpSync as mkdir} from 'mkdirp';
 import {promises as fs} from 'fs';
-import {CustomDnsLookup} from './custom-dns-lookup';
+import {CustomDnsLookup} from './custom-dns-lookup.js';
 
 export class MdnDownloader extends SingleThreadDownloader {
   constructor(public pathToOptions: string,

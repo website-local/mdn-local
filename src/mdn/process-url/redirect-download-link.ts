@@ -1,6 +1,6 @@
-import type {Resource} from 'website-scrap-engine/lib/resource';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
 import URI from 'urijs';
-import {externalHosts} from './consts';
+import {externalHosts} from './consts.js';
 
 const replacements = [
   // https://github.com/website-local/mdn-local/issues/938

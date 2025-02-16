@@ -1,5 +1,5 @@
-import type * as BCD from './types';
-import type {SupportStatementExtended} from './utils';
+import type * as BCD from './types.js';
+import type {SupportStatementExtended} from './utils.js';
 import {
   asList,
   bugURLToString,
@@ -11,7 +11,7 @@ import {
   isTruthy,
   versionIsPreview,
 } from './utils';
-import {LEGEND_LABELS} from './legend';
+import {LEGEND_LABELS} from './legend.js';
 
 const DEFAULT_LOCALE = 'en-US';
 

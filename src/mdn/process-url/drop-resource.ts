@@ -1,8 +1,8 @@
-import {downloadableHosts, localeArr, mdnHosts} from './consts';
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import {downloadableHosts, localeArr, mdnHosts} from './consts.js';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import URI from 'urijs';
-import type {Cheerio} from 'website-scrap-engine/lib/types';
+import type {Cheerio} from 'website-scrap-engine/lib/types.js';
 
 const regExpCache: Record<string, RegExp> = {};
 

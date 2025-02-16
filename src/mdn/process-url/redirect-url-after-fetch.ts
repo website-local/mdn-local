@@ -1,10 +1,10 @@
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import type {
   DownloadResource,
   SubmitResourceFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
 import URI from 'urijs';
-import {mdnHosts, redirectLocale} from './consts';
+import {mdnHosts, redirectLocale} from './consts.js';
 
 export function redirectUrlAfterFetch(
   res: DownloadResource,

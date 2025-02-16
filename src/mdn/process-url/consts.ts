@@ -1,4 +1,4 @@
-import {arrayToMap} from 'website-scrap-engine/lib/util';
+import {arrayToMap} from 'website-scrap-engine/lib/util.js';
 
 export const localeArr = [
   'af', 'ar', 'az', 'bg',

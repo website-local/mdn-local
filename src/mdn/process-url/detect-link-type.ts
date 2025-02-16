@@ -1,7 +1,7 @@
-import {arrayToMap} from 'website-scrap-engine/lib/util';
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import type {Cheerio} from 'website-scrap-engine/lib/types';
+import {arrayToMap} from 'website-scrap-engine/lib/util.js';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import type {Cheerio} from 'website-scrap-engine/lib/types.js';
 
 // manually collected
 const validExtensionName = arrayToMap([

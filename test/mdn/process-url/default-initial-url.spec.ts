@@ -1,6 +1,6 @@
 import {
   defaultInitialUrl
-} from '../../../src/mdn/process-url/default-initial-url';
+} from '../../../src/mdn/process-url/default-initial-url.js';
 
 describe('default-initial-url', function () {
   // related

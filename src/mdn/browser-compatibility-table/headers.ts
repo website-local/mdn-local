@@ -1,5 +1,5 @@
-import type * as BCD from './types';
-import {BrowserName} from './browser-info';
+import type * as BCD from './types.js';
+import {BrowserName} from './browser-info.js';
 
 function PlatformHeaders({
   platforms,

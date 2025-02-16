@@ -1,21 +1,27 @@
+// noinspection ES6PreferShortImport
+
 import type {HTTPError} from 'got';
 import {
   error as errorLogger,
   notFound
-} from 'website-scrap-engine/lib/logger/logger';
-import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+} from 'website-scrap-engine/lib/logger/logger.js';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types.js';
 import type {
   PipelineExecutor
-} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor.js';
 import type {
   DownloadResource,
   SubmitResourceFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import {toString} from 'website-scrap-engine/lib/util';
-import type {YariCompatibilityDataJson} from '../browser-compatibility-table';
-import {renderYariCompatibilityTable} from '../browser-compatibility-table';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {toString} from 'website-scrap-engine/lib/util.js';
+import type {
+  YariCompatibilityDataJson
+} from '../browser-compatibility-table/index.js';
+import {
+  renderYariCompatibilityTable
+} from '../browser-compatibility-table/index.js';
 
 /// region type def
 // See https://github.com/mdn/yari/blob/v0.2.28/client/src/document/types.tsx

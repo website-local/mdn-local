@@ -1,5 +1,7 @@
-import type {DownloadResource} from 'website-scrap-engine/lib/life-cycle/types';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
+import type {
+  DownloadResource
+} from 'website-scrap-engine/lib/life-cycle/types.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {promisify} from 'util';
 import type {InputType} from 'zlib';
 import {gunzip} from 'zlib';

@@ -1,15 +1,15 @@
 import type {
   DownloadResource,
   SubmitResourceFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import type {
   PipelineExecutor
-} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import {toString} from 'website-scrap-engine/lib/util';
-import {error} from 'website-scrap-engine/lib/logger/logger';
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor.js';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {toString} from 'website-scrap-engine/lib/util.js';
+import {error} from 'website-scrap-engine/lib/logger/logger.js';
 
 export interface MdnSearchIndexItem {
   title?: string;

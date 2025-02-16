@@ -1,22 +1,22 @@
-import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types.js';
 import type {
   DownloadResource,
   SubmitResourceFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
 import type {
   PipelineExecutor
-} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
-import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import {error} from 'website-scrap-engine/lib/logger/logger';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor.js';
+import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters.js';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {error} from 'website-scrap-engine/lib/logger/logger.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {
   extractMdnAssets,
   postProcessMdnAssets,
   preProcessMdnAssets
 } from './process-mdn-assets';
-import {preProcessReactData} from './process-react-data';
+import {preProcessReactData} from './process-react-data.js';
 import {
   postProcessJsPolyFill,
   preProcessJsPolyFill
@@ -32,15 +32,15 @@ import {
   postProcessReplaceExternalScriptWithLink,
   preProcessAddIconToExternalLinks
 } from './process-external';
-import {preProcessRemoveElements} from './process-remove-elements';
-import type {ProcessYariDataResult} from './process-yari-data';
+import {preProcessRemoveElements} from './process-remove-elements.js';
+import type {ProcessYariDataResult} from './process-yari-data.js';
 import {
   downloadAndRenderYariCompatibilityData,
   preProcessYariData,
   preProcessYariHydrationData
 } from './process-yari-data';
-import {preProcessPlayground} from './process-playground';
-import {postProcessPlayable, preProcessPlayable} from './process-playable';
+import {preProcessPlayground} from './process-playground.js';
+import {postProcessPlayable, preProcessPlayable} from './process-playable.js';
 
 const INJECT_JS_PATH = '/static/js/inject.js';
 const INJECT_CSS_PATH = '/static/css/inject.css';

@@ -1,4 +1,4 @@
-import {skipProcess} from '../../../src/mdn/process-url/skip-process';
+import {skipProcess} from '../../../src/mdn/process-url/skip-process.js';
 
 const exceptSkipped = (url: string) =>
   expect(skipProcess(url, null, null)).toBe(undefined);

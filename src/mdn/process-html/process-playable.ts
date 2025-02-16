@@ -1,4 +1,4 @@
-import type {CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {CheerioStatic} from 'website-scrap-engine/lib/types.js';
 
 function trimMatch(text1: string, text2: string): boolean {
   text1 = text1.split('\n').map(line => line.trim()).filter(Boolean).join('\n');

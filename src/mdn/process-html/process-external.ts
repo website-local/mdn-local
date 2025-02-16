@@ -1,8 +1,8 @@
 import {
   complete as log,
   skipExternal
-} from 'website-scrap-engine/lib/logger/logger';
-import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+} from 'website-scrap-engine/lib/logger/logger.js';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types.js';
 
 export const preProcessAddIconToExternalLinks = ($: CheerioStatic): void => {
   if ($('script[src*="build/js/wiki"]').length) {

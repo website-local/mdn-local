@@ -16,7 +16,7 @@ Goto [releases](https://github.com/website-local/mdn-local/releases), download a
 `mdn-local` is based on [website-scrap-engine](https://github.com/website-local/website-scrap-engine), the main entry in [mdn-downloader.ts](https://github.com/website-local/mdn-local/blob/0.4.0/src/mdn/mdn-downloader.ts). Below is an example of using it to download mdn docs:
 
 ```typescript
-import createDownloader from './mdn-downloader';
+import createDownloader from './mdn-downloader.js';
 
 createDownloader({
   // The path to download docs to

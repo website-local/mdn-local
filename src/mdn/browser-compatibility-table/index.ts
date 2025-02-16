@@ -1,8 +1,8 @@
-import type * as BCD from './types';
-import { FeatureRow } from './feature-row';
-import { Headers } from './headers';
-import { Legend } from './legend';
-import { listFeatures } from './utils';
+import type * as BCD from './types.js';
+import {FeatureRow} from './feature-row.js';
+import {Headers} from './headers.js';
+import {Legend} from './legend.js';
+import {listFeatures} from './utils.js';
 
 // Note! Don't import any SCSS here inside *this* component.
 // It's done in the component that lazy-loads this component.

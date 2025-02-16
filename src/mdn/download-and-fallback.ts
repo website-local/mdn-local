@@ -1,14 +1,14 @@
 import type {HTTPError} from 'got';
-import {downloadResource} from 'website-scrap-engine/lib/life-cycle';
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
+import {downloadResource} from 'website-scrap-engine/lib/life-cycle.js';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import type {
   DownloadResource,
   RequestOptions
-} from 'website-scrap-engine/lib/life-cycle/types';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import {isUrlHttp} from 'website-scrap-engine/lib/util';
-import {notFound} from 'website-scrap-engine/lib/logger/logger';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
+import {isUrlHttp} from 'website-scrap-engine/lib/util.js';
+import {notFound} from 'website-scrap-engine/lib/logger/logger.js';
 
 
 export async function downloadAndFallback(

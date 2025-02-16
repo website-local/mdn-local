@@ -1,5 +1,5 @@
-import type * as BCD from './types';
-import { HIDDEN_BROWSERS } from './index';
+import type * as BCD from './types.js';
+import {HIDDEN_BROWSERS} from './index.js';
 import {
   asList,
   getFirst,

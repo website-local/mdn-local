@@ -1,9 +1,9 @@
 import type {
   DownloadResource,
   SubmitResourceFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import {toString} from 'website-scrap-engine/lib/util';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {toString} from 'website-scrap-engine/lib/util.js';
 
 function replaceAll(str: string, s: string, r: string): string {
   return str.split(s).join(r);

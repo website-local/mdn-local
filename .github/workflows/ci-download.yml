@@ -49,7 +49,7 @@ jobs:
       - name: Making download script
         run: |
           cat << EOF > src/mdn/run-downloader.ts
-          import createDownloader from './mdn-downloader';
+          import createDownloader from './mdn-downloader.js';
           createDownloader({
             localRoot: './dist/${{ env.build_name }}',
             minConcurrency: 11,

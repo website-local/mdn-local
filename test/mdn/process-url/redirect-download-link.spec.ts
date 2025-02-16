@@ -1,13 +1,13 @@
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import {redirectUrl} from '../../../src/mdn/process-url/redirect-url';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {redirectUrl} from '../../../src/mdn/process-url/redirect-url.js';
 import type {
   DownloadOptions,
   StaticDownloadOptions
-} from 'website-scrap-engine/lib/options';
+} from 'website-scrap-engine/lib/options.js';
 import {
   redirectDownloadLink
-} from '../../../src/mdn/process-url/redirect-download-link';
+} from '../../../src/mdn/process-url/redirect-download-link.js';
 import URI = require('urijs');
 
 const opt = (locale: string): StaticDownloadOptions => ({

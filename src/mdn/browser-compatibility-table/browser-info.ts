@@ -1,4 +1,4 @@
-import type * as BCD from './types';
+import type * as BCD from './types.js';
 
 export function BrowserName({ browserInfo, id }: {
   browserInfo: BCD.Browsers,

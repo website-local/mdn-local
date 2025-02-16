@@ -1,6 +1,6 @@
-import {detectLinkType} from '../../../src/mdn/process-url/detect-link-type';
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
+import {detectLinkType} from '../../../src/mdn/process-url/detect-link-type.js';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {load} from 'cheerio';
 import URI = require('urijs');
 

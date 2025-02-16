@@ -1,4 +1,4 @@
-import {localesMap, redirectLocale} from './consts';
+import {localesMap, redirectLocale} from './consts.js';
 
 export const processPathWithMultiLocale = (pathArr: string[], locale: string): boolean => {
   if (!Array.isArray(pathArr) || !pathArr.length) {

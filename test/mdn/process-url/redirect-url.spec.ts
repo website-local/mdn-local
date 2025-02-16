@@ -1,10 +1,10 @@
-import {redirectUrl} from '../../../src/mdn/process-url/redirect-url';
+import {redirectUrl} from '../../../src/mdn/process-url/redirect-url.js';
 import type {
   DownloadOptions,
   StaticDownloadOptions
-} from 'website-scrap-engine/lib/options';
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
+} from 'website-scrap-engine/lib/options.js';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 
 const opt = (locale: string): StaticDownloadOptions => ({
   localRoot: '/tmp/dummy',

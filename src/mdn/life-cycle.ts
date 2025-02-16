@@ -1,27 +1,27 @@
 import {
   defaultLifeCycle,
   downloadResource
-} from 'website-scrap-engine/lib/life-cycle';
-import type {DownloadOptions} from 'website-scrap-engine/lib/options';
-import {defaultDownloadOptions} from 'website-scrap-engine/lib/options';
-import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
-import {skipProcess} from './process-url/skip-process';
-import {redirectUrl} from './process-url/redirect-url';
-import {detectLinkType} from './process-url/detect-link-type';
-import {redirectDownloadLink} from './process-url/redirect-download-link';
-import {dropResource} from './process-url/drop-resource';
-import {redirectUrlAfterFetch} from './process-url/redirect-url-after-fetch';
-import {postProcessHtml, preProcessHtml} from './process-html';
+} from 'website-scrap-engine/lib/life-cycle.js';
+import type {DownloadOptions} from 'website-scrap-engine/lib/options.js';
+import {defaultDownloadOptions} from 'website-scrap-engine/lib/options.js';
+import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters.js';
+import {skipProcess} from './process-url/skip-process.js';
+import {redirectUrl} from './process-url/redirect-url.js';
+import {detectLinkType} from './process-url/detect-link-type.js';
+import {redirectDownloadLink} from './process-url/redirect-download-link.js';
+import {dropResource} from './process-url/drop-resource.js';
+import {redirectUrlAfterFetch} from './process-url/redirect-url-after-fetch.js';
+import {postProcessHtml, preProcessHtml} from './process-html.js';
 import {
   postProcessInteractiveExample,
   preProcessInteractiveExample
 } from './process-html/process-interactive-examples';
-import {processYariSourceMap} from './process-source-maps';
-import {decompressSitemap} from './decompress-sitemap';
-import {downloadAndFallback} from './download-and-fallback';
-import {processSearchJson} from './process-search-json';
-import {CustomDnsLookup} from './custom-dns-lookup';
-import {processYariMainCss} from './process-html/process-yari-main-css';
+import {processYariSourceMap} from './process-source-maps.js';
+import {decompressSitemap} from './decompress-sitemap.js';
+import {downloadAndFallback} from './download-and-fallback.js';
+import {processSearchJson} from './process-search-json.js';
+import {CustomDnsLookup} from './custom-dns-lookup.js';
+import {processYariMainCss} from './process-html/process-yari-main-css.js';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);

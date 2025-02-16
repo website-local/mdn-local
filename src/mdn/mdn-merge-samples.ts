@@ -3,10 +3,10 @@ import glob from 'fast-glob';
 import {load} from 'cheerio';
 import fs from 'fs';
 import path from 'path';
-import {mkdirRetry} from 'website-scrap-engine/lib/io';
-import {sources} from 'website-scrap-engine/lib/sources';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import {mkdirRetry} from 'website-scrap-engine/lib/io.js';
+import {sources} from 'website-scrap-engine/lib/sources.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types.js';
 
 export interface MdnSampleItem {
   cwd: string;

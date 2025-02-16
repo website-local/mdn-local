@@ -1,4 +1,4 @@
-import type * as BCD from './types';
+import type * as BCD from './types.js';
 
 // Extended for the fields, beyond the bcd types, that are extra-added
 // exclusively in Yari.

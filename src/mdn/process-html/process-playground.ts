@@ -1,14 +1,14 @@
-import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types.js';
 import type {
   DownloadResource,
   SubmitResourceFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
 import type {
   PipelineExecutor
-} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import {simpleHashString} from 'website-scrap-engine/lib/util';
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {simpleHashString} from 'website-scrap-engine/lib/util.js';
 
 const PLAYGROUND_LOCAL_ATTR = 'data-mdn-local-pg-id';
 

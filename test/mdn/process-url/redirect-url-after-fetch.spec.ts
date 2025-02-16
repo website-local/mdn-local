@@ -1,14 +1,16 @@
 import type {
   DownloadResource,
   SubmitResourceFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
-import {redirectUrl} from '../../../src/mdn/process-url/redirect-url';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
+import {redirectUrl} from '../../../src/mdn/process-url/redirect-url.js';
 import type {
   DownloadOptions,
   StaticDownloadOptions
-} from 'website-scrap-engine/lib/options';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import {redirectUrlAfterFetch} from '../../../src/mdn/process-url/redirect-url-after-fetch';
+} from 'website-scrap-engine/lib/options.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {
+  redirectUrlAfterFetch
+} from '../../../src/mdn/process-url/redirect-url-after-fetch.js';
 import URI = require('urijs');
 
 
