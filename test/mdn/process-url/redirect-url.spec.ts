@@ -1,3 +1,4 @@
+import {describe, expect, test} from '@jest/globals';
 import {redirectUrl} from '../../../src/mdn/process-url/redirect-url.js';
 import type {
   DownloadOptions,

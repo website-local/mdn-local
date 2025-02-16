@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {detectLinkType} from '../../../src/mdn/process-url/detect-link-type.js';
 import type {Resource} from 'website-scrap-engine/lib/resource.js';
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {load} from 'cheerio';
-import URI = require('urijs');
+import URI from 'urijs';
 
 describe('detect-link-type', function () {
   test('html', () => {

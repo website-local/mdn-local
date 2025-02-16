@@ -1,7 +1,8 @@
+import {describe, expect, test} from '@jest/globals';
 import {
   processPathWithMultiLocale
 } from '../../../src/mdn/process-url/process-path-with-multi-locale.js';
-import URI = require('urijs');
+import URI from 'urijs';
 
 const testCases = [
   [

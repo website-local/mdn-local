@@ -1,3 +1,4 @@
+import {describe, expect, test} from '@jest/globals';
 import type {Resource} from 'website-scrap-engine/lib/resource.js';
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {redirectUrl} from '../../../src/mdn/process-url/redirect-url.js';
@@ -8,7 +9,7 @@ import type {
 import {
   redirectDownloadLink
 } from '../../../src/mdn/process-url/redirect-download-link.js';
-import URI = require('urijs');
+import URI from 'urijs';
 
 const opt = (locale: string): StaticDownloadOptions => ({
   localRoot: '/tmp/dummy',

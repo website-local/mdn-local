@@ -1,3 +1,4 @@
+import {describe, expect, test} from '@jest/globals';
 import type {
   DownloadResource,
   SubmitResourceFunc
@@ -11,8 +12,7 @@ import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {
   redirectUrlAfterFetch
 } from '../../../src/mdn/process-url/redirect-url-after-fetch.js';
-import URI = require('urijs');
-
+import URI from 'urijs';
 
 const nopSubmit: SubmitResourceFunc = () => void 0;
 

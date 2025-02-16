@@ -1,3 +1,4 @@
+import {describe, expect, test} from '@jest/globals';
 import {
   defaultInitialUrl
 } from '../../../src/mdn/process-url/default-initial-url.js';

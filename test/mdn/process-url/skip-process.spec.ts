@@ -1,3 +1,4 @@
+import {describe, expect, test} from '@jest/globals';
 import {skipProcess} from '../../../src/mdn/process-url/skip-process.js';
 
 const exceptSkipped = (url: string) =>
