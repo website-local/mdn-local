@@ -86,9 +86,7 @@ const SECTION_RE = /h[1-6]/i;
 
 function partOfSection(heading: Cheerio, element: Cheerio) {
   if (
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     SECTION_RE.test(element.prop('tagName')!) &&
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     element.prop('tagName')!.toLowerCase() <= (heading.prop('tagName')?.toLowerCase() || '')
   ) {
     return false;
@@ -101,7 +99,6 @@ function sectionForHeading($: CheerioStatic, heading: Cheerio | null): Cheerio[]
     return [];
   }
   const nodes: Cheerio[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (!SECTION_RE.test(heading.prop('tagName')!)) {
     return [...heading.children().map((_, el) => $(el))];
   }
@@ -135,9 +132,9 @@ function prevHeading(heading: Cheerio) {
   while (prev.parent().prev().children().first().length) {
     prev = prev.parent().prev().children().first();
     if (
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       SECTION_RE.test(prev.prop('tagName')!) &&
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       prev.prop('tagName')!.toLowerCase() < (heading.prop('tagName')?.toLowerCase() || '')
     ) {
       return prev;
@@ -227,7 +224,6 @@ export function getCodeAndNodesForIframe(
   }
   let r = codeForHeading($, heading, src);
   while (r === null) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     heading = prevHeading(heading)!;
     if (heading === null) {
       return null;

@@ -1,4 +1,4 @@
-/* eslint-disable no-useless-escape,no-prototype-builtins */
+/* eslint-disable no-useless-escape,no-prototype-builtins,@typescript-eslint/no-unused-expressions,@typescript-eslint/no-unused-vars */
 // noinspection ES6ConvertVarToLetConst
 
 'use strict';
@@ -1390,7 +1390,7 @@ Prism.languages.javascript = Prism.languages.extend('clike', {
       /(^|[^\w$])/.source +
       '(?:' +
       (
-        // eslint-disable-next-line indent
+
         /NaN|Infinity/.source +
         '|' +
         // binary integer
