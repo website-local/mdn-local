@@ -128,7 +128,7 @@ export const preProcessReactData = (text: string, elem: Cheerio): void => {
     jsonStrEndIndex: number,
     escapedJsonText: string,
     jsonText: string,
-    data: MdnReactData | void,
+    data: MdnReactData | void = undefined,
     stringCatalog: MdnReactData['stringCatalog'],
     key: string;
   if (jsonStrBeginIndex < 1 ||

@@ -66,7 +66,7 @@ export const preProcessHtml = async (
   preProcessRemoveElements($);
   // the script containing inline data
   let dataScript: Cheerio | null = null;
-  let yariCompatibilityData: ProcessYariDataResult;
+  let yariCompatibilityData: ProcessYariDataResult | void = undefined;
   let isYariDocs = false;
   let assetsData;
   const scripts = $('script');

@@ -20,9 +20,9 @@ export interface MdnAssetsData {
 export const extractMdnAssets = (text: string): MdnAssetsData | void => {
 
   let assetsBaseIndex: number,
-    assetsBeginIndex: number | void,
-    assetsEndIndex: number | void,
-    assetsData: MdnAssets | void;
+    assetsBeginIndex: number | void = undefined,
+    assetsEndIndex: number | void = undefined,
+    assetsData: MdnAssets | void = undefined;
 
   if ((assetsBaseIndex = text.indexOf('mdn.assets')) > 0 &&
     (assetsBeginIndex = text.indexOf('=', assetsBaseIndex)) > 0 &&

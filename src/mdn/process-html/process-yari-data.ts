@@ -1,6 +1,7 @@
 import type {HTTPError} from 'got';
 import {
-  error as errorLogger, notFound
+  error as errorLogger,
+  notFound
 } from 'website-scrap-engine/lib/logger/logger';
 import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 import type {
@@ -13,12 +14,8 @@ import type {
 import type {Resource} from 'website-scrap-engine/lib/resource';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {toString} from 'website-scrap-engine/lib/util';
-import type {
-  YariCompatibilityDataJson
-} from '../browser-compatibility-table';
-import {
-  renderYariCompatibilityTable
-} from '../browser-compatibility-table';
+import type {YariCompatibilityDataJson} from '../browser-compatibility-table';
+import {renderYariCompatibilityTable} from '../browser-compatibility-table';
 
 /// region type def
 // See https://github.com/mdn/yari/blob/v0.2.28/client/src/document/types.tsx
@@ -149,7 +146,7 @@ export function preProcessYariDocData(
     }
   }
 
-  let resultVal: ProcessYariDataResult;
+  let resultVal: ProcessYariDataResult = undefined;
   if (browserCompatibilityData.length > 0) {
     resultVal = [];
     for (let i = 0; i < browserCompatibilityData.length; i++) {
@@ -184,7 +181,7 @@ export const preProcessYariHydrationData = (
   text: string, elem: Cheerio
 ): ProcessYariDataResult => {
 
-  let data: { doc?: MdnYariDoc } | void;
+  let data: { doc?: MdnYariDoc } | void = undefined;
   try {
     data = JSON.parse(text);
   } catch (e) {
@@ -222,7 +219,7 @@ export const preProcessYariData = (
     jsonStrEndIndex: number,
     escapedJsonText: string,
     jsonText: string,
-    data: MdnYariDoc | void;
+    data: MdnYariDoc | void = undefined;
   if (jsonStrBeginIndex < 1 ||
     jsonStrBeginIndex + JSON_PARSE_STR.length > text.length) {
     return;
