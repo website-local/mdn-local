@@ -10,7 +10,8 @@
     "declaration": true,
     "esModuleInterop": true,
     "removeComments": false,
-    "strict": true
+    "strict": true,
+    "declarationMap": true
   },
   "include": [
     "src"
