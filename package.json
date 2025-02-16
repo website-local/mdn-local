@@ -4,7 +4,7 @@
   "description": "create offline mozilla developer network documents",
   "main": "index.js",
   "engines": {
-    "node": ">=12.16.0"
+    "node": ">=18.17.0"
   },
   "dependencies": {
     "agentkeepalive": "^4.6.0",
