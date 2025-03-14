@@ -1,7 +1,10 @@
 import {
   SingleThreadDownloader
 } from 'website-scrap-engine/lib/downloader/index.js';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
+import type {
+  DownloadOptions,
+  StaticDownloadOptions
+} from 'website-scrap-engine/lib/options.js';
 import {CookieJar} from 'tough-cookie';
 import {HttpAgent, HttpsAgent} from 'agentkeepalive';
 import {localesMap, redirectLocale} from './process-url/consts.js';
@@ -11,31 +14,37 @@ import {defaultInitialUrl} from './process-url/default-initial-url.js';
 import {mkdirpSync as mkdir} from 'mkdirp';
 import {promises as fs} from 'fs';
 import {CustomDnsLookup} from './custom-dns-lookup.js';
+import {fileURLToPath} from 'node:url';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export class MdnDownloader extends SingleThreadDownloader {
   constructor(public pathToOptions: string,
     overrideOptions?: Partial<StaticDownloadOptions> & { pathToWorker?: string }) {
     super(pathToOptions, overrideOptions);
-    const locale: string = this.options.meta.locale as string || 'en-US';
-    const cookieJar = this.options.req.cookieJar = new CookieJar();
+  }
+
+  protected _internalInit(options: DownloadOptions): Promise<void> {
+    const locale: string = options.meta.locale as string || 'en-US';
+    const cookieJar = options.req.cookieJar = new CookieJar();
     cookieJar.setCookieSync(
       'preferredlocale=' + locale,
       'https://developer.mozilla.org');
 
-    if (!this.options.req.hooks) {
-      this.options.req.hooks = {};
+    if (!options.req.hooks) {
+      options.req.hooks = {};
     }
-    if (!this.options.req.hooks.beforeRedirect) {
-      this.options.req.hooks.beforeRedirect = [];
+    if (!options.req.hooks.beforeRedirect) {
+      options.req.hooks.beforeRedirect = [];
     }
-    if (!this.options.req.headers) {
-      this.options.req.headers = {};
+    if (!options.req.headers) {
+      options.req.headers = {};
     }
-    if (!this.options.req.headers['accept-language']) {
-      this.options.req.headers['accept-language'] = locale;
+    if (!options.req.headers['accept-language']) {
+      options.req.headers['accept-language'] = locale;
     }
 
-    this.options.req.hooks.beforeRedirect.push(function (options: NormalizedOptions) {
+    options.req.hooks.beforeRedirect.push(function (options: NormalizedOptions) {
       const optionsUrl = options.url;
       if (!optionsUrl) {
         return;
@@ -51,30 +60,31 @@ export class MdnDownloader extends SingleThreadDownloader {
     });
 
     // use http 1.1 keep-alive by default
-    if (this.options.meta?.keepAlive !== false) {
-      if (!this.options.req.agent) {
-        this.options.req.agent = {};
+    if (options.meta?.keepAlive !== false) {
+      if (!options.req.agent) {
+        options.req.agent = {};
       }
-      if (!this.options.req.agent.http) {
-        this.options.req.agent.http = new HttpAgent();
+      if (!options.req.agent.http) {
+        options.req.agent.http = new HttpAgent();
       }
-      if (!this.options.req.agent.https) {
-        this.options.req.agent.https = new HttpsAgent();
+      if (!options.req.agent.https) {
+        options.req.agent.https = new HttpsAgent();
       }
-    } else if (this.options.meta?.http2 !== false) {
+    } else if (options.meta?.http2 !== false) {
       // enable http2
-      this.options.req.http2 = true;
+      options.req.http2 = true;
     }
 
     // optional prefer ipv6 config
-    if (this.options.meta.preferIpv6) {
-      let dnsCache = this.options.req.dnsCache;
+    if (options.meta.preferIpv6) {
+      let dnsCache = options.req.dnsCache;
       if (!(dnsCache instanceof CustomDnsLookup)) {
         dnsCache = new CustomDnsLookup();
-        this.options.req.dnsCache = dnsCache;
+        options.req.dnsCache = dnsCache;
       }
       (dnsCache as CustomDnsLookup).preferIpv6 = true;
     }
+    return super._internalInit(options);
   }
 }
 
@@ -118,17 +128,17 @@ export default async function createDownloader(
   mkdir(jsPath);
   mkdir(cssPath);
   await Promise.all([
-    fs.copyFile(path.join(__dirname, 'inject', 'inject.js'),
+    fs.copyFile(path.join(dirname, 'inject', 'inject.js'),
       path.join(jsPath, 'inject.js')),
-    fs.copyFile(path.join(__dirname, 'inject', 'inject.css'),
+    fs.copyFile(path.join(dirname, 'inject', 'inject.css'),
       path.join(cssPath, 'inject.css')),
     fs.writeFile(path.join(
       overrideOptions.localRoot,
       'developer.mozilla.org',
       'index.html'), makeIndexPagePlaceholder(locale)),
   ]);
-  const downloader: MdnDownloader =
-    new MdnDownloader(path.join(__dirname, 'life-cycle'), overrideOptions);
+  const downloader: MdnDownloader = new MdnDownloader(
+    'file://' + path.join(dirname, 'life-cycle.js'), overrideOptions);
   downloader.queuedUrl.add('https://developer.mozilla.org/');
   downloader.queuedUrl.add('https://developer.mozilla.org/index.html');
   await downloader.init;
