@@ -14,7 +14,7 @@
     "mkdirp": "^3.0.1",
     "tough-cookie": "^5.1.2",
     "urijs": "^1.19.11",
-    "website-scrap-engine": "^0.8.1"
+    "website-scrap-engine": "^0.8.2"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
