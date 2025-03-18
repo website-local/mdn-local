@@ -12,6 +12,11 @@ import {simpleHashString} from 'website-scrap-engine/lib/util.js';
 
 const PLAYGROUND_LOCAL_ATTR = 'data-mdn-local-pg-id';
 
+function escapeSelector(selector: string): string {
+  // List of characters that have special meaning in CSS selectors
+  return selector.replace(/([.#:$(),])/g, '\\$1');
+}
+
 export async function preProcessPlayground(
   res: DownloadResource,
   submit: SubmitResourceFunc,
@@ -197,7 +202,7 @@ export function getCodeAndNodesForIframeBySampleClass(
   };
   let empty = true;
   const nodes: Cheerio[] = [];
-  [...$(`.live-sample___${cls}`)].forEach(
+  [...$(`.live-sample___${escapeSelector(cls)}`)].forEach(
     (el) => {
       const pre = $(el);
       const lang = getLanguage(pre);
@@ -218,7 +223,7 @@ export function getCodeAndNodesForIframe(
   iframe: Cheerio,
   src: string
 ) {
-  let heading = $('#' + id) || closestHeading(iframe);
+  let heading = $('#' + escapeSelector(id)) || closestHeading(iframe);
   if (!heading) {
     return null;
   }
