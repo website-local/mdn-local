@@ -4521,4 +4521,164 @@ Prism.languages.py = Prism.languages.python;
   customElements.define('play-runner', PlayRunner);
 
   /// endregion play-runner
+
+
+  /// region play-editor
+
+  export class PlayEditor extends HTMLElement {
+
+    /** @type {EditorView | undefined} */
+    _editor;
+
+    /** @type {number} */
+    _updateTimer = -1;
+
+    constructor() {
+      super();
+      // TODO: theme
+      // this.theme = new ThemeController(this);
+      this.language = this.getAttribute('language');
+      this.minimal = this.hasAttribute('minimal');
+      this._value = "";
+      this.delay = Number(this.getAttribute('delay')) || 1000;
+      this.render();
+    }
+
+    /** @param {string} value */
+    set value(value) {
+      this._value = value;
+      if (this._editor) {
+        const EditorState = window.CM['@codemirror/state'].EditorState;
+        let state = EditorState.create({
+          doc: value,
+          extensions: this._extensions(),
+        });
+        this._editor.setState(state);
+      }
+    }
+
+    get value() {
+      return this._editor ? this._editor.state.doc.toString() : this._value;
+    }
+
+    /**
+     * @param {string} type
+     */
+    _dispatch(type) {
+      this.dispatchEvent(new Event(type, { bubbles: true, composed: true }));
+    }
+    _extensions() {
+      const EditorView = window.CM.codemirror.EditorView;
+      const minimalSetup = window.CM.codemirror.minimalSetup;
+      const langJS = window.CM["@codemirror/lang-javascript"].javascript;
+      const langHTML = window.CM["@codemirror/lang-html"].html;
+      const langCSS = window.CM["@codemirror/lang-css"].css;
+      const langWat = window.CM["@codemirror/lang-wast"].wast;
+      const { indentOnInput, bracketMatching } = window.CM["@codemirror/language"];
+      const { defaultKeymap, indentWithTab } = window.CM["@codemirror/commands"];
+      const {
+        autocompletion,
+        completionKeymap,
+        closeBrackets,
+        closeBracketsKeymap,
+      } = window.CM["@codemirror/autocomplete"];
+      const { lintKeymap } = window.CM["@codemirror/lint"];
+      const { keymap, highlightActiveLine, lineNumbers } = window.CM["@codemirror/view"];
+      const { oneDark } = window.CM["@codemirror/theme-one-dark"];
+      const language = (() => {
+        switch (this.language) {
+        case "js":
+          return [langJS()];
+        case "html":
+          return [langHTML()];
+        case "css":
+          return [langCSS()];
+        case "wat":
+          return [langWat()];
+        default:
+          return [];
+        }
+      })();
+
+      return [
+        minimalSetup,
+        bracketMatching(),
+        closeBrackets(),
+        ...(!this.minimal
+          ? [
+            lineNumbers(),
+            indentOnInput(),
+            autocompletion(),
+            highlightActiveLine(),
+            keymap.of([
+              ...closeBracketsKeymap,
+              ...defaultKeymap,
+              ...completionKeymap,
+              ...lintKeymap,
+              indentWithTab,
+            ]),
+            EditorView.lineWrapping,
+          ]
+          : []),
+        ...(this.theme.value === "dark" ? [oneDark] : []),
+        ...language,
+        EditorView.focusChangeEffect.of((_, focusing) => {
+          this._dispatch(focusing ? "focus" : "blur");
+          return null;
+        }),
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) {
+            if (this._updateTimer !== -1) {
+              clearTimeout(this._updateTimer);
+            }
+            this._updateTimer = window?.setTimeout(() => {
+              this._updateTimer = -1;
+              this._dispatch("update");
+            }, this.delay);
+          }
+        }),
+      ];
+    }
+
+    async format() {
+      // TODO: seems this is not used, but just keep an error here
+      throw new Error('PlayEditor.format');
+    }
+
+    /** @param {PropertyValues} changedProperties */
+    willUpdate(changedProperties) {
+      const StateEffect = window.CM['@codemirror/state'].StateEffect;
+      if (
+        changedProperties.has("language") ||
+        changedProperties.has("ThemeController.value")
+      ) {
+        this._editor?.dispatch({
+          effects: StateEffect.reconfigure.of(this._extensions()),
+        });
+      }
+    }
+
+    render() {
+      this.innerHTML = `<div
+      class=${this.minimal ? "editor minimal" : "editor"}
+    ></div>`;
+    }
+
+    firstUpdated() {
+      const EditorView = window.CM.codemirror.EditorView;
+      const EditorState = window.CM['@codemirror/state'].EditorState;
+      let startState = EditorState.create({
+        doc: this._value,
+        extensions: this._extensions(),
+      });
+      this._editor = new EditorView({
+        state: startState,
+        parent: this.querySelector("div") || undefined,
+      });
+    }
+  }
+
+  customElements.define("play-editor", PlayEditor);
+
+  /// endregion play-editor
 }();
