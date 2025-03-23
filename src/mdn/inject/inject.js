@@ -4539,7 +4539,7 @@ Prism.languages.py = Prism.languages.python;
       // this.theme = new ThemeController(this);
       this.language = this.getAttribute('language');
       this.minimal = this.hasAttribute('minimal');
-      this._value = "";
+      this._value = '';
       this.delay = Number(this.getAttribute('delay')) || 1000;
       this.render();
     }
@@ -4570,30 +4570,30 @@ Prism.languages.py = Prism.languages.python;
     _extensions() {
       const EditorView = window.CM.codemirror.EditorView;
       const minimalSetup = window.CM.codemirror.minimalSetup;
-      const langJS = window.CM["@codemirror/lang-javascript"].javascript;
-      const langHTML = window.CM["@codemirror/lang-html"].html;
-      const langCSS = window.CM["@codemirror/lang-css"].css;
-      const langWat = window.CM["@codemirror/lang-wast"].wast;
-      const { indentOnInput, bracketMatching } = window.CM["@codemirror/language"];
-      const { defaultKeymap, indentWithTab } = window.CM["@codemirror/commands"];
+      const langJS = window.CM['@codemirror/lang-javascript'].javascript;
+      const langHTML = window.CM['@codemirror/lang-html'].html;
+      const langCSS = window.CM['@codemirror/lang-css'].css;
+      const langWat = window.CM['@codemirror/lang-wast'].wast;
+      const { indentOnInput, bracketMatching } = window.CM['@codemirror/language'];
+      const { defaultKeymap, indentWithTab } = window.CM['@codemirror/commands'];
       const {
         autocompletion,
         completionKeymap,
         closeBrackets,
         closeBracketsKeymap,
-      } = window.CM["@codemirror/autocomplete"];
-      const { lintKeymap } = window.CM["@codemirror/lint"];
-      const { keymap, highlightActiveLine, lineNumbers } = window.CM["@codemirror/view"];
-      const { oneDark } = window.CM["@codemirror/theme-one-dark"];
+      } = window.CM['@codemirror/autocomplete'];
+      const { lintKeymap } = window.CM['@codemirror/lint'];
+      const { keymap, highlightActiveLine, lineNumbers } = window.CM['@codemirror/view'];
+      const { oneDark } = window.CM['@codemirror/theme-one-dark'];
       const language = (() => {
         switch (this.language) {
-        case "js":
+        case 'js':
           return [langJS()];
-        case "html":
+        case 'html':
           return [langHTML()];
-        case "css":
+        case 'css':
           return [langCSS()];
-        case "wat":
+        case 'wat':
           return [langWat()];
         default:
           return [];
@@ -4620,10 +4620,10 @@ Prism.languages.py = Prism.languages.python;
             EditorView.lineWrapping,
           ]
           : []),
-        ...(this.theme.value === "dark" ? [oneDark] : []),
+        ...(this.theme.value === 'dark' ? [oneDark] : []),
         ...language,
         EditorView.focusChangeEffect.of((_, focusing) => {
-          this._dispatch(focusing ? "focus" : "blur");
+          this._dispatch(focusing ? 'focus' : 'blur');
           return null;
         }),
         EditorView.updateListener.of((update) => {
@@ -4633,7 +4633,7 @@ Prism.languages.py = Prism.languages.python;
             }
             this._updateTimer = window?.setTimeout(() => {
               this._updateTimer = -1;
-              this._dispatch("update");
+              this._dispatch('update');
             }, this.delay);
           }
         }),
@@ -4649,8 +4649,8 @@ Prism.languages.py = Prism.languages.python;
     willUpdate(changedProperties) {
       const StateEffect = window.CM['@codemirror/state'].StateEffect;
       if (
-        changedProperties.has("language") ||
-        changedProperties.has("ThemeController.value")
+        changedProperties.has('language') ||
+        changedProperties.has('ThemeController.value')
       ) {
         this._editor?.dispatch({
           effects: StateEffect.reconfigure.of(this._extensions()),
@@ -4660,7 +4660,7 @@ Prism.languages.py = Prism.languages.python;
 
     render() {
       this.innerHTML = `<div
-      class=${this.minimal ? "editor minimal" : "editor"}
+      class=${this.minimal ? 'editor minimal' : 'editor'}
     ></div>`;
     }
 
@@ -4673,12 +4673,12 @@ Prism.languages.py = Prism.languages.python;
       });
       this._editor = new EditorView({
         state: startState,
-        parent: this.querySelector("div") || undefined,
+        parent: this.querySelector('div') || undefined,
       });
     }
   }
 
-  customElements.define("play-editor", PlayEditor);
+  customElements.define('play-editor', PlayEditor);
 
   /// endregion play-editor
 }();
