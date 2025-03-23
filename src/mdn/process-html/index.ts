@@ -41,6 +41,10 @@ import {
 } from './process-yari-data.js';
 import {preProcessPlayground} from './process-playground.js';
 import {postProcessPlayable, preProcessPlayable} from './process-playable.js';
+import {
+  postProcessInteractiveExample,
+  preProcessInteractiveExample
+} from './process-new-interactive-examples.js';
 
 const INJECT_JS_PATH = '/static/js/inject.js';
 const INJECT_CSS_PATH = '/static/css/inject.css';
@@ -162,6 +166,9 @@ type="text/css" class="mdn-local-inject-css">`)
   if (res.url.startsWith('https://developer.mozilla.org/mdn-github-io/')) {
     preProcessPlayable($);
   }
+  // 20250323 new interactive examples
+  // https://github.com/website-local/mdn-local/issues/1142
+  preProcessInteractiveExample($);
   return res;
 };
 
@@ -234,6 +241,9 @@ export const postProcessHtml = (
   if (res.url.startsWith('https://developer.mozilla.org/mdn-github-io/')) {
     postProcessPlayable($);
   }
+  // 20250323 new interactive examples
+  // https://github.com/website-local/mdn-local/issues/1142
+  postProcessInteractiveExample($);
   return $;
 };
 
