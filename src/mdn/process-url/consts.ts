@@ -124,6 +124,8 @@ export const externalHosts = [
   // 20250203
   ['/mdn.dev/', 'mdn.dev'],
   ['/resources.whatwg.org/', 'resources.whatwg.org'],
+  // 20250323
+  ['/mdnplay.dev/', 'mdnplay.dev'],
 ].map(([prefix, host, protocol]) => ({
   protocol: protocol || 'https',
   host,
