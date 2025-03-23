@@ -4404,4 +4404,117 @@ Prism.languages.py = Prism.languages.python;
   }
 
   /// endregion render-html
+
+
+  /// region play-runner
+
+  // https://github.com/mdn/yari/blob/v4.7.2/client/src/lit/play/runner.js
+  /**
+   * @import { RunnerDefaults, VConsole } from "./types"
+   * @import { EventName } from "@lit/react"
+   * @import { Ref } from "lit/directives/ref.js"; */
+
+  class PlayRunner extends HTMLElement {
+
+    constructor() {
+      super();
+      /** @type {Record<string, string> | undefined} */
+      this.code = undefined;
+      /** @type {RunnerDefaults | undefined} */
+      this.defaults = this.getAttribute('defaults');
+      this.sandbox = this.getAttribute('sandbox');
+      /** @type {Promise<true>} */
+      this.ready = new Promise((resolve) => {
+        this._resolveReady = () => resolve(true);
+      });
+    }
+
+    /** @param {MessageEvent} e  */
+    _onMessage({ data: { typ, prop, args } }) {
+      if (typ === 'console') {
+        /** @type {VConsole} */
+        const detail = { prop, args };
+        this.dispatchEvent(
+          new CustomEvent('console', { bubbles: true, composed: true, detail })
+        );
+      } else if (typ === 'ready') {
+        this._resolveReady();
+      }
+    }
+    async _updateSrc([code, defaults, theme]) {
+      if (code && code.js && code.wat) {
+        const watUrl = await compileAndEncodeWatToDataUrl(code.wat);
+        code.js = code.js.replace('{%wasm-url%}', watUrl);
+      }
+      // TODO: theme
+      const state  = {
+        html: code?.html || '',
+        css: code?.css || '',
+        js: code?.js || '',
+        defaults: defaults,
+        theme: theme,
+      };
+      // update iframe src without adding to browser history
+      this._iframe.srcdoc = renderHtml(state);
+    }
+
+    connectedCallback() {
+      super.connectedCallback();
+      this._onMessage = this._onMessage.bind(this);
+      window.addEventListener('message', this._onMessage);
+    }
+
+    /** @param {any} message */
+    async postMessage(message) {
+      await this.ready;
+      this._iframe.contentWindow?.postMessage(message, '*');
+    }
+
+    render() {
+      this.innerHTML = `
+      <iframe
+        title="runner"
+        sandbox="allow-scripts allow-same-origin allow-forms ${this.sandbox}"
+      ></iframe>
+    `;
+      this._iframe = this.querySelector('iframe');
+    }
+
+    disconnectedCallback() {
+      super.disconnectedCallback();
+      window.removeEventListener('message', this._onMessage);
+    }
+  }
+
+  /**
+   * Converts a Uint8Array to a base64 encoded string
+   * @param {Uint8Array} bytes - The array of bytes to convert
+   * @returns {string} The base64 encoded string representation of the input bytes
+   */
+  function uInt8ArrayToBase64(bytes) {
+    const binString = Array.from(bytes, (byte) =>
+      String.fromCodePoint(byte)
+    ).join('');
+    return btoa(binString);
+  }
+
+  /**
+   * compiles the wat code to wasm
+   * @param {string} wat
+   * @returns {Promise<string>} a data-url with the compiled wasm, base64 encoded
+   */
+  async function compileAndEncodeWatToDataUrl(wat) {
+    // TODO: watify
+    throw new Error('TODO');
+    // eslint-disable-next-line no-unreachable
+    const { default: init, watify } = {};
+    await init();
+    const binary = watify(wat);
+    const b64 = `data:application/wasm;base64,${uInt8ArrayToBase64(binary)}`;
+    return b64;
+  }
+
+  customElements.define('play-runner', PlayRunner);
+
+  /// endregion play-runner
 }();
