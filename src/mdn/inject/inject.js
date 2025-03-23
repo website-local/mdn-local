@@ -4014,6 +4014,7 @@ Prism.languages.py = Prism.languages.python;
       this.vconsole = new VirtualConsole(this);
       /** @type {string[]} */
       this._messages = [];
+      this.render();
     }
 
     /** @param {CustomEvent<VConsole>} e */
@@ -4427,6 +4428,7 @@ Prism.languages.py = Prism.languages.python;
       this.ready = new Promise((resolve) => {
         this._resolveReady = () => resolve(true);
       });
+      this.render();
     }
 
     /** @param {MessageEvent} e  */
@@ -4441,7 +4443,9 @@ Prism.languages.py = Prism.languages.python;
         this._resolveReady();
       }
     }
-    async _updateSrc([code, defaults, theme]) {
+
+    async _updateSrc() {
+      const {code, defaults, theme} = this;
       if (code && code.js && code.wat) {
         const watUrl = await compileAndEncodeWatToDataUrl(code.wat);
         code.js = code.js.replace('{%wasm-url%}', watUrl);
