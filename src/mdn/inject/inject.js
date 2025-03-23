@@ -3777,7 +3777,7 @@ Prism.languages.py = Prism.languages.python;
   const relativeRoot = new URL('../../', currSrc).toString();
   const customElements = window.customElements;
   const HTMLElement = window.HTMLElement;
-  // region play-console
+  /// region play-console
   // https://github.com/mdn/yari/commit/33de34d9df9f57f3afe9577403bcf6007507be63
   // Copied from https://github.com/mdn/bob/blob/9da42cd641d7f2a9796bf3406e74cad411ce9438/editor/js/editor-libs/console-utils.ts
   /**
@@ -4049,6 +4049,359 @@ Prism.languages.py = Prism.languages.python;
   }
 
   customElements.define('play-console', PlayConsole);
-  // endregion play-console
+  /// endregion play-console
 
+
+  /// region render-html
+  // https://github.com/mdn/yari/blob/v4.7.2/libs/play/index.js#L212
+  /**
+   * @param {Theme} [theme]
+   * @returns {string}
+   */
+  function renderThemeStyles(theme) {
+    return theme === 'os-default'
+      ? `<style>
+        :root {
+          --text-primary: #1b1b1b;
+          --background-primary: #fff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --text-primary: #fff;
+            --background-primary: #1b1b1b;
+          }
+        }
+      </style>`
+      : theme === 'light'
+        ? `<style>
+          :root {
+            --text-primary: #1b1b1b;
+            --background-primary: #fff;
+          }
+        </style>`
+        : theme === 'dark'
+          ? `<style>
+            :root {
+              --text-primary: #fff;
+              --background-primary: #1b1b1b;
+            }
+          </style>`
+          : '';
+  }
+  /**
+   * @param {State | null} [state=null]
+   */
+  function renderHtml(state = null) {
+    const {
+      css,
+      html: htmlCode,
+      js,
+      defaults,
+      theme,
+    } = state || { css: '', html: '', js: '' };
+    // noinspection CssUnresolvedCustomProperty,CssUnknownTarget
+    return `
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        ${renderThemeStyles(theme)}
+        ${defaults === undefined
+    ? `<style>
+              /* Legacy css to support existing live samples */
+              body {
+                padding: 0;
+                margin: 0;
+              }
+
+              svg:not(:root) {
+                display: block;
+              }
+
+              .playable-code {
+                background-color: #f4f7f8;
+                border: none;
+                border-left: 6px solid #558abb;
+                border-width: medium medium medium 6px;
+                color: #4d4e53;
+                height: 100px;
+                width: 90%;
+                padding: 10px 10px 0;
+              }
+
+              .playable-canvas {
+                border: 1px solid #4d4e53;
+                border-radius: 2px;
+              }
+
+              .playable-buttons {
+                text-align: right;
+                width: 90%;
+                padding: 5px 10px 5px 26px;
+              }
+            </style>`
+    : ''}
+        ${defaults === 'ix-tabbed'
+    ? `<style>
+              @font-face {
+                font-family: "Inter";
+                src:
+                  url("${relativeRoot}shared-assets/fonts/Inter.var.woff2")
+                    format("woff2 supports variations"),
+                  url("${relativeRoot}shared-assets/fonts/Inter.var.woff2")
+                    format("woff2-variations");
+                font-weight: 1 999;
+                font-stretch: 75% 100%;
+                font-style: oblique 0deg 20deg;
+                font-display: swap;
+              }
+
+              /* fonts used by the examples rendered inside the shadow dom. Because
+                 @font-face does not work in shadow dom:
+                 http://robdodson.me/at-font-face-doesnt-work-in-shadow-dom/ */
+              @font-face {
+                font-family: "Fira Sans";
+                src:
+                  local("FiraSans-Regular"),
+                  url("${relativeRoot}shared-assets/fonts/FiraSans-Regular.woff2")
+                    format("woff2");
+              }
+
+              @font-face {
+                font-family: "Fira Sans";
+                font-weight: normal;
+                font-style: oblique;
+                src:
+                  local("FiraSans-SemiBoldItalic"),
+                  url("${relativeRoot}shared-assets/fonts/FiraSans-SemiBoldItalic.woff2")
+                    format("woff2");
+              }
+
+              @font-face {
+                font-family: "Dancing Script";
+                src: url("${relativeRoot}shared-assets/fonts/dancing-script/dancing-script-regular.woff2")
+                  format("woff2");
+              }
+
+              @font-face {
+                font-family: molot;
+                src: url("${relativeRoot}shared-assets/fonts/molot.woff2") format("woff2");
+              }
+
+              @font-face {
+                font-family: rapscallion;
+                src: url("${relativeRoot}shared-assets/fonts/rapscall.woff2") format("woff2");
+              }
+
+              body {
+                background-color: #fff;
+                font:
+                  400 1rem/1.1876 Inter,
+                  BlinkMacSystemFont,
+                  "Segoe UI",
+                  "Roboto",
+                  "Oxygen",
+                  "Ubuntu",
+                  "Cantarell",
+                  "Fira Sans",
+                  "Droid Sans",
+                  "Helvetica Neue",
+                  sans-sans;
+                color: #15141aff;
+                font-size: 0.9rem;
+                line-height: 1.5;
+                padding: 2rem 1rem 1rem;
+                margin: 0;
+                min-width: min-content;
+              }
+
+              body math {
+                font-size: 1.5rem;
+              }
+            </style>`
+    : ''}
+        ${defaults === 'ix-choice'
+    ? `<style>
+              @font-face {
+                font-family: "Inter";
+                src:
+                  url("${relativeRoot}shared-assets/fonts/Inter.var.woff2")
+                    format("woff2 supports variations"),
+                  url("${relativeRoot}shared-assets/fonts/Inter.var.woff2")
+                    format("woff2-variations");
+                font-weight: 1 999;
+                font-stretch: 75% 100%;
+                font-style: oblique 0deg 20deg;
+                font-display: swap;
+              }
+
+              body {
+                color: var(--text-primary);
+                background-color: var(--background-primary);
+                font:
+                  400 1rem/1.1876 Inter,
+                  BlinkMacSystemFont,
+                  "Segoe UI",
+                  "Roboto",
+                  "Oxygen",
+                  "Ubuntu",
+                  "Cantarell",
+                  "Fira Sans",
+                  "Droid Sans",
+                  "Helvetica Neue",
+                  sans-sans;
+                height: 300px;
+                overflow: hidden;
+                position: relative;
+                background-color: var(--background-primary);
+                overflow: hidden;
+                padding: 1rem;
+                margin: 0;
+                box-sizing: border-box;
+              }
+
+              section {
+                height: 100%;
+                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
+
+              section.flex-column {
+                flex-direction: column;
+                align-items: initial;
+              }
+
+              /* some examples does not work with a flex display on the container */
+              section.display-block {
+                display: block;
+              }
+
+              section img {
+                flex-grow: 0;
+              }
+
+              section.hidden {
+                display: none;
+              }
+
+              .transition-all {
+                transition: all 0.3s ease-in;
+              }
+
+              * {
+                box-sizing: border-box;
+              }
+            </style>`
+    : ''}
+        <style id="css-output">
+          ${css}
+        </style>
+        <script>
+          const consoleProxy = new Proxy(console, {
+            get(target, prop) {
+              if (typeof target[prop] === "function") {
+                return (...args) => {
+                  try {
+                    window.parent.postMessage(
+                      { typ: "console", prop, args },
+                      "*"
+                    );
+                  } catch {
+                    try {
+                      window.parent.postMessage(
+                        {
+                          typ: "console",
+                          prop,
+                          args: args.map((x) => {
+                            try {
+                              window.structuredClone(x);
+                              return x;
+                            } catch {
+                              return { _MDNPlaySerializedObject: x.toString() };
+                            }
+                          }),
+                        },
+                        "*"
+                      );
+                    } catch {
+                      window.parent.postMessage(
+                        {
+                          typ: "console",
+                          prop: "warn",
+                          args: [
+                            "[Playground] Unsupported console message (see browser console)",
+                          ],
+                        },
+                        "*"
+                      );
+                    }
+                  }
+                  target[prop](...args);
+                };
+              }
+              return target[prop];
+            },
+          });
+
+          window.console = consoleProxy;
+          window.addEventListener("error", (e) => console.log(e.error));
+        </script>
+        ${defaults === 'ix-tabbed'
+    ? `<script>
+              window.addEventListener("click", (event) => {
+                // open links in parent frame if they have no "_target" set
+                const target = event.target;
+                if (
+                  target instanceof HTMLAnchorElement ||
+                  target instanceof HTMLAreaElement
+                ) {
+                  const hrefAttr = target.getAttribute("href");
+                  const targetAttr = target.getAttribute("target");
+                  if (hrefAttr && !hrefAttr.startsWith("#") && !targetAttr) {
+                    target.target = "_parent";
+                  }
+                }
+              });
+            </script>`
+    : ''}
+        ${defaults === 'ix-choice'
+    ? `<script>
+              /** @param {string} code */
+              function setChoice(code) {
+                const element = document.getElementById("example-element");
+                if (element) {
+                  element.style.cssText = code;
+                }
+              }
+
+              window.addEventListener("message", ({ data }) => {
+                if (data.typ === "choice") {
+                  setChoice(data.code);
+                }
+              });
+            </script>`
+    : ''}
+      </head>
+      <body>
+        ${htmlCode}
+        <script type="${defaults === 'ix-wat' ? 'module' : ''}">
+          ${js};
+        </script>
+        <script>
+          try {
+            window.parent.postMessage({ typ: "ready" }, "*");
+          } catch (e) {
+            console.error("[Playground] Failed to post ready message", e);
+          }
+        </script>
+      </body>
+    </html>
+  `;
+  }
+
+  /// endregion render-html
 }();
