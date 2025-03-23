@@ -33,6 +33,14 @@ describe('default-initial-url', function () {
       'https://developer.mozilla.org/sitemaps/en-us/sitemap.xml.gz',
       // https://github.com/website-local/mdn-local/issues/372
       'https://developer.mozilla.org/en-US/search-index.json',
+      // 20250323 fonts for new interactive examples
+      // https://github.com/website-local/mdn-local/issues/1142
+      'https://developer.mozilla.org/shared-assets/fonts/Inter.var.woff2',
+      'https://developer.mozilla.org/shared-assets/fonts/FiraSans-Regular.woff2',
+      'https://developer.mozilla.org/shared-assets/fonts/FiraSans-SemiBoldItalic.woff2',
+      'https://developer.mozilla.org/shared-assets/fonts/dancing-script/dancing-script-regular.woff2',
+      'https://developer.mozilla.org/shared-assets/fonts/molot.woff2',
+      'https://developer.mozilla.org/shared-assets/fonts/rapscall.woff2',
     ]);
   });
   test('non-en-US', () => {
@@ -59,6 +67,14 @@ describe('default-initial-url', function () {
       // https://github.com/website-local/mdn-local/issues/214
       'https://developer.mozilla.org/sitemaps/zh-cn/sitemap.xml.gz',
       'https://developer.mozilla.org/zh-CN/search-index.json',
+      // 20250323 fonts for new interactive examples
+      // https://github.com/website-local/mdn-local/issues/1142
+      'https://developer.mozilla.org/shared-assets/fonts/Inter.var.woff2',
+      'https://developer.mozilla.org/shared-assets/fonts/FiraSans-Regular.woff2',
+      'https://developer.mozilla.org/shared-assets/fonts/FiraSans-SemiBoldItalic.woff2',
+      'https://developer.mozilla.org/shared-assets/fonts/dancing-script/dancing-script-regular.woff2',
+      'https://developer.mozilla.org/shared-assets/fonts/molot.woff2',
+      'https://developer.mozilla.org/shared-assets/fonts/rapscall.woff2',
       // https://github.com/website-local/mdn-local/issues/372
       'https://developer.mozilla.org/sitemaps/en-us/sitemap.xml.gz',
     ]);
