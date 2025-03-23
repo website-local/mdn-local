@@ -24,6 +24,14 @@ export function defaultInitialUrl(locale: string): string[] {
     `https://developer.mozilla.org/sitemaps/${locale.toLowerCase()}/sitemap.xml.gz`,
     // https://github.com/website-local/mdn-local/issues/372
     `https://developer.mozilla.org/${locale}/search-index.json`,
+    // 20250323 fonts for new interactive examples
+    // https://github.com/website-local/mdn-local/issues/1142
+    'https://developer.mozilla.org/shared-assets/fonts/Inter.var.woff2',
+    'https://developer.mozilla.org/shared-assets/fonts/FiraSans-Regular.woff2',
+    'https://developer.mozilla.org/shared-assets/fonts/FiraSans-SemiBoldItalic.woff2',
+    'https://developer.mozilla.org/shared-assets/fonts/dancing-script/dancing-script-regular.woff2',
+    'https://developer.mozilla.org/shared-assets/fonts/molot.woff2',
+    'https://developer.mozilla.org/shared-assets/fonts/rapscall.woff2',
   ];
   if (locale !== 'en-US') {
     // 20230716 incorrect encoding without toLowerCase
