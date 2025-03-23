@@ -30,6 +30,11 @@ export const redirectDownloadLink = (res: Resource): Resource => {
       res.downloadLink = uri.search('').host('mdn.mozillademos.org').toString();
       return res;
     }
+    if (path.startsWith('/shared-assets/')) {
+      // 20250303 shared assets
+      res.downloadLink = uri.search('').host('mdnplay.dev').toString();
+      return res;
+    }
 
     for (const externalHost of externalHosts) {
       if (path.startsWith(externalHost.prefix)) {
