@@ -1,4 +1,4 @@
-/* eslint-disable no-useless-escape,no-prototype-builtins,@typescript-eslint/no-unused-expressions,@typescript-eslint/no-unused-vars */
+/* eslint-disable no-useless-escape,no-prototype-builtins,@typescript-eslint/no-unused-expressions,@typescript-eslint/no-unused-vars,no-case-declarations */
 // noinspection ES6ConvertVarToLetConst
 
 'use strict';
@@ -1021,15 +1021,6 @@ var Prism = (function (_self) {
   return _;
 
 }(window));
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = Prism;
-}
-
-// hack for components to work correctly in node.js
-if (typeof global !== 'undefined') {
-  global.Prism = Prism;
-}
 
 // some additional documentation/types
 
@@ -3777,4 +3768,287 @@ Prism.languages.py = Prism.languages.python;
   if (container) {
     container.classList.remove('hide');
   }
+}();
+
+// 20250323 interactive-example
+// https://github.com/website-local/mdn-local/issues/1142
+!function () {
+  const currSrc = document.currentScript.src;
+  const relativeRoot = new URL('../../', currSrc).toString();
+  const customElements = window.customElements;
+  const HTMLElement = window.HTMLElement;
+  // region play-console
+  // https://github.com/mdn/yari/commit/33de34d9df9f57f3afe9577403bcf6007507be63
+  // Copied from https://github.com/mdn/bob/blob/9da42cd641d7f2a9796bf3406e74cad411ce9438/editor/js/editor-libs/console-utils.ts
+  /**
+   * Formats arrays:
+   * - quotes around strings in arrays
+   * - square brackets around arrays
+   * - adds commas appropriately (with spacing)
+   * designed to be used recursively
+   * @param {any} input - The output to log.
+   * @returns Formatted output as a string.
+   */
+  function formatArray(input) {
+    let output = '';
+    for (let i = 0, l = input.length; i < l; i++) {
+      if (typeof input[i] === 'string') {
+        output += '"' + input[i] + '"';
+      } else if (Array.isArray(input[i])) {
+        output += 'Array [';
+        output += formatArray(input[i]);
+        output += ']';
+      } else {
+        output += formatOutput(input[i]);
+      }
+
+      if (i < input.length - 1) {
+        output += ', ';
+      }
+    }
+    return output;
+  }
+
+  /**
+   * Formats objects:
+   * ArrayBuffer, DataView, SharedArrayBuffer,
+   * Int8Array, Int16Array, Int32Array,
+   * Uint8Array, Uint16Array, Uint32Array,
+   * Uint8ClampedArray, Float32Array, Float64Array
+   * Symbol
+   * @param {any} input - The output to log.
+   * @returns Formatted output as a string.
+   */
+  function formatObject(input) {
+    const bufferDataViewRegExp = /^(ArrayBuffer|SharedArrayBuffer|DataView)$/;
+    const complexArrayRegExp =
+      /^(Int8Array|Int16Array|Int32Array|Uint8Array|Uint16Array|Uint32Array|Uint8ClampedArray|Float32Array|Float64Array|BigInt64Array|BigUint64Array)$/;
+
+    const objectName = input.constructor ? input.constructor.name : input;
+
+    if (objectName === 'String') {
+      // String object
+      return `String { "${input.valueOf()}" }`;
+    }
+
+    if (input === JSON) {
+      // console.log(JSON) is outputed as "JSON {}" in browser console
+      return 'JSON {}';
+    }
+
+    if (objectName.match && objectName.match(bufferDataViewRegExp)) {
+      return objectName + ' {}';
+    }
+
+    if (objectName.match && objectName.match(complexArrayRegExp)) {
+      const arrayLength = input.length;
+
+      if (arrayLength > 0) {
+        return objectName + ' [' + formatArray(input) + ']';
+      } else {
+        return objectName + ' []';
+      }
+    }
+
+    if (objectName === 'Symbol' && input !== undefined) {
+      return input.toString();
+    }
+
+    if (objectName === 'Object') {
+      if (input?._MDNPlaySerializedObject) {
+        return input._MDNPlaySerializedObject;
+      }
+      let formattedChild = '';
+      let start = true;
+      for (const key in input) {
+        if (Object.prototype.hasOwnProperty.call(input, key)) {
+          if (start) {
+            start = false;
+          } else {
+            formattedChild = formattedChild + ', ';
+          }
+          formattedChild = formattedChild + key + ': ' + formatOutput(input[key]);
+        }
+      }
+      return objectName + ' { ' + formattedChild + ' }';
+    }
+
+    // Special object created with `OrdinaryObjectCreate(null)` returned by, for
+    // example, named capture groups in https://mzl.la/2RERfQL
+    // @see https://github.com/mdn/bob/issues/574#issuecomment-858213621
+    if (!input.constructor && !input.prototype) {
+      let formattedChild = '';
+      let start = true;
+      for (const key in input) {
+        if (start) {
+          start = false;
+        } else {
+          formattedChild = formattedChild + ', ';
+        }
+        formattedChild = formattedChild + key + ': ' + formatOutput(input[key]);
+      }
+      return 'Object { ' + formattedChild + ' }';
+    }
+
+    return input;
+  }
+
+  /**
+   * Formats output to indicate its type:
+   * - quotes around strings
+   * - single quotes around strings containing double quotes
+   * - square brackets around arrays
+   * (also copes with arrays of arrays)
+   * does NOT detect Int32Array etc
+   * @param {any} input - The output to log.
+   * @returns Formatted output as a string.
+   */
+  function formatOutput(input) {
+    if (input === undefined || input === null || typeof input === 'boolean') {
+      return String(input);
+    } else if (typeof input === 'number') {
+      // Negative zero
+      if (Object.is(input, -0)) {
+        return '-0';
+      }
+      return String(input);
+    } else if (typeof input === 'bigint') {
+      return String(input) + 'n';
+    } else if (typeof input === 'string') {
+      // string literal
+      if (input.includes('"')) {
+        return '\'' + input + '\'';
+      } else {
+        return '"' + input + '"';
+      }
+    } else if (Array.isArray(input)) {
+      // check the contents of the array
+      return 'Array [' + formatArray(input) + ']';
+    } else {
+      return formatObject(input);
+    }
+  }
+
+  /** @implements {Partial<Console>} */
+  class VirtualConsole {
+
+    /** @param {PlayConsole} host  */
+    constructor(host) {
+      this.host = host;
+    }
+
+    clear() {
+      this.host._messages = [];
+      this.host.updated();
+    }
+
+    /** @param {...any} args */
+    debug(...args) {
+      return this.log(...args);
+    }
+
+    /** @param {...any} args */
+    error(...args) {
+      return this.log(...args);
+    }
+
+    /** @param {...any} args */
+    info(...args) {
+      return this.log(...args);
+    }
+
+    /** @param {...any} args */
+    log(...args) {
+      if (args.length > 1 && typeof args[0] === 'string') {
+        // https://developer.mozilla.org/en-US/docs/Web/API/console#using_string_substitutions
+        // TODO: add unit testing of this
+        args[0] = args[0].replace(
+          /%(?:\.([0-9]+))?(.)/g,
+          (match, formatArg, format) => {
+            switch (format) {
+            case 'o':
+            case 'O':
+              const O = args.splice(1, 1)[0];
+              return formatOutput(O);
+            case 'd':
+            case 'i':
+              const i = args.splice(1, 1)[0];
+              return Math.trunc(i).toFixed(0).padStart(formatArg, '0');
+            case 's':
+              const s = args.splice(1, 1)[0];
+              return s.toString();
+            case 'f':
+              const f = args.splice(1, 1)[0];
+              return (typeof f === 'number' ? f : parseFloat(f)).toFixed(
+                formatArg ?? 6
+              );
+            case 'c':
+              // TODO: Not implemented yet, so just remove the argument
+              args.splice(1, 1);
+              return '';
+            case '%':
+              return '%';
+            default:
+              return match;
+            }
+          }
+        );
+      }
+      this.host._messages = [
+        ...this.host._messages,
+        args.map((x) => formatOutput(x)).join(' '),
+      ];
+      this.host.updated();
+    }
+
+    /** @param {...any} args */
+    warn(...args) {
+      return this.log(...args);
+    }
+  }
+
+  class PlayConsole extends HTMLElement {
+
+    constructor() {
+      super();
+      this.vconsole = new VirtualConsole(this);
+      /** @type {string[]} */
+      this._messages = [];
+    }
+
+    /** @param {CustomEvent<VConsole>} e */
+    onConsole({ detail }) {
+      if (detail.prop in this.vconsole) {
+        const prop = /** @type keyof typeof this.vconsole */ (detail.prop);
+        detail.args ? this.vconsole[prop](...detail.args) : this.vconsole[prop]();
+      } else {
+        this.vconsole.warn(
+          '[Playground] Unsupported console message (see browser console)'
+        );
+      }
+    }
+
+    render() {
+      return this.innerHTML = `
+      <ul>
+        ${this._messages.map((message) => {
+    return `
+            <li>
+              <code>${message}</code>
+            </li>
+          `;
+  })}
+      </ul>
+    `;
+    }
+
+    updated() {
+      this.render();
+      this.scrollTo({ top: this.scrollHeight });
+    }
+  }
+
+  customElements.define('play-console', PlayConsole);
+  // endregion play-console
+
 }();
