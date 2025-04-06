@@ -4429,7 +4429,6 @@ Prism.languages.py = Prism.languages.python;
         this._resolveReady = () => resolve(true);
       });
       this.render();
-      this._updateSrc();
     }
 
     /** @param {MessageEvent} e  */
@@ -4535,7 +4534,7 @@ Prism.languages.py = Prism.languages.python;
     constructor() {
       super();
       // TODO: theme
-      // this.theme = new ThemeController(this);
+      this.theme = {};
       this.language = this.getAttribute('language');
       this.minimal = this.hasAttribute('minimal');
       this._value = '';
@@ -4661,6 +4660,18 @@ Prism.languages.py = Prism.languages.python;
       this.innerHTML = `<div
       class=${this.minimal ? 'editor minimal' : 'editor'}
     ></div>`;
+      if (!PlayEditor._ready) {
+        PlayEditor._ready = new Promise((resolve, reject) => {
+          var script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = relativeRoot + 'static/js/codemirror.js';
+          script.async = true;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.getElementsByTagName('head')[0].appendChild(script);
+        });
+      }
+      PlayEditor._ready.then(() => this.firstUpdated());
     }
 
     firstUpdated() {
@@ -4794,6 +4805,7 @@ Prism.languages.py = Prism.languages.python;
       if (runner) {
         runner.srcPrefix = this.srcPrefix;
         runner.code = this.code;
+        runner._updateSrc();
       }
     }
 
@@ -4812,6 +4824,7 @@ Prism.languages.py = Prism.languages.python;
         const runner = this.querySelector('play-runner');
         if (runner) {
           runner.code = undefined;
+          runner._updateSrc();
         }
       }
     }
@@ -5041,17 +5054,9 @@ Prism.languages.py = Prism.languages.python;
       this.shadowRoot.innerHTML = '';
       // Optionally include styles (imported externally or inline)
       // For demonstration, we insert a simple style tag.
-      const style = document.createElement('style');
-      style.textContent = `
-      /* Base styles for interactive example */
-      .template-console, .template-tabbed, .template-choices {
-        font-family: sans-serif;
-      }
-      header { display: flex; justify-content: space-between; align-items: center; }
-      .buttons button { margin-right: 5px; }
-      /* Add any additional styles you need here */
-    `;
-      this.shadowRoot.appendChild(style);
+      document.querySelectorAll('style, li[rel=stylesheet]').forEach(el => {
+        this.shadowRoot.appendChild(el.cloneNode(true));
+      })
 
       // Render based on the chosen template.
       let container = document.createElement('div');
@@ -5239,7 +5244,7 @@ Prism.languages.py = Prism.languages.python;
       // Update each play-editor in the choices.
       const editorNodes = Array.from(this.shadowRoot.querySelectorAll('play-editor'));
       editorNodes.forEach((editor, index) => {
-        editor.textContent = this._choices[index] || '';
+        editor.value = this._choices[index] || '';
       });
       // Mark unsupported if needed:
       this.__choiceUnsupported = this._choices.map((code) =>
