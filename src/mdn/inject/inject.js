@@ -4482,6 +4482,7 @@ Prism.languages.py = Prism.languages.python;
 
     render() {
       this.innerHTML = `
+      <style>iframe { border: medium; height: 100%; width: 100%; }</style>
       <iframe
         title="runner"
         sandbox="allow-scripts allow-same-origin allow-forms ${this.sandbox}"
@@ -5077,6 +5078,55 @@ Prism.languages.py = Prism.languages.python;
         container.innerHTML = this._renderTabs();
       }
       this.shadowRoot.appendChild(container);
+      let style = document.createElement('style');
+      style.textContent = `:host { --border: 1px solid var(--border-secondary); --tabbed-font-heading: 600 0.625rem/1.2 var(--font-heading); }
+header { align-items: center; border-bottom: var(--border); border-top-left-radius: var(--elem-radius); border-top-right-radius: var(--elem-radius); display: flex; grid-area: header; justify-content: space-between; padding: 0.5rem 1rem; }
+header h4 { font-size: 1rem; font-weight: normal; line-height: 1.1876; margin: 0px; }
+header #reset { background-color: rgba(0, 0, 0, 0); border: 0px; border-radius: var(--elem-radius); color: var(--text-primary); cursor: pointer; font: var(--tabbed-font-heading); height: 2rem; letter-spacing: 1.5px; margin: 0px; max-width: 100px; padding: 0.7em 0.9em; text-transform: uppercase; }
+header #reset:hover { background-color: var(--button-secondary-hover); }
+play-editor { grid-area: editor; height: 100%; overflow: auto; }
+.buttons { display: flex; flex-direction: column; gap: 0.5rem; grid-area: buttons; }
+.buttons button { --button-bg: var(--button-secondary-default); --button-bg-hover: var(--button-secondary-hover); --button-bg-active: var(--button-secondary-active); --button-border-color: var(--border-primary); --button-color: var(--text-secondary); --button-font: var(--type-emphasis-m); --button-padding: 0.43rem 1rem; --button-radius: var(--elem-radius, 0.25rem); background-color: var(--button-bg); border: 1px solid var(--button-border-color); border-radius: var(--button-radius); color: var(--button-color); display: inline-block; font: var(--button-font); letter-spacing: normal; padding: var(--button-padding); text-align: center; text-decoration: none; }
+.buttons button.external::after { display: none; }
+.buttons button:hover { --button-border-color: var(--button-bg-hover); --button-bg: var(--button-bg-hover); }
+.buttons button:active { --button-bg: var(--button-bg-active); }
+play-console { border: var(--border); border-radius: var(--elem-radius); grid-area: console; }
+ix-tab-wrapper { grid-area: tabs; }
+.template-console { align-content: start; display: grid; gap: 0.5rem; grid-template: "header header" max-content "editor editor" 1fr "buttons console" 8rem / max-content 1fr; height: 100%; }
+.template-console header { border: var(--border); }
+.template-console play-runner { display: none; }
+.template-console > play-editor, .template-console ix-tab-wrapper { border-right-width: ; border-right-style: ; border-right-color: ; border-bottom-width: ; border-bottom-style: ; border-bottom-color: ; border-left-width: ; border-left-style: ; border-left-color: ; border-image-outset: ; border-image-repeat: ; border-image-slice: ; border-image-source: ; border-image-width: ; border-bottom-left-radius: var(--elem-radius); border-bottom-right-radius: var(--elem-radius); border-top: 0px; grid-area: editor; margin-top: -0.5rem; }
+@media (max-width: 426px) {
+  .template-console { grid-template: "header" max-content "editor" 1fr "buttons" max-content "console" 8rem / 1fr; }
+  .template-console .buttons { flex-direction: row; justify-content: space-between; }
+}
+.template-tabbed { border: var(--border); border-radius: var(--elem-radius); display: grid; grid-template: "header header" max-content "tabs runner" 1fr / 6fr 4fr; height: 100%; overflow: hidden; }
+.template-tabbed .output-wrapper { border-left: var(--border); grid-area: runner; overflow: hidden; position: relative; }
+.template-tabbed .output-wrapper h4 { background-color: var(--background-secondary); border-bottom-left-radius: var(--elem-radius); color: var(--text-secondary); font: var(--tabbed-font-heading); margin: 0px; padding: 0.5rem 1.6rem; position: absolute; right: 0px; text-transform: uppercase; top: 0px; z-index: 2; }
+@media (max-width: 992px) {
+  .template-tabbed { grid-template: "header" max-content "tabs" 1fr "runner" 1fr / 1fr; }
+  .template-tabbed .output-wrapper { border-left: 0px; border-top: var(--border); }
+}
+.template-choices { border: var(--border); border-radius: var(--elem-radius); display: grid; grid-template: "header header" max-content "choice runner" 1fr / minmax(0px, 1fr) minmax(0px, 1fr); height: 100%; }
+@media (max-width: 992px) {
+  .template-choices { grid-template-areas: "header" "choice" "runner"; grid-template-columns: 1fr; }
+}
+.template-choices .choice-wrapper { border-right: var(--border); display: flex; flex-direction: column; grid-area: choice; overflow-y: auto; padding: 1rem 0px 1rem 1rem; row-gap: 0.4rem; }
+@media (max-width: 992px) {
+  .template-choices .choice-wrapper { border-bottom: var(--border); border-right: medium; padding-right: 1em; }
+}
+.template-choices .choice-wrapper .choice { --field-focus-border: #0085f2; --focus-01: 0 0 0 3px rgba(0, 144, 237, 0.4); align-items: center; display: flex; flex-grow: 1; }
+.template-choices .choice-wrapper .choice::after { color: var(--field-focus-border); content: "▶"; font-size: 0.5rem; opacity: 0; padding: 0px 1rem 0px 0.25rem; width: 1rem; }
+@media (max-width: 992px) {
+  .template-choices .choice-wrapper .choice::after { display: none; }
+}
+.template-choices .choice-wrapper .choice.selected play-editor { border-color: var(--field-focus-border); box-shadow: var(--focus-01); cursor: text; }
+.template-choices .choice-wrapper .choice.selected::after { opacity: 1; padding-left: 0.75rem; padding-right: 0.5rem; transition: 0.2s ease-out; }
+.template-choices .choice-wrapper .choice.unsupported play-editor { border-color: rgb(255, 184, 0); }
+.template-choices .choice-wrapper .choice.unsupported::after { background-image: url("https://developer.mozilla.org/static/media/warning.334964ef472eac4cfb78.svg"); background-position: center center; background-repeat: no-repeat; background-size: 1rem; content: ""; height: 1rem; opacity: 1; transition: none; width: 1rem; }
+.template-choices .choice-wrapper .choice play-editor { border: var(--border); border-radius: var(--elem-radius); cursor: pointer; width: 100%; }
+.template-choices .output-wrapper { height: 300px; overflow: hidden; }`;
+      this.shadowRoot.appendChild(style);
 
       // Find controller and runner elements if they exist.
       this._controllerEl = this.shadowRoot.querySelector('play-controller');
