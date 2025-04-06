@@ -325,12 +325,16 @@ export async function downloadAndRenderYariCompatibilityData(
     });
   }));
   const placeholders: Cheerio[] = [];
-  const elements = $('#content>.article>p,#content>.main-page-content>p');
+  const elements = $('#content>.article>p,' +
+    '#content>.main-page-content>p,' +
+    '#content>.main-page-content>lazy-compat-table');
   for (let i = 0; i < elements.length; i++) {
     const el = $(elements[i]);
     const text = el.text();
     if (text && (text.trim() === BCD_PLACE_HOLDER ||
       text.trim() === BCD_PLACE_HOLDER_2022)) {
+      placeholders.push(el);
+    } else if (el.is('lazy-compat-table')) {
       placeholders.push(el);
     }
   }
