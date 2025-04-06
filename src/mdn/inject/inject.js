@@ -4521,10 +4521,8 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
    * @returns {Promise<string>} a data-url with the compiled wasm, base64 encoded
    */
   async function compileAndEncodeWatToDataUrl(wat) {
-    // TODO: watify
-    throw new Error('TODO');
     // eslint-disable-next-line no-unreachable
-    const { default: init, watify } = {};
+    const { default: init, watify } = await import(relativeRoot + 'static/js/watify.js');
     await init();
     const binary = watify(wat);
     const b64 = `data:application/wasm;base64,${uInt8ArrayToBase64(binary)}`;
@@ -5093,11 +5091,11 @@ play-editor { grid-area: editor; height: 100%; overflow: auto; }
 .buttons button:hover { --button-border-color: var(--button-bg-hover); --button-bg: var(--button-bg-hover); }
 .buttons button:active { --button-bg: var(--button-bg-active); }
 play-console { border: var(--border); border-radius: var(--elem-radius); grid-area: console; }
-ix-tab-wrapper { grid-area: tabs; }
+.tabbed { grid-area: tabs; }
 .template-console { align-content: start; display: grid; gap: 0.5rem; grid-template: "header header" max-content "editor editor" 1fr "buttons console" 8rem / max-content 1fr; height: 100%; }
 .template-console header { border: var(--border); }
 .template-console play-runner { display: none; }
-.template-console > play-editor, .template-console ix-tab-wrapper { border-right-width: ; border-right-style: ; border-right-color: ; border-bottom-width: ; border-bottom-style: ; border-bottom-color: ; border-left-width: ; border-left-style: ; border-left-color: ; border-image-outset: ; border-image-repeat: ; border-image-slice: ; border-image-source: ; border-image-width: ; border-bottom-left-radius: var(--elem-radius); border-bottom-right-radius: var(--elem-radius); border-top: 0px; grid-area: editor; margin-top: -0.5rem; }
+.template-console > play-editor, .template-console .tabbed { border-bottom-left-radius: var(--elem-radius); border-bottom-right-radius: var(--elem-radius); border-top: 0px; grid-area: editor; margin-top: -0.5rem; }
 @media (max-width: 426px) {
   .template-console { grid-template: "header" max-content "editor" 1fr "buttons" max-content "console" 8rem / 1fr; }
   .template-console .buttons { flex-direction: row; justify-content: space-between; }
@@ -5128,6 +5126,7 @@ ix-tab-wrapper { grid-area: tabs; }
 .template-choices .choice-wrapper .choice.unsupported::after { background-image: url("https://developer.mozilla.org/static/media/warning.334964ef472eac4cfb78.svg"); background-position: center center; background-repeat: no-repeat; background-size: 1rem; content: ""; height: 1rem; opacity: 1; transition: none; width: 1rem; }
 .template-choices .choice-wrapper .choice play-editor { border: var(--border); border-radius: var(--elem-radius); cursor: pointer; width: 100%; }
 .template-choices .output-wrapper { height: 300px; overflow: hidden; }
+.template-console .tabbed { border-left: var(--border); border-right: var(--border); border-bottom: var(--border); }
 .tabbed { display: flex; flex-direction: column; overflow: hidden; }
 .panel-wrapper { flex: 1 1 0%; min-height: 0px; }
 .tab-panel { height: 100%; }
@@ -5166,16 +5165,41 @@ ix-tab-wrapper { grid-area: tabs; }
       if (this._languages.length === 1) {
         inner += `<play-editor id="editor" language="${this._languages[0]}"></play-editor>`;
       } else {
-        inner += '<div class="tab-wrapper">';
-        this._languages.forEach((lang) => {
+        inner += `<div class="tabbed"><div class="tab-wrapper">`;
+            // Create tabs and panels – note that activation will be handled later.
+        this._languages.forEach((lang, i) => {
           inner += `
-          <div class="tab" data-lang="${lang}">${this._langName(lang)}</div>
-          <div class="tab-panel" data-lang-panel="${lang}">
-            <play-editor language="${lang}"></play-editor>
-          </div>
-        `;
+        <div class="tab" data-lang="${lang}" data-index="${i}" role="tab">${this._langName(lang)}</div>
+      `;
+          });
+        inner += '</div><div class="panel-wrapper">';
+          this._languages.forEach((lang, i) => {
+            inner += `
+        <div class="tab-panel" data-lang-panel="${lang}" data-index="${i}" role="tabpanel">
+          <play-editor language="${lang}"></play-editor>
+        </div>
+      `;
+          });
+        inner += '</div></div>';
+
+        // Attach events after render.
+        setTimeout(() => {
+          const resetBtn = this.shadowRoot.getElementById('reset');
+          if (resetBtn) {
+            resetBtn.addEventListener('click', () => this._reset());
+          }
+          // Activate first tab and listen for clicks.
+          const tabs = this.shadowRoot.querySelectorAll('.tab');
+          if(tabs.length){
+            tabs.forEach(tab => {
+              tab.addEventListener('click', (ev) => {
+                this._setActiveTab(ev.currentTarget);
+              });
+            });
+            // Initialize first tab as active.
+            this._setActiveTab(tabs[0]);
+          }
         });
-        inner += '</div>';
       }
       inner += `
           <div class="buttons">
@@ -5409,205 +5433,6 @@ ix-tab-wrapper { grid-area: tabs; }
       });
     }
   }
-
-
-  /* ================================
-   Tab Wrapper, Tab and Tab Panel
-   ================================ */
-
-  /*
-Below is an example implementation of a tab wrapper and tab/panels using pure DOM.
-This code closely follows the Lit version in functionality.
-*/
-
-  class TabWrapper extends HTMLElement {
-    constructor() {
-      super();
-      this.attachShadow({ mode: 'open' });
-    }
-    connectedCallback() {
-      this.render();
-      // Activate first tab
-      const firstTab = this._getTab('first');
-      if (firstTab) firstTab.setActive();
-    }
-
-    _getTab(position) {
-      const tabs = Array.from(this.querySelectorAll('ix-tab'));
-      if (tabs.length === 0) return undefined;
-      if (position === 'first') return tabs[0];
-      if (position === 'last') return tabs[tabs.length - 1];
-      const activeIndex = tabs.findIndex((tab) => tab.isActive);
-      if (position === 'active') return tabs[activeIndex];
-      if (position === 'prev') return tabs[(activeIndex - 1 + tabs.length) % tabs.length];
-      if (position === 'next') return tabs[(activeIndex + 1) % tabs.length];
-      return undefined;
-    }
-
-    _setTabActive(tab, focus = false) {
-      if (!tab) return;
-      const active = this._getTab('active');
-      if (active) active.unsetActive();
-      tab.setActive();
-      if (focus) tab.focus();
-    }
-
-    _tablistClick(event) {
-      const tab = event.target.closest('ix-tab');
-      if (tab) {
-        this._setTabActive(tab);
-      }
-    }
-
-    _tablistKeyDown(event) {
-      let position;
-      switch (event.key) {
-      case 'ArrowRight':
-      case 'ArrowDown':
-        position = 'next';
-        break;
-      case 'ArrowLeft':
-      case 'ArrowUp':
-        position = 'prev';
-        break;
-      case 'Home':
-        position = 'first';
-        break;
-      case 'End':
-        position = 'last';
-        break;
-      default:
-        return;
-      }
-      event.preventDefault();
-      const targetTab = this._getTab(position);
-      this._setTabActive(targetTab, true);
-    }
-
-    render() {
-      // We assume that the tabs are passed as slotted content.
-      // Here we wrap the tablist and active panel slots and attach event listeners.
-      this.shadowRoot.innerHTML = `
-      <style>
-         /* write any wrapper styles here */
-      </style>
-      <div id="tablist" role="tablist">
-        <slot name="tablist"></slot>
-      </div>
-      <slot name="active-panel"></slot>
-    `;
-      const tablist = this.shadowRoot.getElementById('tablist');
-      tablist.addEventListener('click', (ev) => this._tablistClick(ev));
-      tablist.addEventListener('keydown', (ev) => this._tablistKeyDown(ev));
-    }
-  }
-
-  customElements.define('ix-tab-wrapper', TabWrapper);
-
-  class Tab extends HTMLElement {
-    constructor() {
-      super();
-      this.attachShadow({ mode: 'open' });
-    }
-    connectedCallback() {
-      // Set necessary ARIA roles/attributes
-      this.setAttribute('slot', 'tablist');
-      this.setAttribute('role', 'tab');
-      this.unsetActive();
-      // Find corresponding panel if it exists (expected to follow immediately).
-      const panel = this.nextElementSibling;
-      if (panel && panel.tagName.toLowerCase() === 'ix-tab-panel') {
-        this.panel = panel;
-        if (panel.id) {
-          this.setAttribute('aria-controls', panel.id);
-        }
-        if (this.id) {
-          panel.setAttribute('aria-labelledby', this.id);
-        }
-      }
-      this.render();
-    }
-
-    setActive() {
-      this.setAttribute('tabindex', '0');
-      this.setAttribute('aria-selected', 'true');
-      if (this.panel && typeof this.panel.setActive === 'function') {
-        this.panel.setActive();
-      }
-      this.classList.add('active');
-    }
-
-    unsetActive() {
-      this.setAttribute('tabindex', '-1');
-      this.setAttribute('aria-selected', 'false');
-      if (this.panel && typeof this.panel.unsetActive === 'function') {
-        this.panel.unsetActive();
-      }
-      this.classList.remove('active');
-    }
-
-    get isActive() {
-      return this.getAttribute('aria-selected') === 'true';
-    }
-
-    render() {
-      this.shadowRoot.innerHTML = `
-      <style>
-        /* tab styles */
-        :host {
-          display: inline-block;
-          padding: 0.5em 1em;
-          cursor: pointer;
-        }
-        :host(.active) {
-          font-weight: bold;
-          border-bottom: 2px solid black;
-        }
-      </style>
-      <slot></slot>
-    `;
-    }
-  }
-
-  customElements.define('ix-tab', Tab);
-
-  class TabPanel extends HTMLElement {
-    constructor() {
-      super();
-      this.attachShadow({ mode: 'open' });
-    }
-    connectedCallback() {
-      this.setAttribute('tabindex', '0');
-      this.setAttribute('role', 'tabpanel');
-      this.render();
-    }
-
-    setActive() {
-      this.setAttribute('slot', 'active-panel');
-      this.style.display = 'block';
-    }
-
-    unsetActive() {
-      this.removeAttribute('slot');
-      this.style.display = 'none';
-    }
-
-    render() {
-      this.shadowRoot.innerHTML = `
-      <style>
-         /* panel styles */
-         :host {
-           display: none;
-           padding: 1em;
-           border: 1px solid #ddd;
-         }
-      </style>
-      <slot></slot>
-    `;
-    }
-  }
-
-  customElements.define('ix-tab-panel', TabPanel);
 
   // Finally, register the element.
   customElements.define('interactive-example', InteractiveExampleBase);
