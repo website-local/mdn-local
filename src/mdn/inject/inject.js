@@ -5290,7 +5290,13 @@ ix-tab-wrapper { grid-area: tabs; }
         const choiceWrapper = this.shadowRoot.querySelector('.choice-wrapper');
         if(choiceWrapper){
           // Listen for focus or updates on editors.
-          choiceWrapper.addEventListener('click', (evt) => {
+          choiceWrapper.addEventListener('focus', (evt) => {
+            const target = evt.target.closest('play-editor');
+            if(target){
+              this._choiceSelect(target);
+            }
+          });
+          choiceWrapper.addEventListener('update', (evt) => {
             const target = evt.target.closest('play-editor');
             if(target){
               this._choiceSelect(target);
@@ -5328,21 +5334,36 @@ ix-tab-wrapper { grid-area: tabs; }
       }
     }
 
+    /** @param {PlayEditor} editor */
+    _getIndex(editor) {
+      return parseInt(editor.dataset.index ?? "-1", 10);
+    }
+
     async _selectChoice(editor) {
       const index = parseInt(editor.dataset.index || '-1', 10);
       // Simulate posting a message to play-runner using postMessage.
       if (this._runnerEl && typeof this._runnerEl.postMessage === 'function') {
         await this._runnerEl.postMessage({
           typ: 'choice',
-          code: editor.textContent,
+          code: editor.value,
         });
       }
       this.__choiceSelected = index;
       // Optionally update the UI to reflect selection.
       this._updateChoicesUI();
     }
+
+    /** @param {PlayEditor} editor */
+    _updateUnsupported(editor) {
+      const index = this._getIndex(editor);
+      this.__choiceUnsupported = this.__choiceUnsupported.map((value, i) =>
+        index === i ? !isCSSSupported(editor.value) : value
+      );
+    }
+
     _choiceSelect(editor) {
       // Called when an editor is selected.
+      this._updateUnsupported(editor);
       this._selectChoice(editor);
     }
 
