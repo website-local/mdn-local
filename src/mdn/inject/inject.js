@@ -4429,6 +4429,7 @@ Prism.languages.py = Prism.languages.python;
         this._resolveReady = () => resolve(true);
       });
       this.render();
+      this._updateSrc();
     }
 
     /** @param {MessageEvent} e  */
@@ -4463,7 +4464,6 @@ Prism.languages.py = Prism.languages.python;
     }
 
     connectedCallback() {
-      super.connectedCallback();
       this._onMessage = this._onMessage.bind(this);
       window.addEventListener('message', this._onMessage);
     }
@@ -4485,7 +4485,6 @@ Prism.languages.py = Prism.languages.python;
     }
 
     disconnectedCallback() {
-      super.disconnectedCallback();
       window.removeEventListener('message', this._onMessage);
     }
   }
@@ -4525,7 +4524,7 @@ Prism.languages.py = Prism.languages.python;
 
   /// region play-editor
 
-  export class PlayEditor extends HTMLElement {
+  class PlayEditor extends HTMLElement {
 
     /** @type {EditorView | undefined} */
     _editor;
@@ -4681,4 +4680,840 @@ Prism.languages.py = Prism.languages.python;
   customElements.define('play-editor', PlayEditor);
 
   /// endregion play-editor
+  class PlayController extends HTMLElement {
+    constructor() {
+      super();
+      // Create shadow root and render initial content.
+      this.attachShadow({ mode: 'open' });
+      this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: contents;
+        }
+      </style>
+      <slot></slot>
+    `;
+
+      // Default property values.
+      this.runOnStart = false;
+      this.runOnChange = false;
+      this.srcPrefix = '';
+      /** @type {Record<string, string>} */
+      this._code = {};
+      /** @type {Record<string, string>} */
+      this._hiddenCode = {};
+      this.initialCode = undefined;
+    }
+
+    // List of attributes we want to observe and reflect to properties.
+    static get observedAttributes() {
+      return ['run-on-start', 'run-on-change'];
+    }
+
+    // When attributes are changed, update properties.
+    attributeChangedCallback(name, oldValue, newValue) {
+      const isTruthy = newValue !== null && newValue !== 'false';
+      if (name === 'run-on-start') {
+        this.runOnStart = isTruthy;
+      } else if (name === 'run-on-change') {
+        this.runOnChange = isTruthy;
+      }
+    }
+
+    // Setter for code property.
+    /**
+     * @param {Record<string, string>} code
+     */
+    set code(code) {
+      // Filter out code for non-hidden editors.
+      this._code = Object.fromEntries(
+        Object.entries(code).filter(([language]) => !language.endsWith('-hidden'))
+      );
+      // Filter out and modify hidden-code.
+      this._hiddenCode = Object.fromEntries(
+        Object.entries(code)
+          .filter(([language]) => language.endsWith('-hidden'))
+          .map(([language, value]) => [language.replace(/-hidden$/, ''), value])
+      );
+      if (!this.initialCode) {
+        this.initialCode = code;
+      }
+
+      // Update <play-editor> elements inside the light DOM.
+      this.querySelectorAll('play-editor').forEach((editor) => {
+        const language = editor.language;
+        if (language) {
+          const value = code[language];
+          if (value !== undefined) {
+            editor.value = value;
+          }
+        }
+      });
+
+      if (this.runOnStart) {
+        this.run();
+      }
+    }
+
+    // Getter for code property.
+    get code() {
+      // Get current code from editors.
+      const code = { ...this._code };
+      this.querySelectorAll('play-editor').forEach((editor) => {
+        const language = editor.language;
+        if (language) {
+          code[language] = editor.value;
+        }
+      });
+      // Prepend hidden code if available.
+      Object.entries(this._hiddenCode).forEach(([language, value]) => {
+        code[language] = code[language] ? `${value}\n${code[language]}` : value;
+      });
+      return code;
+    }
+
+    // Format each play-editor by calling its format method.
+    async format() {
+      try {
+        const editors = Array.from(this.querySelectorAll('play-editor'));
+        await Promise.all(editors.map(e => e.format()));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Run the code by sending it to the runner.
+    run() {
+      // Clear the console first.
+      const playConsole = this.querySelector('play-console');
+      if (playConsole && playConsole.vconsole) {
+        playConsole.vconsole.clear();
+      }
+      // Find the runner element and send code to it.
+      const runner = this.querySelector('play-runner');
+      if (runner) {
+        runner.srcPrefix = this.srcPrefix;
+        runner.code = this.code;
+      }
+    }
+
+    // Reset the code to its initial state.
+    reset() {
+      if (this.initialCode) {
+        this.code = this.initialCode;
+      }
+      if (this.runOnStart) {
+        this.run();
+      } else {
+        const playConsole = this.querySelector('play-console');
+        if (playConsole && playConsole.vconsole) {
+          playConsole.vconsole.clear();
+        }
+        const runner = this.querySelector('play-runner');
+        if (runner) {
+          runner.code = undefined;
+        }
+      }
+    }
+
+    // Handler for editor updates.
+    _onEditorUpdate() {
+      if (this.runOnChange) {
+        this.run();
+      }
+    }
+
+    // Handler for console events from slotted nodes.
+    /** @param {CustomEvent} ev */
+    _onConsole(ev) {
+      const playConsole = this.querySelector('play-console');
+      if (playConsole && typeof playConsole.onConsole === 'function') {
+        playConsole.onConsole(ev);
+      }
+    }
+
+    connectedCallback() {
+      // Listen for events bubbled from light DOM children.
+      this.addEventListener('update', this._onEditorUpdate);
+      this.addEventListener('console', this._onConsole);
+    }
+
+    disconnectedCallback() {
+      // Clean up event listeners.
+      this.removeEventListener('update', this._onEditorUpdate);
+      this.removeEventListener('console', this._onConsole);
+    }
+  }
+
+  customElements.define('play-controller', PlayController);
+
+
+  // A helper decode function; replace with your actual decoding logic if needed.
+  function decode(str) {
+    try {
+      var elem = document.createElement('div');
+      elem.innerHTML = str;
+      return elem.innerText;
+    } catch (e) {
+      return str;
+    }
+  }
+
+  /**
+   * Checks if the CSS code is supported by the current browser.
+   *
+   * @param {string} code
+   */
+  function isCSSSupported(code) {
+    // http://regexr.com/3fvik
+    const cssCommentsMatch = /(\/\*)[\s\S]+(\*\/)/g;
+    const element = document.createElement('div');
+
+    // strip out any CSS comments before applying the code
+    code = code.replace(cssCommentsMatch, '');
+
+    const vendorPrefixMatch = /^-(?:webkit|moz|ms|o)-/;
+    const style = element.style;
+    // Expecting declarations to be separated by ";"
+    // Declarations with just white space are ignored
+    const declarationsArray = code
+      .split(';')
+      .map((d) => d.trim())
+      .filter((d) => d.length > 0);
+
+    /**
+     * @param {string} declaration
+     * @returns {boolean} - true if declaration starts with -webkit-, -moz-, -ms- or -o-
+     */
+    function hasVendorPrefix(declaration) {
+      return vendorPrefixMatch.test(declaration);
+    }
+
+    /**
+     * Looks for property name by cutting off optional vendor prefix at the beginning
+     * and then cutting off rest of the declaration, starting from any whitespace or ":" in property name.
+     * @param {string} declaration - single css declaration, with not white space at the beginning
+     * @returns {string} - property name without vendor prefix.
+     */
+    function getPropertyNameNoPrefix(declaration) {
+      const prefixMatch = vendorPrefixMatch.exec(declaration);
+      const prefix = prefixMatch === null ? '' : prefixMatch[0];
+      const declarationNoPrefix =
+        prefix === null ? declaration : declaration.slice(prefix.length);
+      // Expecting property name to be over, when any whitespace or ":" is found
+      const propertyNameSeparator = /[\s:]/;
+      return declarationNoPrefix.split(propertyNameSeparator)[0] ?? '';
+    }
+
+    // Clearing previous state
+    style.cssText = '';
+
+    // List of found and applied properties with vendor prefix
+    const appliedPropertiesWithPrefix = new Set();
+    // List of not applied properties - because of lack of support for its name or value
+    const notAppliedProperties = new Set();
+
+    for (const declaration of declarationsArray) {
+      const previousCSSText = style.cssText;
+      // Declarations are added one by one, because browsers sometimes combine multiple declarations into one
+      // For example Chrome changes "column-count: auto;column-width: 8rem;" into "columns: 8rem auto;"
+      style.cssText += declaration + ';'; // ";" was previous removed while using split method
+      // In case property name or value is not supported, browsers skip single declaration, while leaving rest of them intact
+      const correctlyApplied = style.cssText !== previousCSSText;
+
+      const vendorPrefixFound = hasVendorPrefix(declaration);
+      const propertyName = getPropertyNameNoPrefix(declaration);
+
+      if (correctlyApplied && vendorPrefixFound) {
+        // We are saving applied properties with prefix, so equivalent property with no prefix doesn't need to be supported
+        appliedPropertiesWithPrefix.add(propertyName);
+      } else if (!correctlyApplied && !vendorPrefixFound) {
+        notAppliedProperties.add(propertyName);
+      }
+    }
+
+    if (notAppliedProperties.size !== 0) {
+      // If property with vendor prefix is supported, we can ignore the fact that browser doesn't support property with no prefix
+      for (const substitute of appliedPropertiesWithPrefix) {
+        notAppliedProperties.delete(substitute);
+      }
+      // If any other declaration is not supported, whole block should be marked as invalid
+      if (notAppliedProperties.size !== 0) return false;
+    }
+    return true;
+  }
+
+
+  /* ================================
+   Interactive Example Component
+   ================================ */
+
+  class InteractiveExampleBase extends HTMLElement {
+    constructor() {
+      super();
+      // Attach shadow DOM if desired.
+      this.attachShadow({ mode: 'open' });
+      this.name = this.getAttribute('name') || '';
+      this._languages = []; // e.g. ["html", "js", "css", "wat"]
+      this._code = {};      // language keyed code
+      this._choices = [];   // for choices
+      this._template = '';  // "choices", "console", or "tabbed"
+
+      // References to child elements
+      this._controllerEl = null;
+      this._runnerEl = null;
+    }
+
+    connectedCallback() {
+      // Render the base template once connected.
+      this._code = this._initialCode();
+      this._template = this._determineTemplate();
+      this.render();
+    }
+
+    _initialCode() {
+      // Look upward for a section that contains code examples.
+      // This is a simplified version of the Lit code.
+      const section = this.closest('section');
+      const code = {};
+      if (section) {
+        const exampleNodes = section.querySelectorAll(
+          '.code-example pre.interactive-example'
+        );
+        exampleNodes.forEach((pre) => {
+          const language = Array.from(pre.classList).find((cls) =>
+            ['html', 'js', 'css', 'wat'].includes(cls)
+          );
+          if (language && pre.textContent) {
+            if (code[language]) {
+              code[language] += '\n' + pre.textContent;
+            } else {
+              code[language] = pre.textContent;
+            }
+          }
+        });
+        const choiceNodes = section.querySelectorAll(
+          '.code-example pre.interactive-example-choice'
+        );
+        this._choices = Array.from(choiceNodes).map(
+          (pre) => pre.textContent.trim()
+        );
+      }
+      this._languages = Object.keys(code);
+      return code;
+    }
+
+    _determineTemplate() {
+      if (this._choices.length) {
+        return 'choices';
+      }
+      if (
+        (this._languages.length === 1 && this._languages[0] === 'js') ||
+        (this._languages.includes('js') && this._languages.includes('wat'))
+      ) {
+        return 'console';
+      }
+      return 'tabbed';
+    }
+
+    _langName(lang) {
+      if (lang === 'js') {
+        return 'JavaScript';
+      }
+      return lang.toUpperCase();
+    }
+
+    // Methods to update/run/reset code
+    _run() {
+      // In your implementation, you might call a method on a controller.
+      if (this._controllerEl && typeof this._controllerEl.run === 'function') {
+        this._controllerEl.run();
+      }
+    }
+    _reset() {
+      if (this._controllerEl && typeof this._controllerEl.reset === 'function') {
+        this._controllerEl.reset();
+      }
+    }
+
+    render() {
+      // Clear shadow DOM content.
+      this.shadowRoot.innerHTML = '';
+      // Optionally include styles (imported externally or inline)
+      // For demonstration, we insert a simple style tag.
+      const style = document.createElement('style');
+      style.textContent = `
+      /* Base styles for interactive example */
+      .template-console, .template-tabbed, .template-choices {
+        font-family: sans-serif;
+      }
+      header { display: flex; justify-content: space-between; align-items: center; }
+      .buttons button { margin-right: 5px; }
+      /* Add any additional styles you need here */
+    `;
+      this.shadowRoot.appendChild(style);
+
+      // Render based on the chosen template.
+      let container = document.createElement('div');
+      if (this._template === 'choices') {
+        container.innerHTML = this._renderChoices();
+      } else if (this._template === 'console') {
+        container.innerHTML = this._renderConsole();
+      } else if (this._template === 'tabbed') {
+        container.innerHTML = this._renderTabs();
+      }
+      this.shadowRoot.appendChild(container);
+
+      // Find controller and runner elements if they exist.
+      this._controllerEl = this.shadowRoot.querySelector('play-controller');
+      this._runnerEl = this.shadowRoot.querySelector('play-runner');
+
+      // In a real app, you might pass the code to the controller.
+      if (this._controllerEl && this._code) {
+        // Suppose your play-controller has a 'code' property.
+        this._controllerEl.code = this._code;
+      }
+    } // end render
+
+    /* ================
+     Template Renderers
+     ================ */
+
+    _renderConsole() {
+      // Render a header, an editor (or tabbed editor if _languages>1),
+      // Run and Reset buttons, and output console.
+      let inner = `
+      <play-controller>
+        <div class="template-console">
+          <header>
+            <h4>${decode(this.name)}</h4>
+          </header>
+    `;
+      if (this._languages.length === 1) {
+        inner += `<play-editor id="editor" language="${this._languages[0]}"></play-editor>`;
+      } else {
+        inner += '<div class="tab-wrapper">';
+        this._languages.forEach((lang) => {
+          inner += `
+          <div class="tab" data-lang="${lang}">${this._langName(lang)}</div>
+          <div class="tab-panel" data-lang-panel="${lang}">
+            <play-editor language="${lang}"></play-editor>
+          </div>
+        `;
+        });
+        inner += '</div>';
+      }
+      inner += `
+          <div class="buttons">
+            <button id="execute">Run</button>
+            <button id="reset">Reset</button>
+          </div>
+          <play-console id="console"></play-console>
+          <play-runner defaults="${this._languages.includes('wat') ? 'ix-wat' : ''}"></play-runner>
+        </div>
+      </play-controller>
+    `;
+      // Attach button events after rendering.
+      setTimeout(() => {
+        const runBtn = this.shadowRoot.getElementById('execute');
+        if (runBtn) {
+          runBtn.addEventListener('click', () => this._run());
+        }
+        const resetBtn = this.shadowRoot.getElementById('reset');
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => this._reset());
+        }
+      });
+      return inner;
+    }
+
+    _renderTabs() {
+      let inner = `
+      <play-controller>
+        <div class="template-tabbed">
+          <header>
+            <h4>${decode(this.name)}</h4>
+            <button id="reset">Reset</button>
+          </header>
+          <div class="tab-wrapper">
+    `;
+      // Create tabs and panels – note that activation will be handled later.
+      this._languages.forEach((lang, i) => {
+        inner += `
+        <div class="tab" data-lang="${lang}" data-index="${i}" role="tab">${this._langName(lang)}</div>
+      `;
+      });
+      inner += '</div><div class="panel-wrapper">';
+      this._languages.forEach((lang, i) => {
+        inner += `
+        <div class="tab-panel" data-lang-panel="${lang}" data-index="${i}" role="tabpanel">
+          <play-editor language="${lang}"></play-editor>
+        </div>
+      `;
+      });
+      inner += `
+          </div>
+          <div class="output-wrapper">
+            <h4>Output</h4>
+            <play-runner sandbox="allow-top-navigation-by-user-activation" defaults="ix-tabbed"></play-runner>
+          </div>
+        </div>
+      </play-controller>
+    `;
+      // Attach events after render.
+      setTimeout(() => {
+        const resetBtn = this.shadowRoot.getElementById('reset');
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => this._reset());
+        }
+        // Activate first tab and listen for clicks.
+        const tabs = this.shadowRoot.querySelectorAll('.tab');
+        if(tabs.length){
+          tabs.forEach(tab => {
+            tab.addEventListener('click', (ev) => {
+              this._setActiveTab(ev.currentTarget);
+            });
+          });
+          // Initialize first tab as active.
+          this._setActiveTab(tabs[0]);
+        }
+      });
+      return inner;
+    }
+
+    _renderChoices() {
+      // Render template for choices. We assume choices are simple text which appears in
+      // a play-editor of language "css". (Your implementation may vary.)
+      let inner = `
+      <div class="template-choices">
+        <header>
+          <h4>${decode(this.name)}</h4>
+          <button id="reset">Reset</button>
+        </header>
+        <div class="choice-wrapper">
+    `;
+      this._choices.forEach((code, index) => {
+        inner += `
+          <div class="choice" data-index="${index}">
+            <play-editor data-index="${index}" language="css" minimal="true" delay="100">${code.trim()}</play-editor>
+          </div>
+      `;
+      });
+      inner += `
+        </div>
+        <div class="output-wrapper">
+          <play-controller run-on-start>
+            <play-runner defaults="ix-choice"></play-runner>
+          </play-controller>
+        </div>
+      </div>
+    `;
+      // Bind events to choices.
+      setTimeout(() => {
+        const choiceWrapper = this.shadowRoot.querySelector('.choice-wrapper');
+        if(choiceWrapper){
+          // Listen for focus or updates on editors.
+          choiceWrapper.addEventListener('click', (evt) => {
+            const target = evt.target.closest('play-editor');
+            if(target){
+              this._choiceSelect(target);
+            }
+          });
+        }
+        const resetBtn = this.shadowRoot.getElementById('reset');
+        if(resetBtn){
+          resetBtn.addEventListener('click', () => this._resetChoices());
+        }
+        // Initialize choices.
+        this._resetChoices();
+      });
+      return inner;
+    }
+
+    /* ======================
+     Choices-specific Code
+     ====================== */
+    _resetChoices() {
+      // Reset the selected choice and update editors with original code.
+      this.__choiceSelected = -1;
+      // Update each play-editor in the choices.
+      const editorNodes = Array.from(this.shadowRoot.querySelectorAll('play-editor'));
+      editorNodes.forEach((editor, index) => {
+        editor.textContent = this._choices[index] || '';
+      });
+      // Mark unsupported if needed:
+      this.__choiceUnsupported = this._choices.map((code) =>
+        !isCSSSupported(code)
+      );
+      // Select first editor by default.
+      if (editorNodes.length) {
+        this._selectChoice(editorNodes[0]);
+      }
+    }
+
+    async _selectChoice(editor) {
+      const index = parseInt(editor.dataset.index || '-1', 10);
+      // Simulate posting a message to play-runner using postMessage.
+      if (this._runnerEl && typeof this._runnerEl.postMessage === 'function') {
+        await this._runnerEl.postMessage({
+          typ: 'choice',
+          code: editor.textContent,
+        });
+      }
+      this.__choiceSelected = index;
+      // Optionally update the UI to reflect selection.
+      this._updateChoicesUI();
+    }
+    _choiceSelect(editor) {
+      // Called when an editor is selected.
+      this._selectChoice(editor);
+    }
+
+    _updateChoicesUI() {
+      const choiceElements = this.shadowRoot.querySelectorAll('.choice');
+      choiceElements.forEach((el) => {
+        const index = parseInt(el.dataset.index, 10);
+        if (index === this.__choiceSelected) {
+          el.classList.add('selected');
+        } else {
+          el.classList.remove('selected');
+        }
+        // Mark unsupported if applicable.
+        if (this.__choiceUnsupported && this.__choiceUnsupported[index]) {
+          el.classList.add('unsupported');
+        } else {
+          el.classList.remove('unsupported');
+        }
+      });
+    }
+
+    /* ======================
+     Simple Tab Handling
+     ====================== */
+    _setActiveTab(clickedTab) {
+      // Remove active state from all tabs, add to clicked one.
+      const tabs = this.shadowRoot.querySelectorAll('.tab');
+      const panels = this.shadowRoot.querySelectorAll('.tab-panel');
+      tabs.forEach((tab) => {
+        tab.classList.remove('active');
+        tab.setAttribute('tabindex', '-1');
+        // Optionally update aria-selected etc.
+      });
+      clickedTab.classList.add('active');
+      clickedTab.setAttribute('tabindex', '0');
+
+      // Activate corresponding panel.
+      const index = clickedTab.dataset.index;
+      panels.forEach((panel) => {
+        if (panel.dataset.index === index) {
+          panel.style.display = '';
+        } else {
+          panel.style.display = 'none';
+        }
+      });
+    }
+  }
+
+  // Finally, register the element.
+  customElements.define('interactive-example', InteractiveExampleBase);
+
+
+  /* ================================
+   Tab Wrapper, Tab and Tab Panel
+   ================================ */
+
+  /*
+Below is an example implementation of a tab wrapper and tab/panels using pure DOM.
+This code closely follows the Lit version in functionality.
+*/
+
+  class TabWrapper extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+    }
+    connectedCallback() {
+      this.render();
+      // Activate first tab
+      const firstTab = this._getTab('first');
+      if (firstTab) firstTab.setActive();
+    }
+
+    _getTab(position) {
+      const tabs = Array.from(this.querySelectorAll('ix-tab'));
+      if (tabs.length === 0) return undefined;
+      if (position === 'first') return tabs[0];
+      if (position === 'last') return tabs[tabs.length - 1];
+      const activeIndex = tabs.findIndex((tab) => tab.isActive);
+      if (position === 'active') return tabs[activeIndex];
+      if (position === 'prev') return tabs[(activeIndex - 1 + tabs.length) % tabs.length];
+      if (position === 'next') return tabs[(activeIndex + 1) % tabs.length];
+      return undefined;
+    }
+
+    _setTabActive(tab, focus = false) {
+      if (!tab) return;
+      const active = this._getTab('active');
+      if (active) active.unsetActive();
+      tab.setActive();
+      if (focus) tab.focus();
+    }
+
+    _tablistClick(event) {
+      const tab = event.target.closest('ix-tab');
+      if (tab) {
+        this._setTabActive(tab);
+      }
+    }
+
+    _tablistKeyDown(event) {
+      let position;
+      switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        position = 'next';
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        position = 'prev';
+        break;
+      case 'Home':
+        position = 'first';
+        break;
+      case 'End':
+        position = 'last';
+        break;
+      default:
+        return;
+      }
+      event.preventDefault();
+      const targetTab = this._getTab(position);
+      this._setTabActive(targetTab, true);
+    }
+
+    render() {
+      // We assume that the tabs are passed as slotted content.
+      // Here we wrap the tablist and active panel slots and attach event listeners.
+      this.shadowRoot.innerHTML = `
+      <style>
+         /* write any wrapper styles here */
+      </style>
+      <div id="tablist" role="tablist">
+        <slot name="tablist"></slot>
+      </div>
+      <slot name="active-panel"></slot>
+    `;
+      const tablist = this.shadowRoot.getElementById('tablist');
+      tablist.addEventListener('click', (ev) => this._tablistClick(ev));
+      tablist.addEventListener('keydown', (ev) => this._tablistKeyDown(ev));
+    }
+  }
+
+  customElements.define('ix-tab-wrapper', TabWrapper);
+
+  class Tab extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+    }
+    connectedCallback() {
+      // Set necessary ARIA roles/attributes
+      this.setAttribute('slot', 'tablist');
+      this.setAttribute('role', 'tab');
+      this.unsetActive();
+      // Find corresponding panel if it exists (expected to follow immediately).
+      const panel = this.nextElementSibling;
+      if (panel && panel.tagName.toLowerCase() === 'ix-tab-panel') {
+        this.panel = panel;
+        if (panel.id) {
+          this.setAttribute('aria-controls', panel.id);
+        }
+        if (this.id) {
+          panel.setAttribute('aria-labelledby', this.id);
+        }
+      }
+      this.render();
+    }
+
+    setActive() {
+      this.setAttribute('tabindex', '0');
+      this.setAttribute('aria-selected', 'true');
+      if (this.panel && typeof this.panel.setActive === 'function') {
+        this.panel.setActive();
+      }
+      this.classList.add('active');
+    }
+
+    unsetActive() {
+      this.setAttribute('tabindex', '-1');
+      this.setAttribute('aria-selected', 'false');
+      if (this.panel && typeof this.panel.unsetActive === 'function') {
+        this.panel.unsetActive();
+      }
+      this.classList.remove('active');
+    }
+
+    get isActive() {
+      return this.getAttribute('aria-selected') === 'true';
+    }
+
+    render() {
+      this.shadowRoot.innerHTML = `
+      <style>
+        /* tab styles */
+        :host {
+          display: inline-block;
+          padding: 0.5em 1em;
+          cursor: pointer;
+        }
+        :host(.active) {
+          font-weight: bold;
+          border-bottom: 2px solid black;
+        }
+      </style>
+      <slot></slot>
+    `;
+    }
+  }
+
+  customElements.define('ix-tab', Tab);
+
+  class TabPanel extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+    }
+    connectedCallback() {
+      this.setAttribute('tabindex', '0');
+      this.setAttribute('role', 'tabpanel');
+      this.render();
+    }
+
+    setActive() {
+      this.setAttribute('slot', 'active-panel');
+      this.style.display = 'block';
+    }
+
+    unsetActive() {
+      this.removeAttribute('slot');
+      this.style.display = 'none';
+    }
+
+    render() {
+      this.shadowRoot.innerHTML = `
+      <style>
+         /* panel styles */
+         :host {
+           display: none;
+           padding: 1em;
+           border: 1px solid #ddd;
+         }
+      </style>
+      <slot></slot>
+    `;
+    }
+  }
+
+  customElements.define('ix-tab-panel', TabPanel);
+
 }();
