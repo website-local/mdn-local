@@ -4030,7 +4030,13 @@ Prism.languages.py = Prism.languages.python;
     }
 
     render() {
-      return this.innerHTML = `
+      if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
+      this.shadowRoot.innerHTML = `
+<style>:host { background-color: var(--code-background-inline); box-sizing: border-box; display: flex; flex-direction: column; font-size: 0.875rem; margin: 0px; overflow: auto; width: 100%; }
+ul { list-style: none; margin: 0px; padding: 0px; }
+li { padding: 0px 0.5em; }
+li::before { content: ">"; }
+code { font-family: var(--font-code); tab-size: 4; }</style>
       <ul>
         ${this._messages.map((message) => {
     return `
@@ -4038,7 +4044,7 @@ Prism.languages.py = Prism.languages.python;
               <code>${message}</code>
             </li>
           `;
-  })}
+  }).join('')}
       </ul>
     `;
     }
