@@ -4420,7 +4420,7 @@ Prism.languages.py = Prism.languages.python;
     constructor() {
       super();
       /** @type {Record<string, string> | undefined} */
-      this.code = undefined;
+      this._code = undefined;
       /** @type {RunnerDefaults | undefined} */
       this.defaults = this.getAttribute('defaults');
       this.sandbox = this.getAttribute('sandbox');
@@ -4442,6 +4442,13 @@ Prism.languages.py = Prism.languages.python;
       } else if (typ === 'ready') {
         this._resolveReady();
       }
+    }
+    get code() {
+      return this._code;
+    }
+    set code(v) {
+      this._code = v;
+      this._updateSrc();
     }
 
     async _updateSrc() {
@@ -4481,6 +4488,7 @@ Prism.languages.py = Prism.languages.python;
       ></iframe>
     `;
       this._iframe = this.querySelector('iframe');
+      this._updateSrc();
     }
 
     disconnectedCallback() {
@@ -4805,7 +4813,7 @@ Prism.languages.py = Prism.languages.python;
       if (runner) {
         runner.srcPrefix = this.srcPrefix;
         runner.code = this.code;
-        runner._updateSrc();
+        // runner._updateSrc();
       }
     }
 
@@ -4824,7 +4832,7 @@ Prism.languages.py = Prism.languages.python;
         const runner = this.querySelector('play-runner');
         if (runner) {
           runner.code = undefined;
-          runner._updateSrc();
+          // runner._updateSrc();
         }
       }
     }
@@ -5134,7 +5142,7 @@ Prism.languages.py = Prism.languages.python;
 
     _renderTabs() {
       let inner = `
-      <play-controller>
+      <play-controller run-on-start run-on-change>
         <div class="template-tabbed">
           <header>
             <h4>${decode(this.name)}</h4>
@@ -5318,9 +5326,6 @@ Prism.languages.py = Prism.languages.python;
       });
     }
   }
-
-  // Finally, register the element.
-  customElements.define('interactive-example', InteractiveExampleBase);
 
 
   /* ================================
@@ -5520,5 +5525,8 @@ This code closely follows the Lit version in functionality.
   }
 
   customElements.define('ix-tab-panel', TabPanel);
+
+  // Finally, register the element.
+  customElements.define('interactive-example', InteractiveExampleBase);
 
 }();
