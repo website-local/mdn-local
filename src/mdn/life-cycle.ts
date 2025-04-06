@@ -22,8 +22,12 @@ import {downloadAndFallback} from './download-and-fallback.js';
 import {processSearchJson} from './process-search-json.js';
 import {CustomDnsLookup} from './custom-dns-lookup.js';
 import {processYariMainCss} from './process-html/process-yari-main-css.js';
+import {
+  interactiveExampleDeps
+} from './process-url/interactive-example-deps.js';
 
 const lifeCycle = defaultLifeCycle();
+lifeCycle.init.push(interactiveExampleDeps);
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);
 lifeCycle.detectResourceType.push(detectLinkType);
 lifeCycle.processBeforeDownload.push(redirectDownloadLink, dropResource);
