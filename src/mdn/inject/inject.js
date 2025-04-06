@@ -4665,7 +4665,8 @@ Prism.languages.py = Prism.languages.python;
     }
 
     render() {
-      this.innerHTML = `<div
+      this.attachShadow({ mode: 'open' });
+      this.shadowRoot.innerHTML = `<div
       class=${this.minimal ? 'editor minimal' : 'editor'}
     ></div>`;
       if (!PlayEditor._ready) {
@@ -4691,7 +4692,7 @@ Prism.languages.py = Prism.languages.python;
       });
       this._editor = new EditorView({
         state: startState,
-        parent: this.querySelector('div') || undefined,
+        parent: this.shadowRoot.querySelector('div') || undefined,
       });
     }
   }
@@ -5064,7 +5065,7 @@ Prism.languages.py = Prism.languages.python;
       // For demonstration, we insert a simple style tag.
       document.querySelectorAll('style, li[rel=stylesheet]').forEach(el => {
         this.shadowRoot.appendChild(el.cloneNode(true));
-      })
+      });
 
       // Render based on the chosen template.
       let container = document.createElement('div');
