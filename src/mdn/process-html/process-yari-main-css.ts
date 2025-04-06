@@ -34,6 +34,7 @@ export const processYariMainCss = (
   // to bypass duplication check
   // this should be never downloaded from since body exists
   newRes.url = res.url.replace(/\.css$/, '_file.css');
+  newRes.redirectedUrl = newRes.url;
   newRes.uri = undefined;
   submit(newRes);
   return res;
