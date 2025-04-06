@@ -4673,7 +4673,14 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
 
     render() {
       this.attachShadow({ mode: 'open' });
-      this.shadowRoot.innerHTML = `<div
+      this.shadowRoot.innerHTML = `<style>:host { display: block; font-size: 0.875rem; }
+.editor { height: 100%; }
+.editor.minimal { display: flex; flex-direction: column; justify-content: center; }
+.editor.minimal .cm-content { align-self: center; min-height: auto; }
+.editor.minimal .cm-focused { outline: none; }
+.editor.minimal .cm-line { padding: 0px 12px; }
+.editor .cm-editor { height: 100%; width: 100%; }
+.editor .cm-editor * { font-family: var(--font-code)  !important; }</style><div
       class=${this.minimal ? 'editor minimal' : 'editor'}
     ></div>`;
       if (!PlayEditor._ready) {
