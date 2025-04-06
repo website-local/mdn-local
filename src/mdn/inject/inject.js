@@ -4883,18 +4883,6 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
 
   customElements.define('play-controller', PlayController);
 
-
-  // A helper decode function; replace with your actual decoding logic if needed.
-  function decode(str) {
-    try {
-      var elem = document.createElement('div');
-      elem.innerHTML = str;
-      return elem.innerText;
-    } catch (e) {
-      return str;
-    }
-  }
-
   /**
    * Checks if the CSS code is supported by the current browser.
    *
@@ -5083,6 +5071,7 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
 
       // Render based on the chosen template.
       let container = document.createElement('div');
+      container.style.height = '100%';
       if (this._template === 'choices') {
         container.innerHTML = this._renderChoices();
       } else if (this._template === 'console') {
@@ -5138,7 +5127,15 @@ ix-tab-wrapper { grid-area: tabs; }
 .template-choices .choice-wrapper .choice.unsupported play-editor { border-color: rgb(255, 184, 0); }
 .template-choices .choice-wrapper .choice.unsupported::after { background-image: url("https://developer.mozilla.org/static/media/warning.334964ef472eac4cfb78.svg"); background-position: center center; background-repeat: no-repeat; background-size: 1rem; content: ""; height: 1rem; opacity: 1; transition: none; width: 1rem; }
 .template-choices .choice-wrapper .choice play-editor { border: var(--border); border-radius: var(--elem-radius); cursor: pointer; width: 100%; }
-.template-choices .output-wrapper { height: 300px; overflow: hidden; }`;
+.template-choices .output-wrapper { height: 300px; overflow: hidden; }
+.tabbed { display: flex; flex-direction: column; overflow: hidden; }
+.panel-wrapper { flex: 1 1 0%; min-height: 0px; }
+.tab-panel { height: 100%; }
+.tab-wrapper { background: var(--background-secondary); border-bottom: 1px solid var(--border-secondary); display: flex; flex-shrink: 0; gap: 0.5rem; overflow-x: auto; }
+.tab { background-color: rgba(0, 0, 0, 0); border-width: 3px 0px; border-style: solid none; border-color: rgba(0, 0, 0, 0) currentcolor; border-image: none; color: var(--text-secondary); cursor: pointer; font: var(--type-emphasis-m); padding: 0.5em 30px; transition: color 0.2s, background-color 0.2s; }
+.tab:hover, .tab:focus { background-color: var(--ix-tab-background-active); color: var(--text-primary); }
+.tab.active { background-color: var(--ix-tab-background-active); border-bottom-color: var(--accent-primary); color: var(--accent-primary); }
+`;
       this.shadowRoot.appendChild(style);
 
       // Find controller and runner elements if they exist.
@@ -5163,7 +5160,7 @@ ix-tab-wrapper { grid-area: tabs; }
       <play-controller>
         <div class="template-console">
           <header>
-            <h4>${decode(this.name)}</h4>
+            <h4>${this.name}</h4>
           </header>
     `;
       if (this._languages.length === 1) {
@@ -5209,9 +5206,10 @@ ix-tab-wrapper { grid-area: tabs; }
       <play-controller run-on-start run-on-change>
         <div class="template-tabbed">
           <header>
-            <h4>${decode(this.name)}</h4>
+            <h4>${(this.name)}</h4>
             <button id="reset">Reset</button>
           </header>
+          <div class="tabbed">
           <div class="tab-wrapper">
     `;
       // Create tabs and panels – note that activation will be handled later.
@@ -5229,7 +5227,7 @@ ix-tab-wrapper { grid-area: tabs; }
       `;
       });
       inner += `
-          </div>
+          </div></div>
           <div class="output-wrapper">
             <h4>Output</h4>
             <play-runner sandbox="allow-top-navigation-by-user-activation" defaults="ix-tabbed"></play-runner>
@@ -5264,7 +5262,7 @@ ix-tab-wrapper { grid-area: tabs; }
       let inner = `
       <div class="template-choices">
         <header>
-          <h4>${decode(this.name)}</h4>
+          <h4>${(this.name)}</h4>
           <button id="reset">Reset</button>
         </header>
         <div class="choice-wrapper">
@@ -5336,7 +5334,7 @@ ix-tab-wrapper { grid-area: tabs; }
 
     /** @param {PlayEditor} editor */
     _getIndex(editor) {
-      return parseInt(editor.dataset.index ?? "-1", 10);
+      return parseInt(editor.dataset.index ?? '-1', 10);
     }
 
     async _selectChoice(editor) {
