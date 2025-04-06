@@ -4521,7 +4521,7 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
    * @returns {Promise<string>} a data-url with the compiled wasm, base64 encoded
    */
   async function compileAndEncodeWatToDataUrl(wat) {
-    // eslint-disable-next-line no-unreachable
+
     const { default: init, watify } = await import(relativeRoot + 'static/js/watify.js');
     await init();
     const binary = watify(wat);
@@ -5165,21 +5165,21 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
       if (this._languages.length === 1) {
         inner += `<play-editor id="editor" language="${this._languages[0]}"></play-editor>`;
       } else {
-        inner += `<div class="tabbed"><div class="tab-wrapper">`;
-            // Create tabs and panels – note that activation will be handled later.
+        inner += '<div class="tabbed"><div class="tab-wrapper">';
+        // Create tabs and panels – note that activation will be handled later.
         this._languages.forEach((lang, i) => {
           inner += `
         <div class="tab" data-lang="${lang}" data-index="${i}" role="tab">${this._langName(lang)}</div>
       `;
-          });
+        });
         inner += '</div><div class="panel-wrapper">';
-          this._languages.forEach((lang, i) => {
-            inner += `
+        this._languages.forEach((lang, i) => {
+          inner += `
         <div class="tab-panel" data-lang-panel="${lang}" data-index="${i}" role="tabpanel">
           <play-editor language="${lang}"></play-editor>
         </div>
       `;
-          });
+        });
         inner += '</div></div>';
 
         // Attach events after render.
