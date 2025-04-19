@@ -3772,6 +3772,7 @@ Prism.languages.py = Prism.languages.python;
 
 // 20250323 interactive-example
 // https://github.com/website-local/mdn-local/issues/1142
+// Currently based on https://github.com/mdn/yari/tree/v4.8.0/client/src/lit
 !function () {
   const currSrc = document.currentScript.src;
   const relativeRoot = new URL('../../', currSrc).toString();

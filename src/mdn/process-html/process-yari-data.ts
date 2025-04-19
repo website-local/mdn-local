@@ -17,7 +17,7 @@ import type {Resource} from 'website-scrap-engine/lib/resource.js';
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {toString} from 'website-scrap-engine/lib/util.js';
 import type {
-  YariCompatibilityDataJson
+  Compat
 } from '../browser-compatibility-table/index.js';
 import {
   renderYariCompatibilityTable
@@ -380,13 +380,11 @@ export async function downloadAndRenderYariCompatibilityData(
         data, contexts[i].index, el.prev().attr('id'), res.url);
     }
     // note: keep the original body of resource
-    const jsonData: YariCompatibilityDataJson =
+    const jsonData: Compat =
       JSON.parse(toString(bcdRes.body, bcdRes.encoding));
-    //
-    if (!jsonData.locale) {
-      jsonData.locale = locale;
-    }
-    const html = renderYariCompatibilityTable(jsonData);
+
+    const html = renderYariCompatibilityTable(
+      jsonData, data.query || '', locale);
     el.html(html);
   }
 }
