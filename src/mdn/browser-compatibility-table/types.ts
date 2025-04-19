@@ -10,7 +10,7 @@
 /**
  * The names of the known browsers.
  */
-export type BrowserName = 'chrome' | 'chrome_android' | 'deno' | 'edge' | 'firefox' | 'firefox_android' | 'ie' | 'nodejs' | 'oculus' | 'opera' | 'opera_android' | 'safari' | 'safari_ios' | 'samsunginternet_android' | 'webview_android';
+export type BrowserName = 'chrome' | 'chrome_android' | 'deno' | 'edge' | 'firefox' | 'firefox_android' | 'ie' | 'nodejs' | 'oculus' | 'opera' | 'opera_android' | 'safari' | 'safari_ios' | 'samsunginternet_android' | 'webview_android' | 'webview_ios';
 
 export type VersionValue = string | boolean | null;
 
@@ -54,6 +54,14 @@ export interface BrowserStatement {
    */
   upstream?: BrowserName;
   /**
+   * The name of the browser's preview channel (e.g. 'Nightly' for Firefox or 'TP' for Safari).
+   */
+  preview_name?: string;
+  /**
+   * URL of the page where feature flags can be changed (e.g. 'about:config' for Firefox or 'chrome://flags' for Chrome).
+   */
+  pref_url?: string;
+  /**
    * Whether the browser supports user-toggleable flags that enable or disable features.
    */
   accepts_flags: boolean;
@@ -61,14 +69,6 @@ export interface BrowserStatement {
    * Whether the browser supports extensions.
    */
   accepts_webextensions: boolean;
-  /**
-   * URL of the page where feature flags can be changed (e.g. 'about:config' for Firefox or 'chrome://flags' for Chrome).
-   */
-  pref_url?: string;
-  /**
-   * The name of the browser's preview channel (e.g. 'Nightly' for Firefox or 'TP' for Safari).
-   */
-  preview_name?: string;
   /**
    * The known versions of this browser.
    */
@@ -88,6 +88,10 @@ export interface ReleaseStatement {
    */
   release_notes?: string;
   /**
+   * A property indicating where in the lifetime cycle this release is in (e.g. current, retired, beta, nightly).
+   */
+  status: BrowserStatus;
+  /**
    * Name of the browser's underlying engine.
    */
   engine?: BrowserEngine;
@@ -95,10 +99,6 @@ export interface ReleaseStatement {
    * Version of the engine corresponding to the browser version.
    */
   engine_version?: string;
-  /**
-   * A property indicating where in the lifetime cycle this release is in (e.g. current, retired, beta, nightly).
-   */
-  status: BrowserStatus;
 }
 
 
@@ -111,31 +111,16 @@ export interface ReleaseStatement {
  */
 export type Identifier = {[key: string]: Identifier} & {__compat?: CompatStatement};
 /**
- * This interface was referenced by `CompatDataFile`'s JSON-Schema
- * via the `definition` "support_statement".
- */
-export type SupportStatement = SimpleSupportStatement | SimpleSupportStatement[];
-/**
- * This interface was referenced by `CompatDataFile`'s JSON-Schema
- * via the `definition` "support_block".
+ * The data for the support of each browser, containing a `support_statement` object for each browser identifier with information about versions, prefixes, or alternate names, as well as notes.
  */
 export type SupportBlock = Partial<Record<BrowserName, SupportStatement>>;
 /**
  * This interface was referenced by `CompatDataFile`'s JSON-Schema
- * via the `definition` "spec_url_value".
+ * via the `definition` "support_statement".
  */
-export type SpecUrlValue = string;
-/**
- * This interface was referenced by `CompatDataFile`'s JSON-Schema
- * via the `definition` "impl_url_value".
- */
-export type ImplUrlValue = string;
-/**
- * This interface was referenced by `CompatDataFile`'s JSON-Schema
- * via the `definition` "webextensions_identifier".
- * THIS INTERFACE SHOULD NOT BE USED AND MAY BE REMOVED AT ANY TIME; USE THE "Identifier" INTERFACE INSTEAD.
- */
-export type WebextensionsIdentifier = {[key: string]: Identifier} & {__compat?: CompatStatement};
+export type SupportStatement =
+  | SimpleSupportStatement
+  | [SimpleSupportStatement, SimpleSupportStatement, ...SimpleSupportStatement[]];
 
 
 /**
@@ -157,19 +142,36 @@ export interface CompatStatement {
   /**
    * An optional URL or array of URLs, each of which is for a specific part of a specification in which this feature is defined. Each URL must contain a fragment identifier.
    */
-  spec_url?: string | string[];
+  spec_url?: string | [string, string, ...string[]];
+  /**
+   * An optional array of strings allowing to assign tags to the feature.
+   *
+   * @minItems 1
+   */
+  tags?: [string, ...string[]];
   /**
    * The path to the file that defines this feature in browser-compat-data, relative to the repository root. Useful for guiding potential contributors towards the correct file to edit. This is automatically generated at build time and should never manually be specified.
    */
   source_file?: string;
-  /**
-   * The data for the support of each browser, containing a `support_statement` object for each browser identifier with information about versions, prefixes, or alternate names, as well as notes.
-   */
   support: SupportBlock;
-  /**
-   * An object containing information about the stability of the feature.
-   */
   status?: StatusBlock;
+}
+/**
+ * An object containing information about the stability of the feature.
+ */
+export interface StatusBlock {
+  /**
+   * A boolean value that indicates the general stability of this feature. This value will be true if the feature was implemented in one browser engine recently. This value will be false if the feature was implemented in multiple browser engines, or if the feature had been implemented over two years ago in any one browser engine.
+   */
+  experimental: boolean;
+  /**
+   * A boolean value indicating whether the feature is part of an active specification or specification process.
+   */
+  standard_track: boolean;
+  /**
+   * A boolean value that indicates whether the feature is no longer recommended. It might be removed in the future or might only be kept for compatibility purposes. Avoid using this functionality.
+   */
+  deprecated: boolean;
 }
 /**
  * This interface was referenced by `CompatDataFile`'s JSON-Schema
@@ -177,13 +179,17 @@ export interface CompatStatement {
  */
 export interface SimpleSupportStatement {
   /**
-   * A string (indicating which browser version added this feature), the value true (indicating support added in an unknown version), the value false (indicating the feature is not supported), or the value null (indicating support is unknown).
+   * A string (indicating which browser version added this feature), or the value false (indicating the feature is not supported).
    */
   version_added: VersionValue;
   /**
-   * A string, indicating which browser version removed this feature, or the value true, indicating that the feature was removed in an unknown version.
+   * A string, indicating which browser version removed this feature.
    */
   version_removed?: VersionValue;
+  /**
+   * A string, indicating the last browser version that supported this feature. This is automatically generated.
+   */
+  version_last?: VersionValue;
   /**
    * A prefix to add to the sub-feature name (defaults to empty string). If applicable, leading and trailing '-' must be included.
    */
@@ -194,12 +200,14 @@ export interface SimpleSupportStatement {
   alternative_name?: string;
   /**
    * An optional array of objects describing flags that must be configured for this browser to support this feature.
+   *
+   * @minItems 1
    */
-  flags?: FlagStatement[];
+  flags?: [FlagStatement, ...FlagStatement[]];
   /**
    * An optional changeset/commit URL for the revision which implemented the feature in the source code, or the URL to the bug tracking the implementation, for the associated browser.
    */
-  impl_url?: string | string[];
+  impl_url?: string | [string, string, ...string[]];
   /**
    * A boolean value indicating whether or not the implementation of the sub-feature deviates from the specification in a way that may cause compatibility problems. It defaults to false (no interoperability problems expected). If set to true, it is recommended that you add a note explaining how it diverges from the standard (such as that it implements an old version of the standard, for example).
    */
@@ -207,7 +215,7 @@ export interface SimpleSupportStatement {
   /**
    * A string or array of strings containing additional information.
    */
-  notes?: string | string[];
+  notes?: string | [string, string, ...string[]];
 }
 /**
  * This interface was referenced by `CompatDataFile`'s JSON-Schema
@@ -226,24 +234,6 @@ export interface FlagStatement {
    * A string giving the value which the specified flag must be set to for this feature to work.
    */
   value_to_set?: string;
-}
-/**
- * This interface was referenced by `CompatDataFile`'s JSON-Schema
- * via the `definition` "status_block".
- */
-export interface StatusBlock {
-  /**
-   * A boolean value that indicates whether this functionality is intended to be an addition to the Web platform. Set to false, it means the functionality is mature, and no significant incompatible changes are expected in the future.
-   */
-  experimental: boolean;
-  /**
-   * A boolean value indicating whether the feature is part of an active specification or specification process.
-   */
-  standard_track: boolean;
-  /**
-   * A boolean value that indicates whether the feature is no longer recommended. It might be removed in the future or might only be kept for compatibility purposes. Avoid using this functionality.
-   */
-  deprecated: boolean;
 }
 
 
@@ -289,6 +279,11 @@ export interface CompatData {
   javascript: Identifier;
 
   /**
+   * Contains data for various manifests, such as the [Web Application Manifest](https://developer.mozilla.org/docs/Web/Progressive_web_apps/manifest).
+   */
+  manifests: Identifier;
+
+  /**
    * Contains data for [MathML](https://developer.mozilla.org/docs/Web/MathML) elements, attributes, and global attributes.
    */
   mathml: Identifier;
@@ -297,6 +292,11 @@ export interface CompatData {
    * Contains data for [SVG](https://developer.mozilla.org/docs/Web/SVG) elements, attributes, and global attributes.
    */
   svg: Identifier;
+
+  /**
+   * Contains data for [WebAssembly](https://developer.mozilla.org/docs/WebAssembly) features.
+   */
+  webassembly: Identifier;
 
   /**
    * Contains data for [WebDriver](https://developer.mozilla.org/docs/Web/WebDriver) commands.
@@ -308,3 +308,20 @@ export interface CompatData {
    */
   webextensions: Identifier;
 }
+
+// https://github.com/mdn/yari/blob/v4.9.0/client/src/lit/compat/types.ts
+// Extended for the fields, beyond the bcd types, that are extra-added
+// exclusively in Yari.
+export interface SimpleSupportStatementExtended
+  extends SimpleSupportStatement {
+  // Known for some support statements where the browser *version* is known,
+  // as opposed to just "true" and if the version release date is known.
+  release_date?: string;
+  // The version before the version_removed if the *version* removed is known,
+  // as opposed to just "true". Otherwise the version_removed.
+  version_last?: VersionValue;
+}
+
+export type SupportStatementExtended =
+  | SimpleSupportStatementExtended
+  | SimpleSupportStatementExtended[];
