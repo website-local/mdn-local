@@ -5439,3 +5439,37 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
   customElements.define('interactive-example', InteractiveExampleBase);
 
 }();
+
+// 20250419 new compatibility table
+// https://github.com/website-local/mdn-local/issues/1149
+!function () {
+  var btns = document.getElementsByClassName('mdn-local-toggle-history-btn'),
+    len = btns.length, i = 0;
+  function handleMousedown(event) {
+    // Blur active element if already focused.
+    var activeElement = document.activeElement;
+    var { currentTarget } = event;
+
+    if (
+      activeElement instanceof window.HTMLElement &&
+      currentTarget instanceof window.HTMLElement
+    ) {
+      var activeCell = activeElement.closest('td');
+      var currentCell = currentTarget.closest('td');
+
+      if (activeCell === currentCell) {
+        activeElement.blur();
+        event.preventDefault();
+        return;
+      }
+    }
+
+    if (currentTarget instanceof window.HTMLElement) {
+      // Workaround for Safari, which doesn't focus implicitly.
+      setTimeout(() => currentTarget.focus(), 0);
+    }
+  }
+  for (; i < len; i++) {
+    btns[i].onmousedown = handleMousedown;
+  }
+}();
