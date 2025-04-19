@@ -1,16 +1,21 @@
-import type * as BCD from './types.js';
-import {HIDDEN_BROWSERS} from './index.js';
 import {
   asList,
   getFirst,
   hasMore,
   hasNoteworthyNotes,
+  HIDDEN_BROWSERS,
   listFeatures,
   versionIsPreview,
 } from './utils.js';
+import type {BrowserName, Browsers, Identifier} from './types.js';
 
-// Also specifies the order in which the legend appears
-export const LEGEND_LABELS = {
+type LegendKey = 'yes' | 'partial' | 'preview' | 'no' | 'unknown' | 'experimental' | 'nonstandard' | 'deprecated' | 'footnote' | 'disabled' | 'altname' | 'prefix' | 'more';
+
+/**
+ * Legend labels which also specifies the order in which the legend appears.
+ * @type {Record<LegendKey, string>}
+ */
+export const LEGEND_LABELS: Record<LegendKey, string> = {
   yes: 'Full support',
   partial: 'Partial support',
   preview: 'In development. Supported in a pre-release version.',
@@ -25,14 +30,19 @@ export const LEGEND_LABELS = {
   prefix: 'Requires a vendor prefix or different name for use.',
   more: 'Has more compatibility info.',
 };
-type LEGEND_KEY = keyof typeof LEGEND_LABELS;
 
-function getActiveLegendItems(
-  compat: BCD.Identifier,
-  name: string,
-  browserInfo: BCD.Browsers
-) {
-  const legendItems = new Set<LEGEND_KEY>();
+/**
+ * Gets the active legend items based on browser compatibility data.
+ *
+ * @param {Identifier} compat - The compatibility data identifier.
+ * @param {string} name - The name of the feature.
+ * @param {Browsers} browserInfo - Information about browsers.
+ * @param {BrowserName[]} browsers - The list of displayed browsers.
+ * @returns {Array<[LegendKey, string]>} An array of legend item entries, where each entry is a tuple of the legend key and its label.
+ */
+export function getActiveLegendItems(compat: Identifier, name: string, browserInfo: Browsers, browsers: BrowserName[]): Array<[LegendKey, string]> {
+  /** @type {Set<LegendKey>} */
+  const legendItems = new Set();
 
   for (const feature of listFeatures(compat, '', name)) {
     const { status } = feature.compat;
@@ -49,18 +59,17 @@ function getActiveLegendItems(
       }
     }
 
-    for (const [browser, browserSupport] of Object.entries(
-      feature.compat.support
-    )) {
+    for (const browser of browsers) {
+      const browserSupport = feature.compat.support[browser] ?? {
+        version_added: null,
+      };
+
       if (HIDDEN_BROWSERS.includes(browser)) {
         continue;
       }
-      if (!browserSupport) {
-        legendItems.add('no');
-        continue;
-      }
+
       const firstSupportItem = getFirst(browserSupport);
-      if (hasNoteworthyNotes(firstSupportItem)) {
+      if (firstSupportItem && hasNoteworthyNotes(firstSupportItem)) {
         legendItems.add('footnote');
       }
 
@@ -69,7 +78,7 @@ function getActiveLegendItems(
           if (versionSupport.flags && versionSupport.flags.length) {
             legendItems.add('no');
           } else if (
-            versionIsPreview(versionSupport.version_added, browserInfo[browser as BCD.BrowserName])
+            versionIsPreview(versionSupport.version_added, browserInfo[browser])
           ) {
             legendItems.add('preview');
           } else {
@@ -94,57 +103,21 @@ function getActiveLegendItems(
           legendItems.add('disabled');
         }
       }
+
       if (hasMore(browserSupport)) {
         legendItems.add('more');
       }
     }
   }
-  return Object.keys(LEGEND_LABELS)
-    .filter((key) => legendItems.has(key as LEGEND_KEY))
-    .map((key) => [key, LEGEND_LABELS[key as LEGEND_KEY]]);
-}
 
-export function Legend({
-  compat,
-  name,
-  browserInfo,
-}: {
-  compat: BCD.Identifier;
-  name: string;
-  browserInfo: BCD.Browsers
-}): string {
-  return (
-    `<section class="bc-legend">
-      <h3 class="visually-hidden" id="Legend">
-        Legend
-      </h3>
-      <p class="bc-legend-tip">
-        Tip: you can click/tap on a cell for more information.
-      </p>
-      <dl class="bc-legend-items-container">
-        ${getActiveLegendItems(compat, name, browserInfo).map(([key, label]) =>
-      ['yes', 'partial', 'no', 'unknown', 'preview'].includes(key) ? (
-        `<div class="bc-legend-item" key="${key}">
-           <dt class="bc-legend-item-dt" key="${key}">
-             <span class="bc-supports-${key} bc-supports">
-               <abbr class="bc-level bc-level-${key} icon icon-${key}" title="${label}">
-                 <span class="visually-hidden">${label}</span>
-               </abbr>
-             </span>
-           </dt>
-           <dd class="bc-legend-item-dd">${label}</dd>
-         </div>`
-      ) : (
-        `<div class="bc-legend-item" key="${key}">
-           <dt class="bc-legend-item-dt" key="${key}">
-             <abbr class="legend-icons icon icon-${key}"
-               title="${label}"></abbr>
-           </dt>
-           <dd class="bc-legend-item-dd">${label}</dd>
-         </div>`
-      )
-    ).join('')}
-      </dl>
-    </section>`
-  );
+  const keys: LegendKey[] = Object.keys(LEGEND_LABELS) as LegendKey[];
+
+  return keys
+    .filter((key) => legendItems.has(key))
+    .map(
+      /**
+       * @param {LegendKey} key
+       */
+      (key) => [key, LEGEND_LABELS[key]]
+    );
 }
