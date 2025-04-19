@@ -13,6 +13,7 @@ Changes
 * Removed all event handlers, which would be moved to inject.js.
 * Array maps in html are joined later.
 * All html attrs are quoted.
+* Rendered null to empty string.
 
 Note
 --------------

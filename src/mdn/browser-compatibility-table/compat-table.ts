@@ -206,7 +206,7 @@ export class CompatTable {
 
     let titleNode;
     const titleContent = `${title}${compat.status &&
-        this._renderStatusIcons(compat.status)}`;
+        this._renderStatusIcons(compat.status) || ''}`;
     if (compat.mdn_url && depth > 0) {
       const href = compat.mdn_url.replace(
         `/${DEFAULT_LOCALE}/docs`,
@@ -254,7 +254,7 @@ export class CompatTable {
       `
         <div class="timeline" tabindex="0">
           <dl class="bc-notes-list">${notes}</dl>
-        </div>`}
+        </div>` || ''}
             </td>`;
   }).join('')}
         </tr>`;
@@ -496,9 +496,9 @@ export class CompatTable {
             ? `<span>${(label)}</span>`
             : label}
               </dd>`;
-          })}
-            ${!hasNotes ? '<dd></dd>' : null}
-          </div>`
+          }).join('')}
+            ${!hasNotes ? '<dd></dd>' : ''}
+          </div>` || ''
         );
       })
       .filter(Boolean).join('');
@@ -609,13 +609,13 @@ export class CompatTable {
     ? `${browser.name} ${added} – Released ${browserReleaseDate}`
     : ''}"
         >
-          ${!timeline || added ? label : null}
+          ${!timeline || added ? label : ''}
           ${browserReleaseDate && timeline
     ? ` (Released ${browserReleaseDate})`
     : ''}
         </span>
       </div>
-      ${support && this._renderCellIcons(support)}
+      ${support && this._renderCellIcons(support) || ''}
     </div>`;
   }
 
