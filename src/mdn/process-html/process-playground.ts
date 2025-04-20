@@ -9,6 +9,7 @@ import type {
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {simpleHashString} from 'website-scrap-engine/lib/util.js';
+import {load} from 'cheerio';
 
 const PLAYGROUND_LOCAL_ATTR = 'data-mdn-local-pg-id';
 
@@ -62,7 +63,7 @@ export async function preProcessPlayground(
     const iframeHtml = renderHtml(r.code);
     iframeRes.body = iframeHtml;
     iframeRes.meta = {
-      doc: $.load(iframeHtml)
+      doc: load(iframeHtml, options.cheerioParse)
     };
     const processed =
       await pipeline.processAfterDownload(iframeRes as DownloadResource, submit, options);
@@ -71,6 +72,7 @@ export async function preProcessPlayground(
     }
     frame.removeAttr('srcdoc');
     frame.attr('src', processed.replacePath);
+    frame.attr('data-playground', '1');
     // this resource has to be submitted, since runner path could diff from src page
     submit(processed);
   }

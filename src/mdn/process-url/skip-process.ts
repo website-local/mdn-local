@@ -78,6 +78,11 @@ export const skipProcess = (
     errorLogger.info('skipped incorrectly parsed url', url, parent?.url);
     return;
   }
+  // New playground
+  // https://github.com/website-local/mdn-local/issues/1105
+  if (element?.is('iframe') && element.attr('data-playground')) {
+    return;
+  }
 
   const path = uri.path();
   if (path.startsWith('/presentations/') ||
