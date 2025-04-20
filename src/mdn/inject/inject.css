@@ -396,39 +396,39 @@ aside.article-footer {
   display: none;
 }
 
-
-.table-container table {
+/* New compat table */
+.lazy-compat-table table {
   display: grid;
   grid-auto-flow: dense
 }
 
-.table-container table thead tr {
+.lazy-compat-table table thead tr {
   display: contents
 }
 
-.table-container table thead tr th, .table-container table thead tr td {
+.lazy-compat-table table thead tr th, .lazy-compat-table table thead tr td {
   display: grid;
   grid-template-columns:subgrid
 }
 
-.table-container table tbody {
+.lazy-compat-table table tbody {
   display: contents
 }
 
-.table-container table tbody tr {
+.lazy-compat-table table tbody tr {
   display: contents
 }
 
-.table-container table tbody tr th, .table-container table tbody tr td {
+.lazy-compat-table table tbody tr th, .lazy-compat-table table tbody tr td {
   display: contents
 }
 
-.table-container table tbody tr th button, .table-container table tbody tr td button {
+.lazy-compat-table table tbody tr th button, .lazy-compat-table table tbody tr td button {
   display: grid;
   grid-template-columns:subgrid
 }
 
-.table-container table tbody tr th .timeline, .table-container table tbody tr td .timeline {
+.lazy-compat-table table tbody tr th .timeline, .lazy-compat-table table tbody tr td .timeline {
   grid-column: 1/-1
 }
 
@@ -602,17 +602,17 @@ aside.article-footer {
   display: flex
 }
 
-.table-container .bc-table .bc-platforms th {
+.lazy-compat-table .bc-table .bc-platforms th {
   align-items: center;
   display: flex;
   justify-content: center
 }
 
-.table-container .bc-table .bc-platforms td {
+.lazy-compat-table .bc-table .bc-platforms td {
   border: medium
 }
 
-.table-container .bc-table .bc-browsers th {
+.lazy-compat-table .bc-table .bc-browsers th {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -785,7 +785,7 @@ dl.bc-notes-list dd.bc-supports-dd:last-child {
     gap: 0.5rem
   }
 
-  .table-container {
+  .lazy-compat-table .table-container {
     overflow-x: auto
   }
 }
@@ -842,19 +842,19 @@ dl.bc-notes-list dd.bc-supports-dd:last-child {
     border-bottom: 2px solid var(--text-primary)
   }
 
-  .table-container {
+  .lazy-compat-table .table-container {
     margin: 0px -3rem;
     overflow: auto;
     width: 100vw
   }
 
-  .table-container-inner {
+  .lazy-compat-table .table-container-inner {
     min-width: max-content;
     padding: 0px 3rem;
     position: relative
   }
 
-  .table-container-inner::after {
+  .lazy-compat-table .table-container-inner::after {
     bottom: 0px;
     content: "";
     height: 10px;
@@ -887,34 +887,27 @@ dl.bc-notes-list dd.bc-supports-dd:last-child {
 }
 
 @media (min-width: 769px) {
-  .table-container {
+  .lazy-compat-table .table-container {
     width: calc(100% + 6rem)
   }
 
-  .table-container-inner {
+  .lazy-compat-table .table-container-inner {
     min-width: initial
-  }
-
-  .bc-on-github {
-    text-align: right
   }
 
   .bc-table {
     grid-template-columns:minmax(25%, max-content) repeat(var(--browser-count), calc(75% / var(--browser-count)))
   }
 
-  .icon {
-    --size: calc(1rem + 1px)
-  }
 }
 
 @media (min-width: 1200px) {
-  .table-container {
+  .lazy-compat-table .table-container {
     margin: 0px;
     width: 100%
   }
 
-  .table-container-inner {
+  .lazy-compat-table .table-container-inner {
     padding: 0px
   }
 
