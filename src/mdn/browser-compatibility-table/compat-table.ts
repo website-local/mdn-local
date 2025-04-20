@@ -279,7 +279,7 @@ export class CompatTable {
       hasMore(support) && this._renderIcon('more'),
     ].filter(Boolean);
 
-    return icons.length ? `<div class="bc-icons">${icons}</div>` : null;
+    return icons.length ? `<div class="bc-icons">${icons.join('')}</div>` : null;
   }
 
   /**
@@ -421,7 +421,7 @@ export class CompatTable {
                         ` To change preferences in ${browser.name}, visit ${browser.pref_url}.`,
                 ]
                   .filter(Boolean)
-                  .map((value) => `${value}`)}
+                  .map((value) => `${value}`).join('')}
                   `;
               })(),
             }
