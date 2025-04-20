@@ -4059,6 +4059,52 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
   customElements.define('play-console', PlayConsole);
   /// endregion play-console
 
+  /// region theme-controller
+  /**
+   * Requests a Lit update when the theme changes,
+   * with a "ThemeController.value" changed property in `willUpdate`.
+   * Current theme can be accessed through `.value`.
+   */
+  class ThemeController {
+    constructor(host) {
+      this.host = host;
+      // this.host.addController(this);
+      /** @type {Theme} */
+      this.value = 'os-default';
+      // this.initialValue = 'os-default';
+      this._observer = new window.MutationObserver(() => this._updateTheme());
+      this._matchMedia = window.matchMedia('(prefers-color-scheme: dark)');
+    }
+
+    _updateTheme() {
+      /** @type {Theme[]} */
+      const themes = ['os-default', 'dark', 'light'];
+      const { classList } = document.documentElement;
+      let value = themes.filter((x) => classList.contains(x))[0] || 'os-default';
+      if (value === 'os-default') {
+        value = this._matchMedia.matches ? 'dark' : 'light';
+      }
+      this.value = value;
+      this.host.willUpdate();
+    }
+
+    hostConnected() {
+      this._observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class'],
+      });
+      this._updateTheme = this._updateTheme.bind(this);
+      this._matchMedia.addEventListener('change', this._updateTheme);
+      this._updateTheme();
+      this.initialValue = this.value;
+    }
+
+    hostDisconnected() {
+      this._observer.disconnect();
+      this._matchMedia.removeEventListener('change', this._updateTheme);
+    }
+  }
+  /// endregion theme-controller
 
   /// region render-html
   // https://github.com/mdn/yari/blob/v4.7.2/libs/play/index.js#L212
@@ -4435,6 +4481,7 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
       this.ready = new Promise((resolve) => {
         this._resolveReady = () => resolve(true);
       });
+      this.theme = new ThemeController(this);
       this.render();
     }
 
@@ -4470,7 +4517,7 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
         css: code?.css || '',
         js: code?.js || '',
         defaults: defaults,
-        theme: theme,
+        theme: theme.value,
       };
       // update iframe src without adding to browser history
       this._iframe.srcdoc = renderHtml(state);
@@ -4479,6 +4526,7 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
     connectedCallback() {
       this._onMessage = this._onMessage.bind(this);
       window.addEventListener('message', this._onMessage);
+      this.theme.hostConnected();
     }
 
     /** @param {any} message */
@@ -4499,8 +4547,13 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
       this._updateSrc();
     }
 
+    willUpdate() {
+      this._updateSrc();
+    }
+
     disconnectedCallback() {
       window.removeEventListener('message', this._onMessage);
+      this.theme.hostDisconnected();
     }
   }
 
@@ -4547,8 +4600,7 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
 
     constructor() {
       super();
-      // TODO: theme
-      this.theme = {};
+      this.theme = new ThemeController(this);
       this.language = this.getAttribute('language');
       this.minimal = this.hasAttribute('minimal');
       this._value = '';
@@ -4657,17 +4709,12 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
       throw new Error('PlayEditor.format');
     }
 
-    /** @param {PropertyValues} changedProperties */
-    willUpdate(changedProperties) {
+    willUpdate() {
       const StateEffect = window.CM['@codemirror/state'].StateEffect;
-      if (
-        changedProperties.has('language') ||
-        changedProperties.has('ThemeController.value')
-      ) {
-        this._editor?.dispatch({
-          effects: StateEffect.reconfigure.of(this._extensions()),
-        });
-      }
+
+      this._editor?.dispatch({
+        effects: StateEffect.reconfigure.of(this._extensions()),
+      });
     }
 
     render() {
@@ -4707,6 +4754,11 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
         state: startState,
         parent: this.shadowRoot.querySelector('div') || undefined,
       });
+      this.theme.hostConnected();
+    }
+
+    disconnectedCallback() {
+      this.theme.hostDisconnected();
     }
   }
 
