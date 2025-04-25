@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
-    "@types/node": "^22.14.1",
+    "@types/node": "^22.15.0",
     "@types/tough-cookie": "^4.0.5",
     "@types/urijs": "^1.19.25",
     "@typescript-eslint/eslint-plugin": "^8.31.0",
