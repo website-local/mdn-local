@@ -2,16 +2,36 @@ import type {Resource} from 'website-scrap-engine/lib/resource.js';
 import URI from 'urijs';
 import {externalHosts} from './consts.js';
 
+// updated 20250503
+// https://github.com/website-local/mdn-local/issues/1118
+// https://github.com/website-local/assets/releases/tag/mdn-local-video
 const replacements = [
-  // https://github.com/website-local/mdn-local/issues/938
-  'https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4',
-  // A much smaller file
-  'https://mdn.github.io/dom-examples/picture-in-picture/assets/bigbuckbunny.mp4',
-  // This video is only used once, but result in ~40M
-  // https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Solve_HTML_problems/Cheatsheet
+  'https://archive.org/download/ElephantsDream/ed_hd.avi',
+  'https://website-local.github.io/assets/ed_hd.avi',
+  'https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4',
+  'https://website-local.github.io/assets/ed_1024_512kb.mp4',
   'https://archive.org/download/ElephantsDream/ed_hd.ogv',
-  // A much smaller ogv file
-  'https://mdn.dev/archives/media/samples/video/chroma-key/video.ogv',
+  'https://website-local.github.io/assets/ed_hd.ogv',
+  'https://mdn.github.io/dom-examples/picture-in-picture/assets/bigbuckbunny.mp4',
+  'https://website-local.github.io/assets/bigbuckbunny.mp4',
+  'https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4',
+  'https://website-local.github.io/assets/bigbuckbunny.mp4',
+  'https://mdn.github.io/dom-examples/fullscreen-api/assets/bigbuckbunny.mp4',
+  'https://website-local.github.io/assets/bigbuckbunny.mp4',
+  'https://mdn.github.io/dom-examples/document-picture-in-picture/assets/bigbuckbunny.mp4',
+  'https://website-local.github.io/assets/bigbuckbunny.mp4',
+  'https://mdn.github.io/imsc-examples/videos/coffee.mp4',
+  'https://website-local.github.io/assets/coffee.mp4',
+  'https://mdn.github.io/imsc-examples/videos/stars.mp4',
+  'https://website-local.github.io/assets/stars.mp4',
+  'https://mdn.github.io/learning-area/javascript/apis/video-audio/finished/video/sintel-short.mp4',
+  'https://website-local.github.io/assets/sintel-short.mp4',
+  'https://mdn.github.io/html-examples/link-rel-preload/video/sintel-short.mp4',
+  'https://website-local.github.io/assets/sintel-short.mp4',
+  'https://mdn.github.io/learning-area/javascript/apis/video-audio/finished/video/sintel-short.webm',
+  'https://website-local.github.io/assets/sintel-short.webm',
+  'https://mdn.github.io/html-examples/link-rel-preload/video/sintel-short.webm',
+  'https://website-local.github.io/assets/sintel-short.webm',
 ];
 
 export const redirectDownloadLink = (res: Resource): Resource => {
@@ -32,7 +52,7 @@ export const redirectDownloadLink = (res: Resource): Resource => {
     }
     if (path.startsWith('/shared-assets/')) {
       // 20250303 shared assets
-      res.downloadLink = uri.search('').host('mdnplay.dev').toString();
+      res.downloadLink = uri.search('').host('www.mdnplay.dev').toString();
       return res;
     }
 
@@ -45,11 +65,11 @@ export const redirectDownloadLink = (res: Resource): Resource => {
           .host(externalHost.host)
           .path(path.slice(externalHost.pathPrefixLength))
           .toString();
-        if (res.downloadLink === replacements[0]) {
-          res.downloadLink = replacements[1];
-        }
-        if (res.downloadLink === replacements[2]) {
-          res.downloadLink = replacements[3];
+        for (let i = 0; i < replacements.length; i += 2) {
+          if (res.downloadLink === replacements[i]) {
+            res.downloadLink = replacements[i + 1];
+            break;
+          }
         }
         return res;
       }
