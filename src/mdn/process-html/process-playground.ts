@@ -14,8 +14,8 @@ import {load} from 'cheerio';
 const PLAYGROUND_LOCAL_ATTR = 'data-mdn-local-pg-id';
 
 function escapeSelector(selector: string): string {
-  // List of characters that have special meaning in CSS selectors
-  return selector.replace(/([.#:$(),])/g, '\\$1');
+  // List of characters that have special meaning in CSS selectors, including backslash
+  return selector.replace(/([.#:$(),\\])/g, '\\$1');
 }
 
 export async function preProcessPlayground(
