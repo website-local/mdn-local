@@ -36,6 +36,4 @@ createDownloader({
 
 ## Large video handling
 
-A large video has been replaced into a much smaller alternative for faster download of the package, get it back from [the original link](https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4) or [here](https://github.com/website-local/assets/releases/download/mdn-local/big_buck_bunny_720p_surround.mp4);
-
-Another large video has been replaced into a much smaller alternative for faster download of the package, get it back from [the original link](https://archive.org/download/ElephantsDream/ed_hd.ogv) or [here](https://github.com/website-local/assets/releases/download/mdn-local/ed_hd.ogv);
+A set of large videos have been replaced into much smaller alternatives for faster download and smaller size of the package, see [issue #1118](https://github.com/website-local/mdn-local/issues/1118) for more details. Check [here](https://github.com/website-local/assets/releases/tag/mdn-local-video) for a full list of videos that are replaced.
