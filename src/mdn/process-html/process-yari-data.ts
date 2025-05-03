@@ -327,7 +327,8 @@ export async function downloadAndRenderYariCompatibilityData(
   const placeholders: Cheerio[] = [];
   const elements = $('#content>.article>p,' +
     '#content>.main-page-content>p,' +
-    '#content>.main-page-content>lazy-compat-table');
+    '#content>.main-page-content>lazy-compat-table,' +
+    '#content>.main-page-content>div.spinner');
   for (let i = 0; i < elements.length; i++) {
     const el = $(elements[i]);
     const text = el.text();
@@ -335,6 +336,9 @@ export async function downloadAndRenderYariCompatibilityData(
       text.trim() === BCD_PLACE_HOLDER_2022)) {
       placeholders.push(el);
     } else if (el.is('lazy-compat-table')) {
+      placeholders.push(el);
+    } else if (el.is('div.spinner')) {
+      // 20250503 a placeholder could be spinner, that's confusing
       placeholders.push(el);
     }
   }
@@ -376,7 +380,7 @@ export async function downloadAndRenderYariCompatibilityData(
       // https://github.com/mdn/yari/pull/2266
       el.prev().attr('id')?.toLowerCase() !== data.id.toLowerCase()) {
       errorLogger.warn(
-        'yari bcd: rendering the table into wrong place',
+        'yari bcd: possibly rendering the table into wrong place',
         data, contexts[i].index, el.prev().attr('id'), res.url);
     }
     // note: keep the original body of resource
@@ -389,6 +393,10 @@ export async function downloadAndRenderYariCompatibilityData(
     // make this lazy-compat-table plain element
     if (el.is('lazy-compat-table')) {
       el.prop('tagName', 'div').addClass('lazy-compat-table');
+    }
+    // 20250503 a placeholder could be spinner
+    if (el.is('div.spinner')) {
+      el.removeClass('spinner').addClass('lazy-compat-table');
     }
   }
 }
