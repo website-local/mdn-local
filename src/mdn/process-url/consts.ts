@@ -126,6 +126,12 @@ export const externalHosts = [
   ['/resources.whatwg.org/', 'resources.whatwg.org'],
   // 20250323
   ['/mdnplay.dev/', 'mdnplay.dev'],
+  // 20250503
+  // having no idea why they like external images so much
+  ['/pixabay.com/', 'pixabay.com'],
+  ['/c1.staticflickr.com/', 'c1.staticflickr.com'],
+  ['/wikipedia.org/', 'wikipedia.org'],
+  ['/images.unsplash.com/', 'images.unsplash.com'],
 ].map(([prefix, host, protocol]) => ({
   protocol: protocol || 'https',
   host,
