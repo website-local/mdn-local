@@ -970,3 +970,10 @@ dl.bc-notes-list dd.bc-supports-dd:last-child {
     padding-top: 0.5rem
   }
 }
+.bc-level-no {
+  background-color: var(--icon-critical);
+}
+
+.bc-level-preview {
+  background-color: var(--icon-information);
+}
