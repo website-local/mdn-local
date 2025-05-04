@@ -225,8 +225,11 @@ export function getCodeAndNodesForIframe(
   iframe: Cheerio,
   src: string
 ) {
-  let heading = $('#' + escapeSelector(id)) || closestHeading(iframe);
-  if (!heading) {
+  let heading: Cheerio | null = $('#' + escapeSelector(id));
+  if (!heading.length) {
+    heading = closestHeading(iframe);
+  }
+  if (!heading?.length) {
     return null;
   }
   let r = codeForHeading($, heading, src);
