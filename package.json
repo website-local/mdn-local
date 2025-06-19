@@ -17,7 +17,7 @@
     "website-scrap-engine": "^0.8.3"
   },
   "devDependencies": {
-    "@jest/globals": "^29.7.0",
+    "@jest/globals": "^30.0.1",
     "@types/node": "^22.15.30",
     "@types/tough-cookie": "^4.0.5",
     "@types/urijs": "^1.19.25",
