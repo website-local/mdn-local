@@ -106,7 +106,10 @@ export class CompatTable {
   }
 
   get _name() {
-    return this._breadcrumbs.at(-1) ?? '';
+    const bc = this._breadcrumbs;
+    return bc.length > 0
+      ? bc[bc.length - 1]
+      : '';
   }
 
   connectedCallback() {
