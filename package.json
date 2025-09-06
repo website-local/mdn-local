@@ -12,7 +12,7 @@
     "fast-glob": "^3.3.3",
     "json5": "^2.2.3",
     "mkdirp": "^3.0.1",
-    "tough-cookie": "^5.1.2",
+    "tough-cookie": "^6.0.0",
     "urijs": "^1.19.11",
     "website-scrap-engine": "^0.8.4"
   },
