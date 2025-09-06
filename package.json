@@ -28,6 +28,9 @@
     "ts-jest": "^29.4.1",
     "typescript": "^5.9.2"
   },
+  "overrides": {
+    "undici": "npm:@favware/skip-dependency@1.2.2"
+  },
   "scripts": {
     "test": "npm run lint && node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "eslint --fix src test",
