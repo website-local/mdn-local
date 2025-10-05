@@ -3087,7 +3087,23 @@ Prism.languages.py = Prism.languages.python;
       setTimeout(function () {
         linkCss.href =  linkPreload.href;
       }, 30);
-
+    } else {
+      linkCss = document.querySelectorAll('link[rel="stylesheet"][href*="static/client"]');
+      len = linkCss.length;
+      linkPreload = [];
+      for (i = 0; i < len; i++) {
+        linkPreload[i] = document.createElement('link');
+        linkPreload[i].href = linkCss[i].href.replace(/\.css$/, '_file.css');
+        linkPreload[i].rel = 'preload';
+        linkPreload[i].as = 'style';
+        document.head.appendChild(linkPreload[i]);
+      }
+      setTimeout(function () {
+        len = linkCss.length;
+        for (i = 0; i < len; i++) {
+          linkCss[i].href =  linkPreload[i].href;
+        }
+      }, len * 4);
     }
   }
   /// endregion yari mask-image to background fix
