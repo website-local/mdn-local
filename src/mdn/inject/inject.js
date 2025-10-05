@@ -5541,3 +5541,72 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
     btns[i].onmousedown = handleMousedown;
   }
 }();
+
+// 20251005 theme switcher
+// https://github.com/website-local/mdn-local/issues/1306
+!function () {
+  /* global localStorage, HTMLElement */
+  // You do NOT need custom elements everywhere
+  // since we are not creating them in script,
+  // should be just one
+  let mode;
+  try {
+    mode = localStorage.getItem('theme');
+  } catch (error) {
+    console.warn('Unable to read theme from localStorage', error);
+  }
+  if (mode !== 'light dark' && mode !== 'light' && mode !== 'dark') {
+    mode = 'light dark';
+  }
+  document.querySelectorAll('mdn-color-theme').forEach(theme => {
+    const sr = theme.shadowRoot;
+    if (!sr) {
+      return;
+    }
+
+    function setMode(e) {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+      const mode = target.dataset.mode;
+      if (!(mode === 'light dark' || mode === 'light' || mode === 'dark')) {
+        return;
+      }
+      try {
+        localStorage.setItem('theme', mode);
+      } catch (error) {
+        console.warn('Unable to write theme to localStorage', error);
+      }
+      const dropdown = sr.querySelector('mdn-dropdown');
+      if (dropdown) {
+        dropdown.blur();
+      }
+
+      document.documentElement.dataset.theme = mode;
+      this.dispatchEvent(
+        new CustomEvent("mdn-color-theme-update", {
+          bubbles: true,
+          composed: true,
+          detail: mode,
+        }),
+      );
+      sr.querySelectorAll('.color-theme__option').forEach(el => {
+        if (el.dataset.mode === mode) {
+          el.setAttribute('data-current', 'true');
+        } else {
+          el.removeAttribute('data-current', 'true');
+        }
+      });
+
+    }
+    sr.querySelectorAll('.color-theme__option').forEach(el => {
+      if (el.dataset.mode === mode) {
+        el.setAttribute('data-current', 'true');
+      } else {
+        el.removeAttribute('data-current', 'true');
+      }
+      el.onclick = setMode;
+    });
+  });
+}();
