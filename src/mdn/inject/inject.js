@@ -2482,7 +2482,7 @@ Prism.languages.py = Prism.languages.python;
 !function () {
   /// region top-level vars
   // noinspection ES6ConvertVarToLetConst
-  var htabs, desktops, mobiles, len, i, j, htab, links, a,
+  var len, i,
     // yari new compatibility table
     newTables, status = null,
     // yari expandable top menu
@@ -2563,80 +2563,6 @@ Prism.languages.py = Prism.languages.python;
     return false;
   }
   /// endregion class utils
-
-  /// region old compatibility table
-  // old compatibility table script, missing from official site
-  // implemented with pure js
-  // noinspection ES6ConvertVarToLetConst
-  htabs = 'getElementsByClassName' in document ?
-    document.getElementsByClassName('htab') :
-    document.querySelectorAll('.htab');
-  desktops = document.querySelectorAll('div[id=compat-desktop]');
-  mobiles = document.querySelectorAll('div[id=compat-mobile]');
-  len = htabs.length;
-
-  function changeTabListener(e) {
-    // noinspection JSDeprecatedSymbols
-    e = e || window.event;
-    if (e) {
-      if (e.preventDefault) e.preventDefault();
-      if (e.stopPropagation) e.stopPropagation();
-    }
-    // noinspection ES6ConvertVarToLetConst
-    var li, ul, i, index, selfIndex, elems, tab;
-    if (!(li = this.parentNode)) return false;
-    if ((ul = li.parentNode)) {
-      index = 0;
-      elems = ul.childNodes;
-      for (i = 0; i < elems.length; i++) {
-        if (elems[i].tagName !== 'LI') {
-          continue;
-        }
-        if (elems[i] === li) {
-          selfIndex = index;
-          addClass(elems[i], 'selected');
-        } else {
-          removeClass(elems[i], 'selected');
-        }
-        ++index;
-      }
-    }
-    if ((tab = ul.parentNode)) {
-      index = 0;
-      elems = tab.childNodes;
-      for (i = 0; i < elems.length; i++) {
-        if (elems[i].tagName !== 'DIV') {
-          continue;
-        }
-        if (index++ === selfIndex) {
-          elems[i].style.display = '';
-        } else {
-          elems[i].style.display = 'none';
-        }
-      }
-    }
-  }
-
-  for (i = 0; i < len; i++) {
-    htab = htabs[i];
-    links = htab.querySelectorAll('ul>li>a');
-    if (desktops[i]) {
-      // noinspection JSCheckFunctionSignatures
-      htab.appendChild(desktops[i]);
-    }
-    if (mobiles[i]) {
-      // noinspection JSCheckFunctionSignatures
-      htab.appendChild(mobiles[i]);
-    }
-    for (j = 0; j < links.length; j++) {
-      a = links[j];
-      a.onclick = changeTabListener;
-      if (j === 0) {
-        changeTabListener.call(a);
-      }
-    }
-  }
-  /// endregion old compatibility table
 
   /// region yari new compatibility table
   // https://github.com/website-local/mdn-local/issues/630
