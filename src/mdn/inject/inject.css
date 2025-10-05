@@ -8,7 +8,9 @@
 .dropdown-container,
 .bc-data .bc-github-link,
 .signin-link,
-.homepage-hero .homepage-hero-search.hide {
+.homepage-hero .homepage-hero-search.hide,
+.homepage-header__search.hide,
+.navigation__search.hide {
   display: none;
 }
 
@@ -18,7 +20,7 @@ article a.mdn-local-red-link {
 }
 
 /* margin-top of Last modified is not needed */
-.metadata-content-container .last-modified-date {
+.metadata-content-container .last-modified-date, .article-footer__last-modified {
   margin-top: 0;
 }
 /* Article actions, with only the language switcher inside */
@@ -365,7 +367,7 @@ aside.article-footer {
   padding: 0.5rem;
 }
 
-.article-footer .article-footer-inner p.last-modified-date {
+.article-footer .article-footer-inner p.last-modified-date, article-footer__last-modified {
   font-size: var(--type-tiny-font-size);
   margin: 0;
 }
