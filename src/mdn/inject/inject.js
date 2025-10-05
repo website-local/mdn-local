@@ -5545,7 +5545,7 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
 // 20251005 theme switcher
 // https://github.com/website-local/mdn-local/issues/1306
 !function () {
-  /* global localStorage, HTMLElement */
+  /* global localStorage, HTMLElement, location, CSSStyleSheet */
   // You do NOT need custom elements everywhere
   // since we are not creating them in script,
   // should be just one
@@ -5558,55 +5558,84 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
   if (mode !== 'light dark' && mode !== 'light' && mode !== 'dark') {
     mode = 'light dark';
   }
-  document.querySelectorAll('mdn-color-theme').forEach(theme => {
-    const sr = theme.shadowRoot;
-    if (!sr) {
+
+  function setMode(e) {
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) {
       return;
     }
-
-    function setMode(e) {
-      const target = e.target;
-      if (!(target instanceof HTMLElement)) {
-        return;
-      }
-      const mode = target.dataset.mode;
-      if (!(mode === 'light dark' || mode === 'light' || mode === 'dark')) {
-        return;
-      }
-      try {
-        localStorage.setItem('theme', mode);
-      } catch (error) {
-        console.warn('Unable to write theme to localStorage', error);
-      }
-      const dropdown = sr.querySelector('mdn-dropdown');
-      if (dropdown) {
-        dropdown.blur();
-      }
-
-      document.documentElement.dataset.theme = mode;
-      this.dispatchEvent(
-        new CustomEvent("mdn-color-theme-update", {
-          bubbles: true,
-          composed: true,
-          detail: mode,
-        }),
-      );
-      sr.querySelectorAll('.color-theme__option').forEach(el => {
-        if (el.dataset.mode === mode) {
-          el.setAttribute('data-current', 'true');
-        } else {
-          el.removeAttribute('data-current', 'true');
-        }
-      });
-
+    const mode = target.dataset.mode;
+    if (!(mode === 'light dark' || mode === 'light' || mode === 'dark')) {
+      return;
     }
+    try {
+      localStorage.setItem('theme', mode);
+    } catch (error) {
+      console.warn('Unable to write theme to localStorage', error);
+    }
+    const sr = target.getRootNode();
+    if (sr.activeElement) {
+      // hides the dropdown
+      sr.activeElement.blur();
+    }
+
+    document.documentElement.dataset.theme = mode;
+    document.body.dispatchEvent(
+      new CustomEvent('mdn-color-theme-update', {
+        bubbles: true,
+        composed: true,
+        detail: mode,
+      }),
+    );
     sr.querySelectorAll('.color-theme__option').forEach(el => {
       if (el.dataset.mode === mode) {
         el.setAttribute('data-current', 'true');
       } else {
         el.removeAttribute('data-current', 'true');
       }
+    });
+    sr.querySelector('.color-theme').dataset.theme = mode;
+
+  }
+
+  document.querySelectorAll('mdn-color-theme').forEach(theme => {
+    const sr = theme.shadowRoot;
+    if (!sr) {
+      return;
+    }
+    sr.querySelectorAll('.color-theme__option').forEach(el => {
+      if (el.dataset.mode === mode) {
+        setMode({target: el});
+      }
       el.onclick = setMode;
     });
+    if (location.protocol !== 'file:') {
+      return;
+    }
+    function replaceAll(str, s, r) {
+      if (str.replaceAll) {
+        return str.replaceAll(s, r);
+      }
+      return str.split(s).join(r);
+    }
+    for (let i = 0, len = sr.styleSheets.length; i < len; i++) {
+      const ss = sr.styleSheets[i];
+      const r = ss.cssRules;
+      for (let j = 0; j < r.length; j++) {
+        if (!r[j].style) {
+          continue;
+        }
+        let cssText = r[j].style.cssText;
+        cssText = replaceAll(cssText, '-webkit-mask-', '-webkit-background-');
+        cssText = replaceAll(cssText, '-webkit-mask:', '-webkit-background:');
+        cssText = replaceAll(cssText, 'mask-', 'background-');
+        cssText = replaceAll(cssText, 'mask:', 'background:');
+        r[j].style.cssText = cssText;
+      }
+    }
+    const style = document.createElement('style');
+    const sel = ['button.color-theme__button::before','button.color-theme__option::before'];
+    style.innerHTML = `${sel}{background-color:transparent}${sel.map(e => '[data-theme=dark] ' + e)}{filter:invert(1)}`;
+    sr.appendChild(style);
   });
 }();
