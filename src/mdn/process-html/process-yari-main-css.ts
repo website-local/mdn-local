@@ -4,6 +4,7 @@ import type {
 } from 'website-scrap-engine/lib/life-cycle/types.js';
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {toString} from 'website-scrap-engine/lib/util.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 
 function replaceAll(str: string, s: string, r: string): string {
   return str.split(s).join(r);
@@ -15,10 +16,14 @@ const MAIN_CSS_REGEX = /\/main\.[0-9a-fA-F]+\.css$/;
 
 export const processYariMainCss = (
   res: DownloadResource,
-  submit: SubmitResourceFunc
+  submit: SubmitResourceFunc,
+  options: StaticDownloadOptions,
 ): DownloadResource => {
+  const mdnHost: string = options.meta.host as string | void
+    || 'developer.mozilla.org';
   if (res.type !== ResourceType.Css ||
-    !MAIN_CSS_REGEX.test(res.downloadLink) ||
+    !(res.uri?.host() === mdnHost && res.uri.path().includes('static/client') ||
+      MAIN_CSS_REGEX.test(res.downloadLink))||
     res.savePath.endsWith('_file.css')) {
     return res;
   }
