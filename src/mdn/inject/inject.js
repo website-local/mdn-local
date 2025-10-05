@@ -3869,6 +3869,10 @@ Prism.languages.py = Prism.languages.python;
        * @type {HTMLElement|null}
        */
       this._sidebarInnerNav = null;
+      /**
+       * @type {HTMLElement|null}
+       */
+      this.input = null;
     }
 
     firstUpdated() {
@@ -3928,15 +3932,25 @@ Prism.languages.py = Prism.languages.python;
           }
         }
         const trimmedQuery = this.query.trim();
+        let span = this.input?.getRootNode().querySelector('.counter');
         if (trimmedQuery) {
           this._saveScrollPosition();
+          if (!span && this.input) {
+            span = document.createElement('span');
+            span.className = 'counter';
+            this.input.getRootNode().insertBefore(span, this.input.nextElementSibling);
+          }
         }
         if (this._filterer) {
           const count = this._filterer.applyFilter(trimmedQuery);
           this.matchCount = count;
+          if (span) {
+            span.innerText = count;
+          }
         }
         if (!trimmedQuery) {
           this._restoreScrollPosition();
+          span.remove();
         }
       }
     }
@@ -3965,7 +3979,9 @@ Prism.languages.py = Prism.languages.python;
     const filter = new MDNSidebarFilter();
     const sr = elem.shadowRoot;
     const btn = sr.querySelector('mdn-button');
-    sr.querySelector('input').oninput = (e) => {
+    const input = sr.querySelector('input');
+    filter.input = input;
+    input.oninput = (e) => {
       filter._onInput(e);
       btn.style.visibility = e.target.value.length ? 'initial' : '';
     };
