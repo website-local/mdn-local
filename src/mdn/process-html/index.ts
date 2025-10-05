@@ -12,16 +12,6 @@ import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {error} from 'website-scrap-engine/lib/logger/logger.js';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {
-  extractMdnAssets,
-  postProcessMdnAssets,
-  preProcessMdnAssets
-} from './process-mdn-assets.js';
-import {preProcessReactData} from './process-react-data.js';
-import {
-  postProcessJsPolyFill,
-  preProcessJsPolyFill
-} from './process-js-polyfill.js';
-import {
   preProcessRemoveCompatibilityTableWarning
 } from './process-compatibility-table.js';
 import {
@@ -75,7 +65,6 @@ export const preProcessHtml = async (
   let dataScript: Cheerio | null = null;
   let yariCompatibilityData: ProcessYariDataResult | void = undefined;
   let isYariDocs = false;
-  let assetsData;
   const scripts = $('script');
   for (let i = 0; i < scripts.length; i++) {
     const elem: Cheerio = $(scripts[i]);
@@ -90,23 +79,6 @@ export const preProcessHtml = async (
         // fetch polyfill not needed since it's mocked.
         text.includes('fetch-polyfill')) {
         elem.remove();
-        continue;
-      }
-      // mdn.assets
-      if ((assetsData = extractMdnAssets(text)) &&
-        ({assetsData} = assetsData) && assetsData) {
-        preProcessMdnAssets($, text, assetsData);
-        dataScript = elem;
-        continue;
-      }
-      // js polyfill
-      if (text.includes('document.write') && text.includes('js-polyfill')) {
-        preProcessJsPolyFill($, text);
-        continue;
-      }
-      if (text.includes('window._react_data')) {
-        preProcessReactData(text, elem);
-        dataScript = elem;
         continue;
       }
       if (text.includes('window.__data__')) {
@@ -188,49 +160,7 @@ export const postProcessHtml = (
   // 20251005 module scripts not supported in file: protocol
   $('script[type="module"]').remove();
 
-  let isYariDocs = false;
-
-  $('script').each((index, el) => {
-    let text: string | null;
-    const elem = $(el);
-    const src = elem.attr('src');
-    // remove main script chunk
-    // /static/js/2.bffd2cab.chunk.js
-    // /static/js/main.71bcbe14.chunk.js
-    if (src && src.endsWith('.chunk.js') && (
-      src.match(/\/\d+\./) || src.includes('/main.')
-    )) {
-      elem.remove();
-      return;
-    }
-    // /static/js/main.e9205f9f.js
-    // new since 20220717
-    if (src && src.match(/\/main\.[0-9a-fA-F]+\.js$/)) {
-      elem.remove();
-      return;
-    }
-    if (!(text = elem.html())) {
-      return;
-    }
-    // See https://github.com/mdn/yari/pull/2387
-    if (text.includes('polyfill.io/v3/polyfill.min.js')) {
-      elem.remove();
-      return;
-    }
-    if (text.includes('document.write') && text.includes('js-polyfill')) {
-      postProcessJsPolyFill($, elem, text);
-      return;
-    }
-    if (text.includes('window.__data__')) {
-      isYariDocs = true;
-      return;
-    }
-    postProcessMdnAssets(text, $, elem);
-  });
-
-  if (isYariDocs) {
-    postProcessAddIconToExternalLinks($);
-  }
+  postProcessAddIconToExternalLinks($);
   // replace external iframe with external links
   postProcessReplaceExternalIframeWithLink($, res.url);
   // replace external img with external links
