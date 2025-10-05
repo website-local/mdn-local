@@ -17,8 +17,10 @@ export function redirectUrlAfterFetch(
     res.redirectedUrl = res.url;
     return res;
   }
-  if (host !== 'developer.mozilla.org') {
-    url = uri.host('developer.mozilla.org').toString();
+  const mdnHost: string = options.meta.host as string | void
+    || 'developer.mozilla.org';
+  if (host !== mdnHost) {
+    url = uri.host(mdnHost).toString();
   }
   const path = uri.path(), pathArr = path.split('/');
   if (redirectLocale[pathArr[1]]) {
