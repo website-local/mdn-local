@@ -3152,6 +3152,8 @@ Prism.languages.py = Prism.languages.python;
         }
       }
     });
+  // Updated 20251005
+  // https://github.com/website-local/mdn-local/issues/1308
   function addCopyToClipboardButton(element, header) {
     if (!header || header.querySelector('.copy-icon')) return;
     if (typeof navigator !== 'object' || !navigator.clipboard) {
@@ -3160,19 +3162,16 @@ Prism.languages.py = Prism.languages.python;
 
     var button = document.createElement('button');
     var span = document.createElement('span');
-    var liveregion = document.createElement('span');
 
-    span.textContent = 'Copy to Clipboard';
+    span.textContent = 'Copy';
 
     button.setAttribute('type', 'button');
-    button.setAttribute('class', 'icon copy-icon');
-    span.setAttribute('class', 'visually-hidden');
-    liveregion.classList.add('copy-icon-message', 'visually-hidden');
-    liveregion.setAttribute('role', 'alert');
+    button.style.cssText = 'border: 1px solid; margin-left: auto;' +
+      'border-radius: 0.25rem; padding: 0.5em; background: transparent;';
+    // span.setAttribute('class', 'visually-hidden');
 
     button.appendChild(span);
     header.appendChild(button);
-    header.appendChild(liveregion);
     button.onclick = function () {
       return Promise.resolve().then(function () {
         var text = element.textContent || '';
@@ -3185,49 +3184,30 @@ Prism.languages.py = Prism.languages.python;
 
         if (copiedSuccessfully) {
           button.classList.add('copied');
-          showCopiedMessage(header, 'Copied!');
+          showCopiedMessage('Copied!');
         } else {
           button.classList.add('failed');
-          showCopiedMessage(header, 'Error trying to copy to clipboard!');
+          showCopiedMessage('Copy failed!');
         }
 
         setTimeout(
           function () {
-            hideCopiedMessage(header);
+            hideCopiedMessage();
           },
           copiedSuccessfully ? 1000 : 3000
         );
       });
     };
 
-  }
-  function showCopiedMessage(wrapper, msg) {
-    var element = getCopiedMessageElement(wrapper);
-    element.textContent = msg;
-    element.classList.remove('visually-hidden');
-  }
-
-  function hideCopiedMessage(wrapper) {
-    var element = getCopiedMessageElement(wrapper);
-    element.textContent = ''; // ensure contents change, so that they are picked up by the live region
-    if (element) {
-      element.classList.add('visually-hidden');
+    function showCopiedMessage(msg) {
+      span.textContent = msg;
     }
-  }
 
-  function getCopiedMessageElement(wrapper) {
-    var className = 'copy-icon-message';
-    var element = wrapper.querySelector(`span.${className}`);
-    if (!element) {
-      element = document.createElement('span');
-      element.classList.add(className);
-      element.classList.add('visually-hidden');
-      element.setAttribute('role', 'alert');
-      wrapper.appendChild(element);
+    function hideCopiedMessage() {
+      span.textContent = 'Copy';
     }
-    return element;
-  }
 
+  }
 }();
 
 // 20231003 mdn: scroll to highlight on sidebar
