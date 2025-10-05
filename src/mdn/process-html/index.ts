@@ -67,6 +67,9 @@ export const preProcessHtml = async (
   // class name updated again on 2024
   $('#license.page-footer-legal-text')
     .insertAfter($('.article-footer-inner>.last-modified-date'));
+  // 20251005 fred
+  $('.footer__mozilla>p:last-child')
+    .insertAfter($('.article-footer__last-modified'));
   preProcessRemoveElements($);
   // the script containing inline data
   let dataScript: Cheerio | null = null;
@@ -184,6 +187,8 @@ export const postProcessHtml = (
   $('script[src*="react-main."]').remove();
   // 20250203 gtag.js googletagmanager stuff
   $('script[src*="gtag.js"]').remove();
+  // 20251005 module scripts not supported in file: protocol
+  $('script[type="module"]').remove();
 
   let isYariDocs = false;
 
