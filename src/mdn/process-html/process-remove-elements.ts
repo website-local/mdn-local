@@ -121,4 +121,23 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   // 20241006 blog newsletter
   // https://github.com/website-local/mdn-local/issues/1068
   $('.section-newsletter').remove();
+  // 20251005 banner
+  $('.page-layout__banner').remove();
+  $('.translation-banner').remove();
+  // language switcher
+  $('mdn-language-switcher').remove();
+  // footer
+  $('.article-footer__links,mdn-content-feedback').remove();
+  $('.article-footer__inner>#feedback').remove();
+  $('.article-footer__svg-container,.article-footer__contribute').remove();
+  $('.page-layout__footer').remove();
+  // search box
+  $('.homepage-header__search').addClass('hide');
+  $('.navigation__search').addClass('hide');
+  // homepage
+  $('.homepage-body>section:not(:first-child)').remove();
+  // footer
+  $('.homepage-footer').remove();
+  // menus
+  $('.menu__tab[data-section="tools"] menu__panel-content>ul:first-child').remove();
 };
