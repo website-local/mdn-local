@@ -143,15 +143,13 @@ export const preProcessHtml = async (
   await preProcessPlayground(res, submit, options, pipeline, $);
 
   /// region inject external script and style
-  if (dataScript?.length) {
-    // language=HTML
-    $(`<script class="mdn-local-inject-js" src="${INJECT_JS_PATH}"></script>`)
-      .insertAfter(dataScript);
-    // language=HTML
-    $(`<link href="${INJECT_CSS_PATH}" rel="stylesheet" \
+  // language=HTML
+  $(`<script class="mdn-local-inject-js" src="${INJECT_JS_PATH}"></script>`)
+    .insertAfter(dataScript?.length ? dataScript : $('body'));
+  // language=HTML
+  $(`<link href="${INJECT_CSS_PATH}" rel="stylesheet" \
 type="text/css" class="mdn-local-inject-css">`)
-      .appendTo($('head'));
-  }
+    .appendTo($('head'));
   /// endregion inject external script and style
 
   // download and render yari browser-compatibility-table
