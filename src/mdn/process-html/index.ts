@@ -19,11 +19,8 @@ import {
   postProcessReplaceExternalScriptWithLink,
 } from './process-external.js';
 import {preProcessRemoveElements} from './process-remove-elements.js';
-import type {ProcessYariDataResult} from './process-yari-data.js';
 import {
   downloadAndRenderYariCompatibilityData,
-  preProcessYariData,
-  preProcessYariHydrationData
 } from './process-yari-data.js';
 import {preProcessPlayground} from './process-playground.js';
 import {postProcessPlayable, preProcessPlayable} from './process-playable.js';
@@ -57,9 +54,6 @@ export const preProcessHtml = async (
   $('.footer__mozilla>p:last-child')
     .insertAfter($('.article-footer__last-modified'));
   preProcessRemoveElements($);
-  // the script containing inline data
-  let dataScript: Cheerio | null = null;
-  let yariCompatibilityData: ProcessYariDataResult | void = undefined;
   const scripts = $('script');
   for (let i = 0; i < scripts.length; i++) {
     const elem: Cheerio = $(scripts[i]);
@@ -74,22 +68,6 @@ export const preProcessHtml = async (
         // fetch polyfill not needed since it's mocked.
         text.includes('fetch-polyfill')) {
         elem.remove();
-        continue;
-      }
-      if (text.includes('window.__data__')) {
-        if (yariCompatibilityData) {
-          error.warn('preProcessHtml: multiple yari data found', res.url);
-        }
-        yariCompatibilityData = preProcessYariData(text, elem);
-        dataScript = elem;
-      }
-      if (elem.attr('id') === 'hydration' &&
-        elem.attr('type') === 'application/json') {
-        if (yariCompatibilityData) {
-          error.warn('preProcessHtml: multiple yari data found', res.url);
-        }
-        yariCompatibilityData = preProcessYariHydrationData(text, elem);
-        dataScript = elem;
       }
     }
   }
@@ -102,7 +80,7 @@ export const preProcessHtml = async (
   /// region inject external script and style
   // language=HTML
   $(`<script class="mdn-local-inject-js" src="${INJECT_JS_PATH}"></script>`)
-    .insertAfter(dataScript?.length ? dataScript : $('body'));
+    .insertAfter($('body'));
   // language=HTML
   $(`<link href="${INJECT_CSS_PATH}" rel="stylesheet" \
 type="text/css" class="mdn-local-inject-css">`)
@@ -112,9 +90,8 @@ type="text/css" class="mdn-local-inject-css">`)
   // download and render yari browser-compatibility-table
   try {
     await downloadAndRenderYariCompatibilityData(
-      res, submit, pipeline,
-      $, dataScript, yariCompatibilityData,
-      options.meta.locale as string
+      res, submit, pipeline, options,
+      $, options.meta.locale as string
     );
   } catch (e) {
     error.error('Error processing yari browser-compatibility-table', e, res.url);
