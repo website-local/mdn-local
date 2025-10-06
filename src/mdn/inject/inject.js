@@ -4839,6 +4839,296 @@ code {
   customElements.define('mdn-play-controller', MDNPlayController);
   /// endregion play-controller
 
+  /// region ix-tab
+  class MDNIXTabPanel extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+    }
+
+    connectedCallback() {
+      this.setAttribute('tabindex', '0');
+      this.setAttribute('role', 'tabpanel');
+      this._render();
+    }
+
+    setActive() {
+      this.setAttribute('slot', 'active-panel');
+    }
+
+    unsetActive() {
+      this.removeAttribute('slot');
+    }
+
+    _render() {
+      this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          flex: 1;
+          min-height: 0;
+        }
+      </style>
+      <slot></slot>
+    `;
+    }
+  }
+
+  customElements.define('mdn-ix-tab-panel', MDNIXTabPanel);
+
+  class MDNIXTabWrapper extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+    }
+
+    connectedCallback() {
+      this._render();
+      this._setupEventListeners();
+      this._initFirstTab();
+    }
+
+    _render() {
+      this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        }
+
+        #tablist {
+          display: flex;
+          flex-shrink: 0;
+          gap: 0.5rem;
+          overflow-x: auto;
+          background: var(--color-background-secondary);
+          border-bottom: 1px solid var(--color-border-primary);
+        }
+      </style>
+      <div id="tablist" role="tablist">
+        <slot name="tablist"></slot>
+      </div>
+      <slot name="active-panel"></slot>
+    `;
+
+      // Setup event delegation
+      const tablist = this.shadowRoot.getElementById('tablist');
+      tablist.addEventListener('click', this._tablistClick.bind(this));
+      tablist.addEventListener('keydown', this._tablistKeyDown.bind(this));
+    }
+
+    _setupEventListeners() {
+      const tablist = this.shadowRoot.getElementById('tablist');
+      tablist.addEventListener('click', this._tablistClick.bind(this));
+      tablist.addEventListener('keydown', this._tablistKeyDown.bind(this));
+    }
+
+    _initFirstTab() {
+      setTimeout(() => {
+        const firstTab = this.querySelector('mdn-ix-tab');
+        if (firstTab) {
+          firstTab.setActive();
+        }
+      }, 0);
+    }
+
+    _getTab(position) {
+      const tabs = [...this.querySelectorAll('mdn-ix-tab')];
+      if (position === 'first') {
+        return tabs[0];
+      }
+      if (position === 'last') {
+        return tabs.at(-1);
+      }
+      const activeIndex = tabs.findIndex((tab) => tab.isActive);
+      if (position === 'active') {
+        return tabs[activeIndex];
+      }
+      if (position === 'prev') {
+        return tabs.at((activeIndex - 1) % tabs.length);
+      }
+      if (position === 'next') {
+        return tabs.at((activeIndex + 1) % tabs.length);
+      }
+      return undefined;
+    }
+
+    _setTabActive(tab, focus = false) {
+      if (!tab) {
+        return;
+      }
+      const activeTab = this._getTab('active');
+      if (activeTab) {
+        activeTab.unsetActive();
+      }
+      tab.setActive();
+      if (focus) {
+        tab.focus();
+      }
+    }
+
+    _tablistClick(event) {
+      const target = event.target;
+      if (target instanceof HTMLElement) {
+        const tab = target.closest('mdn-ix-tab') || undefined;
+        this._setTabActive(tab);
+      }
+    }
+
+    _tablistKeyDown(event) {
+      let position;
+      switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        position = 'next';
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        position = 'prev';
+        break;
+      case 'Home':
+        position = 'first';
+        break;
+      case 'End':
+        position = 'last';
+        break;
+      default:
+        return;
+      }
+      event.preventDefault();
+      this._setTabActive(this._getTab(position), true);
+    }
+  }
+
+  customElements.define('mdn-ix-tab-wrapper', MDNIXTabWrapper);
+
+  class MDNIXTab extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+    }
+
+    connectedCallback() {
+      this.setAttribute('slot', 'tablist');
+      this.setAttribute('role', 'tab');
+      this.unsetActive();
+
+      // Setup panel relationship
+      const panel = this.nextElementSibling;
+      if (panel instanceof MDNIXTabPanel) {
+        this.panel = panel;
+        if (panel.id) {
+          this.setAttribute('aria-controls', panel.id);
+        }
+        if (this.id) {
+          panel.setAttribute('aria-labelledby', this.id);
+        }
+      }
+
+      this._applyStyles();
+      this._render();
+    }
+
+    _applyStyles() {
+      const style = document.createElement('style');
+      style.textContent = `
+      :host {
+        --ix-tab-background-active: light-dark(
+          var(--color-gray-90),
+          var(--color-gray-10)
+        );
+        padding: 0.5em 30px;
+        font-size: var(--font-size-small);
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        background-color: transparent;
+        border: 0 none;
+        border-top: 3px solid transparent;
+        border-bottom: 3px solid transparent;
+        transition:
+          color 0.2s,
+          background-color 0.2s;
+      }
+
+      :host(:hover),
+      :host(:focus) {
+        color: var(--color-text-primary);
+        background-color: var(--ix-tab-background-active);
+      }
+
+      :host([aria-selected="true"]) {
+        color: var(--color-border-active);
+        background-color: var(--ix-tab-background-active);
+        border-bottom-color: var(--color-border-active);
+      }
+    `;
+      this.shadowRoot.appendChild(style);
+    }
+
+    _render() {
+      this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          --ix-tab-background-active: light-dark(
+            var(--color-gray-90),
+            var(--color-gray-10)
+          );
+          padding: 0.5em 30px;
+          font-size: var(--font-size-small);
+          color: var(--color-text-secondary);
+          cursor: pointer;
+          background-color: transparent;
+          border: 0 none;
+          border-top: 3px solid transparent;
+          border-bottom: 3px solid transparent;
+          transition:
+            color 0.2s,
+            background-color 0.2s;
+        }
+
+        :host(:hover),
+        :host(:focus) {
+          color: var(--color-text-primary);
+          background-color: var(--ix-tab-background-active);
+        }
+
+        :host([aria-selected="true"]) {
+          color: var(--color-border-active);
+          background-color: var(--ix-tab-background-active);
+          border-bottom-color: var(--color-border-active);
+        }
+      </style>
+      <slot></slot>
+    `;
+    }
+
+    setActive() {
+      this.setAttribute('tabindex', '0');
+      this.setAttribute('aria-selected', 'true');
+      if (this.panel) {
+        this.panel.setActive();
+      }
+    }
+
+    unsetActive() {
+      this.setAttribute('tabindex', '-1');
+      this.setAttribute('aria-selected', 'false');
+      if (this.panel) {
+        this.panel.unsetActive();
+      }
+    }
+
+    get isActive() {
+      return this.getAttribute('aria-selected') === 'true';
+    }
+  }
+
+  customElements.define('mdn-ix-tab', MDNIXTab);
+
+  /// endregion ix-tab
+
+  /// region interactive-example
+  // https://github.com/mdn/fred/blob/v1.6.1/components/interactive-example/utils.js
   /**
    * Checks if the CSS code is supported by the current browser.
    *
@@ -4850,7 +5140,7 @@ code {
     const element = document.createElement('div');
 
     // strip out any CSS comments before applying the code
-    code = code.replace(cssCommentsMatch, '');
+    code = code.replaceAll(cssCommentsMatch, '');
 
     const vendorPrefixMatch = /^-(?:webkit|moz|ms|o)-/;
     const style = element.style;
@@ -4912,13 +5202,13 @@ code {
       }
     }
 
-    if (notAppliedProperties.size !== 0) {
+    if (notAppliedProperties.size > 0) {
       // If property with vendor prefix is supported, we can ignore the fact that browser doesn't support property with no prefix
       for (const substitute of appliedPropertiesWithPrefix) {
         notAppliedProperties.delete(substitute);
       }
       // If any other declaration is not supported, whole block should be marked as invalid
-      if (notAppliedProperties.size !== 0) return false;
+      if (notAppliedProperties.size > 0) return false;
     }
     return true;
   }
@@ -5096,8 +5386,8 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
       this.shadowRoot.appendChild(style);
 
       // Find controller and runner elements if they exist.
-      this._controllerEl = this.shadowRoot.querySelector('play-controller');
-      this._runnerEl = this.shadowRoot.querySelector('play-runner');
+      this._controllerEl = this.shadowRoot.querySelector('mdn-play-controller');
+      this._runnerEl = this.shadowRoot.querySelector('mdn-play-runner');
 
       // In a real app, you might pass the code to the controller.
       if (this._controllerEl && this._code) {
@@ -5114,14 +5404,14 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
       // Render a header, an editor (or tabbed editor if _languages>1),
       // Run and Reset buttons, and output console.
       let inner = `
-      <play-controller>
+      <mdn-play-controller>
         <div class="template-console">
           <header>
             <h4>${this.name}</h4>
           </header>
     `;
       if (this._languages.length === 1) {
-        inner += `<play-editor id="editor" language="${this._languages[0]}"></play-editor>`;
+        inner += `<mdn-play-editor id="editor" language="${this._languages[0]}"></mdn-play-editor>`;
       } else {
         inner += '<div class="tabbed"><div class="tab-wrapper">';
         // Create tabs and panels – note that activation will be handled later.
@@ -5134,7 +5424,7 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
         this._languages.forEach((lang, i) => {
           inner += `
         <div class="tab-panel" data-lang-panel="${lang}" data-index="${i}" role="tabpanel">
-          <play-editor language="${lang}"></play-editor>
+          <mdn-play-editor language="${lang}"></mdn-play-editor>
         </div>
       `;
         });
@@ -5164,10 +5454,10 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
             <button id="execute">Run</button>
             <button id="reset">Reset</button>
           </div>
-          <play-console id="console"></play-console>
-          <play-runner defaults="${this._languages.includes('wat') ? 'ix-wat' : ''}"></play-runner>
+          <mdn-play-console id="console"></mdn-play-console>
+          <mdn-play-runner defaults="${this._languages.includes('wat') ? 'ix-wat' : ''}"></mdn-play-runner>
         </div>
-      </play-controller>
+      </mdn-play-controller>
     `;
       // Attach button events after rendering.
       setTimeout(() => {
@@ -5185,7 +5475,7 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
 
     _renderTabs() {
       let inner = `
-      <play-controller run-on-start run-on-change>
+      <mdn-play-controller run-on-start run-on-change>
         <div class="template-tabbed">
           <header>
             <h4>${(this.name)}</h4>
@@ -5204,7 +5494,7 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
       this._languages.forEach((lang, i) => {
         inner += `
         <div class="tab-panel" data-lang-panel="${lang}" data-index="${i}" role="tabpanel">
-          <play-editor language="${lang}"></play-editor>
+          <mdn-play-editor language="${lang}"></mdn-play-editor>
         </div>
       `;
       });
@@ -5212,10 +5502,10 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
           </div></div>
           <div class="output-wrapper">
             <h4>Output</h4>
-            <play-runner sandbox="allow-top-navigation-by-user-activation" defaults="ix-tabbed"></play-runner>
+            <mdn-play-runner sandbox="allow-top-navigation-by-user-activation" defaults="ix-tabbed"></mdn-play-runner>
           </div>
         </div>
-      </play-controller>
+      </mdn-play-controller>
     `;
       // Attach events after render.
       setTimeout(() => {
@@ -5252,16 +5542,16 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
       this._choices.forEach((code, index) => {
         inner += `
           <div class="choice" data-index="${index}">
-            <play-editor data-index="${index}" language="css" minimal="true" delay="100">${code.trim()}</play-editor>
+            <mdn-play-editor data-index="${index}" language="css" minimal="true" delay="100">${code.trim()}</mdn-play-editor>
           </div>
       `;
       });
       inner += `
         </div>
         <div class="output-wrapper">
-          <play-controller run-on-start>
-            <play-runner defaults="ix-choice"></play-runner>
-          </play-controller>
+          <mdn-play-controller run-on-start>
+            <mdn-play-runner defaults="ix-choice"></mdn-play-runner>
+          </mdn-play-controller>
         </div>
       </div>
     `;
@@ -5271,13 +5561,13 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
         if(choiceWrapper){
           // Listen for focus or updates on editors.
           choiceWrapper.addEventListener('focus', (evt) => {
-            const target = evt.target.closest('play-editor');
+            const target = evt.target.closest('mdn-play-editor');
             if(target){
               this._choiceSelect(target);
             }
           });
           choiceWrapper.addEventListener('update', (evt) => {
-            const target = evt.target.closest('play-editor');
+            const target = evt.target.closest('mdn-play-editor');
             if(target){
               this._choiceSelect(target);
             }
@@ -5300,7 +5590,7 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
       // Reset the selected choice and update editors with original code.
       this.__choiceSelected = -1;
       // Update each play-editor in the choices.
-      const editorNodes = Array.from(this.shadowRoot.querySelectorAll('play-editor'));
+      const editorNodes = Array.from(this.shadowRoot.querySelectorAll('mdn-play-editor'));
       editorNodes.forEach((editor, index) => {
         editor.value = this._choices[index] || '';
       });
@@ -5395,6 +5685,7 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
   // Finally, register the element.
   customElements.define('interactive-example', InteractiveExampleBase);
 
+  /// endregion interactive-example
 }();
 
 // 20250419 new compatibility table
