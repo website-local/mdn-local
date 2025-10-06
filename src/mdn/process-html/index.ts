@@ -12,15 +12,11 @@ import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {error} from 'website-scrap-engine/lib/logger/logger.js';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {
-  preProcessRemoveCompatibilityTableWarning
-} from './process-compatibility-table.js';
-import {
   postProcessAddIconToExternalLinks,
   postProcessReplaceExternalIframeWithLink,
   postProcessReplaceExternalImgWithLink,
   postProcessReplaceExternalMediaWithLink,
   postProcessReplaceExternalScriptWithLink,
-  preProcessAddIconToExternalLinks
 } from './process-external.js';
 import {preProcessRemoveElements} from './process-remove-elements.js';
 import type {ProcessYariDataResult} from './process-yari-data.js';
@@ -64,7 +60,6 @@ export const preProcessHtml = async (
   // the script containing inline data
   let dataScript: Cheerio | null = null;
   let yariCompatibilityData: ProcessYariDataResult | void = undefined;
-  let isYariDocs = false;
   const scripts = $('script');
   for (let i = 0; i < scripts.length; i++) {
     const elem: Cheerio = $(scripts[i]);
@@ -87,7 +82,6 @@ export const preProcessHtml = async (
         }
         yariCompatibilityData = preProcessYariData(text, elem);
         dataScript = elem;
-        isYariDocs = true;
       }
       if (elem.attr('id') === 'hydration' &&
         elem.attr('type') === 'application/json') {
@@ -96,17 +90,8 @@ export const preProcessHtml = async (
         }
         yariCompatibilityData = preProcessYariHydrationData(text, elem);
         dataScript = elem;
-        isYariDocs = true;
       }
     }
-  }
-
-  // We're converting our compatibility data into a machine-readable JSON format.
-  preProcessRemoveCompatibilityTableWarning($);
-  // not needed in yari
-  if (!isYariDocs) {
-    // Add icon to external links
-    preProcessAddIconToExternalLinks($);
   }
 
   // https://github.com/website-local/mdn-local/issues/888

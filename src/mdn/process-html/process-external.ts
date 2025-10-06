@@ -3,21 +3,6 @@ import {
   skipExternal
 } from 'website-scrap-engine/lib/logger/logger.js';
 import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types.js';
-
-export const preProcessAddIconToExternalLinks = ($: CheerioStatic): void => {
-  if ($('script[src*="build/js/wiki"]').length) {
-    return;
-  }
-  // original script form developer.mozilla.org/static/build/js/wiki.62ddb187a9d0.js
-  // not applied to yari
-  $('.external').each(function (index, element) {
-    const $link = $(element);
-    if (!$link.find('img').length) {
-      $link.addClass('external-icon');
-    }
-  });
-};
-
 export const postProcessAddIconToExternalLinks = ($: CheerioStatic): void => {
   // no need to add class external-icon for yari
   $('#content > .article a[href^="http://"]').addClass('external');
