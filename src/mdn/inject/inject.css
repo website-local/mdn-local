@@ -1343,7 +1343,7 @@ dl.bc-notes-list dd.bc-supports-dd {
 }
 
 .mask-fix .prev:is(.prev-next li) a::before,
-.next:is(.prev-next li) a::after {
+.mask-fix .next:is(.prev-next li) a::after {
   background-color: transparent;
   filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(200deg) brightness(0.9);
 }
