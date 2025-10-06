@@ -5339,6 +5339,7 @@ code {
       this.__choiceUnsupported = this._choices.map(code =>
         !isCSSSupported(code || '')
       );
+      this._updateUnsupportedClass();
 
       if (editorNodes[0]) {
         this._selectChoice(editorNodes[0]);
@@ -5371,6 +5372,10 @@ code {
       this.__choiceUnsupported = this.__choiceUnsupported.map((value, i) =>
         index === i ? !isCSSSupported(editor.value) : value
       );
+      this._updateUnsupportedClass();
+    }
+
+    _updateUnsupportedClass() {
       this.__choiceUnsupported.forEach((value, i) => {
         const li = this.shadowRoot.querySelector(`.choice[data-index="${i}"]`);
         if (li) {
@@ -5404,6 +5409,7 @@ code {
         html = this._renderConsole();
       }
 
+      // noinspection CssInvalidMediaFeature,CssInvalidFunction
       this.shadowRoot.innerHTML = `
       <style>
         :host {
@@ -5538,6 +5544,17 @@ code {
           border-radius: var(--elem-radius);
         }
 
+        /* Media query: replace with actual condition, e.g. (max-width: 768px) */
+        @media (--screen-medium-and-narrower) {
+          .template-choices {
+            grid-template-areas:
+              "header"
+              "choice"
+              "runner";
+            grid-template-columns: 1fr;
+          }
+        }
+
         .template-choices .choice-wrapper {
           display: flex;
           flex-direction: column;
@@ -5549,44 +5566,81 @@ code {
           border-right: var(--border);
         }
 
-        .template-choices .choice {
+        @media (--screen-medium-and-narrower) {
+          .template-choices .choice-wrapper {
+            padding-right: 1em;
+            border-right: none;
+            border-bottom: var(--border);
+          }
+        }
+
+        .template-choices .choice-wrapper .choice {
+          --field-focus-border: light-dark(var(--color-blue-50), var(--color-blue-80));
+          --focus-01: 0 0 0 3px light-dark(var(--color-blue-90), var(--color-blue-10));
           display: flex;
           flex-grow: 1;
           align-items: center;
+          position: relative; /* ensures pseudo-element positioning reference if needed */
         }
 
-        .template-choices .choice::after {
+        .template-choices .choice-wrapper .choice::after {
           display: block;
-          width: 0.25rem;
-          /*width: 1.25rem;*/
-          /*height: 1.25rem;*/
-          /*margin: 0 0.75rem;*/
+          width: 1.25rem;
+          height: 1.25rem;
+          margin: 0 0.75rem;
           color: var(--field-focus-border);
           content: "";
-          /*background-color: currentcolor;*/
+          background-color: currentColor;
           opacity: 0;
-          /*mask-image: url("../icon/chevron-right.svg");*/
-          /*mask-size: cover;*/
+          mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2224%22%20height=%2224%22%20fill=%22none%22%20stroke=%22currentColor%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%20stroke-width=%222%22%20viewBox=%220%200%2024%2024%22%3E%3Cpath%20d=%22m9%2018%206-6-6-6%22/%3E%3C/svg%3E");
+          -webkit-mask-size: cover;
+          mask-size: cover;
         }
 
-        .template-choices .choice.selected mdn-play-editor {
+        @media (--screen-medium-and-narrower) {
+          .template-choices .choice-wrapper .choice::after {
+            display: none;
+          }
+        }
+
+        .template-choices .choice-wrapper .choice.selected mdn-play-editor {
           cursor: text;
           border-color: var(--field-focus-border);
           box-shadow: var(--focus-01);
         }
 
-        .template-choices .choice.selected::after {
+        .template-choices .choice-wrapper .choice.selected::after {
           opacity: 1;
           transition: all 0.2s ease-out;
         }
 
-        .template-choices .choice mdn-play-editor {
+        .template-choices .choice-wrapper .choice.unsupported {
+          --color-unsupported: light-dark(var(--color-yellow-50), var(--color-yellow-80));
+        }
+
+        .template-choices .choice-wrapper .choice.unsupported mdn-play-editor {
+          border-color: var(--color-unsupported);
+        }
+
+        .template-choices .choice-wrapper .choice.unsupported::after {
+          background-color: var(--color-unsupported);
+          mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2224%22%20height=%2224%22%20fill=%22none%22%20stroke=%22currentColor%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%20stroke-width=%222%22%20viewBox=%220%200%2024%2024%22%3E%3Cpath%20d=%22m21.73%2018-8-14a2%202%200%200%200-3.48%200l-8%2014A2%202%200%200%200%204%2021h16a2%202%200%200%200%201.73-3M12%209v4m0%204h.01%22/%3E%3C/svg%3E");
+          -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+          -webkit-mask-size: contain;
+          mask-size: contain;
+          transition: none;
+        }
+
+        /* mdn-play-editor inside .choice */
+        .template-choices .choice-wrapper .choice mdn-play-editor {
           width: 100%;
           cursor: pointer;
           border: var(--border);
           border-radius: var(--elem-radius);
         }
 
+        /* output wrapper */
         .template-choices .output-wrapper {
           height: 300px;
           overflow: hidden;
