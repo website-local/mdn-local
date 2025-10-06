@@ -4443,7 +4443,12 @@ code {
 
     render() {
       this.innerHTML = `
-      <style>iframe { border: medium; height: 100%; width: 100%; }</style>
+      <style>iframe {
+  box-sizing: content-box;
+  width: 100%;
+  height: 100%;
+  border: none;
+}</style>
       <iframe
         title="runner"
         allow="${this.allow || ''}"
@@ -4491,7 +4496,7 @@ code {
     return b64;
   }
 
-  customElements.define("mdn-play-runner", MDNPlayRunner);
+  customElements.define('mdn-play-runner', MDNPlayRunner);
 
   /// endregion play-runner
 
