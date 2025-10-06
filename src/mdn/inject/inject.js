@@ -3136,6 +3136,33 @@ Prism.languages.py = Prism.languages.python;
   }
 }();
 
+/**
+ * @param {ShadowRoot} sr
+ */
+function mdnMaskImageStyleFix(sr) {
+  function replaceAll(str, s, r) {
+    if (str.replaceAll) {
+      return str.replaceAll(s, r);
+    }
+    return str.split(s).join(r);
+  }
+  for (let i = 0, len = sr.styleSheets.length; i < len; i++) {
+    const ss = sr.styleSheets[i];
+    const r = ss.cssRules;
+    for (let j = 0; j < r.length; j++) {
+      if (!r[j].style) {
+        continue;
+      }
+      let cssText = r[j].style.cssText;
+      cssText = replaceAll(cssText, '-webkit-mask-', '-webkit-background-');
+      cssText = replaceAll(cssText, '-webkit-mask:', '-webkit-background:');
+      cssText = replaceAll(cssText, 'mask-', 'background-');
+      cssText = replaceAll(cssText, 'mask:', 'background:');
+      r[j].style.cssText = cssText;
+    }
+  }
+}
+
 // 20250203 mdn: sidebar filters
 // https://github.com/website-local/mdn-local/issues/1020
 // 20251005 updated
@@ -3691,28 +3718,7 @@ Prism.languages.py = Prism.languages.python;
     return;
   }
 
-  function replaceAll(str, s, r) {
-    if (str.replaceAll) {
-      return str.replaceAll(s, r);
-    }
-    return str.split(s).join(r);
-  }
-
-  for (let i = 0, len = sr.styleSheets.length; i < len; i++) {
-    const ss = sr.styleSheets[i];
-    const r = ss.cssRules;
-    for (let j = 0; j < r.length; j++) {
-      if (!r[j].style) {
-        continue;
-      }
-      let cssText = r[j].style.cssText;
-      cssText = replaceAll(cssText, '-webkit-mask-', '-webkit-background-');
-      cssText = replaceAll(cssText, '-webkit-mask:', '-webkit-background:');
-      cssText = replaceAll(cssText, 'mask-', 'background-');
-      cssText = replaceAll(cssText, 'mask:', 'background:');
-      r[j].style.cssText = cssText;
-    }
-  }
+  mdnMaskImageStyleFix(sr);
   const style = document.createElement('style');
   style.innerHTML = '.icon{background-color:transparent}.icon[data-theme=dark]{filter:invert(1)}';
   sr.appendChild(style);
@@ -5547,27 +5553,7 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
     if (location.protocol !== 'file:') {
       return;
     }
-    function replaceAll(str, s, r) {
-      if (str.replaceAll) {
-        return str.replaceAll(s, r);
-      }
-      return str.split(s).join(r);
-    }
-    for (let i = 0, len = sr.styleSheets.length; i < len; i++) {
-      const ss = sr.styleSheets[i];
-      const r = ss.cssRules;
-      for (let j = 0; j < r.length; j++) {
-        if (!r[j].style) {
-          continue;
-        }
-        let cssText = r[j].style.cssText;
-        cssText = replaceAll(cssText, '-webkit-mask-', '-webkit-background-');
-        cssText = replaceAll(cssText, '-webkit-mask:', '-webkit-background:');
-        cssText = replaceAll(cssText, 'mask-', 'background-');
-        cssText = replaceAll(cssText, 'mask:', 'background:');
-        r[j].style.cssText = cssText;
-      }
-    }
+    mdnMaskImageStyleFix(sr);
     const style = document.createElement('style');
     const sel = ['button.color-theme__button::before','button.color-theme__option::before'];
     style.innerHTML = `${sel}{background-color:transparent}${sel.map(e => '[data-theme=dark] ' + e)}{filter:invert(1)}`;
