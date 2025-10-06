@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   BrowserStatement,
-  CompatStatement,
   Identifier,
   SimpleSupportStatement,
   SimpleSupportStatementExtended,
@@ -9,22 +8,32 @@ import type {
   SupportStatementExtended,
   VersionValue
 } from './types.js';
-
-interface Feature {
-  name: string;
-  compat: CompatStatement;
-  depth: number;
-}
+import type {Feature} from './compat.js';
 
 /**
  * A list of browsers to be hidden.
  * @constant {string[]}
  */
-export const HIDDEN_BROWSERS = ['ie'];
+export const SHOW_BROWSERS = [
+  'chrome',
+  'edge',
+  'firefox',
+  'opera',
+  'safari',
+  'chrome_android',
+  'firefox_android',
+  'opera_android',
+  'safari_ios',
+  'samsunginternet_android',
+  'webview_android',
+  'webview_ios',
+  'bun',
+  'deno',
+  'nodejs',
+];
 
 /**
  * Gets the first element of an array or returns the value itself.
- *
  * @template T
  * @param {T | [T?, ...any[]]} a
  * @returns {T | undefined}
@@ -35,7 +44,6 @@ export function getFirst<T>(a: T | [T?, ...any[]]): T | undefined {
 
 /**
  * Ensures the input is returned as an array.
- *
  * @template T
  * @param {T | T[]} a
  * @returns {T[]}
@@ -46,7 +54,6 @@ export function asList<T>(a: T | T[]): T[] {
 
 /**
  * Finds the first compatibility depth in a BCD Identifier.
- *
  * @param {Identifier} identifier
  * @returns {number}
  */
@@ -71,7 +78,7 @@ function findFirstCompatDepth(identifier: Identifier): number {
         entries.push([subpath, subvalue]);
       }
     }
-  } while (entries.length);
+  } while (entries.length > 0);
 
   // Fallback.
   return 0;
@@ -79,12 +86,11 @@ function findFirstCompatDepth(identifier: Identifier): number {
 
 /**
  * Recursively lists features from a BCD Identifier.
- *
  * @param {Identifier} identifier
- * @param {string} [parentName=""]
- * @param {string} [rootName=""]
- * @param {number} [depth=0]
- * @param {number} [firstCompatDepth=0]
+ * @param {string} [parentName]
+ * @param {string} [rootName]
+ * @param {number} [depth]
+ * @param {number} [firstCompatDepth]
  * @returns {Feature[]}
  */
 export function listFeatures(
@@ -92,10 +98,10 @@ export function listFeatures(
   parentName = '',
   rootName = '',
   depth = 0,
-  firstCompatDepth = 0
+  firstCompatDepth = 0,
 ): Feature[] {
   /** @type {Feature[]} */
-  const features = [];
+  const features: Feature[] = [];
 
   if (rootName && identifier.__compat) {
     features.push({
@@ -124,7 +130,13 @@ export function listFeatures(
 
     if ('__compat' in subIdentifier /* || depth + 1 < firstCompatDepth*/) {
       features.push(
-        ...listFeatures(subIdentifier, subName, '', depth + 1, firstCompatDepth)
+        ...listFeatures(
+          subIdentifier,
+          subName,
+          '',
+          depth + 1,
+          firstCompatDepth,
+        ),
       );
     }
   }
@@ -133,7 +145,6 @@ export function listFeatures(
 
 /**
  * Checks if the support statement is an array with more than one item.
- *
  * @param {SupportStatement | undefined} support
  * @returns {boolean}
  */
@@ -143,7 +154,6 @@ export function hasMore(support: SupportStatement | undefined): boolean {
 
 /**
  * Determines if a version is a preview version.
- *
  * @param {string | VersionValue | undefined} version
  * @param {BrowserStatement} browser
  * @returns {boolean}
@@ -155,7 +165,7 @@ export function versionIsPreview(version: string | VersionValue | undefined, bro
 
   if (browser && typeof version === 'string' && browser.releases[version]) {
     return ['beta', 'nightly', 'planned'].includes(
-      browser.releases[version].status
+      browser.releases[version].status,
     );
   }
 
@@ -164,15 +174,14 @@ export function versionIsPreview(version: string | VersionValue | undefined, bro
 
 /**
  * Checks if the support statement has noteworthy notes.
- *
  * @param {SimpleSupportStatement} support
  * @returns {boolean}
  */
 export function hasNoteworthyNotes(support: SimpleSupportStatement): boolean {
   return (
     !!(
-      (support.notes && support.notes.length) ||
-      (support.impl_url && support.impl_url.length)
+      (support.notes && support.notes.length > 0) ||
+      (support.impl_url && support.impl_url.length > 0)
     ) &&
     !support.version_removed &&
     !support.partial_implementation
@@ -181,21 +190,19 @@ export function hasNoteworthyNotes(support: SimpleSupportStatement): boolean {
 
 /**
  * Converts a bug URL to a simplified string.
- *
  * @param {string} url
  * @returns {string}
  */
 export function bugURLToString(url: string): string {
   const match = url.match(
-    /^https:\/\/(?:crbug\.com|webkit\.org\/b|bugzil\.la)\/([0-9]+)/i
+    /^https:\/\/(?:crbug\.com|webkit\.org\/b|bugzil\.la)\/([0-9]+)/i,
   );
-  const bugNumber = match ? match[1] : null;
+  const bugNumber = match ? match[1] : undefined;
   return bugNumber ? `bug ${bugNumber}` : url;
 }
 
 /**
  * Checks if a support statement has any limitation.
- *
  * @param {SimpleSupportStatement} support
  * @returns {boolean}
  */
@@ -205,7 +212,6 @@ function hasLimitation(support: SimpleSupportStatement): boolean {
 
 /**
  * Checks if a support statement has major limitations.
- *
  * @param {SimpleSupportStatement} support
  * @returns {boolean}
  */
@@ -221,7 +227,6 @@ function hasMajorLimitation(support: SimpleSupportStatement): boolean {
 
 /**
  * Checks if a support statement is fully supported without any limitation.
- *
  * @param {SimpleSupportStatement} support
  * @returns {boolean}
  */
@@ -231,7 +236,6 @@ export function isFullySupportedWithoutLimitation(support: SimpleSupportStatemen
 
 /**
  * Checks if a support statement is not supported at all.
- *
  * @param {SimpleSupportStatement} support
  * @returns {boolean}
  */
@@ -241,7 +245,6 @@ export function isNotSupportedAtAll(support: SimpleSupportStatement): boolean {
 
 /**
  * Checks if a support statement is fully supported without major limitations.
- *
  * @param {SimpleSupportStatement} support
  * @returns {boolean}
  */
@@ -253,46 +256,45 @@ function isFullySupportedWithoutMajorLimitation(support: SimpleSupportStatement)
  * Gets the current support statement from a support statement extended.
  *
  * Prioritizes support items in the following order:
- *   1. Full support without limitation.
- *   2. Full support with only notes and version_added.
- *   3. Full support with alternative name or prefix.
- *   4. Partial support.
- *   5. Support with flags only.
- *   6. No/Inactive support.
- *
- * @param {SupportStatementExtended | undefined} support
- * @returns {SimpleSupportStatementExtended | undefined}
+ * 1. Full support without limitation.
+ * 2. Full support with only notes and version_added.
+ * 3. Full support with alternative name or prefix.
+ * 4. Partial support.
+ * 5. Support with flags only.
+ * 6. No/Inactive support.
+ * @param {import("@compat").SupportStatementExtended | undefined} support
+ * @returns {import("@compat").SimpleSupportStatementExtended | undefined}
  */
 export function getCurrentSupport(support: SupportStatementExtended | undefined): SimpleSupportStatementExtended | undefined {
-  if (!support) return undefined;
+  if (!support) return;
 
   // Full support without limitation.
   const noLimitationSupportItem = asList(support).find((item) =>
-    isFullySupportedWithoutLimitation(item)
+    isFullySupportedWithoutLimitation(item),
   );
   if (noLimitationSupportItem) return noLimitationSupportItem;
 
   // Full support with only notes and version_added.
   const minorLimitationSupportItem = asList(support).find((item) =>
-    isFullySupportedWithoutMajorLimitation(item)
+    isFullySupportedWithoutMajorLimitation(item),
   );
   if (minorLimitationSupportItem) return minorLimitationSupportItem;
 
   // Full support with alternative name/prefix.
   const altnamePrefixSupportItem = asList(support).find(
-    (item) => !item.version_removed && (item.prefix || item.alternative_name)
+    (item) => !item.version_removed && (item.prefix || item.alternative_name),
   );
   if (altnamePrefixSupportItem) return altnamePrefixSupportItem;
 
   // Partial support.
   const partialSupportItem = asList(support).find(
-    (item) => !item.version_removed && item.partial_implementation
+    (item) => !item.version_removed && item.partial_implementation,
   );
   if (partialSupportItem) return partialSupportItem;
 
   // Support with flags only.
   const flagSupportItem = asList(support).find(
-    (item) => !item.version_removed && item.flags
+    (item) => !item.version_removed && item.flags,
   );
   if (flagSupportItem) return flagSupportItem;
 
