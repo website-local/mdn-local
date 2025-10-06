@@ -213,13 +213,15 @@ table.compat-table th {
 }
 
 .mask-fix .bc-legend-item-dt .icon,
-.mask-fix .bc-table .icon {
+.mask-fix .bc-table .icon,
+.mask-fix .bc-table :is(.bc-table-row-header .bc-icons) .icon {
   background-color: transparent;
-  filter: opacity(0.6);
+  filter: opacity(0.8);
 }
 [data-theme="dark"] .mask-fix .bc-legend-item-dt .icon,
-[data-theme="dark"] .mask-fix .bc-table .icon {
-  filter: invert(1) opacity(0.6);
+[data-theme="dark"] .mask-fix .bc-table .icon,
+[data-theme="dark"] .mask-fix .bc-table :is(.bc-table-row-header .bc-icons) .icon {
+  filter: invert(1) opacity(0.8);
 }
 .mask-fix .icon.icon-no {
   filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(340deg) brightness(0.9) !important;
@@ -459,7 +461,7 @@ table.bc-table {
   grid-template-columns: subgrid;
 }
 
-:is(:is(table.bc-table tbody) tr) td, :is(:is(table.bc-table tbody) tr) th, :is(table tbody) tr, table tbody {
+:is(:is(table.bc-table tbody) tr) td, :is(:is(table.bc-table tbody) tr) th, :is(table.bc-table tbody) tr, table.bc-table tbody {
   display: contents;
 }
 
@@ -855,10 +857,6 @@ dl.bc-notes-list dd.bc-supports-dd {
     gap: 0.5rem;
   }
 
-  .bc-on-github a {
-    white-space: nowrap;
-  }
-
   .table-container {
     overflow-x: auto;
   }
@@ -945,10 +943,6 @@ dl.bc-notes-list dd.bc-supports-dd {
 }
 
 @media (769px < width) {
-  .bc-on-github {
-    text-align: right;
-  }
-
   .bc-table {
     grid-template-columns: minmax(25%, max-content) repeat(var(--compat-browser-count), calc(75% / var(--compat-browser-count)));
   }
@@ -1015,4 +1009,256 @@ dl.bc-notes-list dd.bc-supports-dd {
     padding-right: 0.25rem;
     padding-top: 0.5rem;
   }
+}
+
+.lazy-compat-table .table-container-inner {
+  margin: 0;
+}
+
+/* compat table icons */
+
+.bc-table .icon {
+  --size: var(--icon-size,1rem);
+  background-color: var(--color-border-secondary);
+  display: inline-block;
+  flex-shrink: 0;
+  height: var(--size);
+  mask-size: cover;
+  background-size: cover;
+  vertical-align: middle;
+  width: var(--size);
+}
+
+/** Platform icons. */
+.bc-table .icon.icon-desktop {
+  mask-image: url("./icon/monitor.svg");
+}
+
+.bc-table .icon.icon-mobile {
+  mask-image: url("./icon/smartphone.svg");
+}
+
+.bc-table .icon.icon-server {
+  mask-image: url("./icon/server.svg");
+}
+
+/** Browser icons. */
+
+.bc-table .icon.icon-bun {
+  mask-image: url("./icon/browser/bun.svg");
+}
+
+.bc-table .icon.icon-chrome {
+  mask-image: url("./icon/browser/chrome.svg");
+}
+
+.bc-table .icon.icon-deno {
+  mask-image: url("./icon/browser/deno.svg");
+}
+
+.bc-table .icon.icon-edge {
+  mask-image: url("./icon/browser/edge.svg");
+}
+
+.bc-table .icon.icon-firefox {
+  mask-image: url("./icon/browser/firefox.svg");
+}
+
+.bc-table .icon.icon-edge {
+  mask-image: url("./icon/browser/edge.svg");
+}
+
+.bc-table .icon.icon-nodejs {
+  mask-image: url("./icon/browser/nodejs.svg");
+}
+
+.bc-table .icon.icon-opera {
+  mask-image: url("./icon/browser/opera.svg");
+}
+
+.bc-table .icon.icon-safari {
+  mask-image: url("./icon/browser/safari.svg");
+}
+
+.bc-table .icon.icon-samsunginternet {
+  mask-image: url("./icon/browser/samsung-internet.svg");
+}
+
+.bc-table .icon.icon-webview {
+  mask-image: url("./icon/browser/webview.svg");
+}
+
+/** Status icons. */
+
+.bc-table .icon.icon-no {
+  mask-image: url("./icon/circle-x.svg");
+}
+
+.bc-table .icon.icon-partial {
+  mask-image: url("./icon/circle-slash.svg");
+}
+
+.bc-table .icon.icon-yes {
+  mask-image: url("./icon/check.svg");
+}
+
+.bc-table .icon.icon-yes-circle {
+  mask-image: url("./icon/circle-check.svg");
+}
+
+.bc-table .icon.icon-experimental {
+  mask-image: url("./icon/flask-conical.svg");
+}
+
+.bc-table .icon.icon-deprecated {
+  mask-image: url("./icon/trash-2.svg");
+}
+
+.bc-table .icon.icon-nonstandard {
+  mask-image: url("./icon/triangle-alert.svg");
+}
+
+.bc-table .icon.icon-footnote {
+  mask-image: url("./icon/asterisk.svg");
+}
+
+.bc-table .icon.icon-unknown {
+  mask-image: url("./icon/circle-help.svg");
+}
+
+.bc-table .icon.icon-prefix {
+  mask-image: url("./icon/mdn-prefix.svg");
+}
+
+.bc-table .icon.icon-altname {
+  mask-image: url("./icon/git-fork.svg");
+}
+
+.bc-table .icon.icon-disabled {
+  mask-image: url("./icon/flag.svg");
+}
+
+.bc-table .icon.icon-more {
+  mask-image: url("./icon/ellipsis.svg");
+}
+
+.bc-table .icon.icon-preview {
+  mask-image: url("./icon/flask-conical.svg");
+}
+
+/** Platform icons. */
+.mask-fix .bc-table .icon.icon-desktop {
+  mask-image: none;background-image: url("./icon/monitor.svg");
+}
+
+.mask-fix .bc-table .icon.icon-mobile {
+  mask-image: none;background-image: url("./icon/smartphone.svg");
+}
+
+.mask-fix .bc-table .icon.icon-server {
+  mask-image: none;background-image: url("./icon/server.svg");
+}
+
+/** Browser icons. */
+
+.mask-fix .bc-table .icon.icon-bun {
+  mask-image: none;background-image: url("./icon/browser/bun.svg");
+}
+
+.mask-fix .bc-table .icon.icon-chrome {
+  mask-image: none;background-image: url("./icon/browser/chrome.svg");
+}
+
+.mask-fix .bc-table .icon.icon-deno {
+  mask-image: none;background-image: url("./icon/browser/deno.svg");
+}
+
+.mask-fix .bc-table .icon.icon-edge {
+  mask-image: none;background-image: url("./icon/browser/edge.svg");
+}
+
+.mask-fix .bc-table .icon.icon-firefox {
+  mask-image: none;background-image: url("./icon/browser/firefox.svg");
+}
+
+.mask-fix .bc-table .icon.icon-edge {
+  mask-image: none;background-image: url("./icon/browser/edge.svg");
+}
+
+.mask-fix .bc-table .icon.icon-nodejs {
+  mask-image: none;background-image: url("./icon/browser/nodejs.svg");
+}
+
+.mask-fix .bc-table .icon.icon-opera {
+  mask-image: none;background-image: url("./icon/browser/opera.svg");
+}
+
+.mask-fix .bc-table .icon.icon-safari {
+  mask-image: none;background-image: url("./icon/browser/safari.svg");
+}
+
+.mask-fix .bc-table .icon.icon-samsunginternet {
+  mask-image: none;background-image: url("./icon/browser/samsung-internet.svg");
+}
+
+.mask-fix .bc-table .icon.icon-webview {
+  mask-image: none;background-image: url("./icon/browser/webview.svg");
+}
+
+/** Status icons. */
+
+.mask-fix .bc-table .icon.icon-no {
+  mask-image: none;background-image: url("./icon/circle-x.svg");
+}
+
+.mask-fix .bc-table .icon.icon-partial {
+  mask-image: none;background-image: url("./icon/circle-slash.svg");
+}
+
+.mask-fix .bc-table .icon.icon-yes {
+  mask-image: none;background-image: url("./icon/check.svg");
+}
+
+.mask-fix .bc-table .icon.icon-yes-circle {
+  mask-image: none;background-image: url("./icon/circle-check.svg");
+}
+
+.mask-fix .bc-table .icon.icon-experimental {
+  mask-image: none;background-image: url("./icon/flask-conical.svg");
+}
+
+.mask-fix .bc-table .icon.icon-deprecated {
+  mask-image: none;background-image: url("./icon/trash-2.svg");
+}
+
+.mask-fix .bc-table .icon.icon-nonstandard {
+  mask-image: none;background-image: url("./icon/triangle-alert.svg");
+}
+
+.mask-fix .bc-table .icon.icon-footnote {
+  mask-image: none;background-image: url("./icon/asterisk.svg");
+}
+
+.mask-fix .bc-table .icon.icon-unknown {
+  mask-image: none;background-image: url("./icon/circle-help.svg");
+}
+
+.mask-fix .bc-table .icon.icon-prefix {
+  mask-image: none;background-image: url("./icon/mdn-prefix.svg");
+}
+
+.mask-fix .bc-table .icon.icon-altname {
+  mask-image: none;background-image: url("./icon/git-fork.svg");
+}
+
+.mask-fix .bc-table .icon.icon-disabled {
+  mask-image: none;background-image: url("./icon/flag.svg");
+}
+
+.mask-fix .bc-table .icon.icon-more {
+  mask-image: none;background-image: url("./icon/ellipsis.svg");
+}
+
+.mask-fix .bc-table .icon.icon-preview {
+  mask-image: none;background-image: url("./icon/flask-conical.svg");
 }
