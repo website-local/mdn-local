@@ -1326,3 +1326,11 @@ dl.bc-notes-list dd.bc-supports-dd {
 .mask-fix .example-bad:is(.code-example pre)::after {
   background-color: transparent;
 }
+.mask-fix .menu__tab-button::after,
+.mask-fix :is(:is([data-section="learn"], [data-section="tools"]) .menu__tab-button)::before {
+  background-color: transparent;
+}
+[data-theme="dark"] .mask-fix .menu__tab-button::after,
+[data-theme="dark"] .mask-fix :is(:is([data-section="learn"], [data-section="tools"]) .menu__tab-button)::before {
+  filter: invert(1);
+}
