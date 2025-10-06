@@ -20,11 +20,11 @@ import type {
   Compat
 } from '../browser-compatibility-table/index.js';
 import {
-  renderYariCompatibilityTable
+  renderCompatibilityTable
 } from '../browser-compatibility-table/index.js';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 
-export interface MdnYariCompatibilityData {
+export interface MdnCompatibilityData {
   dataURL?: string
   locale?: string
   query?: string
@@ -34,19 +34,19 @@ export interface MdnYariCompatibilityData {
  * Custom interface to make sure dataURL and id is not empty
  */
 
-export interface MdnYariCompatibilityDataWithUrl extends MdnYariCompatibilityData {
+export interface MdnCompatibilityDataWithUrl extends MdnCompatibilityData {
   dataURL: string
 }
 
 /// endregion type def
 
-export interface MdnYariCompatibilityRenderingContext {
+export interface MdnCompatibilityRenderingContext {
   res: Resource;
-  data: MdnYariCompatibilityDataWithUrl;
+  data: MdnCompatibilityDataWithUrl;
   element: Cheerio;
 }
 
-export async function downloadAndRenderYariCompatibilityData(
+export async function downloadAndRenderCompatibilityData(
   res: DownloadResource,
   submit: SubmitResourceFunc,
   pipeline: PipelineExecutor,
@@ -58,7 +58,7 @@ export async function downloadAndRenderYariCompatibilityData(
   if (!elements.length) return;
   const mdnHost: string = options.meta.host as string | void
     || 'developer.mozilla.org';
-  const contexts: MdnYariCompatibilityRenderingContext[] = [];
+  const contexts: MdnCompatibilityRenderingContext[] = [];
 
   for (let i = 0, length = elements.length; i < length; i++) {
     const el = $(elements[i]);
@@ -120,7 +120,7 @@ export async function downloadAndRenderYariCompatibilityData(
     });
   }));
 
-  for (let i = 0, el: Cheerio, data: MdnYariCompatibilityDataWithUrl;
+  for (let i = 0, el: Cheerio, data: MdnCompatibilityDataWithUrl;
     i < downloadResources.length; i++) {
     const r = downloadResources[i];
     data = contexts[i].data;
@@ -131,7 +131,7 @@ export async function downloadAndRenderYariCompatibilityData(
     if (!r.res.body) {
       // fail to download, is MdnYariCompatibilityRenderingContext
       el.html(`<div class="notecard warning"><p>No compatibility data found for <code>${
-        (r as MdnYariCompatibilityRenderingContext)?.data?.query
+        (r as MdnCompatibilityRenderingContext)?.data?.query
       }</code>.</p></div>`);
       el.prop('tagName', 'div');
       continue;
@@ -142,7 +142,7 @@ export async function downloadAndRenderYariCompatibilityData(
     const jsonData: Compat =
       JSON.parse(toString(bcdRes.body, bcdRes.encoding));
 
-    const html = renderYariCompatibilityTable(
+    const html = renderCompatibilityTable(
       jsonData, data.query || '', locale);
     el.html(html);
     // make this lazy-compat-table plain element

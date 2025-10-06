@@ -20,8 +20,8 @@ import {
 } from './process-external.js';
 import {preProcessRemoveElements} from './process-remove-elements.js';
 import {
-  downloadAndRenderYariCompatibilityData,
-} from './process-yari-data.js';
+  downloadAndRenderCompatibilityData,
+} from './process-compat-table.js';
 import {preProcessPlayground} from './process-playground.js';
 import {postProcessPlayable, preProcessPlayable} from './process-playable.js';
 import {
@@ -89,7 +89,7 @@ type="text/css" class="mdn-local-inject-css">`)
 
   // download and render yari browser-compatibility-table
   try {
-    await downloadAndRenderYariCompatibilityData(
+    await downloadAndRenderCompatibilityData(
       res, submit, pipeline, options,
       $, options.meta.locale as string
     );
