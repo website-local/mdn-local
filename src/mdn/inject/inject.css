@@ -1331,6 +1331,13 @@ dl.bc-notes-list dd.bc-supports-dd {
   background-color: transparent;
 }
 [data-theme="dark"] .mask-fix .menu__tab-button::after,
-[data-theme="dark"] .mask-fix :is(:is([data-section="learn"], [data-section="tools"]) .menu__tab-button)::before {
+[data-theme="dark"] .mask-fix :is(:is([data-section="learn"], [data-section="tools"]) .menu__tab-button)::before,
+.mask-fix [data-scheme="dark"] .menu__tab-button::after,
+.mask-fix [data-scheme="dark"] :is(:is([data-section="learn"], [data-section="tools"]) .menu__tab-button)::before{
   filter: invert(1);
+}
+
+.mask-fix .featured-articles__summary::after {
+  background-image: none;
+  mask-image: linear-gradient(90deg,#0000,#000 75%);
 }
