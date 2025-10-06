@@ -1312,3 +1312,13 @@ dl.bc-notes-list dd.bc-supports-dd {
 :is(.content-section .lazy-compat-table dl) dd {
   margin-left: 0;
 }
+
+/* misc icons */
+@media (width <= 1006px) {
+  .mask-fix .navigation__button::before {
+    background-color: transparent;
+  }
+  [data-theme="dark"] .mask-fix .navigation__button::before {
+    filter: invert(1);
+  }
+}
