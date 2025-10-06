@@ -2861,6 +2861,21 @@ Prism.languages.py = Prism.languages.python;
   }
   /// endregion fred navigation btn
 
+  /// region fred mdn-toggle-sidebar
+  // https://github.com/website-local/mdn-local/issues/1310
+  const toggleSidebar = document.querySelector('mdn-toggle-sidebar');
+  const mainSidebar = document.querySelector('#main-sidebar');
+  if (toggleSidebar && mainSidebar) {
+    toggleSidebar.addEventListener('click', () => {
+      if (mainSidebar.style.display !== 'block') {
+        mainSidebar.style.display = "block";
+      } else {
+        mainSidebar.style.removeProperty("display");
+      }
+    });
+  }
+  /// endregion mdn-toggle-sidebar
+
   /// region yari mobile left sidebar
   // https://github.com/website-local/mdn-local/issues/784
   sidebarBtn = document.querySelector('.sidebar-button');
