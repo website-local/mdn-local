@@ -175,6 +175,12 @@ table.compat-table th {
 }
 
 /* icons in sidebars */
+.mask-fix :is(:is(.left-sidebar details) summary)::before {
+  background-color: transparent;
+}
+[data-theme="dark"] .mask-fix :is(:is(.left-sidebar details) summary)::before {
+  filter: invert(1);
+}
 .mask-fix .icon-experimental,
 .mask-fix .icon-nonstandard {
   background-color: transparent;
