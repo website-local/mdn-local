@@ -474,7 +474,7 @@ table.bc-table {
   grid-column: 1 / -1;
 }
 
-.bc-table {
+.content-section table.bc-table {
   border: 1px solid var(--color-border-primary);
   border-collapse: initial;
   border-radius: 0.25rem;
@@ -484,7 +484,7 @@ table.bc-table {
   width: 100%;
 }
 
-.bc-table td, .bc-table th {
+:is(.content-section table.bc-table) td, :is(.content-section table.bc-table) th {
   border-bottom: 1px solid var(--color-border-primary);
   border-left: 1px solid var(--color-border-primary);
   border-right: 0 solid var(--color-border-primary);
@@ -493,17 +493,21 @@ table.bc-table {
   padding: 0.4rem;
 }
 
-.bc-table td, .bc-table th, :is(.bc-table td, .bc-table th) code {
+:is(.content-section table.bc-table) td,
+:is(.content-section table.bc-table) th,
+:is(.bc-table td, .bc-table th) code {
   font-size: var(--font-size-small);
 }
-
-.bc-table th {
-  background: var(--color-background-primary);
+:is(.content-section table.bc-table) tr,:is(.content-section table.bc-table) th {
+  background: transparent;
+}
+:is(.content-section table.bc-table) th {
+  /*background: var(--color-background-primary);*/
   padding: 0.4rem;
   vertical-align: bottom;
 }
 
-.bc-table thead {
+:is(.content-section table.bc-table) thead {
   line-height: var(--font-line-ui);
   white-space: nowrap;
 }
@@ -594,11 +598,11 @@ table.bc-table {
   flex-basis: max-content;
 }
 
-.bc-table .bc-feature-depth-2 {
+.bc-table .bc-feature-depth-2, :is(.content-section table.bc-table) th.bc-feature-depth-2 {
   border-left: 7px solid var(--color-border-primary);
 }
 
-.bc-table .bc-feature-depth-3 {
+.bc-table .bc-feature-depth-3, :is(.content-section table.bc-table) th.bc-feature-depth-3 {
   border-left: 15px solid var(--color-border-primary);
 }
 
@@ -671,17 +675,17 @@ table.bc-table {
   background-color: var(--color-border-secondary);
 }
 
-.bc-platforms th {
+:is(.content-section table.bc-table) .bc-platforms th {
   align-items: center;
   display: flex;
   justify-content: center;
 }
 
-.bc-platforms td {
+:is(.content-section table.bc-table) .bc-platforms td {
   border: medium;
 }
 
-.bc-browsers th {
+:is(.content-section table.bc-table) .bc-browsers th {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -690,7 +694,7 @@ table.bc-table {
   vertical-align: bottom;
 }
 
-.bc-browsers td {
+:is(.content-section table.bc-table) .bc-browsers td {
   border-width: 0px 0px 1px;
 }
 
@@ -887,7 +891,7 @@ dl.bc-notes-list dd.bc-supports-dd {
     border-left: var(--border);
   }
 
-  .bc-table td, .bc-table th {
+  :is(.content-section table.bc-table) td, :is(.content-section table.bc-table) th {
     background: inherit;
     padding: 0.25rem;
   }
@@ -1017,7 +1021,7 @@ dl.bc-notes-list dd.bc-supports-dd {
 
 /* compat table icons */
 
-.bc-table .icon {
+.lazy-compat-table .icon, .bc-table .icon {
   --size: var(--icon-size,1rem);
   background-color: var(--color-border-secondary);
   display: inline-block;
@@ -1030,128 +1034,128 @@ dl.bc-notes-list dd.bc-supports-dd {
 }
 
 /** Platform icons. */
-.bc-table .icon.icon-desktop {
+.lazy-compat-table .icon.icon-desktop {
   mask-image: url("./icon/monitor.svg");
 }
 
-.bc-table .icon.icon-mobile {
+.lazy-compat-table .icon.icon-mobile {
   mask-image: url("./icon/smartphone.svg");
 }
 
-.bc-table .icon.icon-server {
+.lazy-compat-table .icon.icon-server {
   mask-image: url("./icon/server.svg");
 }
 
 /** Browser icons. */
 
-.bc-table .icon.icon-bun {
+.lazy-compat-table .icon.icon-bun {
   mask-image: url("./icon/browser/bun.svg");
 }
 
-.bc-table .icon.icon-chrome {
+.lazy-compat-table .icon.icon-chrome {
   mask-image: url("./icon/browser/chrome.svg");
 }
 
-.bc-table .icon.icon-deno {
+.lazy-compat-table .icon.icon-deno {
   mask-image: url("./icon/browser/deno.svg");
 }
 
-.bc-table .icon.icon-edge {
+.lazy-compat-table .icon.icon-edge {
   mask-image: url("./icon/browser/edge.svg");
 }
 
-.bc-table .icon.icon-firefox {
+.lazy-compat-table .icon.icon-firefox {
   mask-image: url("./icon/browser/firefox.svg");
 }
 
-.bc-table .icon.icon-edge {
+.lazy-compat-table .icon.icon-edge {
   mask-image: url("./icon/browser/edge.svg");
 }
 
-.bc-table .icon.icon-nodejs {
+.lazy-compat-table .icon.icon-nodejs {
   mask-image: url("./icon/browser/nodejs.svg");
 }
 
-.bc-table .icon.icon-opera {
+.lazy-compat-table .icon.icon-opera {
   mask-image: url("./icon/browser/opera.svg");
 }
 
-.bc-table .icon.icon-safari {
+.lazy-compat-table .icon.icon-safari {
   mask-image: url("./icon/browser/safari.svg");
 }
 
-.bc-table .icon.icon-samsunginternet {
+.lazy-compat-table .icon.icon-samsunginternet {
   mask-image: url("./icon/browser/samsung-internet.svg");
 }
 
-.bc-table .icon.icon-webview {
+.lazy-compat-table .icon.icon-webview {
   mask-image: url("./icon/browser/webview.svg");
 }
 
 /** Status icons. */
 
-.bc-table .icon.icon-no {
+.lazy-compat-table .icon.icon-no {
   mask-image: url("./icon/circle-x.svg");
 }
 
-.bc-table .icon.icon-partial {
+.lazy-compat-table .icon.icon-partial {
   mask-image: url("./icon/circle-slash.svg");
 }
 
-.bc-table .icon.icon-yes {
+.lazy-compat-table .icon.icon-yes {
   mask-image: url("./icon/check.svg");
 }
 
-.bc-table .icon.icon-yes-circle {
+.lazy-compat-table .icon.icon-yes-circle {
   mask-image: url("./icon/circle-check.svg");
 }
 
-.bc-table .icon.icon-experimental {
+.lazy-compat-table .icon.icon-experimental {
   mask-image: url("./icon/flask-conical.svg");
 }
 
-.bc-table .icon.icon-deprecated {
+.lazy-compat-table .icon.icon-deprecated {
   mask-image: url("./icon/trash-2.svg");
 }
 
-.bc-table .icon.icon-nonstandard {
+.lazy-compat-table .icon.icon-nonstandard {
   mask-image: url("./icon/triangle-alert.svg");
 }
 
-.bc-table .icon.icon-footnote {
+.lazy-compat-table .icon.icon-footnote {
   mask-image: url("./icon/asterisk.svg");
 }
 
-.bc-table .icon.icon-unknown {
+.lazy-compat-table .icon.icon-unknown {
   mask-image: url("./icon/circle-help.svg");
 }
 
-.bc-table .icon.icon-prefix {
+.lazy-compat-table .icon.icon-prefix {
   mask-image: url("./icon/mdn-prefix.svg");
 }
 
-.bc-table .icon.icon-altname {
+.lazy-compat-table .icon.icon-altname {
   mask-image: url("./icon/git-fork.svg");
 }
 
-.bc-table .icon.icon-disabled {
+.lazy-compat-table .icon.icon-disabled {
   mask-image: url("./icon/flag.svg");
 }
 
-.bc-table .icon.icon-more {
+.lazy-compat-table .icon.icon-more {
   mask-image: url("./icon/ellipsis.svg");
 }
 
-.bc-table .icon.icon-preview {
+.lazy-compat-table .icon.icon-preview {
   mask-image: url("./icon/flask-conical.svg");
 }
 
-:is(.bc-table .bc-support) .icon.icon-removed-partial {
+:is(.lazy-compat-table .bc-support) .icon.icon-removed-partial {
   background-color: var(--color-text-red);
   mask-image: url("./icon/circle-x.svg");
 }
 
-:is(.bc-table .bc-support) .timeline .icon.icon-removed-partial {
+:is(.lazy-compat-table .bc-support) .timeline .icon.icon-removed-partial {
   background-color: var(--color-text-yellow);
   mask-image: url("./icon/circle-slash.svg");
 }
@@ -1167,130 +1171,130 @@ dl.bc-notes-list dd.bc-supports-dd {
 }
 
 /** Platform icons. */
-.mask-fix .bc-table .icon.icon-desktop {
+.mask-fix .lazy-compat-table .icon.icon-desktop {
   mask-image: none;background-image: url("./icon/monitor.svg");
 }
 
-.mask-fix .bc-table .icon.icon-mobile {
+.mask-fix .lazy-compat-table .icon.icon-mobile {
   mask-image: none;background-image: url("./icon/smartphone.svg");
 }
 
-.mask-fix .bc-table .icon.icon-server {
+.mask-fix .lazy-compat-table .icon.icon-server {
   mask-image: none;background-image: url("./icon/server.svg");
 }
 
 /** Browser icons. */
 
-.mask-fix .bc-table .icon.icon-bun {
+.mask-fix .lazy-compat-table .icon.icon-bun {
   mask-image: none;background-image: url("./icon/browser/bun.svg");
 }
 
-.mask-fix .bc-table .icon.icon-chrome {
+.mask-fix .lazy-compat-table .icon.icon-chrome {
   mask-image: none;background-image: url("./icon/browser/chrome.svg");
 }
 
-.mask-fix .bc-table .icon.icon-deno {
+.mask-fix .lazy-compat-table .icon.icon-deno {
   mask-image: none;background-image: url("./icon/browser/deno.svg");
 }
 
-.mask-fix .bc-table .icon.icon-edge {
+.mask-fix .lazy-compat-table .icon.icon-edge {
   mask-image: none;background-image: url("./icon/browser/edge.svg");
 }
 
-.mask-fix .bc-table .icon.icon-firefox {
+.mask-fix .lazy-compat-table .icon.icon-firefox {
   mask-image: none;background-image: url("./icon/browser/firefox.svg");
 }
 
-.mask-fix .bc-table .icon.icon-edge {
+.mask-fix .lazy-compat-table .icon.icon-edge {
   mask-image: none;background-image: url("./icon/browser/edge.svg");
 }
 
-.mask-fix .bc-table .icon.icon-nodejs {
+.mask-fix .lazy-compat-table .icon.icon-nodejs {
   mask-image: none;background-image: url("./icon/browser/nodejs.svg");
 }
 
-.mask-fix .bc-table .icon.icon-opera {
+.mask-fix .lazy-compat-table .icon.icon-opera {
   mask-image: none;background-image: url("./icon/browser/opera.svg");
 }
 
-.mask-fix .bc-table .icon.icon-safari {
+.mask-fix .lazy-compat-table .icon.icon-safari {
   mask-image: none;background-image: url("./icon/browser/safari.svg");
 }
 
-.mask-fix .bc-table .icon.icon-samsunginternet {
+.mask-fix .lazy-compat-table .icon.icon-samsunginternet {
   mask-image: none;background-image: url("./icon/browser/samsung-internet.svg");
 }
 
-.mask-fix .bc-table .icon.icon-webview {
+.mask-fix .lazy-compat-table .icon.icon-webview {
   mask-image: none;background-image: url("./icon/browser/webview.svg");
 }
 
 /** Status icons. */
 
-.mask-fix .bc-table .icon.icon-no {
+.mask-fix .lazy-compat-table .icon.icon-no {
   mask-image: none;background-image: url("./icon/circle-x.svg");
 }
 
-.mask-fix .bc-table .icon.icon-partial {
+.mask-fix .lazy-compat-table .icon.icon-partial {
   mask-image: none;background-image: url("./icon/circle-slash.svg");
   filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(35deg) brightness(0.9);
 }
 
-.mask-fix .bc-table .icon.icon-yes {
+.mask-fix .lazy-compat-table .icon.icon-yes {
   mask-image: none;background-image: url("./icon/check.svg");
 }
 
-.mask-fix .bc-table .icon.icon-yes-circle {
+.mask-fix .lazy-compat-table .icon.icon-yes-circle {
   mask-image: none;background-image: url("./icon/circle-check.svg");
 }
 
-.mask-fix .bc-table .icon.icon-experimental {
+.mask-fix .lazy-compat-table .icon.icon-experimental {
   mask-image: none;background-image: url("./icon/flask-conical.svg");
 }
 
-.mask-fix .bc-table .icon.icon-deprecated {
+.mask-fix .lazy-compat-table .icon.icon-deprecated {
   mask-image: none;background-image: url("./icon/trash-2.svg");
 }
 
-.mask-fix .bc-table .icon.icon-nonstandard {
+.mask-fix .lazy-compat-table .icon.icon-nonstandard {
   mask-image: none;background-image: url("./icon/triangle-alert.svg");
 }
 
-.mask-fix .bc-table .icon.icon-footnote {
+.mask-fix .lazy-compat-table .icon.icon-footnote {
   mask-image: none;background-image: url("./icon/asterisk.svg");
 }
 
-.mask-fix .bc-table .icon.icon-unknown {
+.mask-fix .lazy-compat-table .icon.icon-unknown {
   mask-image: none;background-image: url("./icon/circle-help.svg");
 }
 
-.mask-fix .bc-table .icon.icon-prefix {
+.mask-fix .lazy-compat-table .icon.icon-prefix {
   mask-image: none;background-image: url("./icon/mdn-prefix.svg");
 }
 
-.mask-fix .bc-table .icon.icon-altname {
+.mask-fix .lazy-compat-table .icon.icon-altname {
   mask-image: none;background-image: url("./icon/git-fork.svg");
 }
 
-.mask-fix .bc-table .icon.icon-disabled {
+.mask-fix .lazy-compat-table .icon.icon-disabled {
   mask-image: none;background-image: url("./icon/flag.svg");
 }
 
-.mask-fix .bc-table .icon.icon-more {
+.mask-fix .lazy-compat-table .icon.icon-more {
   mask-image: none;background-image: url("./icon/ellipsis.svg");
 }
 
-.mask-fix .bc-table .icon.icon-preview {
+.mask-fix .lazy-compat-table .icon.icon-preview {
   mask-image: none;background-image: url("./icon/flask-conical.svg");
 }
 
-.mask-fix :is(.bc-table .bc-support) .icon.icon-removed-partial {
+.mask-fix :is(.lazy-compat-table .bc-support) .icon.icon-removed-partial {
   background-color: transparent;
   mask-image: none;background-image: url("./icon/circle-x.svg");
   filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(35deg) brightness(0.9);
 }
 
-.mask-fix :is(.bc-table .bc-support) .timeline .icon.icon-removed-partial {
+.mask-fix :is(.lazy-compat-table .bc-support) .timeline .icon.icon-removed-partial {
   background-color: transparent;
   mask-image: none;background-image: url("./icon/circle-slash.svg");
 }
@@ -1305,6 +1309,6 @@ dl.bc-notes-list dd.bc-supports-dd {
   mask-image: none;background-image: url("./icon/circle.svg");
 }
 
-.bc-table :is(.content-section dl) dd {
+:is(.content-section .lazy-compat-table dl) dd {
   margin-left: 0;
 }
