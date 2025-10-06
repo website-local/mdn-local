@@ -4875,6 +4875,7 @@ code {
 
   customElements.define('mdn-ix-tab-panel', MDNIXTabPanel);
 
+  // noinspection CssUnresolvedCustomProperty
   class MDNIXTabWrapper extends HTMLElement {
     constructor() {
       super();
@@ -5002,6 +5003,7 @@ code {
 
   customElements.define('mdn-ix-tab-wrapper', MDNIXTabWrapper);
 
+  // noinspection CssUnresolvedCustomProperty
   class MDNIXTab extends HTMLElement {
     constructor() {
       super();
@@ -5012,6 +5014,8 @@ code {
       this.setAttribute('slot', 'tablist');
       this.setAttribute('role', 'tab');
       this.unsetActive();
+
+      this._render();
 
       // Setup panel relationship
       const panel = this.nextElementSibling;
@@ -5025,47 +5029,10 @@ code {
         }
       }
 
-      this._applyStyles();
-      this._render();
-    }
-
-    _applyStyles() {
-      const style = document.createElement('style');
-      style.textContent = `
-      :host {
-        --ix-tab-background-active: light-dark(
-          var(--color-gray-90),
-          var(--color-gray-10)
-        );
-        padding: 0.5em 30px;
-        font-size: var(--font-size-small);
-        color: var(--color-text-secondary);
-        cursor: pointer;
-        background-color: transparent;
-        border: 0 none;
-        border-top: 3px solid transparent;
-        border-bottom: 3px solid transparent;
-        transition:
-          color 0.2s,
-          background-color 0.2s;
-      }
-
-      :host(:hover),
-      :host(:focus) {
-        color: var(--color-text-primary);
-        background-color: var(--ix-tab-background-active);
-      }
-
-      :host([aria-selected="true"]) {
-        color: var(--color-border-active);
-        background-color: var(--ix-tab-background-active);
-        border-bottom-color: var(--color-border-active);
-      }
-    `;
-      this.shadowRoot.appendChild(style);
     }
 
     _render() {
+      // noinspection CssInvalidFunction
       this.shadowRoot.innerHTML = `
       <style>
         :host {
@@ -5105,6 +5072,19 @@ code {
     setActive() {
       this.setAttribute('tabindex', '0');
       this.setAttribute('aria-selected', 'true');
+      if (!this.panel) {
+        // check it again, WTF?
+        const panel = this.nextElementSibling;
+        if (panel instanceof MDNIXTabPanel) {
+          this.panel = panel;
+          if (panel.id) {
+            this.setAttribute('aria-controls', panel.id);
+          }
+          if (this.id) {
+            panel.setAttribute('aria-labelledby', this.id);
+          }
+        }
+      }
       if (this.panel) {
         this.panel.setActive();
       }
@@ -5213,417 +5193,171 @@ code {
     return true;
   }
 
+  // noinspection CssUnresolvedCustomProperty
+  class InteractiveExample extends HTMLElement {
+    static get observedAttributes() {
+      return ['name'];
+    }
 
-  /* ================================
-   Interactive Example Component
-   ================================ */
-
-  class InteractiveExampleBase extends HTMLElement {
     constructor() {
       super();
-      // Attach shadow DOM if desired.
-      this.attachShadow({ mode: 'open' });
-      this.name = this.getAttribute('name') || '';
-      this._languages = []; // e.g. ["html", "js", "css", "wat"]
-      this._code = {};      // language keyed code
-      this._choices = [];   // for choices
-      this._template = '';  // "choices", "console", or "tabbed"
+      this.name = '';
+      this._languages = [];
+      this._code = {};
+      this._choices = [];
+      this._template = 'console';
+      this.__choiceSelected = -1;
+      this.__choiceUnsupported = [];
+      this.__choiceUpdated = false;
 
-      // References to child elements
-      this._controllerEl = null;
-      this._runnerEl = null;
+      // Create shadow root
+      this.attachShadow({ mode: 'open' });
+    }
+
+    // Attribute handling
+    attributeChangedCallback(name, oldValue, newValue) {
+      if (name === 'name') {
+        this.name = newValue;
+      }
     }
 
     connectedCallback() {
-      // Render the base template once connected.
       this._code = this._initialCode();
-      this._template = this._determineTemplate();
-      this.render();
+      this._render();
     }
 
+    // Public API methods
+    _run() {
+      const controller = this.shadowRoot.querySelector('mdn-play-controller');
+      if (controller && controller.run) controller.run();
+    }
+
+    _reset() {
+      if (this._template === 'choices') {
+        this._resetChoices();
+      } else {
+        const controller = this.shadowRoot.querySelector('mdn-play-controller');
+        if (controller && controller.reset) controller.reset();
+      }
+    }
+
+    // Template methods
     _initialCode() {
-      // Look upward for a section that contains code examples.
-      // This is a simplified version of the Lit code.
-      const section = this.closest('section');
-      const code = {};
-      if (section) {
-        const exampleNodes = section.querySelectorAll(
-          '.code-example pre.interactive-example'
-        );
-        exampleNodes.forEach((pre) => {
-          const language = Array.from(pre.classList).find((cls) =>
-            ['html', 'js', 'css', 'wat'].includes(cls)
-          );
-          if (language && pre.textContent) {
-            if (code[language]) {
-              code[language] += '\n' + pre.textContent;
-            } else {
-              code[language] = pre.textContent;
-            }
-          }
-        });
-        const choiceNodes = section.querySelectorAll(
-          '.code-example pre.interactive-example-choice'
-        );
-        this._choices = Array.from(choiceNodes).map(
-          (pre) => pre.textContent.trim()
-        );
+      const initialCode = {};
+
+      // Process main code examples
+      const examples = this.closest('section')?.querySelectorAll(
+        '.code-example pre.interactive-example'
+      ) || [];
+
+      for (const pre of examples) {
+        const example = this._upgradePre(pre);
+        if (example) {
+          const { language, code } = example;
+          initialCode[language] = initialCode[language]
+            ? `${initialCode[language]}\n${code}`
+            : code;
+        }
       }
-      this._languages = Object.keys(code);
-      return code;
+
+      // Process choice examples
+      this._choices = [
+        ...(this.closest('section')?.querySelectorAll(
+          '.code-example pre.interactive-example-choice'
+        ) || [])
+      ]
+        .map(pre => this._upgradePre(pre)?.code.trim())
+        .filter(x => x !== undefined);
+
+      this._languages = Object.keys(initialCode);
+      this._template =
+        this._choices.length > 0
+          ? 'choices'
+          : (this._languages.length === 1 && this._languages[0] === 'js') ||
+          (this._languages.includes('js') && this._languages.includes('wat'))
+            ? 'console'
+            : 'tabbed';
+
+      return initialCode;
     }
 
-    _determineTemplate() {
-      if (this._choices.length) {
-        return 'choices';
-      }
-      if (
-        (this._languages.length === 1 && this._languages[0] === 'js') ||
-        (this._languages.includes('js') && this._languages.includes('wat'))
-      ) {
-        return 'console';
-      }
-      return 'tabbed';
+    _upgradePre(pre) {
+      if (!pre || !pre.textContent) return null;
+
+      const className = pre.className || '';
+      const langMatch = className.match(/html|js|css|wat/i);
+      const lang = langMatch ? langMatch[0] : 'unknown';
+
+      return {
+        language: lang,
+        code: pre.textContent
+      };
     }
 
     _langName(lang) {
-      if (lang === 'js') {
-        return 'JavaScript';
-      }
-      return lang.toUpperCase();
-    }
-
-    // Methods to update/run/reset code
-    _run() {
-      // In your implementation, you might call a method on a controller.
-      if (this._controllerEl && typeof this._controllerEl.run === 'function') {
-        this._controllerEl.run();
-      }
-    }
-    _reset() {
-      if (this._controllerEl && typeof this._controllerEl.reset === 'function') {
-        this._controllerEl.reset();
+      switch (lang) {
+      case 'js': return 'JavaScript';
+      default: return lang.toUpperCase();
       }
     }
 
-    render() {
-      // Clear shadow DOM content.
-      this.shadowRoot.innerHTML = '';
-      // Optionally include styles (imported externally or inline)
-      // For demonstration, we insert a simple style tag.
-      document.querySelectorAll('style, li[rel=stylesheet]').forEach(el => {
-        this.shadowRoot.appendChild(el.cloneNode(true));
-      });
-
-      // Render based on the chosen template.
-      let container = document.createElement('div');
-      container.style.height = '100%';
-      if (this._template === 'choices') {
-        container.innerHTML = this._renderChoices();
-      } else if (this._template === 'console') {
-        container.innerHTML = this._renderConsole();
-      } else if (this._template === 'tabbed') {
-        container.innerHTML = this._renderTabs();
+    // Choice methods
+    _choiceFocus(event) {
+      if (event.target instanceof MDNPlayEditor) {
+        event.target.focus();
       }
-      this.shadowRoot.appendChild(container);
-      let style = document.createElement('style');
-      style.textContent = `:host { --border: 1px solid var(--border-secondary); --tabbed-font-heading: 600 0.625rem/1.2 var(--font-heading); }
-header { align-items: center; border-bottom: var(--border); border-top-left-radius: var(--elem-radius); border-top-right-radius: var(--elem-radius); display: flex; grid-area: header; justify-content: space-between; padding: 0.5rem 1rem; }
-header h4 { font-size: 1rem; font-weight: normal; line-height: 1.1876; margin: 0px; }
-header #reset { background-color: rgba(0, 0, 0, 0); border: 0px; border-radius: var(--elem-radius); color: var(--text-primary); cursor: pointer; font: var(--tabbed-font-heading); height: 2rem; letter-spacing: 1.5px; margin: 0px; max-width: 100px; padding: 0.7em 0.9em; text-transform: uppercase; }
-header #reset:hover { background-color: var(--button-secondary-hover); }
-play-editor { grid-area: editor; height: 100%; overflow: auto; }
-.buttons { display: flex; flex-direction: column; gap: 0.5rem; grid-area: buttons; }
-.buttons button { --button-bg: var(--button-secondary-default); --button-bg-hover: var(--button-secondary-hover); --button-bg-active: var(--button-secondary-active); --button-border-color: var(--border-primary); --button-color: var(--text-secondary); --button-font: var(--type-emphasis-m); --button-padding: 0.43rem 1rem; --button-radius: var(--elem-radius, 0.25rem); background-color: var(--button-bg); border: 1px solid var(--button-border-color); border-radius: var(--button-radius); color: var(--button-color); display: inline-block; font: var(--button-font); letter-spacing: normal; padding: var(--button-padding); text-align: center; text-decoration: none; }
-.buttons button.external::after { display: none; }
-.buttons button:hover { --button-border-color: var(--button-bg-hover); --button-bg: var(--button-bg-hover); }
-.buttons button:active { --button-bg: var(--button-bg-active); }
-play-console { border: var(--border); border-radius: var(--elem-radius); grid-area: console; }
-.tabbed { grid-area: tabs; }
-.template-console { align-content: start; display: grid; gap: 0.5rem; grid-template: "header header" max-content "editor editor" 1fr "buttons console" 8rem / max-content 1fr; height: 100%; }
-.template-console header { border: var(--border); }
-.template-console play-runner { display: none; }
-.template-console > play-editor, .template-console .tabbed { border-bottom-left-radius: var(--elem-radius); border-bottom-right-radius: var(--elem-radius); border-top: 0px; grid-area: editor; margin-top: -0.5rem; }
-@media (max-width: 426px) {
-  .template-console { grid-template: "header" max-content "editor" 1fr "buttons" max-content "console" 8rem / 1fr; }
-  .template-console .buttons { flex-direction: row; justify-content: space-between; }
-}
-.template-tabbed { border: var(--border); border-radius: var(--elem-radius); display: grid; grid-template: "header header" max-content "tabs runner" 1fr / 6fr 4fr; height: 100%; overflow: hidden; }
-.template-tabbed .output-wrapper { border-left: var(--border); grid-area: runner; overflow: hidden; position: relative; }
-.template-tabbed .output-wrapper h4 { background-color: var(--background-secondary); border-bottom-left-radius: var(--elem-radius); color: var(--text-secondary); font: var(--tabbed-font-heading); margin: 0px; padding: 0.5rem 1.6rem; position: absolute; right: 0px; text-transform: uppercase; top: 0px; z-index: 2; }
-@media (max-width: 992px) {
-  .template-tabbed { grid-template: "header" max-content "tabs" 1fr "runner" 1fr / 1fr; }
-  .template-tabbed .output-wrapper { border-left: 0px; border-top: var(--border); }
-}
-.template-choices { border: var(--border); border-radius: var(--elem-radius); display: grid; grid-template: "header header" max-content "choice runner" 1fr / minmax(0px, 1fr) minmax(0px, 1fr); height: 100%; }
-@media (max-width: 992px) {
-  .template-choices { grid-template-areas: "header" "choice" "runner"; grid-template-columns: 1fr; }
-}
-.template-choices .choice-wrapper { border-right: var(--border); display: flex; flex-direction: column; grid-area: choice; overflow-y: auto; padding: 1rem 0px 1rem 1rem; row-gap: 0.4rem; }
-@media (max-width: 992px) {
-  .template-choices .choice-wrapper { border-bottom: var(--border); border-right: medium; padding-right: 1em; }
-}
-.template-choices .choice-wrapper .choice { --field-focus-border: #0085f2; --focus-01: 0 0 0 3px rgba(0, 144, 237, 0.4); align-items: center; display: flex; flex-grow: 1; }
-.template-choices .choice-wrapper .choice::after { color: var(--field-focus-border); content: "▶"; font-size: 0.5rem; opacity: 0; padding: 0px 1rem 0px 0.25rem; width: 1rem; }
-@media (max-width: 992px) {
-  .template-choices .choice-wrapper .choice::after { display: none; }
-}
-.template-choices .choice-wrapper .choice.selected play-editor { border-color: var(--field-focus-border); box-shadow: var(--focus-01); cursor: text; }
-.template-choices .choice-wrapper .choice.selected::after { opacity: 1; padding-left: 0.75rem; padding-right: 0.5rem; transition: 0.2s ease-out; }
-.template-choices .choice-wrapper .choice.unsupported play-editor { border-color: rgb(255, 184, 0); }
-.template-choices .choice-wrapper .choice.unsupported::after { background-image: url("https://developer.mozilla.org/static/media/warning.334964ef472eac4cfb78.svg"); background-position: center center; background-repeat: no-repeat; background-size: 1rem; content: ""; height: 1rem; opacity: 1; transition: none; width: 1rem; }
-.template-choices .choice-wrapper .choice play-editor { border: var(--border); border-radius: var(--elem-radius); cursor: pointer; width: 100%; }
-.template-choices .output-wrapper { height: 300px; overflow: hidden; }
-.template-console .tabbed { border-left: var(--border); border-right: var(--border); border-bottom: var(--border); }
-.tabbed { display: flex; flex-direction: column; overflow: hidden; }
-.panel-wrapper { flex: 1 1 0%; min-height: 0px; }
-.tab-panel { height: 100%; }
-.tab-wrapper { background: var(--background-secondary); border-bottom: 1px solid var(--border-secondary); display: flex; flex-shrink: 0; gap: 0.5rem; overflow-x: auto; }
-.tab { background-color: rgba(0, 0, 0, 0); border-width: 3px 0px; border-style: solid none; border-color: rgba(0, 0, 0, 0) currentcolor; border-image: none; color: var(--text-secondary); cursor: pointer; font: var(--type-emphasis-m); padding: 0.5em 30px; transition: color 0.2s, background-color 0.2s; }
-.tab:hover, .tab:focus { background-color: var(--ix-tab-background-active); color: var(--text-primary); }
-.tab.active { background-color: var(--ix-tab-background-active); border-bottom-color: var(--accent-primary); color: var(--accent-primary); }
-`;
-      this.shadowRoot.appendChild(style);
-
-      // Find controller and runner elements if they exist.
-      this._controllerEl = this.shadowRoot.querySelector('mdn-play-controller');
-      this._runnerEl = this.shadowRoot.querySelector('mdn-play-runner');
-
-      // In a real app, you might pass the code to the controller.
-      if (this._controllerEl && this._code) {
-        // Suppose your play-controller has a 'code' property.
-        this._controllerEl.code = this._code;
-      }
-    } // end render
-
-    /* ================
-     Template Renderers
-     ================ */
-
-    _renderConsole() {
-      // Render a header, an editor (or tabbed editor if _languages>1),
-      // Run and Reset buttons, and output console.
-      let inner = `
-      <mdn-play-controller>
-        <div class="template-console">
-          <header>
-            <h4>${this.name}</h4>
-          </header>
-    `;
-      if (this._languages.length === 1) {
-        inner += `<mdn-play-editor id="editor" language="${this._languages[0]}"></mdn-play-editor>`;
-      } else {
-        inner += '<div class="tabbed"><div class="tab-wrapper">';
-        // Create tabs and panels – note that activation will be handled later.
-        this._languages.forEach((lang, i) => {
-          inner += `
-        <div class="tab" data-lang="${lang}" data-index="${i}" role="tab">${this._langName(lang)}</div>
-      `;
-        });
-        inner += '</div><div class="panel-wrapper">';
-        this._languages.forEach((lang, i) => {
-          inner += `
-        <div class="tab-panel" data-lang-panel="${lang}" data-index="${i}" role="tabpanel">
-          <mdn-play-editor language="${lang}"></mdn-play-editor>
-        </div>
-      `;
-        });
-        inner += '</div></div>';
-
-        // Attach events after render.
-        setTimeout(() => {
-          const resetBtn = this.shadowRoot.getElementById('reset');
-          if (resetBtn) {
-            resetBtn.addEventListener('click', () => this._reset());
-          }
-          // Activate first tab and listen for clicks.
-          const tabs = this.shadowRoot.querySelectorAll('.tab');
-          if(tabs.length){
-            tabs.forEach(tab => {
-              tab.addEventListener('click', (ev) => {
-                this._setActiveTab(ev.currentTarget);
-              });
-            });
-            // Initialize first tab as active.
-            this._setActiveTab(tabs[0]);
-          }
-        });
-      }
-      inner += `
-          <div class="buttons">
-            <button id="execute">Run</button>
-            <button id="reset">Reset</button>
-          </div>
-          <mdn-play-console id="console"></mdn-play-console>
-          <mdn-play-runner defaults="${this._languages.includes('wat') ? 'ix-wat' : ''}"></mdn-play-runner>
-        </div>
-      </mdn-play-controller>
-    `;
-      // Attach button events after rendering.
-      setTimeout(() => {
-        const runBtn = this.shadowRoot.getElementById('execute');
-        if (runBtn) {
-          runBtn.addEventListener('click', () => this._run());
-        }
-        const resetBtn = this.shadowRoot.getElementById('reset');
-        if (resetBtn) {
-          resetBtn.addEventListener('click', () => this._reset());
-        }
-      });
-      return inner;
     }
 
-    _renderTabs() {
-      let inner = `
-      <mdn-play-controller run-on-start run-on-change>
-        <div class="template-tabbed">
-          <header>
-            <h4>${(this.name)}</h4>
-            <button id="reset">Reset</button>
-          </header>
-          <div class="tabbed">
-          <div class="tab-wrapper">
-    `;
-      // Create tabs and panels – note that activation will be handled later.
-      this._languages.forEach((lang, i) => {
-        inner += `
-        <div class="tab" data-lang="${lang}" data-index="${i}" role="tab">${this._langName(lang)}</div>
-      `;
-      });
-      inner += '</div><div class="panel-wrapper">';
-      this._languages.forEach((lang, i) => {
-        inner += `
-        <div class="tab-panel" data-lang-panel="${lang}" data-index="${i}" role="tabpanel">
-          <mdn-play-editor language="${lang}"></mdn-play-editor>
-        </div>
-      `;
-      });
-      inner += `
-          </div></div>
-          <div class="output-wrapper">
-            <h4>Output</h4>
-            <mdn-play-runner sandbox="allow-top-navigation-by-user-activation" defaults="ix-tabbed"></mdn-play-runner>
-          </div>
-        </div>
-      </mdn-play-controller>
-    `;
-      // Attach events after render.
-      setTimeout(() => {
-        const resetBtn = this.shadowRoot.getElementById('reset');
-        if (resetBtn) {
-          resetBtn.addEventListener('click', () => this._reset());
-        }
-        // Activate first tab and listen for clicks.
-        const tabs = this.shadowRoot.querySelectorAll('.tab');
-        if(tabs.length){
-          tabs.forEach(tab => {
-            tab.addEventListener('click', (ev) => {
-              this._setActiveTab(ev.currentTarget);
-            });
-          });
-          // Initialize first tab as active.
-          this._setActiveTab(tabs[0]);
-        }
-      });
-      return inner;
+    _choiceSelect(event) {
+      if (event.target instanceof MDNPlayEditor) {
+        this._updateUnsupported(event.target);
+        this._selectChoice(event.target);
+      }
     }
 
-    _renderChoices() {
-      // Render template for choices. We assume choices are simple text which appears in
-      // a play-editor of language "css". (Your implementation may vary.)
-      let inner = `
-      <div class="template-choices">
-        <header>
-          <h4>${(this.name)}</h4>
-          <button id="reset">Reset</button>
-        </header>
-        <div class="choice-wrapper">
-    `;
-      this._choices.forEach((code, index) => {
-        inner += `
-          <div class="choice" data-index="${index}">
-            <mdn-play-editor data-index="${index}" language="css" minimal="true" delay="100">${code.trim()}</mdn-play-editor>
-          </div>
-      `;
-      });
-      inner += `
-        </div>
-        <div class="output-wrapper">
-          <mdn-play-controller run-on-start>
-            <mdn-play-runner defaults="ix-choice"></mdn-play-runner>
-          </mdn-play-controller>
-        </div>
-      </div>
-    `;
-      // Bind events to choices.
-      setTimeout(() => {
-        const choiceWrapper = this.shadowRoot.querySelector('.choice-wrapper');
-        if(choiceWrapper){
-          // Listen for focus or updates on editors.
-          choiceWrapper.addEventListener('focus', (evt) => {
-            const target = evt.target.closest('mdn-play-editor');
-            if(target){
-              this._choiceSelect(target);
-            }
-          });
-          choiceWrapper.addEventListener('update', (evt) => {
-            const target = evt.target.closest('mdn-play-editor');
-            if(target){
-              this._choiceSelect(target);
-            }
-          });
+    _choiceUpdate(event) {
+      if (event.target instanceof MDNPlayEditor) {
+        this._updateUnsupported(event.target);
+        const index = this._getIndex(event.target);
+        if (this.__choiceSelected === index) {
+          this._selectChoice(event.target);
         }
-        const resetBtn = this.shadowRoot.getElementById('reset');
-        if(resetBtn){
-          resetBtn.addEventListener('click', () => this._resetChoices());
-        }
-        // Initialize choices.
-        this._resetChoices();
-      });
-      return inner;
+        this.__choiceUpdated = true;
+      }
     }
 
-    /* ======================
-     Choices-specific Code
-     ====================== */
     _resetChoices() {
-      // Reset the selected choice and update editors with original code.
       this.__choiceSelected = -1;
-      // Update each play-editor in the choices.
-      const editorNodes = Array.from(this.shadowRoot.querySelectorAll('mdn-play-editor'));
-      editorNodes.forEach((editor, index) => {
-        editor.value = this._choices[index] || '';
-      });
-      // Mark unsupported if needed:
-      this.__choiceUnsupported = this._choices.map((code) =>
-        !isCSSSupported(code)
+      this.__choiceUpdated = false;
+
+      const editorNodes = this.shadowRoot.querySelectorAll('mdn-play-editor');
+      for (let i = 0; i < editorNodes.length; i++) {
+        const code = this._choices[i] || '';
+        editorNodes[i].value = code;
+      }
+
+      this.__choiceUnsupported = this._choices.map(code =>
+        !isCSSSupported(code || '')
       );
-      // Select first editor by default.
-      if (editorNodes.length) {
+
+      if (editorNodes[0]) {
         this._selectChoice(editorNodes[0]);
       }
     }
 
-    /** @param {PlayEditor} editor */
-    _getIndex(editor) {
-      return parseInt(editor.dataset.index ?? '-1', 10);
-    }
-
     async _selectChoice(editor) {
-      const index = parseInt(editor.dataset.index || '-1', 10);
-      // Simulate posting a message to play-runner using postMessage.
-      if (this._runnerEl && typeof this._runnerEl.postMessage === 'function') {
-        await this._runnerEl.postMessage({
+      const index = this._getIndex(editor);
+      const runner = this.shadowRoot.querySelector('mdn-play-runner');
+
+      if (runner && runner.postMessage) {
+        await runner.postMessage({
           typ: 'choice',
           code: editor.value,
         });
       }
       this.__choiceSelected = index;
-      // Optionally update the UI to reflect selection.
-      this._updateChoicesUI();
     }
 
-    /** @param {PlayEditor} editor */
     _updateUnsupported(editor) {
       const index = this._getIndex(editor);
       this.__choiceUnsupported = this.__choiceUnsupported.map((value, i) =>
@@ -5631,59 +5365,410 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
       );
     }
 
-    _choiceSelect(editor) {
-      // Called when an editor is selected.
-      this._updateUnsupported(editor);
-      this._selectChoice(editor);
+    _getIndex(editor) {
+      const index = editor.dataset.index;
+      return index ? parseInt(index, 10) : -1;
     }
 
-    _updateChoicesUI() {
-      const choiceElements = this.shadowRoot.querySelectorAll('.choice');
-      choiceElements.forEach((el) => {
-        const index = parseInt(el.dataset.index, 10);
-        if (index === this.__choiceSelected) {
-          el.classList.add('selected');
-        } else {
-          el.classList.remove('selected');
+    // Render methods
+    _render() {
+      const template = this._template;
+      let html = '';
+
+      if (template === 'choices') {
+        html = this._renderChoices();
+      } else if (template === 'tabbed') {
+        html = this._renderTabbed();
+      } else {
+        html = this._renderConsole();
+      }
+
+      this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          --border: 1px solid var(--color-border-primary);
+          --tabbed-font-heading: 600 0.625rem/1.2 var(--font-family-text);
+          --elem-radius: 0.25rem;
         }
-        // Mark unsupported if applicable.
-        if (this.__choiceUnsupported && this.__choiceUnsupported[index]) {
-          el.classList.add('unsupported');
-        } else {
-          el.classList.remove('unsupported');
+
+        header {
+          display: flex;
+          grid-area: header;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.5rem 1rem;
+          border-bottom: var(--border);
+          border-top-left-radius: var(--elem-radius);
+          border-top-right-radius: var(--elem-radius);
         }
-      });
+
+        header h4 {
+          margin: 0;
+          font-size: var(--font-size-normal);
+          font-weight: normal;
+          line-height: 1.1876;
+          overflow-wrap: anywhere;
+        }
+
+        header mdn-button {
+          margin-right: -0.5rem;
+        }
+
+        mdn-play-editor {
+          grid-area: editor;
+          height: 100%;
+          overflow: auto;
+        }
+
+        .buttons {
+          display: flex;
+          flex-direction: column;
+          grid-area: buttons;
+          gap: 0.5rem;
+        }
+
+        mdn-play-console {
+          grid-area: console;
+          border: var(--border);
+          border-radius: var(--elem-radius);
+        }
+
+        mdn-ix-tab-wrapper {
+          grid-area: tabs;
+        }
+
+        /* Console template */
+        .template-console {
+          display: grid;
+          grid-template-areas:
+            "header  header"
+            "editor  editor"
+            "buttons console";
+          grid-template-rows: max-content 1fr 8rem;
+          grid-template-columns: max-content 1fr;
+          gap: 0.5rem;
+          align-content: start;
+          height: 100%;
+        }
+
+        .template-console header {
+          border: var(--border);
+        }
+
+        .template-console mdn-play-runner {
+          display: none;
+        }
+
+        .template-console > mdn-play-editor,
+        .template-console mdn-ix-tab-wrapper {
+          grid-area: editor;
+          margin-top: -0.5rem;
+          border: var(--border);
+          border-top: 0;
+          border-bottom-right-radius: var(--elem-radius);
+          border-bottom-left-radius: var(--elem-radius);
+        }
+
+        /* Tabbed template */
+        .template-tabbed {
+          display: grid;
+          grid-template-areas:
+            "header header"
+            "tabs   runner";
+          grid-template-rows: max-content 1fr;
+          grid-template-columns: 6fr 4fr;
+          height: 100%;
+          overflow: hidden;
+          border: var(--border);
+          border-radius: var(--elem-radius);
+        }
+
+        .template-tabbed .output-wrapper {
+          position: relative;
+          grid-area: runner;
+          overflow: hidden;
+          border-left: var(--border);
+        }
+
+        .template-tabbed .output-wrapper h4 {
+          position: absolute;
+          top: 0;
+          right: 0;
+          z-index: 2;
+          padding: 0.5rem 1.6rem;
+          margin: 0;
+          font: var(--tabbed-font-heading);
+          color: var(--color-text-secondary);
+          text-transform: uppercase;
+          background-color: var(--color-background-secondary);
+          border-bottom-left-radius: var(--elem-radius);
+        }
+
+        /* Choices template */
+        .template-choices {
+          display: grid;
+          grid-template-areas:
+            "header header"
+            "choice runner";
+          grid-template-rows: max-content 1fr;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          height: 100%;
+          border: var(--border);
+          border-radius: var(--elem-radius);
+        }
+
+        .template-choices .choice-wrapper {
+          display: flex;
+          flex-direction: column;
+          grid-area: choice;
+          row-gap: 0.4rem;
+          padding: 1rem;
+          padding-right: 0;
+          overflow-y: auto;
+          border-right: var(--border);
+        }
+
+        .template-choices .choice {
+          display: flex;
+          flex-grow: 1;
+          align-items: center;
+        }
+
+        .template-choices .choice::after {
+          display: block;
+          width: 0.25rem;
+          /*width: 1.25rem;*/
+          /*height: 1.25rem;*/
+          /*margin: 0 0.75rem;*/
+          color: var(--field-focus-border);
+          content: "";
+          /*background-color: currentcolor;*/
+          opacity: 0;
+          /*mask-image: url("../icon/chevron-right.svg");*/
+          /*mask-size: cover;*/
+        }
+
+        .template-choices .choice.selected mdn-play-editor {
+          cursor: text;
+          border-color: var(--field-focus-border);
+          box-shadow: var(--focus-01);
+        }
+
+        .template-choices .choice.selected::after {
+          opacity: 1;
+          transition: all 0.2s ease-out;
+        }
+
+        .template-choices .choice mdn-play-editor {
+          width: 100%;
+          cursor: pointer;
+          border: var(--border);
+          border-radius: var(--elem-radius);
+        }
+
+        .template-choices .output-wrapper {
+          height: 300px;
+          overflow: hidden;
+        }
+
+        @media print {
+          mdn-button {
+            display: none !important;
+          }
+        }
+      </style>
+      ${html}
+    `;
+
+      // Find controller and runner elements if they exist.
+      this._controllerEl = this.shadowRoot.querySelector('mdn-play-controller');
+
+      // In a real app, you might pass the code to the controller.
+      if (this._controllerEl && this._code) {
+        // Suppose your play-controller has a 'code' property.
+        this._controllerEl.code = this._code;
+      }
+      // Attach event listeners after render
+      this._attachEventListeners();
     }
 
-    /* ======================
-     Simple Tab Handling
-     ====================== */
-    _setActiveTab(clickedTab) {
-      // Remove active state from all tabs, add to clicked one.
-      const tabs = this.shadowRoot.querySelectorAll('.tab');
-      const panels = this.shadowRoot.querySelectorAll('.tab-panel');
-      tabs.forEach((tab) => {
-        tab.classList.remove('active');
-        tab.setAttribute('tabindex', '-1');
-        // Optionally update aria-selected etc.
-      });
-      clickedTab.classList.add('active');
-      clickedTab.setAttribute('tabindex', '0');
+    _renderConsole() {
+      const id = this._randomIdString();
+      const languages = this._languages;
 
-      // Activate corresponding panel.
-      const index = clickedTab.dataset.index;
-      panels.forEach((panel) => {
-        if (panel.dataset.index === index) {
-          panel.style.display = '';
-        } else {
-          panel.style.display = 'none';
+      return `
+      <mdn-play-controller run-on-start run-on-change>
+        <div class="template-console" aria-labelledby="${id}">
+          <header>
+            <h4 id="${id}">${this._decode(this.name)}</h4>
+          </header>
+          ${
+  languages.length === 1
+    ? `<mdn-play-editor
+                  id="editor"
+                  language="${languages[0]}">
+                </mdn-play-editor>`
+    : `<mdn-ix-tab-wrapper>
+                  ${languages.map(
+    (lang) => `
+                      <mdn-ix-tab id="${lang}">
+                        ${this._langName(lang)}
+                      </mdn-ix-tab>
+                      <mdn-ix-tab-panel id="${lang}-panel">
+                        <mdn-play-editor language="${lang}"></mdn-play-editor>
+                      </mdn-ix-tab-panel>
+                    `
+  ).join('')}
+                </mdn-ix-tab-wrapper>`
+}
+          <div class="buttons">
+            <mdn-button
+              id="execute"
+              variant="secondary"
+              title="Run example, and show console output">
+              Run
+            </mdn-button>
+            <mdn-button
+              id="reset"
+              variant="secondary"
+              title="Reset example, and clear console output">
+              Reset
+            </mdn-button>
+          </div>
+          <mdn-play-console
+            id="console"
+            title="Console output">
+          </mdn-play-console>
+          <mdn-play-runner
+            ${languages.includes('wat') ? 'defaults="ix-wat"' : ''}
+            sandbox="allow-modals">
+          </mdn-play-runner>
+        </div>
+      </mdn-play-controller>
+    `;
+    }
+
+    _renderTabbed() {
+      const id = this._randomIdString();
+      const languages = this._languages;
+
+      return `
+      <mdn-play-controller run-on-start run-on-change>
+        <div class="template-tabbed" aria-labelledby="${id}">
+          <header>
+            <h4 id="${id}">${this._decode(this.name)}</h4>
+            <mdn-button id="reset" variant="secondary">
+              Reset
+            </mdn-button>
+          </header>
+          <mdn-ix-tab-wrapper>
+            ${languages.map(
+    (lang) => `
+                <mdn-ix-tab id="${lang}">
+                  ${this._langName(lang)}
+                </mdn-ix-tab>
+                <mdn-ix-tab-panel id="${lang}-panel">
+                  <mdn-play-editor language="${lang}"></mdn-play-editor>
+                </mdn-ix-tab-panel>
+              `
+  ).join('')}
+          </mdn-ix-tab-wrapper>
+          <div class="output-wrapper">
+            <h4>Output</h4>
+            <mdn-play-runner
+              defaults="ix-tabbed"
+              sandbox="allow-modals allow-top-navigation-by-user-activation">
+            </mdn-play-runner>
+          </div>
+        </div>
+      </mdn-play-controller>
+    `;
+    }
+
+    _renderChoices() {
+      const id = this._randomIdString();
+      const choices = this._choices;
+
+      return `
+      <div class="template-choices" aria-labelledby="${id}">
+        <header>
+          <h4 id="${id}">${this._decode(this.name)}</h4>
+          <mdn-button
+            id="reset"
+            variant="secondary"
+            ${!this.__choiceUpdated ? 'disabled' : ''}>
+            Reset
+          </mdn-button>
+        </header>
+        <ul
+          class="choice-wrapper"
+          aria-label="Value select">
+          ${choices.map(
+    (code, index) => `
+              <li
+                class="choice
+                  ${index === this.__choiceSelected ? 'selected' : ''}
+                  ${this.__choiceUnsupported[index] ? 'unsupported' : ''}"
+              >
+                <mdn-play-editor
+                  data-index="${index}"
+                  language="css"
+                  minimal="true"
+                  delay="100"
+                  value="${code?.trim() || ''}"
+                  ${this.__choiceUnsupported[index]
+    ? 'aria-label="The current value is not supported by your browser."'
+    : ''}
+                ></mdn-play-editor>
+              </li>
+            `
+  ).join('')}
+        </ul>
+        <div class="output-wrapper">
+          <mdn-play-controller run-on-start>
+            <mdn-play-runner
+              defaults="ix-choice"
+              sandbox="allow-modals">
+            </mdn-play-runner>
+          </mdn-play-controller>
+        </div>
+      </div>
+    `;
+    }
+
+    _attachEventListeners() {
+      const resetBtn = this.shadowRoot.querySelector('#reset');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => this._reset());
+      }
+
+      const executeBtn = this.shadowRoot.querySelector('#execute');
+      if (executeBtn) {
+        executeBtn.addEventListener('click', () => this._run());
+      }
+
+      // Choice event listeners
+      if (this._template === 'choices') {
+        const choiceWrapper = this.shadowRoot.querySelector('.choice-wrapper');
+        if (choiceWrapper) {
+          choiceWrapper.addEventListener('click', (e) => this._choiceFocus(e));
+          choiceWrapper.addEventListener('focus', (e) => this._choiceSelect(e));
+          choiceWrapper.addEventListener('update', (e) => this._choiceUpdate(e));
         }
-      });
+      }
+    }
+
+    // Utility methods
+    _randomIdString() {
+      return 'id-' + Math.random().toString(36).slice(2, 9);
+    }
+
+    _decode(str) {
+      return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
   }
 
-  // Finally, register the element.
-  customElements.define('interactive-example', InteractiveExampleBase);
+  customElements.define('interactive-example', InteractiveExample);
 
   /// endregion interactive-example
 }();
