@@ -175,10 +175,13 @@ table.compat-table th {
 }
 
 /* icons in sidebars */
-.mask-fix :is(:is(.left-sidebar details) summary)::before {
+.mask-fix :is(:is(.left-sidebar details) summary)::before,
+/* icon breadcrumbs */
+.mask-fix :is(.breadcrumbs li):not(:last-child)::after {
   background-color: transparent;
 }
-[data-theme="dark"] .mask-fix :is(:is(.left-sidebar details) summary)::before {
+[data-theme="dark"] .mask-fix :is(:is(.left-sidebar details) summary)::before,
+[data-theme="dark"] .mask-fix :is(.breadcrumbs li):not(:last-child)::after{
   filter: invert(1);
 }
 .mask-fix .icon-experimental,
