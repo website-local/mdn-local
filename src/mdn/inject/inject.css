@@ -421,141 +421,162 @@ aside.article-footer {
 }
 
 /* New compat table */
-.lazy-compat-table table {
+.bc-table button {
+  appearance: none;
+  background: none;
+  border: medium;
+}
+
+.bc-table a:link {
+  color: var(--color-link-normal);
+}
+
+.bc-table a:visited {
+  color: var(--color-link-visited);
+}
+
+.bc-table a:hover {
+  text-decoration: none;
+}
+
+.bc-table code {
+  background-color: var(--color-background-secondary);
+  padding: 0.125rem 0.25rem;
+  width: fit-content;
+}
+
+table.bc-table {
   display: grid;
-  grid-auto-flow: dense
+  grid-auto-flow: dense;
 }
 
-.lazy-compat-table table thead tr {
-  display: contents
+:is(table.bc-table thead) tr {
+  display: contents;
 }
 
-.lazy-compat-table table thead tr th, .lazy-compat-table table thead tr td {
+:is(:is(table.bc-table thead) tr) td, :is(:is(table.bc-table thead) tr) th {
   display: grid;
-  grid-template-columns:subgrid
+  grid-template-columns: subgrid;
 }
 
-.lazy-compat-table table tbody {
-  display: contents
+:is(:is(table.bc-table tbody) tr) td, :is(:is(table.bc-table tbody) tr) th, :is(table tbody) tr, table tbody {
+  display: contents;
 }
 
-.lazy-compat-table table tbody tr {
-  display: contents
-}
-
-.lazy-compat-table table tbody tr th, .lazy-compat-table table tbody tr td {
-  display: contents
-}
-
-.lazy-compat-table table tbody tr th button, .lazy-compat-table table tbody tr td button {
+:is(:is(:is(table.bc-table tbody) tr) th, :is(:is(table.bc-table tbody) tr) td) button {
   display: grid;
-  grid-template-columns:subgrid
+  grid-template-columns: subgrid;
 }
 
-.lazy-compat-table table tbody tr th .timeline, .lazy-compat-table table tbody tr td .timeline {
-  grid-column: 1/-1
+:is(:is(:is(table.bc-table tbody) tr) th, :is(:is(table.bc-table tbody) tr) td) .timeline {
+  grid-column: 1 / -1;
 }
 
 .bc-table {
-  border: 1px solid var(--border-primary);
-  border-collapse: separate;
-  border-radius: var(--elem-radius);
+  border: 1px solid var(--color-border-primary);
+  border-collapse: initial;
+  border-radius: 0.25rem;
   border-spacing: 0px;
   margin: 0px;
-  width: 100%
+  overflow-x: auto;
+  width: 100%;
 }
 
 .bc-table td, .bc-table th {
-  border-width: 0px 0px 1px 1px;
-  font-size: var(--type-smaller-font-size);
+  border-bottom: 1px solid var(--color-border-primary);
+  border-left: 1px solid var(--color-border-primary);
+  border-right: 0 solid var(--color-border-primary);
+  border-top: 0 solid var(--color-border-primary);
   font-weight: 500;
-  padding: 0.4rem
+  padding: 0.4rem;
 }
 
-.bc-table td code, .bc-table th code {
-  font-size: var(--type-smaller-font-size)
+.bc-table td, .bc-table th, :is(.bc-table td, .bc-table th) code {
+  font-size: var(--font-size-small);
 }
 
 .bc-table th {
-  background: var(--background-primary);
+  background: var(--color-background-primary);
   padding: 0.4rem;
-  vertical-align: bottom
+  vertical-align: bottom;
 }
 
 .bc-table thead {
-  line-height: 1;
-  white-space: nowrap
+  line-height: var(--font-line-ui);
+  white-space: nowrap;
 }
 
-.bc-table tbody tr {
-  height: 3rem
+:is(.bc-table tbody) tr {
+  height: 3rem;
 }
 
-@media (min-width: 426px) {
-  .bc-table tbody tr:last-child th, .bc-table tbody tr:last-child td {
-    border-bottom-width: 0px
+@media (426px < width) {
+  :is(:is(.bc-table tbody) tr):last-child td, :is(:is(.bc-table tbody) tr):last-child th {
+    border-bottom-width: 0px;
   }
 }
 
-.bc-table tbody tr th {
+:is(:is(.bc-table tbody) tr) th {
   border-left-width: 0px;
-  vertical-align: middle
+  vertical-align: middle;
 }
 
-.bc-table tbody .bc-support {
-  vertical-align: top
+:is(.bc-table tbody) .bc-support {
+  vertical-align: top;
 }
 
-.bc-table tbody .bc-support button {
+:is(:is(.bc-table tbody) .bc-support) button {
   cursor: pointer;
-  width: 100%
+  width: 100%;
 }
 
-.bc-table tbody .bc-support.bc-supports-no > button > span {
-  color: var(--text-primary-red)
+.bc-supports-no:is(:is(.bc-table tbody) .bc-support) > button > span {
+  color: var(--color-text-red);
 }
 
-.bc-table tbody .bc-support.bc-supports-partial > button > span {
-  color: var(--text-primary-yellow)
+.bc-supports-partial:is(:is(.bc-table tbody) .bc-support) > button > span {
+  color: var(--color-text-yellow);
 }
 
-.bc-table tbody .bc-support.bc-supports-preview > button > span {
-  color: var(--text-primary-blue)
+.bc-supports-preview:is(:is(.bc-table tbody) .bc-support) > button > span {
+  color: var(--color-text-blue);
 }
 
-.bc-table tbody .bc-support.bc-supports-yes > button > span {
-  color: var(--text-primary-green)
+.bc-supports-yes:is(:is(.bc-table tbody) .bc-support) > button > span {
+  color: var(--color-text-green);
 }
 
 .bc-table .bc-supports {
-  margin-bottom: 1rem
+  margin-bottom: 1rem;
 }
 
-.bc-table .bc-supports .icon-wrap {
-  background: var(--background-primary)
+:is(.bc-table .bc-supports) .icon-wrap {
+  background: var(--color-background-page);
+  padding-bottom: 2px;
 }
 
-.bc-table .bc-supports.bc-supports-removed-partial .bcd-cell-text-copy {
-  color: var(--text-primary-yellow)
+:is(.bc-table .bc-supports.bc-supports-removed-partial) .bcd-cell-text-copy {
+  color: var(--color-text-yellow);
 }
 
-.bc-table .icon-wrap .bc-support-level {
-  border: 0px;
-  clip: rect(0px, 0px, 0px, 0px);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0px;
+:is(.bc-table .icon-wrap) .bc-support-level {
+  border: 0px !important;
+  clip-path: inset(50%) !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  padding: 0px !important;
   position: absolute !important;
-  width: 1px
+  white-space: nowrap !important;
+  width: 1px !important;
 }
 
-.bc-table .bc-support > button > .icon-wrap {
-  display: block
+:is(.bc-table .bc-support) > button > .icon-wrap {
+  display: block;
 }
 
-.bc-table .bc-support.bc-supports-removed-partial .bcd-cell-text-copy {
-  color: var(--text-primary-red)
+:is(.bc-table .bc-support.bc-supports-removed-partial) .bcd-cell-text-copy {
+  color: var(--color-text-red);
 }
 
 .bc-table .bc-feature {
@@ -563,441 +584,435 @@ aside.article-footer {
   border: medium;
   display: flex;
   text-align: left;
-  width: 100%
+  width: 100%;
 }
 
-.bc-table .bc-feature > * {
+:is(.bc-table .bc-feature) > * {
   border: medium !important;
-  flex-basis: max-content
+  flex-basis: max-content;
 }
 
 .bc-table .bc-feature-depth-2 {
-  border-left: 7px solid var(--border-primary)
+  border-left: 7px solid var(--color-border-primary);
 }
 
 .bc-table .bc-feature-depth-3 {
-  border-left: 15px solid var(--border-primary)
+  border-left: 15px solid var(--color-border-primary);
 }
 
 .bc-table .timeline {
-  display: none
+  display: none;
 }
 
 .bc-table .bc-has-history:focus-within .timeline {
-  display: initial
+  display: initial;
 }
 
 .bc-head-txt-label {
-  line-height: 1;
+  line-height: var(--font-line-ui);
   text-orientation: sideways;
   transform: rotate(180deg);
   white-space: nowrap;
-  writing-mode: vertical-rl
+  writing-mode: vertical-rl;
 }
 
 .bc-support {
   text-align: center;
-  vertical-align: middle
+  vertical-align: middle;
+}
+
+.bc-level-no {
+  background-color: var(--color-text-red);
+}
+
+.bc-level-partial {
+  background-color: var(--color-text-yellow);
+}
+
+.bc-level-preview {
+  background-color: var(--color-text-blue);
 }
 
 .bc-legend-items-container {
   display: flex;
   flex-wrap: wrap;
-  font-size: var(--type-smaller-font-size);
+  font-size: var(--font-size-small);
   gap: 1.5rem;
-  margin-bottom: 2rem
+  margin-bottom: 2rem;
 }
 
 .bc-legend-tip {
-  font-size: var(--type-smaller-font-size);
+  font-size: var(--font-size-small);
   font-style: italic;
   font-variation-settings: "slnt" -10;
   margin-bottom: 1rem;
-  margin-top: 0px
+  margin-top: 0px;
+}
+
+@media print {
+  .bc-legend-tip {
+    display: none !important;
+  }
 }
 
 .bc-legend-item {
   align-items: center;
   display: flex;
-  gap: 0.5rem
+  gap: 0.5rem;
 }
 
 .bc-legend-item-dt {
-  display: flex
+  display: flex;
 }
 
-.lazy-compat-table .bc-table .bc-platforms th {
+.bc-legend-item-dt .icon {
+  background-color: var(--color-border-secondary);
+}
+
+.bc-platforms th {
   align-items: center;
   display: flex;
-  justify-content: center
+  justify-content: center;
 }
 
-.lazy-compat-table .bc-table .bc-platforms td {
-  border: medium
+.bc-platforms td {
+  border: medium;
 }
 
-.lazy-compat-table .bc-table .bc-browsers th {
+.bc-browsers th {
   align-items: center;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   justify-content: end;
-  vertical-align: bottom
+  vertical-align: bottom;
 }
 
 .bc-browsers td {
-  border-width: 0px 0px 1px
+  border-width: 0px 0px 1px;
 }
 
 .bc-notes-list {
   margin: 0.5rem 0px;
   position: relative;
   text-align: left;
-  width: 100%
+  width: 100%;
 }
 
 .bc-notes-list::before {
-  background: var(--border-primary);
+  background: var(--color-border-primary);
+  bottom: 4px;
   content: "";
-  height: calc(100% - 0.25rem);
   left: 7px;
   margin-top: 0.25rem;
   position: absolute;
-  width: 2px;
-  z-index: -1
+  top: 0px;
+  width: 3px;
+  z-index: -1;
 }
 
 .bc-notes-list .bc-notes-wrapper:last-child dd:last-child {
-  position: relative
+  position: relative;
 }
 
-.bc-notes-list .bc-notes-wrapper:last-child dd:last-child::before {
-  background: var(--background-primary);
+:is(.bc-notes-list .bc-notes-wrapper:last-child dd:last-child)::before {
+  background: var(--color-background-page);
   bottom: 0px;
   content: "";
-  height: calc(100% - 6px);
   left: 7px;
   position: absolute;
-  width: 2px;
-  z-index: -1
+  top: 3px;
+  width: 3px;
+  z-index: -1;
 }
 
-.bc-notes-list .bc-supports-dd .icon {
-  background: var(--border-primary);
-  border: 3px solid var(--background-primary);
-  border-radius: 50%;
-  mask-image: none
+:is(.bc-notes-list .bc-supports-dd) .icon-wrap {
+  background-color: var(--color-background-page);
+  padding-bottom: 2px;
 }
 
 .bc-notes-list .bc-version-label {
-  display: inline
+  display: inline;
 }
 
 .bc-notes-list abbr {
   margin-right: 4px;
-  text-decoration: none
+  text-decoration: none;
 }
 
 .bc-notes-list dd {
   margin-bottom: 1rem;
   padding-left: 1.5rem;
-  text-indent: -1.5rem
+  text-indent: -1.5rem;
 }
 
-.bc-notes-list dd:last-child {
-  margin-bottom: 2rem
+:is(.bc-notes-list dd):last-child {
+  margin-bottom: 2rem;
 }
 
 .bc-notes-wrapper {
-  color: var(--text-primary);
-  margin-bottom: 1rem
+  color: var(--color-border-secondary);
+  margin-bottom: 1rem;
 }
 
 .bc-notes-wrapper:last-child {
-  margin-bottom: 0px
+  margin-bottom: 0px;
 }
 
 dl.bc-notes-list dt.bc-supports {
-  margin-top: 1rem
+  margin-top: 1rem;
 }
 
-dl.bc-notes-list dt.bc-supports:first-child {
-  margin-top: 0px
+:is(dl.bc-notes-list dt.bc-supports):first-child {
+  margin-top: 0px;
 }
 
 dl.bc-notes-list dd.bc-supports-dd {
-  margin-bottom: 1rem
+  margin-bottom: 1rem;
 }
 
-dl.bc-notes-list dd.bc-supports-dd:last-child {
-  margin-bottom: 0px
+:is(dl.bc-notes-list dd.bc-supports-dd):last-child {
+  margin-bottom: 0px;
 }
 
 .only-icon span {
-  border: 0px;
-  clip: rect(0px, 0px, 0px, 0px);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0px;
+  border: 0px !important;
+  clip-path: inset(50%) !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  padding: 0px !important;
   position: absolute !important;
-  width: 1px
+  white-space: nowrap !important;
+  width: 1px !important;
 }
 
 .bc-table-row-header {
   padding: 0.25em;
   text-align: left;
-  width: 100%
+  width: 100%;
 }
 
 .bc-table-row-header code {
-  overflow: hidden
+  overflow: hidden;
 }
 
 .bc-table-row-header .bc-icons {
   display: inline-flex;
   gap: 0.5ch;
   margin-left: 0.5ch;
-  vertical-align: text-top
+  vertical-align: text-top;
 }
 
+:is(.bc-table-row-header .bc-icons) .icon {
+  background-color: var(--color-text-secondary);
+}
 
-.main-page-content .bc-legend dd, .main-page-content .bc-legend dt {
+:is(.main-page-content .bc-legend) dd, :is(.main-page-content .bc-legend) dt {
   margin-bottom: 0px;
   margin-left: 0px;
-  margin-top: 0px
+  margin-top: 0px;
 }
 
 .main-page-content .bc-supports-dd {
-  margin: 0px
+  margin: 0px;
 }
 
-@media (max-width: 425.98px) {
+@media (width <= 426px) {
   .bc-table {
-    grid-template-columns:auto
+    grid-template-columns: auto;
   }
 
   .bc-table thead {
-    display: none
+    display: none;
   }
 
-  .bc-table tr td.bc-support {
+  :is(.bc-table tr) td.bc-support {
     border-right: medium;
     border-bottom: medium;
     border-left: medium;
     border-image: none;
-    border-top: 1px solid var(--border-primary);
-    display: block
+    border-top: 1px solid var(--color-border-primary);
+    display: block;
   }
 
-  .bc-table tr td.bc-support:last-child {
-    border-bottom: 1px solid var(--border-primary)
+  :is(:is(.bc-table tr) td.bc-support):last-child {
+    border-bottom: 1px solid var(--color-border-primary);
   }
 
   .bc-table .timeline {
-    margin-left: 0.25rem
+    margin-left: 0.25rem;
   }
 
   .bc-table tr:not(:first-of-type) .bc-feature {
-    border-top: 2px solid var(--border-primary)
+    border-top: 2px solid var(--color-border-primary);
   }
 
   .bc-table .bc-feature, .bc-table .bc-support > button {
     align-content: center;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem
+    gap: 0.5rem;
   }
 
-  .lazy-compat-table .table-container {
-    overflow-x: auto
+  .bc-on-github a {
+    white-space: nowrap;
+  }
+
+  .table-container {
+    overflow-x: auto;
   }
 }
 
-@media (min-width: 426px) {
+@media (426px < width) {
   .bc-table {
-    grid-template-columns:minmax(20vw, min-content) repeat(var(--browser-count), auto)
+    grid-template-columns: minmax(20vw, min-content) repeat(var(--compat-browser-count), auto);
   }
 
   .bc-table thead {
-    display: contents
+    display: contents;
   }
 
-  .bc-table thead .bc-platforms th {
-    vertical-align: revert
+  :is(:is(.bc-table thead) .bc-platforms) th {
+    vertical-align: revert;
   }
 
   .bc-table tbody {
-    --border: 1px solid var(--border-secondary)
+    --border: 1px solid var(--color-border-primary);
   }
 
-  .bc-table tbody tr:not(:first-child) th > *, .bc-table tbody tr:not(:first-child) td > * {
-    border-top: var(--border)
+  :is(:is(.bc-table tbody) tr):not(:first-child) .bc-feature, :is(:is(:is(.bc-table tbody) tr):not(:first-child) th, :is(:is(.bc-table tbody) tr):not(:first-child) td) > * {
+    border-top: var(--border);
   }
 
-  .bc-table tbody tr:not(:first-child) .bc-feature {
-    border-top: var(--border)
-  }
-
-  .bc-table tbody tr th:not(:first-child) > *, .bc-table tbody tr td:not(:first-child) > * {
-    border-left: var(--border)
+  :is(:is(:is(.bc-table tbody) tr) th:not(:first-child), :is(:is(.bc-table tbody) tr) td:not(:first-child)) > * {
+    border-left: var(--border);
   }
 
   .bc-table td, .bc-table th {
     background: inherit;
-    padding: 0.25rem
+    padding: 0.25rem;
   }
 
   .bc-table td.bc-support {
-    padding: 0px
+    padding: 0px;
   }
 
-  .bc-table td.bc-support > button {
-    padding: 0.25rem
+  :is(.bc-table td.bc-support) > button {
+    padding: 0.25rem;
   }
 
   .bc-table .timeline {
     border-left: medium !important;
-    border-top: var(--border)
+    border-top: var(--border);
   }
 
-  .bc-table .bc-has-history:focus-within > button {
+  :is(.bc-table .bc-has-history):focus-within > button {
     --padding-bottom-offset: -2px;
-    border-bottom: 2px solid var(--text-primary)
+    border-bottom: 2px solid var(--color-border-primary);
   }
 
-  .lazy-compat-table .table-container {
-    margin: 0px -3rem;
-    overflow: auto;
-    width: 100vw
+  :is(.bc-table .bc-has-history) > button:hover {
+    background: var(--color-background-secondary);
   }
 
-  .lazy-compat-table .table-container-inner {
-    min-width: max-content;
-    padding: 0px 3rem;
-    position: relative
+  .table-container-inner {
+    position: relative;
   }
 
-  .lazy-compat-table .table-container-inner::after {
+  .table-container-inner::after {
     bottom: 0px;
     content: "";
     height: 10px;
     position: absolute;
     right: 0px;
-    width: 10px
+    width: 10px;
   }
 
-  .bcd-cell-text-wrapper .bc-support-level, .bcd-cell-text-wrapper .bc-browser-name {
-    display: none
+  .bcd-cell-text-wrapper .bc-browser-name, .bcd-cell-text-wrapper .bc-support-level {
+    display: none;
   }
 
   .bc-notes-list {
     margin-left: 20%;
     max-width: 80vw;
-    width: auto
+    width: auto;
   }
 
   .bc-support .bc-support-level {
-    display: none
-  }
-
-  .bc-has-history {
-    cursor: pointer
-  }
-
-  .bc-has-history > button:hover {
-    background: var(--background-secondary)
+    display: none;
   }
 }
 
-@media (min-width: 769px) {
-  .lazy-compat-table .table-container {
-    width: calc(100% + 6rem)
-  }
-
-  .lazy-compat-table .table-container-inner {
-    min-width: initial
+@media (769px < width) {
+  .bc-on-github {
+    text-align: right;
   }
 
   .bc-table {
-    grid-template-columns:minmax(25%, max-content) repeat(var(--browser-count), calc(75% / var(--browser-count)))
+    grid-template-columns: minmax(25%, max-content) repeat(var(--compat-browser-count), calc(75% / var(--compat-browser-count)));
   }
 
+  .bc-table .icon {
+    --size: calc(1rem + 1px);
+  }
 }
 
-@media (min-width: 1200px) {
-  .lazy-compat-table .table-container {
-    margin: 0px;
-    width: 100%
-  }
-
-  .lazy-compat-table .table-container-inner {
-    padding: 0px
-  }
-
+@media (1200px < width) {
   .bc-table {
-    grid-template-columns:minmax(33%, max-content) repeat(var(--browser-count), calc(67% / var(--browser-count)))
+    grid-template-columns: minmax(33%, max-content) repeat(var(--compat-browser-count), calc(67% / var(--compat-browser-count)));
   }
 }
 
 .bcd-cell-text-wrapper {
   display: flex;
   flex-direction: row;
-  gap: 0.5rem
+  gap: 0.5rem;
 }
 
-@media (min-width: 426px) {
+@media (426px < width) {
   .bcd-cell-text-wrapper {
     align-items: center;
-    flex-direction: column
+    flex-direction: column;
   }
 }
 
 .bcd-timeline-cell-text-wrapper {
   display: flex;
   flex-direction: row;
-  gap: 0.25rem
+  gap: 0.25rem;
 }
 
 .bcd-cell-text-copy {
-  color: var(--text-primary)
+  color: var(--color-text-primary);
 }
 
 .bc-supports-yes .bcd-cell-text-copy {
-  color: var(--text-primary-green)
+  color: var(--color-text-green);
 }
 
 .bc-supports-partial .bcd-cell-text-copy {
-  color: var(--text-primary-yellow)
+  color: var(--color-text-yellow);
 }
 
 .bc-supports-no .bcd-cell-text-copy {
-  color: var(--text-primary-red)
+  color: var(--color-text-red);
 }
 
 .bcd-cell-icons {
   display: flex;
-  gap: 0.5rem
+  gap: 0.5rem;
 }
 
-@media (min-width: 426px) {
+@media (426px < width) {
   .bcd-cell-icons {
-    display: block
+    display: block;
   }
-}
 
-@media (min-width: 426px) {
   .bc-table td.bc-support > button {
     padding-bottom: calc(.5rem + var(--padding-bottom-offset, 0px));
     padding-left: 0.25rem;
     padding-right: 0.25rem;
-    padding-top: 0.5rem
+    padding-top: 0.5rem;
   }
-}
-.bc-level-no {
-  background-color: var(--icon-critical);
-}
-
-.bc-level-preview {
-  background-color: var(--icon-information);
 }

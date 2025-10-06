@@ -855,7 +855,7 @@ export class MDNCompatTable {
           </div>`
         : `<div class="bc-legend-item">
             <dt class="bc-legend-item-dt">
-              <abbr class="legend-icons icon icon-${key}" title=${label}></abbr>
+              <abbr class="legend-icons icon icon-${key}" title="${label}"></abbr>
             </dt>
             <dd class="bc-legend-item-dd">${label}</dd>
           </div>`;
