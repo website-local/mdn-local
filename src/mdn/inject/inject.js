@@ -2491,8 +2491,6 @@ Prism.languages.py = Prism.languages.python;
     mainMenuNoJs,
     // yari search box on main page
     searchBox,
-    // yari mobile left sidebar
-    sidebarBtn, sidebarContainer, sidebarCurrentElem,
     // yari mask-image to background fix
     linkCss, linkPreload;
 
@@ -2875,33 +2873,6 @@ Prism.languages.py = Prism.languages.python;
     });
   }
   /// endregion mdn-toggle-sidebar
-
-  /// region yari mobile left sidebar
-  // https://github.com/website-local/mdn-local/issues/784
-  sidebarBtn = document.querySelector('.sidebar-button');
-  sidebarContainer = document.getElementById('sidebar-quicklinks');
-  if (sidebarBtn && sidebarContainer) {
-    sidebarBtn.onclick = function () {
-      if (hasClass(sidebarContainer, 'is-expanded')) {
-        removeClass(sidebarContainer, 'is-expanded');
-        removeClass(document.body, 'mobile-overlay-active');
-        sidebarBtn.setAttribute('aria-label', 'Expand sidebar');
-        sidebarBtn.setAttribute('aria-expanded', 'false');
-      } else {
-        addClass(sidebarContainer, 'is-expanded');
-        addClass(document.body, 'mobile-overlay-active');
-        sidebarBtn.setAttribute('aria-label', 'Collapse sidebar');
-        sidebarBtn.setAttribute('aria-expanded', 'true');
-      }
-    };
-    sidebarCurrentElem = sidebarContainer.querySelector('.sidebar em');
-    if (sidebarCurrentElem &&
-      typeof sidebarCurrentElem.scrollIntoView === 'function') {
-      sidebarCurrentElem.scrollIntoView({ block: 'center' });
-    }
-
-  }
-  /// endregion yari mobile left sidebar
 
   /// region yari mask-image to background fix
   // https://github.com/website-local/mdn-local/issues/785
@@ -3617,7 +3588,10 @@ function mdnMaskImageStyleFix(sr) {
     filter._onInput(e);
     btn.style.visibility = e.target.value.length ? 'initial' : '';
   };
-  btn.onclick = () => filter._clearFilter();
+  btn.onclick = () => {
+    filter._clearFilter();
+    input.value = '';
+  };
   filter.firstUpdated();
   if (location.protocol !== 'file:') {
     return;
