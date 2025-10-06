@@ -1,4 +1,4 @@
-/* eslint-disable no-useless-escape,no-prototype-builtins,@typescript-eslint/no-unused-expressions,@typescript-eslint/no-unused-vars,no-case-declarations */
+/* eslint-disable no-useless-escape,no-prototype-builtins,@typescript-eslint/no-unused-expressions,@typescript-eslint/no-unused-vars */
 // noinspection ES6ConvertVarToLetConst
 
 'use strict';
@@ -2868,9 +2868,9 @@ Prism.languages.py = Prism.languages.python;
   if (toggleSidebar && mainSidebar) {
     toggleSidebar.addEventListener('click', () => {
       if (mainSidebar.style.display !== 'block') {
-        mainSidebar.style.display = "block";
+        mainSidebar.style.display = 'block';
       } else {
-        mainSidebar.style.removeProperty("display");
+        mainSidebar.style.removeProperty('display');
       }
     });
   }
@@ -3632,22 +3632,23 @@ function mdnMaskImageStyleFix(sr) {
   });
 }();
 
-// 20250323 interactive-example
+// 20251006 interactive-example
 // https://github.com/website-local/mdn-local/issues/1142
-// Currently based on https://github.com/mdn/yari/tree/v4.8.0/client/src/lit
+// https://github.com/website-local/mdn-local/issues/1309
 !function () {
   const currSrc = document.currentScript.src;
   const relativeRoot = new URL('../../', currSrc).toString();
   const customElements = window.customElements;
   const HTMLElement = window.HTMLElement;
   /// region play-console
-  // https://github.com/mdn/yari/commit/33de34d9df9f57f3afe9577403bcf6007507be63
+  // Currently based on https://github.com/mdn/fred/blob/v1.6.1/components/play-console/utils.js
   // Copied from https://github.com/mdn/bob/blob/9da42cd641d7f2a9796bf3406e74cad411ce9438/editor/js/editor-libs/console-utils.ts
   /**
    * Formats arrays:
    * - quotes around strings in arrays
    * - square brackets around arrays
    * - adds commas appropriately (with spacing)
+   * - identifies empty slots
    * designed to be used recursively
    * @param {any} input - The output to log.
    * @returns Formatted output as a string.
@@ -3661,8 +3662,16 @@ function mdnMaskImageStyleFix(sr) {
         output += 'Array [';
         output += formatArray(input[i]);
         output += ']';
-      } else {
+      } else if (Object.prototype.hasOwnProperty.call(input, i)) {
         output += formatOutput(input[i]);
+      } else {
+        let emptyCount = 1;
+        while (i + 1 < l && !Object.prototype.hasOwnProperty.call(input, i + 1)) {
+          emptyCount++;
+          i++;
+        }
+        output +=
+          emptyCount === 1 ? '<1 empty slot>' : `<${emptyCount} empty slots>`;
       }
 
       if (i < input.length - 1) {
@@ -3695,22 +3704,20 @@ function mdnMaskImageStyleFix(sr) {
     }
 
     if (input === JSON) {
-      // console.log(JSON) is outputed as "JSON {}" in browser console
+      // console.log(JSON) is output as "JSON {}" in browser console
       return 'JSON {}';
     }
 
-    if (objectName.match && objectName.match(bufferDataViewRegExp)) {
+    if (objectName.match && bufferDataViewRegExp.test(objectName)) {
       return objectName + ' {}';
     }
 
-    if (objectName.match && objectName.match(complexArrayRegExp)) {
+    if (objectName.match && complexArrayRegExp.test(objectName)) {
       const arrayLength = input.length;
 
-      if (arrayLength > 0) {
-        return objectName + ' [' + formatArray(input) + ']';
-      } else {
-        return objectName + ' []';
-      }
+      return arrayLength > 0
+        ? objectName + ' [' + formatArray(input) + ']'
+        : objectName + ' []';
     }
 
     if (objectName === 'Symbol' && input !== undefined) {
@@ -3779,11 +3786,7 @@ function mdnMaskImageStyleFix(sr) {
       return String(input) + 'n';
     } else if (typeof input === 'string') {
       // string literal
-      if (input.includes('"')) {
-        return '\'' + input + '\'';
-      } else {
-        return '"' + input + '"';
-      }
+      return input.includes('"') ? '\'' + input + '\'' : '"' + input + '"';
     } else if (Array.isArray(input)) {
       // check the contents of the array
       return 'Array [' + formatArray(input) + ']';
@@ -3792,10 +3795,11 @@ function mdnMaskImageStyleFix(sr) {
     }
   }
 
+  // https://github.com/mdn/fred/blob/v1.6.1/components/play-console/
   /** @implements {Partial<Console>} */
   class VirtualConsole {
 
-    /** @param {PlayConsole} host  */
+    /** @param {MDNPlayConsole} host  */
     constructor(host) {
       this.host = host;
     }
@@ -3830,21 +3834,25 @@ function mdnMaskImageStyleFix(sr) {
           (match, formatArg, format) => {
             switch (format) {
             case 'o':
-            case 'O':
+            case 'O': {
               const O = args.splice(1, 1)[0];
               return formatOutput(O);
+            }
             case 'd':
-            case 'i':
+            case 'i': {
               const i = args.splice(1, 1)[0];
               return Math.trunc(i).toFixed(0).padStart(formatArg, '0');
-            case 's':
+            }
+            case 's': {
               const s = args.splice(1, 1)[0];
               return s.toString();
-            case 'f':
+            }
+            case 'f': {
               const f = args.splice(1, 1)[0];
-              return (typeof f === 'number' ? f : parseFloat(f)).toFixed(
-                formatArg ?? 6
+              return (typeof f === 'number' ? f : Number.parseFloat(f)).toFixed(
+                formatArg ?? 6,
               );
+            }
             case 'c':
               // TODO: Not implemented yet, so just remove the argument
               args.splice(1, 1);
@@ -3854,7 +3862,7 @@ function mdnMaskImageStyleFix(sr) {
             default:
               return match;
             }
-          }
+          },
         );
       }
       this.host._messages = [
@@ -3870,7 +3878,8 @@ function mdnMaskImageStyleFix(sr) {
     }
   }
 
-  class PlayConsole extends HTMLElement {
+  // noinspection CssUnresolvedCustomProperty
+  class MDNPlayConsole extends HTMLElement {
 
     constructor() {
       super();
@@ -3883,7 +3892,7 @@ function mdnMaskImageStyleFix(sr) {
     /** @param {CustomEvent<VConsole>} e */
     onConsole({ detail }) {
       if (detail.prop in this.vconsole) {
-        const prop = /** @type keyof typeof this.vconsole */ (detail.prop);
+        const prop = /** @type {keyof typeof this.vconsole} */ (detail.prop);
         detail.args ? this.vconsole[prop](...detail.args) : this.vconsole[prop]();
       } else {
         this.vconsole.warn(
@@ -3895,12 +3904,32 @@ function mdnMaskImageStyleFix(sr) {
     render() {
       if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
       this.shadowRoot.innerHTML = `
-<style>:host { background-color: var(--code-background-inline); box-sizing: border-box; display: flex; flex-direction: column; font-size: 0.875rem; margin: 0px; overflow: auto; width: 100%; }
-ul { list-style: none; margin: 0px; padding: 0px; }
-li { padding: 0px 0.5em; }
-li::before { content: ">"; }
-code { font-family: var(--font-code); tab-size: 4; }</style>
-      <ul>
+<style>:host {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  overflow: auto;
+  font-size: var(--font-size-small);
+  background-color: var(--color-background-secondary);
+}
+ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+li {
+  padding: 0 0.5em;
+}
+li::before {
+  content: "> ";
+}
+code {
+  font-family: var(--font-family-code);
+  tab-size: 4;
+}</style>
+      <ul aria-live="polite">
         ${this._messages.map((message) => {
     return `
             <li>
@@ -3918,7 +3947,7 @@ code { font-family: var(--font-code); tab-size: 4; }</style>
     }
   }
 
-  customElements.define('play-console', PlayConsole);
+  customElements.define('mdn-play-console', MDNPlayConsole);
   /// endregion play-console
 
   /// region theme-controller
