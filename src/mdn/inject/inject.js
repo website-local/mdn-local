@@ -3957,10 +3957,10 @@ code {
    * Current theme can be accessed through `.value`.
    */
   class ThemeController {
-    /** @param {LitElement} host */
+    /** @param {HTMLElement} host */
     constructor(host) {
       this.host = host;
-      this.host.addController(this);
+      // this.host.addController(this);
       /** @type {ColorScheme} */
       this.value = 'light dark';
       this.initialValue = 'light dark';
@@ -4363,26 +4363,31 @@ code {
 
   /// region play-runner
 
-  // https://github.com/mdn/yari/blob/v4.7.2/client/src/lit/play/runner.js
+  // https://github.com/mdn/fred/blob/v1.6.1/components/play-runner/element.js
   /**
    * @import { RunnerDefaults, VConsole } from "./types"
    * @import { EventName } from "@lit/react"
    * @import { Ref } from "lit/directives/ref.js"; */
 
-  class PlayRunner extends HTMLElement {
+  class MDNPlayRunner extends HTMLElement {
 
     constructor() {
       super();
+      this.theme = new ThemeController(this);
       /** @type {Record<string, string> | undefined} */
       this._code = undefined;
       /** @type {RunnerDefaults | undefined} */
       this.defaults = this.getAttribute('defaults');
+      /** @type {string | undefined} */
+      this.srcPrefix = undefined;
+      /** @type {string | undefined} */
+      this.allow = undefined;
+      /** @type {string | undefined} */
       this.sandbox = this.getAttribute('sandbox');
       /** @type {Promise<true>} */
       this.ready = new Promise((resolve) => {
         this._resolveReady = () => resolve(true);
       });
-      this.theme = new ThemeController(this);
       this.render();
     }
 
@@ -4441,7 +4446,9 @@ code {
       <style>iframe { border: medium; height: 100%; width: 100%; }</style>
       <iframe
         title="runner"
+        allow="${this.allow || ''}"
         sandbox="allow-scripts allow-same-origin allow-forms ${this.sandbox}"
+        aria-live="polite"
       ></iframe>
     `;
       this._iframe = this.querySelector('iframe');
@@ -4465,7 +4472,7 @@ code {
    */
   function uInt8ArrayToBase64(bytes) {
     const binString = Array.from(bytes, (byte) =>
-      String.fromCodePoint(byte)
+      String.fromCodePoint(byte),
     ).join('');
     return btoa(binString);
   }
@@ -4484,7 +4491,7 @@ code {
     return b64;
   }
 
-  customElements.define('play-runner', PlayRunner);
+  customElements.define("mdn-play-runner", MDNPlayRunner);
 
   /// endregion play-runner
 
