@@ -156,12 +156,11 @@ table.compat-table th {
 
 .mask-fix a.external::after {
   background-size: cover;
-  filter: invert(1) contrast(0.5);
   background-color: transparent;
 }
 
-.dark .mask-fix a.external::after {
-  filter: none;
+[data-theme="dark"] .mask-fix a.external::after {
+  filter: invert(1);
 }
 
 @media screen and (min-width: 1200px) {
@@ -209,8 +208,8 @@ table.compat-table th {
   background-color: transparent;
   filter: opacity(0.6);
 }
-.dark .mask-fix .bc-legend-item-dt .icon,
-.dark .mask-fix .bc-table .icon {
+[data-theme="dark"] .mask-fix .bc-legend-item-dt .icon,
+[data-theme="dark"] .mask-fix .bc-table .icon {
   filter: invert(1) opacity(0.6);
 }
 .mask-fix .icon.icon-no {
@@ -227,7 +226,7 @@ table.compat-table th {
   background-color: transparent;
   filter: brightness(0.6);
 }
-.dark .mask-fix .bc-notes-list .bc-level-yes.icon.icon-yes {
+[data-theme="dark"] .mask-fix .bc-notes-list .bc-level-yes.icon.icon-yes {
   filter: none;
 }
 .mask-fix abbr[title] {
@@ -252,7 +251,7 @@ table.compat-table th {
   filter: invert(1);
   background-color: transparent;
 }
-.dark .mask-fix .breadcrumbs-container li .breadcrumb::after {
+[data-theme="dark"] .mask-fix .breadcrumbs-container li .breadcrumb::after {
   filter: none;
 }
 .mask-fix .icon.icon-theme-os-default,
@@ -266,20 +265,20 @@ table.compat-table th {
 .mask-fix .icon.icon-cancel {
   filter: invert(1);
 }
-.dark .mask-fix .icon.icon-theme-os-default,
-.dark .mask-fix .icon.icon-theme-light,
-.dark .mask-fix .icon.icon-theme-dark,
-.dark .mask-fix .icon.icon-sidebar,
-.dark .mask-fix .icon.icon-sidebar {
+[data-theme="dark"] .mask-fix .icon.icon-theme-os-default,
+[data-theme="dark"] .mask-fix .icon.icon-theme-light,
+[data-theme="dark"] .mask-fix .icon.icon-theme-dark,
+[data-theme="dark"] .mask-fix .icon.icon-sidebar,
+[data-theme="dark"] .mask-fix .icon.icon-sidebar {
   filter: invert(1);
 }
-.dark .mask-fix .icon.icon-cancel {
+[data-theme="dark"] .mask-fix .icon.icon-cancel {
   filter: none;
 }
 .mask-fix .icon.icon-unknown {
   filter: invert(0.2);
 }
-.dark .mask-fix .icon.icon-unknown {
+[data-theme="dark"] .mask-fix .icon.icon-unknown {
   filter: invert(1);
 }
 .mask-fix .languages-switcher-menu > .button .button-wrap::after,
@@ -287,15 +286,15 @@ table.compat-table th {
   background-color: transparent;
   filter: invert(1) opacity(0.6);
 }
-.dark .mask-fix .languages-switcher-menu > .button .button-wrap::after,
-.dark .mask-fix .theme-switcher-menu > .button .button-wrap::after {
+[data-theme="dark"] .mask-fix .languages-switcher-menu > .button .button-wrap::after,
+[data-theme="dark"] .mask-fix .theme-switcher-menu > .button .button-wrap::after {
   filter: opacity(0.6);
 }
 .mask-fix .top-navigation-main .menu-toggle::after {
   background-color: transparent;
   filter: invert(1);
 }
-.dark .mask-fix .top-navigation-main .menu-toggle::after {
+[data-theme="dark"] .mask-fix .top-navigation-main .menu-toggle::after {
   filter: none;
 }
 .mask-fix .featured-articles .article-tile p::after {
@@ -316,7 +315,7 @@ table.compat-table th {
   background-color: transparent;
   filter: opacity(0.6);
 }
-.dark .mask-fix .code-example .copy-icon {
+[data-theme="dark"] .mask-fix .code-example .copy-icon {
   filter: invert(1) opacity(0.6);
 }
 /* 20230716 process: masked icons in blogs */
@@ -327,10 +326,10 @@ table.compat-table th {
   .mask-fix .blog-container .previous-next a.previous::before {
     background-color: transparent;
   }
-  .dark .mask-fix .blog-container .previous-next a.next::after,
-  .dark .mask-fix .blog-container .previous-next a.next::before,
-  .dark .mask-fix .blog-container .previous-next a.previous::after,
-  .dark .mask-fix .blog-container .previous-next a.previous::before {
+  [data-theme="dark"] .mask-fix .blog-container .previous-next a.next::after,
+  [data-theme="dark"] .mask-fix .blog-container .previous-next a.next::before,
+  [data-theme="dark"] .mask-fix .blog-container .previous-next a.previous::after,
+  [data-theme="dark"] .mask-fix .blog-container .previous-next a.previous::before {
     filter: invert(1);
   }
 }
@@ -401,7 +400,7 @@ aside.article-footer {
   background-color: transparent;
 }
 
-.dark .mask-fix .sidebar-filter-container .sidebar-filter-label .icon {
+[data-theme="dark"] .mask-fix .sidebar-filter-container .sidebar-filter-label .icon {
   filter: opacity(0.6);
 }
 
