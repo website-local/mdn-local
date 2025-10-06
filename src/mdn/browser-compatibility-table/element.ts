@@ -815,7 +815,7 @@ export class MDNCompatTable {
     ? `${ browser.name } ${ added } – Release date: ${ browserReleaseDate }`
     : ''}
         >
-          ${!timeline || added ? label : undefined}
+          ${!timeline || added ? label : ''}
           ${browserReleaseDate && timeline
     ? `(Release date: ${browserReleaseDate})`
     : ''}

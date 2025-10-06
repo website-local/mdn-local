@@ -132,6 +132,9 @@ export default async function createDownloader(
       path.join(jsPath, 'inject.js')),
     fs.copyFile(path.join(dirname, 'inject', 'inject.css'),
       path.join(cssPath, 'inject.css')),
+    // node.js 16.7+
+    fs.cp(path.join(dirname, 'inject', 'icon'),
+      path.join(cssPath, 'icon'), {recursive: true}),
     fs.writeFile(path.join(
       overrideOptions.localRoot,
       'developer.mozilla.org',
