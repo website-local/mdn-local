@@ -139,5 +139,5 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   // footer
   $('.homepage-footer').remove();
   // menus
-  $('.menu__tab[data-section="tools"] menu__panel-content>ul:first-child').remove();
+  $('.menu__tab[data-section="tools"] .menu__panel-content>ul:first-child').remove();
 };
