@@ -1146,6 +1146,26 @@ dl.bc-notes-list dd.bc-supports-dd {
   mask-image: url("./icon/flask-conical.svg");
 }
 
+:is(.bc-table .bc-support) .icon.icon-removed-partial {
+  background-color: var(--color-text-red);
+  mask-image: url("./icon/circle-x.svg");
+}
+
+:is(.bc-table .bc-support) .timeline .icon.icon-removed-partial {
+  background-color: var(--color-text-yellow);
+  mask-image: url("./icon/circle-slash.svg");
+}
+
+.bc-notes-list .bc-level-yes.icon.icon-yes {
+  background-color: var(--color-text-green);
+  mask-image: url("./icon/circle-check.svg");
+}
+
+:is(.bc-notes-list .bc-supports-dd) .icon {
+  background-color: var(--color-text-secondary);
+  mask-image: url("./icon/circle.svg");
+}
+
 /** Platform icons. */
 .mask-fix .bc-table .icon.icon-desktop {
   mask-image: none;background-image: url("./icon/monitor.svg");
@@ -1261,4 +1281,24 @@ dl.bc-notes-list dd.bc-supports-dd {
 
 .mask-fix .bc-table .icon.icon-preview {
   mask-image: none;background-image: url("./icon/flask-conical.svg");
+}
+
+.mask-fix :is(.bc-table .bc-support) .icon.icon-removed-partial {
+  background-color: transparent;
+  mask-image: none;background-image: url("./icon/circle-x.svg");
+}
+
+.mask-fix :is(.bc-table .bc-support) .timeline .icon.icon-removed-partial {
+  background-color: transparent;
+  mask-image: none;background-image: url("./icon/circle-slash.svg");
+}
+
+.mask-fix .bc-notes-list .bc-level-yes.icon.icon-yes {
+  background-color: transparent;
+  mask-image: none;background-image: url("./icon/circle-check.svg");
+}
+
+.mask-fix :is(.bc-notes-list .bc-supports-dd) .icon {
+  background-color: transparent;
+  mask-image: none;background-image: url("./icon/circle.svg");
 }
