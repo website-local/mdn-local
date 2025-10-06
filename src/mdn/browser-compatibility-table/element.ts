@@ -403,7 +403,7 @@ export class MDNCompatTable {
             tabindex="0"
             aria-expanded="false"
           >
-            <dl class="bc-notes-list">${notes}</dl>
+            <dl class="bc-notes-list">${notes.join('')}</dl>
           </div>` || ''}
         </td>`;
       });
@@ -563,7 +563,7 @@ export class MDNCompatTable {
             >
               ${this._renderCellText(item, browser, true) || ''}
             </dt>
-            ${notesItems} ${hasNotes ? '' : '<dd></dd>'}
+            ${notesItems.join('')} ${hasNotes ? '' : '<dd></dd>'}
           </div>` || ''
         );
       })
@@ -868,7 +868,7 @@ export class MDNCompatTable {
       <p class="bc-legend-tip">
         Tip: you can click/tap on a cell for more information.
       </p>
-      <dl class="bc-legend-items-container">${items}</dl>
+      <dl class="bc-legend-items-container">${items.join('')}</dl>
     </section>`;
   }
 
