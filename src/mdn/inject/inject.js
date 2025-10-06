@@ -5576,6 +5576,28 @@ code {
             display: none !important;
           }
         }
+        mdn-button {
+          box-sizing: border-box;
+          height: 100%;
+          /*width: 100%;*/
+          align-items: center;
+          background-color: initial;
+          border: 1px solid currentColor;
+          border-radius: 0.25rem;
+          color: var(--color-text-primary);
+          column-gap: 0.3125em;
+          cursor: pointer;
+          display: inline-flex;
+          font-family: var(--font-family-text);
+          font-size: 0.875em;
+          font-weight: 450;
+          justify-content: center;
+          line-height: var(--font-line-ui);
+          margin: 0px;
+          padding: 0.5em;
+          text-decoration: none;
+          vertical-align: middle;
+        }
       </style>
       ${html}
     `;
