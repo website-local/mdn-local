@@ -1,5 +1,5 @@
 import type { Browsers, Identifier } from './types.js';
-import {MDNCompatTable} from './compat-table.js';
+import {MDNCompatTable} from './element.js';
 export type Compat = { data: Identifier; browsers: Browsers; };
 
 export function renderYariCompatibilityTable(
