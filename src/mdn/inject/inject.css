@@ -1341,3 +1341,9 @@ dl.bc-notes-list dd.bc-supports-dd {
   background-image: none;
   mask-image: linear-gradient(90deg,#0000,#000 75%);
 }
+
+.mask-fix .prev:is(.prev-next li) a::before,
+.next:is(.prev-next li) a::after {
+  background-color: transparent;
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(200deg) brightness(0.9);
+}
