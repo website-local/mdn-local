@@ -4503,7 +4503,7 @@ code {
 
   /// region play-editor
 
-  class PlayEditor extends HTMLElement {
+  class MDNPlayEditor extends HTMLElement {
 
     /** @type {EditorView | undefined} */
     _editor;
@@ -4525,12 +4525,13 @@ code {
     set value(value) {
       this._value = value;
       if (this._editor) {
-        const EditorState = window.CM['@codemirror/state'].EditorState;
-        let state = EditorState.create({
-          doc: value,
-          extensions: this._extensions(),
+        this._editor.dispatch({
+          changes: {
+            from: 0,
+            to: this._editor.state.doc.length,
+            insert: value,
+          },
         });
-        this._editor.setState(state);
       }
     }
 
@@ -4538,12 +4539,10 @@ code {
       return this._editor ? this._editor.state.doc.toString() : this._value;
     }
 
-    /**
-     * @param {string} type
-     */
-    _dispatch(type) {
-      this.dispatchEvent(new Event(type, { bubbles: true, composed: true }));
+    focus() {
+      this._editor?.focus();
     }
+
     _extensions() {
       const EditorView = window.CM.codemirror.EditorView;
       const minimalSetup = window.CM.codemirror.minimalSetup;
@@ -4562,6 +4561,7 @@ code {
       const { lintKeymap } = window.CM['@codemirror/lint'];
       const { keymap, highlightActiveLine, lineNumbers } = window.CM['@codemirror/view'];
       const { oneDark } = window.CM['@codemirror/theme-one-dark'];
+
       const language = (() => {
         switch (this.language) {
         case 'js':
@@ -4581,8 +4581,9 @@ code {
         minimalSetup,
         bracketMatching(),
         closeBrackets(),
-        ...(!this.minimal
-          ? [
+        ...(this.minimal
+          ? []
+          : [
             lineNumbers(),
             indentOnInput(),
             autocompletion(),
@@ -4595,12 +4596,16 @@ code {
               indentWithTab,
             ]),
             EditorView.lineWrapping,
-          ]
-          : []),
+          ]),
         ...(this.theme.value === 'dark' ? [oneDark] : []),
         ...language,
         EditorView.focusChangeEffect.of((_, focusing) => {
-          this._dispatch(focusing ? 'focus' : 'blur');
+          this.dispatchEvent(
+            new Event(focusing ? 'focus' : 'blur', {
+              bubbles: true,
+              composed: true,
+            }),
+          );
           return null;
         }),
         EditorView.updateListener.of((update) => {
@@ -4608,9 +4613,11 @@ code {
             if (this._updateTimer !== -1) {
               clearTimeout(this._updateTimer);
             }
-            this._updateTimer = window?.setTimeout(() => {
+            this._updateTimer = window.setTimeout(() => {
               this._updateTimer = -1;
-              this._dispatch('update');
+              this.dispatchEvent(
+                new Event('update', { bubbles: true, composed: true }),
+              );
             }, this.delay);
           }
         }),
@@ -4632,18 +4639,19 @@ code {
 
     render() {
       this.attachShadow({ mode: 'open' });
-      this.shadowRoot.innerHTML = `<style>:host { display: block; font-size: 0.875rem; }
+      // noinspection CssUnresolvedCustomProperty
+      this.shadowRoot.innerHTML = `<style>:host { display: block; }
 .editor { height: 100%; }
 .editor.minimal { display: flex; flex-direction: column; justify-content: center; }
 .editor.minimal .cm-content { align-self: center; min-height: auto; }
 .editor.minimal .cm-focused { outline: none; }
-.editor.minimal .cm-line { padding: 0px 12px; }
+.editor.minimal .cm-line { padding: 0 12px; }
 .editor .cm-editor { height: 100%; width: 100%; }
-.editor .cm-editor * { font-family: var(--font-code)  !important; }</style><div
+.editor .cm-editor * { font-family: var(--font-family-code) !important; }</style><div
       class=${this.minimal ? 'editor minimal' : 'editor'}
     ></div>`;
-      if (!PlayEditor._ready) {
-        PlayEditor._ready = new Promise((resolve, reject) => {
+      if (!MDNPlayEditor._ready) {
+        MDNPlayEditor._ready = new Promise((resolve, reject) => {
           var script = document.createElement('script');
           script.type = 'text/javascript';
           script.src = relativeRoot + 'static/js/codemirror.js';
@@ -4653,7 +4661,7 @@ code {
           document.getElementsByTagName('head')[0].appendChild(script);
         });
       }
-      PlayEditor._ready.then(() => this.firstUpdated());
+      MDNPlayEditor._ready.then(() => this.firstUpdated());
     }
 
     firstUpdated() {
@@ -4675,9 +4683,10 @@ code {
     }
   }
 
-  customElements.define('play-editor', PlayEditor);
+  customElements.define('mdn-play-editor', MDNPlayEditor);
 
   /// endregion play-editor
+
   class PlayController extends HTMLElement {
     constructor() {
       super();
