@@ -5578,8 +5578,6 @@ code {
         }
         mdn-button {
           box-sizing: border-box;
-          height: 100%;
-          /*width: 100%;*/
           align-items: center;
           background-color: initial;
           border: 1px solid currentColor;
@@ -5593,8 +5591,9 @@ code {
           font-weight: 450;
           justify-content: center;
           line-height: var(--font-line-ui);
-          margin: 0px;
-          padding: 0.5em;
+          margin: 0;
+          padding-block: 0.625em;
+          padding-inline: 0.5625em;
           text-decoration: none;
           vertical-align: middle;
         }
