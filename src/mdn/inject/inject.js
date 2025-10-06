@@ -3957,42 +3957,52 @@ code {
    * Current theme can be accessed through `.value`.
    */
   class ThemeController {
+    /** @param {LitElement} host */
     constructor(host) {
       this.host = host;
-      // this.host.addController(this);
-      /** @type {Theme} */
-      this.value = 'os-default';
-      // this.initialValue = 'os-default';
-      this._observer = new window.MutationObserver(() => this._updateTheme());
-      this._matchMedia = window.matchMedia('(prefers-color-scheme: dark)');
+      this.host.addController(this);
+      /** @type {ColorScheme} */
+      this.value = 'light dark';
+      this.initialValue = 'light dark';
     }
 
-    _updateTheme() {
-      /** @type {Theme[]} */
-      const themes = ['os-default', 'dark', 'light'];
-      const { classList } = document.documentElement;
-      let value = themes.filter((x) => classList.contains(x))[0] || 'os-default';
-      if (value === 'os-default') {
-        value = this._matchMedia.matches ? 'dark' : 'light';
-      }
+    /** @param {Event} [event] */
+    _updateTheme(event) {
+      let value = event instanceof CustomEvent && this._lightOrDark(event.detail);
+      value ||= this._lightOrDark(document.documentElement.dataset.theme);
+      value ||= this._matchMedia?.matches ? 'dark' : 'light';
+      // const oldValue = this.value;
       this.value = value;
       this.host.willUpdate();
     }
 
+    /**
+     * @param {any} value
+     * @returns {"light" | "dark" | undefined}
+     */
+    _lightOrDark(value) {
+      switch (value) {
+      case 'light':
+        return 'light';
+      case 'dark':
+        return 'dark';
+      default:
+        return;
+      }
+    }
+
     hostConnected() {
-      this._observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['class'],
-      });
       this._updateTheme = this._updateTheme.bind(this);
+      document.body.addEventListener('mdn-color-theme-update', this._updateTheme);
+      this._matchMedia = globalThis.matchMedia('(prefers-color-scheme: dark)');
       this._matchMedia.addEventListener('change', this._updateTheme);
       this._updateTheme();
       this.initialValue = this.value;
     }
 
     hostDisconnected() {
-      this._observer.disconnect();
-      this._matchMedia.removeEventListener('change', this._updateTheme);
+      this._matchMedia?.removeEventListener('change', this._updateTheme);
+      document.body.removeEventListener('mdn-color-theme-update', this._updateTheme);
     }
   }
   /// endregion theme-controller
