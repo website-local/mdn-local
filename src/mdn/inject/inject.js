@@ -3668,20 +3668,57 @@ Prism.languages.py = Prism.languages.python;
     }
 
   }
-  const elem = document.querySelector('mdn-sidebar-filter');
-  if (elem) {
-    const filter = new MDNSidebarFilter();
-    const sr = elem.shadowRoot;
-    const btn = sr.querySelector('mdn-button');
-    const input = sr.querySelector('input');
-    filter.input = input;
-    input.oninput = (e) => {
-      filter._onInput(e);
-      btn.style.visibility = e.target.value.length ? 'initial' : '';
-    };
-    btn.onclick = () => filter._clearFilter();
-    filter.firstUpdated();
+  const currentPage = document.querySelector('#main-sidebar [aria-current="page"]');
+  if (currentPage) {
+    currentPage.scrollIntoView({block: 'center'});
   }
+  const elem = document.querySelector('mdn-sidebar-filter');
+  if (!elem) {
+    return;
+  }
+  const filter = new MDNSidebarFilter();
+  const sr = elem.shadowRoot;
+  const btn = sr.querySelector('mdn-button');
+  const input = sr.querySelector('input');
+  filter.input = input;
+  input.oninput = (e) => {
+    filter._onInput(e);
+    btn.style.visibility = e.target.value.length ? 'initial' : '';
+  };
+  btn.onclick = () => filter._clearFilter();
+  filter.firstUpdated();
+  if (location.protocol !== 'file:') {
+    return;
+  }
+
+  function replaceAll(str, s, r) {
+    if (str.replaceAll) {
+      return str.replaceAll(s, r);
+    }
+    return str.split(s).join(r);
+  }
+
+  for (let i = 0, len = sr.styleSheets.length; i < len; i++) {
+    const ss = sr.styleSheets[i];
+    const r = ss.cssRules;
+    for (let j = 0; j < r.length; j++) {
+      if (!r[j].style) {
+        continue;
+      }
+      let cssText = r[j].style.cssText;
+      cssText = replaceAll(cssText, '-webkit-mask-', '-webkit-background-');
+      cssText = replaceAll(cssText, '-webkit-mask:', '-webkit-background:');
+      cssText = replaceAll(cssText, 'mask-', 'background-');
+      cssText = replaceAll(cssText, 'mask:', 'background:');
+      r[j].style.cssText = cssText;
+    }
+  }
+  const style = document.createElement('style');
+  style.innerHTML = '.icon{background-color:transparent}.icon[data-theme=dark]{filter:invert(1)}';
+  sr.appendChild(style);
+  document.body.addEventListener('mdn-color-theme-update', ev => {
+    sr.querySelector('.icon').dataset.theme = ev.detail;
+  });
 }();
 
 // 20250323 interactive-example
