@@ -319,6 +319,9 @@ table.compat-table th {
   background-color: transparent;
   filter: invert(1);
 }
+[data-theme="dark"] .mask-fix .icon.icon-chevron {
+  filter: none;
+}
 /* 20230716 playground copy icons */
 .mask-fix .code-example .copy-icon {
   background-color: transparent;
