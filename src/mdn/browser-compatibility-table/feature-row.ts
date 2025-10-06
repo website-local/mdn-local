@@ -1,11 +1,9 @@
 import {getCurrentSupport, versionIsPreview} from './utils.js';
 import type {BrowserStatement, SupportStatementExtended} from './types.js';
-
-type SupportClassName = 'no'|'yes'|'partial'|'preview'|'removed-partial'|'unknown';
+import type {SupportClassName} from './compat.js';
 
 /**
  * Returns a CSS class name based on support data and the browser.
- *
  * @param {SupportStatementExtended|undefined} support - The extended support statement.
  * @param {BrowserStatement} browser - The browser statement.
  * @returns {SupportClassName}
@@ -30,7 +28,7 @@ export function getSupportClassName(support: SupportStatementExtended | undefine
     className = 'preview';
   } else if (version_added) {
     className = 'yes';
-    if (version_removed || (flags && flags.length)) {
+    if (version_removed || (flags && flags.length > 0)) {
       className = 'no';
     }
   } else {
@@ -45,7 +43,6 @@ export function getSupportClassName(support: SupportStatementExtended | undefine
 
 /**
  * Returns a label string derived from a version value.
- *
  * @param {string|boolean|null|undefined} version - The version value.
  * @param {BrowserStatement} browser - The browser statement.
  * @returns {string} The resulting label.
@@ -70,7 +67,6 @@ export function labelFromString(version: string | boolean | null | undefined, br
 
 /**
  * Generates a version label from added and removed support data.
- *
  * @param {string|boolean|null|undefined} added - The added version.
  * @param {string|boolean|null|undefined} removed - The removed version.
  * @param {BrowserStatement} browser - The browser statement.
@@ -82,19 +78,18 @@ export function versionLabelFromSupport(added: string | boolean | null | undefin
   }
   return `${labelFromString(
     added,
-    browser
+    browser,
   )}&#8202;&ndash;&#8202;${labelFromString(removed, browser)}`;
 }
 
 /**
  * Retrieves the browser release date from a support statement.
- *
  * @param {SupportStatementExtended|undefined} support - The extended support statement.
  * @returns {string|undefined} The release date if available.
  */
 export function getSupportBrowserReleaseDate(support: SupportStatementExtended | undefined): string | undefined {
   if (!support) {
-    return undefined;
+    return;
   }
 
   return getCurrentSupport(support)?.release_date;
