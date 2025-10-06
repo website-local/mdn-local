@@ -5356,6 +5356,14 @@ code {
         });
       }
       this.__choiceSelected = index;
+      this.shadowRoot.querySelectorAll('.choice[data-index]').forEach(e => {
+        // noinspection EqualityComparisonWithCoercionJS
+        if (e.dataset.index == index) {
+          e.classList.add('selected');
+        } else {
+          e.classList.remove('selected');
+        }
+      });
     }
 
     _updateUnsupported(editor) {
@@ -5363,6 +5371,19 @@ code {
       this.__choiceUnsupported = this.__choiceUnsupported.map((value, i) =>
         index === i ? !isCSSSupported(editor.value) : value
       );
+      this.__choiceUnsupported.forEach((value, i) => {
+        const li = this.shadowRoot.querySelector(`.choice[data-index="${i}"]`);
+        if (li) {
+          if (value) {
+            li.classList.add('unsupported');
+            li.firstElementChild.setAttribute(
+              'aria-label', 'The current value is not supported by your browser.');
+          } else {
+            li.classList.remove('unsupported');
+            li.firstElementChild.removeAttribute('aria-label');
+          }
+        }
+      });
     }
 
     _getIndex(editor) {
@@ -5727,19 +5748,14 @@ code {
           ${choices.map(
     (code, index) => `
               <li
-                class="choice
-                  ${index === this.__choiceSelected ? 'selected' : ''}
-                  ${this.__choiceUnsupported[index] ? 'unsupported' : ''}"
+                class="choice"
+                data-index="${index}"
               >
                 <mdn-play-editor
                   data-index="${index}"
                   language="css"
                   minimal="true"
                   delay="100"
-                  value="${code?.trim() || ''}"
-                  ${this.__choiceUnsupported[index]
-    ? 'aria-label="The current value is not supported by your browser."'
-    : ''}
                 ></mdn-play-editor>
               </li>
             `
@@ -5776,6 +5792,7 @@ code {
           choiceWrapper.addEventListener('focus', (e) => this._choiceSelect(e));
           choiceWrapper.addEventListener('update', (e) => this._choiceUpdate(e));
         }
+        this._resetChoices();
       }
     }
 
