@@ -5440,7 +5440,8 @@ play-console { border: var(--border); border-radius: var(--elem-radius); grid-ar
         el.removeAttribute('data-current', 'true');
       }
     });
-    sr.querySelector('.color-theme').dataset.theme = mode;
+    sr.querySelector('.color-theme').dataset.theme =
+      document.querySelector('.navigation[data-scheme="dark"]') ? 'dark' : mode;
 
   }
 
