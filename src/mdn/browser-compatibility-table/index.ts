@@ -1,5 +1,5 @@
 import type { Browsers, Identifier } from './types.js';
-import {CompatTable} from './compat-table.js';
+import {MDNCompatTable} from './compat-table.js';
 export type Compat = { data: Identifier; browsers: Browsers; };
 
 export function renderYariCompatibilityTable(
@@ -7,7 +7,7 @@ export function renderYariCompatibilityTable(
   query: string,
   locale: string
 ): string {
-  const table = new CompatTable();
+  const table = new MDNCompatTable();
   table.query = query || '';
   table.locale = locale || 'en-US';
   table.data = json.data;
