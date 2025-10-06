@@ -1302,3 +1302,7 @@ dl.bc-notes-list dd.bc-supports-dd {
   background-color: transparent;
   mask-image: none;background-image: url("./icon/circle.svg");
 }
+
+.bc-table :is(.content-section dl) dd {
+  margin-left: 0;
+}
