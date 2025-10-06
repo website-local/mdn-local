@@ -146,7 +146,7 @@ export async function downloadAndRenderCompatibilityData(
       jsonData, data.query || '', locale);
     el.html(html);
     // make this lazy-compat-table plain element
-    if (el.is('lazy-compat-table')) {
+    if (el.is('lazy-compat-table') || el.is('mdn-compat-table-lazy')) {
       el.prop('tagName', 'div').addClass('lazy-compat-table');
     }
   }

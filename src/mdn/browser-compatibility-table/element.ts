@@ -821,7 +821,7 @@ export class MDNCompatTable {
     : ''}
         </span>
       </div>
-      ${support && this._renderCellIcons(support)}
+      ${support && this._renderCellIcons(support) || ''}
     </div>`;
   }
 
