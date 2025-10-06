@@ -2491,8 +2491,6 @@ Prism.languages.py = Prism.languages.python;
     mainMenuNoJs,
     // yari search box on main page
     searchBox,
-    // yari theme menu
-    themeBtn, themeMenu, currentTheme,
     // yari mobile left sidebar
     sidebarBtn, sidebarContainer, sidebarCurrentElem,
     // yari mask-image to background fix
@@ -2850,126 +2848,18 @@ Prism.languages.py = Prism.languages.python;
   }
   /// endregion yari main-menu nojs
 
-  /// region yari theme menu
-  // https://github.com/website-local/mdn-local/issues/782
-  themeBtn = document.querySelector('button.theme-switcher-menu');
-  if (themeBtn) {
-    themeMenu = document.createElement('ul');
-    themeMenu.style.display = 'none';
-    themeMenu.style.right = '1rem';
-    themeMenu.className = 'submenu themes-menu inline-submenu-lg';
-    themeMenu.setAttribute('aria-labelledby', 'themes-menu-button');
-    themeBtn.parentNode.append(themeMenu);
-    themeMenu.innerHTML = '<li>\n' +
-      '<button type="button" class="button primary has-icon active-menu-item">\n' +
-      '<span class="button-wrap">\n' +
-      '<span class="icon icon-theme-os-default"></span>OS Default</span>\n' +
-      '</button></li>\n' +
-      '<li>\n' +
-      '<button type="button" class="button primary has-icon">\n' +
-      '<span class="button-wrap"><span class="icon icon-theme-light"></span>Light</span>\n' +
-      '</button>\n' +
-      '</li>\n' +
-      '<li>\n' +
-      '<button type="button" class="button primary has-icon">\n' +
-      '<span class="button-wrap"><span class="icon icon-theme-dark"></span>Dark</span>\n' +
-      '</button>\n' +
-      '</li>';
-    themeBtn.onclick = function () {
-      if (themeMenu.style.display === 'none') {
-        themeMenu.style.display = '';
-      } else {
-        themeMenu.style.display = 'none';
-      }
-    };
-    themeBtn = themeBtn.querySelector('span.icon');
-    themeMenu.onclick = function (e) {
-      // noinspection ES6ConvertVarToLetConst
-      var theme, el;
-      if (e && e.target) {
-        switch (e.target.tagName) {
-        case 'SPAN':
-          if (e.target.className === 'button-wrap') {
-            el = e.target.querySelector('span.icon');
-          } else if (e.target.className.indexOf('icon-theme-') > -1) {
-            el = e.target;
-          }
-          break;
-        case 'BUTTON':
-        case 'LI':
-          el = e.target.querySelector('span.icon');
-          break;
-        }
-        if (el) {
-          theme = el.className.match(/icon-theme-([^ ]+)/);
-          if (theme) {
-            theme = theme[1];
-            if (theme) {
-              switchTheme(theme);
-            }
-          }
-        }
-      }
-    };
-    currentTheme = window.localStorage ?
-      window.localStorage.getItem('theme') : '';
-    if (!currentTheme) {
-      currentTheme = 'os-default';
-    } else {
-      switchTheme(currentTheme);
-    }
+  /// region fred navigation btn
+  // https://github.com/website-local/mdn-local/issues/1310
+  const button = document.querySelector('[aria-controls="navigation__popup"]');
+  const navigation = document.querySelector('.navigation');
+  if (button instanceof HTMLElement && navigation instanceof HTMLElement) {
+    button.addEventListener('click', () => {
+      const open = (!(navigation.dataset.open === 'true')).toString();
+      navigation.dataset.open = open;
+      button.setAttribute('aria-expanded', open);
+    });
   }
-
-  /**
-   * Posts the name of the theme we are changing to the
-   * interactive examples `iframe`.
-   * @param theme - The theme to switch to
-   */
-  function postToIEx(theme) {
-    // noinspection ES6ConvertVarToLetConst
-    var iexFrame = document.querySelector('.interactive');
-
-    if (iexFrame) {
-      if (iexFrame.getAttribute('data-readystate') === 'complete' &&
-        iexFrame.contentWindow) {
-        iexFrame.contentWindow.postMessage({ theme: theme }, '*');
-      }
-    }
-  }
-
-  function switchTheme(theme) {
-    // noinspection ES6ConvertVarToLetConst
-    var html = document.documentElement, btn;
-
-    if (window && html) {
-      html.className = theme;
-      html.style.backgroundColor = '';
-      try {
-        window.localStorage.setItem('theme', theme);
-      } catch (err) {
-        console.warn('Unable to write theme to localStorage', err);
-      }
-      themeBtn.className = 'icon icon-theme-' + theme;
-      currentTheme = theme;
-      btn = themeMenu.querySelector('.active-menu-item');
-      if (btn) {
-        removeClass(btn, 'active-menu-item');
-      }
-      btn = themeMenu.querySelector('.icon-theme-' + theme);
-      if (btn) {
-        btn = btn.parentNode;
-        if (btn) {
-          btn = btn.parentNode;
-          if (btn) {
-            addClass(btn, 'active-menu-item');
-          }
-        }
-      }
-      themeMenu.style.display = 'none';
-      postToIEx(theme);
-    }
-  }
-  /// endregion yari theme menu
+  /// endregion fred navigation btn
 
   /// region yari mobile left sidebar
   // https://github.com/website-local/mdn-local/issues/784
