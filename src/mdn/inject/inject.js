@@ -4502,6 +4502,7 @@ code {
 
 
   /// region play-editor
+  // https://github.com/mdn/fred/blob/v1.6.1/components/play-editor/element.css
 
   class MDNPlayEditor extends HTMLElement {
 
@@ -4687,19 +4688,14 @@ code {
 
   /// endregion play-editor
 
-  class PlayController extends HTMLElement {
+  /// region play-controller
+  // https://github.com/mdn/fred/blob/v1.6.1/components/play-controller/element.js
+  class MDNPlayController extends HTMLElement {
     constructor() {
       super();
       // Create shadow root and render initial content.
       this.attachShadow({ mode: 'open' });
-      this.shadowRoot.innerHTML = `
-      <style>
-        :host {
-          display: contents;
-        }
-      </style>
-      <slot></slot>
-    `;
+      this.shadowRoot.innerHTML = '<style>:host {display: contents;}</style><slot></slot>';
 
       // Default property values.
       this.runOnStart = false;
@@ -4728,35 +4724,29 @@ code {
     }
 
     // Setter for code property.
-    /**
-     * @param {Record<string, string>} code
-     */
+    /** @param {Record<string, string>} code */
     set code(code) {
-      // Filter out code for non-hidden editors.
       this._code = Object.fromEntries(
-        Object.entries(code).filter(([language]) => !language.endsWith('-hidden'))
+        Object.entries(code).filter(
+          ([language]) => !language.endsWith('-hidden'),
+        ),
       );
-      // Filter out and modify hidden-code.
       this._hiddenCode = Object.fromEntries(
         Object.entries(code)
           .filter(([language]) => language.endsWith('-hidden'))
-          .map(([language, value]) => [language.replace(/-hidden$/, ''), value])
+          .map(([language, value]) => [language.replace(/-hidden$/, ''), value]),
       );
       if (!this.initialCode) {
         this.initialCode = code;
       }
-
-      // Update <play-editor> elements inside the light DOM.
-      this.querySelectorAll('play-editor').forEach((editor) => {
+      const editors = this.querySelectorAll('mdn-play-editor');
+      for (const editor of editors) {
         const language = editor.language;
         if (language) {
           const value = code[language];
-          if (value !== undefined) {
-            editor.value = value;
-          }
+          editor.value = value || '';
         }
-      });
-
+      }
       if (this.runOnStart) {
         this.run();
       }
@@ -4764,65 +4754,60 @@ code {
 
     // Getter for code property.
     get code() {
-      // Get current code from editors.
       const code = { ...this._code };
-      this.querySelectorAll('play-editor').forEach((editor) => {
+      const editors = this.querySelectorAll('mdn-play-editor');
+      for (const editor of editors) {
         const language = editor.language;
         if (language) {
           code[language] = editor.value;
         }
-      });
-      // Prepend hidden code if available.
-      Object.entries(this._hiddenCode).forEach(([language, value]) => {
+      }
+      for (const [language, value] of Object.entries(this._hiddenCode)) {
         code[language] = code[language] ? `${value}\n${code[language]}` : value;
-      });
+      }
       return code;
     }
 
     // Format each play-editor by calling its format method.
     async format() {
       try {
-        const editors = Array.from(this.querySelectorAll('play-editor'));
-        await Promise.all(editors.map(e => e.format()));
-      } catch (e) {
-        console.error(e);
+        await Promise.all(
+          [...this.querySelectorAll('mdn-play-editor')].map((e) => e.format()),
+        );
+      } catch (error) {
+        console.error(error);
       }
     }
 
     // Run the code by sending it to the runner.
     run() {
-      // Clear the console first.
-      const playConsole = this.querySelector('play-console');
-      if (playConsole && playConsole.vconsole) {
-        playConsole.vconsole.clear();
-      }
-      // Find the runner element and send code to it.
-      const runner = this.querySelector('play-runner');
+      this.querySelector('mdn-play-console')?.vconsole.clear();
+      const runner = this.querySelector('mdn-play-runner');
       if (runner) {
         runner.srcPrefix = this.srcPrefix;
         runner.code = this.code;
-        // runner._updateSrc();
       }
     }
 
     // Reset the code to its initial state.
     reset() {
-      if (this.initialCode) {
-        this.code = this.initialCode;
-      }
+      this.code = this.initialCode ?? {};
       if (this.runOnStart) {
         this.run();
       } else {
-        const playConsole = this.querySelector('play-console');
-        if (playConsole && playConsole.vconsole) {
-          playConsole.vconsole.clear();
-        }
-        const runner = this.querySelector('play-runner');
+        this.querySelector('mdn-play-console')?.vconsole.clear();
+        const runner = this.querySelector('mdn-play-runner');
         if (runner) {
           runner.code = undefined;
-          // runner._updateSrc();
         }
       }
+    }
+
+    clear() {
+      this.runOnChange = true;
+      this.initialCode = undefined;
+      this.srcPrefix = '';
+      this.reset();
     }
 
     // Handler for editor updates.
@@ -4835,10 +4820,7 @@ code {
     // Handler for console events from slotted nodes.
     /** @param {CustomEvent} ev */
     _onConsole(ev) {
-      const playConsole = this.querySelector('play-console');
-      if (playConsole && typeof playConsole.onConsole === 'function') {
-        playConsole.onConsole(ev);
-      }
+      this.querySelector('mdn-play-console')?.onConsole(ev);
     }
 
     connectedCallback() {
@@ -4854,7 +4836,8 @@ code {
     }
   }
 
-  customElements.define('play-controller', PlayController);
+  customElements.define('mdn-play-controller', MDNPlayController);
+  /// endregion play-controller
 
   /**
    * Checks if the CSS code is supported by the current browser.
