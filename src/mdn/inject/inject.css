@@ -1322,3 +1322,7 @@ dl.bc-notes-list dd.bc-supports-dd {
     filter: invert(1);
   }
 }
+
+.mask-fix .example-bad:is(.code-example pre)::after {
+  background-color: transparent;
+}
