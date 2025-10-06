@@ -235,7 +235,7 @@ table.compat-table th {
 }
 .mask-fix .bc-notes-list .bc-level-yes.icon.icon-yes {
   background-color: transparent;
-  filter: brightness(0.6);
+  filter: contrast(0.5) sepia(2) sepia(2) saturate(50) hue-rotate(120deg) brightness(0.6);
 }
 [data-theme="dark"] .mask-fix .bc-notes-list .bc-level-yes.icon.icon-yes {
   filter: none;
@@ -1233,6 +1233,7 @@ dl.bc-notes-list dd.bc-supports-dd {
 
 .mask-fix .bc-table .icon.icon-partial {
   mask-image: none;background-image: url("./icon/circle-slash.svg");
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(35deg) brightness(0.9);
 }
 
 .mask-fix .bc-table .icon.icon-yes {
@@ -1286,6 +1287,7 @@ dl.bc-notes-list dd.bc-supports-dd {
 .mask-fix :is(.bc-table .bc-support) .icon.icon-removed-partial {
   background-color: transparent;
   mask-image: none;background-image: url("./icon/circle-x.svg");
+  filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(35deg) brightness(0.9);
 }
 
 .mask-fix :is(.bc-table .bc-support) .timeline .icon.icon-removed-partial {
