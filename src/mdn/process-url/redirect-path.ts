@@ -380,7 +380,9 @@ export const mdnLocaleRedirectPath = (locale: string): Record<string, string> =>
     ['/zh-CN/docs/Web/Reference/Events/readystatechange']:
       '/zh-CN/docs/Web/API/Document/readystatechange_event',
     ['/zh-CN/docs/Web/Events/readystatechange_event']:
-      '/zh-CN/docs/Web/API/Document/readystatechange_event'
+      '/zh-CN/docs/Web/API/Document/readystatechange_event',
+    ['/zh-CN/docs/Web/https:/developer.mozilla.org/en-US/docs/Glossary/Serializable_object']:
+      '/zh-CN/docs/Glossary/Serializable_object',
   };
 };
 
