@@ -1,4 +1,6 @@
 name: Download MDN Contents
+permissions:
+  contents: read
 defaults:
   run:
     shell: bash
