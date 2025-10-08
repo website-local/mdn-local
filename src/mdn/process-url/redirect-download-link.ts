@@ -36,11 +36,11 @@ const replacements = [
   'https://website-local.github.io/assets/sintel-short.mp4',
   'https://developer.mozilla.org/shared-assets/videos/sintel-short.webm',
   'https://website-local.github.io/assets/sintel-short.webm',
-  'https://developer.mozilla.org/shared-assets/videos/tears-of-steel-battle-clip-medium.mp4',
+  'https://www.mdnplay.dev/shared-assets/videos/tears-of-steel-battle-clip-medium.mp4',
   'https://website-local.github.io/assets/tears-of-steel-battle-clip-medium.mp4',
-  'https://developer.mozilla.org/shared-assets/videos/tears-of-steel-battle-clip-medium.ogg',
+  'https://www.mdnplay.dev/shared-assets/videos/tears-of-steel-battle-clip-medium.ogg',
   'https://website-local.github.io/assets/tears-of-steel-battle-clip-medium.ogg',
-  'https://developer.mozilla.org/shared-assets/videos/tears-of-steel-battle-clip-medium.webm',
+  'https://www.mdnplay.dev/shared-assets/videos/tears-of-steel-battle-clip-medium.webm',
   'https://website-local.github.io/assets/tears-of-steel-battle-clip-medium.webm',
 ];
 
@@ -63,6 +63,12 @@ export const redirectDownloadLink = (res: Resource): Resource => {
     if (path.startsWith('/shared-assets/')) {
       // 20250303 shared assets
       res.downloadLink = uri.search('').host('www.mdnplay.dev').toString();
+      for (let i = 0; i < replacements.length; i += 2) {
+        if (res.downloadLink === replacements[i]) {
+          res.downloadLink = replacements[i + 1];
+          break;
+        }
+      }
       return res;
     }
 
