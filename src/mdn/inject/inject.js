@@ -2909,6 +2909,50 @@ Prism.languages.py = Prism.languages.python;
     }
   }
   /// endregion yari mask-image to background fix
+
+  /// region scrim-inline
+  // mdn: handle scrim-inline elements #1071
+  // https://github.com/website-local/mdn-local/issues/1071
+  function scrimCustomElement() {
+    // Create a class for the element
+    class ScrimInline extends window.HTMLElement {
+      constructor() {
+        super();
+        var a = document.createElement('a');
+        a.href = this.getAttribute('url');
+        a.innerText = this.getAttribute('scrimtitle');
+        a.className = 'external';
+        a.target = '_blank';
+        this.appendChild(a);
+      }
+    }
+
+    // Define the new element
+    window.customElements.define('mdn-scrim-inline', ScrimInline);
+
+  }
+
+  try {
+    scrimCustomElement();
+  } catch (e) {
+    console.warn('scrim-inline', e);
+  }
+  /// endregion scrim-inline
+
+  /// region set-html-lang
+  function setHtmlLang() {
+    var meta = document.querySelector('meta[property="og:locale"]');
+    if (meta) {
+      document.documentElement.setAttribute('lang',
+        meta.getAttribute('content').replace('_', '-'));
+    }
+  }
+  try {
+    setHtmlLang();
+  } catch (e) {
+    console.warn('set-html-lang', e);
+  }
+  /// endregion set-html-lang
 }();
 
 // playground code from yari codebase, rewritten to legacy grammar

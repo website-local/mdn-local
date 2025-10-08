@@ -398,7 +398,9 @@ aside.article-footer {
 
 /* https://github.com/website-local/mdn-local/issues/1071 */
 .curriculum-content-container.curriculum-module .curriculum-content scrim-inline[url],
-.curriculum-content-container.curriculum-overview .curriculum-content scrim-inline[url] {
+.curriculum-content-container.curriculum-overview .curriculum-content scrim-inline[url],
+:is(:is(:is(.curriculum-content-container.curriculum-landing .landing-about-container) .landing-about) .scrim-wrapper) mdn-scrim-inline,
+:is(:is(.curriculum-content-container.curriculum-overview, .curriculum-content-container.curriculum-module) .curriculum-content) mdn-scrim-inline {
   aspect-ratio: auto;
   margin: 0;
 }
