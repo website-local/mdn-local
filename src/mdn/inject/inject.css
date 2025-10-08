@@ -1347,3 +1347,21 @@ dl.bc-notes-list dd.bc-supports-dd {
   background-color: transparent;
   filter: contrast(0.1) sepia(2) sepia(2) saturate(50) hue-rotate(200deg) brightness(0.9);
 }
+
+.mask-fix :is(.blog-post-previous-next__previous:is(.blog-post-previous-next a),
+ .blog-post-previous-next__next:is(.blog-post-previous-next a))::after,
+.mask-fix :is(.blog-post-previous-next__previous:is(.blog-post-previous-next a),
+ .blog-post-previous-next__next:is(.blog-post-previous-next a))::before {
+  background-color: transparent;
+}
+
+[data-theme="dark"] .mask-fix :is(.blog-post-previous-next__previous:is(.blog-post-previous-next a),
+ .blog-post-previous-next__next:is(.blog-post-previous-next a))::after,
+[data-theme="dark"] .mask-fix :is(.blog-post-previous-next__previous:is(.blog-post-previous-next a),
+ .blog-post-previous-next__next:is(.blog-post-previous-next a))::before {
+  filter: invert(1);
+}
+
+.code-example iframe, .code-example mdn-play-runner {
+  width: 100%;
+}
