@@ -1,4 +1,6 @@
 name: Upload release
+permissions:
+  contents: write
 defaults:
   run:
     shell: bash
