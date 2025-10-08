@@ -78,13 +78,15 @@ export const preProcessHtml = async (
   await preProcessPlayground(res, submit, options, pipeline, $);
 
   /// region inject external script and style
-  // language=HTML
-  $(`<script class="mdn-local-inject-js" src="${INJECT_JS_PATH}"></script>`)
-    .insertAfter($('body'));
-  // language=HTML
-  $(`<link href="${INJECT_CSS_PATH}" rel="stylesheet" \
-type="text/css" class="mdn-local-inject-css">`)
-    .appendTo($('head'));
+  if ($('script[type="module"]').length) {
+    // language=HTML
+    $(`<script class="mdn-local-inject-js" src="${INJECT_JS_PATH}"></script>`)
+      .appendTo($('body'));
+    // language=HTML
+    $(`<link href="${INJECT_CSS_PATH}" rel="stylesheet"
+            type="text/css" class="mdn-local-inject-css">`)
+      .appendTo($('head'));
+  }
   /// endregion inject external script and style
 
   // download and render yari browser-compatibility-table
