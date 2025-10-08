@@ -32,6 +32,16 @@ const replacements = [
   'https://website-local.github.io/assets/sintel-short.webm',
   'https://mdn.github.io/html-examples/link-rel-preload/video/sintel-short.webm',
   'https://website-local.github.io/assets/sintel-short.webm',
+  'https://developer.mozilla.org/shared-assets/videos/sintel-short.mp4',
+  'https://website-local.github.io/assets/sintel-short.mp4',
+  'https://developer.mozilla.org/shared-assets/videos/sintel-short.webm',
+  'https://website-local.github.io/assets/sintel-short.webm',
+  'https://developer.mozilla.org/shared-assets/videos/tears-of-steel-battle-clip-medium.mp4',
+  'https://website-local.github.io/assets/tears-of-steel-battle-clip-medium.mp4',
+  'https://developer.mozilla.org/shared-assets/videos/tears-of-steel-battle-clip-medium.ogg',
+  'https://website-local.github.io/assets/tears-of-steel-battle-clip-medium.ogg',
+  'https://developer.mozilla.org/shared-assets/videos/tears-of-steel-battle-clip-medium.webm',
+  'https://website-local.github.io/assets/tears-of-steel-battle-clip-medium.webm',
 ];
 
 export const redirectDownloadLink = (res: Resource): Resource => {
