@@ -204,7 +204,7 @@ export function getCodeAndNodesForIframeBySampleClass(
   };
   let empty = true;
   const nodes: Cheerio[] = [];
-  [...$(`.live-sample___${escapeSelector(cls)}`)].forEach(
+  [...$(`.live-sample___${escapeSelector(cls)},.live-sample---${escapeSelector(cls)}`)].forEach(
     (el) => {
       const pre = $(el);
       const lang = getLanguage(pre);
