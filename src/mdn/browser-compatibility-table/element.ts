@@ -85,6 +85,7 @@ export class MDNCompatTable {
     _pathname: { state: true },
     _platforms: { state: true },
     _browsers: { state: true },
+    _showTimelineId: { state: true },
   };
 
   query: string;
@@ -94,6 +95,7 @@ export class MDNCompatTable {
   _pathname: string;
   _platforms: string[];
   _browsers: BrowserName[];
+  _showTimelineId: string | undefined;
 
   constructor() {
     this.query = '';
@@ -107,6 +109,8 @@ export class MDNCompatTable {
     this._platforms = [];
     /** @type {BrowserName[]} */
     this._browsers = [];
+    /** @type {string|undefined} */
+    this._showTimelineId = undefined;
   }
 
   get _breadcrumbs() {
@@ -340,7 +344,7 @@ export class MDNCompatTable {
       features = features.slice(0, MAX_FEATURES);
     }
 
-    const featureRows = features.map((feature) => {
+    const featureRows = features.map((feature, featureIndex) => {
       // <FeatureRow>
       const { name, compat, depth } = feature;
 
@@ -369,7 +373,7 @@ export class MDNCompatTable {
       }
 
 
-      const browserCells = browsers.map((browserName) => {
+      const browserCells = browsers.map((browserName, browserIndex) => {
         // <CompatCell>
         const browser = browserInfo[browserName];
         if (!browser) {
@@ -379,10 +383,12 @@ export class MDNCompatTable {
           version_added: false,
         };
 
-        const timelineId = randomIdString('timeline-');
+        const timelineId = `timeline-${featureIndex}-${browserIndex}`;
         const supportClassName = getSupportClassName(support, browser);
         const notes = this._renderNotes(browser, support);
 
+        const hasHistory = notes.length > 0;
+        // const isExpanded = hasHistory && this._showTimelineId == timelineId;
         return `<td
           class="bc-support bc-browser-${browserName} bc-supports-${supportClassName} ${
   notes ? 'bc-has-history' : ''
@@ -392,16 +398,16 @@ export class MDNCompatTable {
             type="button"
             class="mdn-local-toggle-history-btn"
             aria-controls=${timelineId}
+            aria-expanded="false"
             title="${notes ? 'Toggle history' : ''}"
           >
             ${this._renderCellText(support, browser)}
           </button>
-          ${notes &&
+          ${hasHistory &&
         `<div
             id="${timelineId}"
             class="timeline"
             tabindex="0"
-            aria-expanded="false"
           >
             <dl class="bc-notes-list">${notes.join('')}</dl>
           </div>` || ''}

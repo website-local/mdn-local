@@ -608,14 +608,6 @@ table.bc-table {
   border-left: 15px solid var(--color-border-primary);
 }
 
-.bc-table .timeline {
-  display: none;
-}
-
-.bc-table .bc-has-history:focus-within .timeline {
-  display: initial;
-}
-
 .bc-head-txt-label {
   line-height: var(--font-line-ui);
   text-orientation: sideways;
@@ -906,12 +898,16 @@ dl.bc-notes-list dd.bc-supports-dd {
     padding: 0.25rem;
   }
 
+  button[aria-expanded="false"] ~ .timeline {
+    display: none;
+  }
+
   .bc-table .timeline {
     border-left: medium !important;
     border-top: var(--border);
   }
 
-  :is(.bc-table .bc-has-history):focus-within > button {
+  :is(.bc-table .bc-has-history) > button[aria-expanded="true"] {
     --padding-bottom-offset: -2px;
     border-bottom: 2px solid var(--color-border-primary);
   }

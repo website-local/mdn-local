@@ -5887,33 +5887,27 @@ code {
 // https://github.com/website-local/mdn-local/issues/1149
 !function () {
   var btns = document.getElementsByClassName('mdn-local-toggle-history-btn'),
-    len = btns.length, i = 0;
-  function handleMousedown(event) {
-    // Blur active element if already focused.
-    var activeElement = document.activeElement;
-    var { currentTarget } = event;
+    len = btns.length, i = 0, _showTimelineId = undefined;
 
-    if (
-      activeElement instanceof window.HTMLElement &&
-      currentTarget instanceof window.HTMLElement
-    ) {
-      var activeCell = activeElement.closest('td');
-      var currentCell = currentTarget.closest('td');
-
-      if (activeCell === currentCell) {
-        activeElement.blur();
-        event.preventDefault();
-        return;
-      }
+  function handleClick(event) {
+    var currentTarget = event.currentTarget;
+    var timelineId = currentTarget.getAttribute('aria-controls');
+    var isExpanded = _showTimelineId === timelineId;
+    var lastTimeline = _showTimelineId &&
+      document.querySelector('[aria-controls="' + _showTimelineId+ '"]');
+    if (lastTimeline) {
+      lastTimeline.setAttribute('aria-expanded', 'false');
+    }
+    if (isExpanded) {
+      _showTimelineId = undefined;
+    } else {
+      _showTimelineId = timelineId;
+      currentTarget.setAttribute('aria-expanded', 'true');
     }
 
-    if (currentTarget instanceof window.HTMLElement) {
-      // Workaround for Safari, which doesn't focus implicitly.
-      setTimeout(() => currentTarget.focus(), 0);
-    }
   }
   for (; i < len; i++) {
-    btns[i].onmousedown = handleMousedown;
+    btns[i].onclick = handleClick;
   }
 }();
 
