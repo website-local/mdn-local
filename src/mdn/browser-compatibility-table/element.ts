@@ -33,16 +33,6 @@ import {renderCompatSupportFlags} from './flags.js';
 
 const DEFAULT_LOCALE = 'en-US';
 
-/**
- * Used to generate a random element id by combining a prefix with a random string.
- *
- * @param {string} prefix
- * @returns {string}
- */
-function randomIdString(prefix: string = 'id-'): string {
-  return Math.random().toString(36).replace('0.', prefix);
-}
-
 /** @type {IconName[]} */
 const ICON_NAMES: IconName[] = [
   'yes',
