@@ -1360,6 +1360,13 @@ dl.bc-notes-list dd.bc-supports-dd {
   filter: invert(1);
 }
 
+.mask-fix .menu__panel-icon[data-icon="mdn-m"]::before,
+.mask-fix .menu__panel-icon[data-icon="users"]::before,
+.mask-fix .menu__panel-icon[data-icon="chart-no-axes-combined"]::before,
+.mask-fix .menu__panel-icon[data-icon="github"]::before {
+  background-color: transparent;
+}
+
 .code-example iframe, .code-example mdn-play-runner {
   width: 100%;
 }
