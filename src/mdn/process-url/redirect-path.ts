@@ -400,6 +400,10 @@ export const hardCodedRedirectUrl: Record<string, string> = {
     'https://developer.mozilla.org/favicon.ico',
   'https://www.mozilla.org/favicon.ico':
     'https://developer.mozilla.org/favicon.ico',
+  'http://developer.mozilla.org/www.mozilla.org/favicon.ico':
+    'https://developer.mozilla.org/favicon.ico',
+  'https://developer.mozilla.org/www.mozilla.org/favicon.ico':
+    'https://developer.mozilla.org/favicon.ico',
   'https://developer.cdn.mozilla.net/media/redesign/img/favicon32.png':
     'https://developer.mozilla.org/favicon.ico',
   'http://developer.cdn.mozilla.net/media/redesign/img/favicon32.png':
