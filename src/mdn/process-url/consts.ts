@@ -89,6 +89,8 @@ export const downloadableHosts = arrayToMap([
   // 20250203
   'mdn.dev',
   'resources.whatwg.org',
+  'pixabay.com',
+  'c1.staticflickr.com',
 ]);
 
 export interface ExternalHost {
@@ -132,6 +134,7 @@ export const externalHosts = [
   ['/c1.staticflickr.com/', 'c1.staticflickr.com'],
   ['/wikipedia.org/', 'wikipedia.org'],
   ['/images.unsplash.com/', 'images.unsplash.com'],
+  ['/www.mozilla.org/', 'www.mozilla.org'],
 ].map(([prefix, host, protocol]) => ({
   protocol: protocol || 'https',
   host,

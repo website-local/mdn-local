@@ -50,7 +50,9 @@ export const skipProcess = (
   if (host && !downloadableHosts[host] &&
     !host.endsWith('.mdn.mozit.cloud')&&
     // https://github.com/website-local/mdn-local/issues/891
-    !host.endsWith('.mdnplay.dev')) {
+    !host.endsWith('.mdnplay.dev') &&
+    !url.startsWith('https://www.mozilla.org/images/') &&
+    !url.startsWith('https://www.mozilla.org/media/img/')) {
     skipExternalLogger.debug('skipped external link', host, url, parent?.url);
     return;
   }
@@ -66,7 +68,8 @@ export const skipProcess = (
   // https://mdn.github.io/dom-examples/fullscreen-api/index.html
   // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery
   if ((host === 'peach.blender.org' || host === 'archive.org') && (!element ||
-    !element.is('img') && !element.is('video') && !element.is('audio'))) {
+    !element.is('img') && !element.is('video') && !element.is('audio') &&
+    !element.is('source') && !element.is('style'))) {
     skipExternalLogger.debug('skipped external link', host, url, parent?.url);
     return;
   }
