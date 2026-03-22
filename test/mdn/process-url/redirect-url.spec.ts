@@ -544,4 +544,103 @@ describe('redirect-url', function () {
         'media.prod.mdn.mozit.cloud/attachments/2012/07/09/' +
         '3075/89b1e0a26e8421e19f907e0522b188bd/svgdemo1.xml');
   });
+
+  // Case conflicts on case-insensitive filesystems (NTFS)
+  test('redirect case-conflicting URLs (shared)', () => {
+    // glossary/index.html → Glossary
+    expect(redirectUrl(
+      'https://developer.mozilla.org/en-US/docs/glossary/index.html',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Glossary');
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/glossary/index.html',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Glossary');
+
+    // GZip_compression → gzip_compression
+    expect(redirectUrl(
+      'https://developer.mozilla.org/en-US/docs/Glossary/GZip_compression',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Glossary/gzip_compression');
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Glossary/GZip_compression',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Glossary/gzip_compression');
+
+    // visual_viewport → Visual_Viewport
+    expect(redirectUrl(
+      'https://developer.mozilla.org/en-US/docs/Glossary/visual_viewport',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Glossary/Visual_Viewport');
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Glossary/visual_viewport',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Glossary/Visual_Viewport');
+
+    // Viewport_Segments_API → Viewport_segments_API
+    expect(redirectUrl(
+      'https://developer.mozilla.org/en-US/docs/Web/API/Viewport_Segments_API',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/API/Viewport_segments_API');
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/API/Viewport_Segments_API',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/Viewport_segments_API');
+  });
+
+  test('redirect case-conflicting URLs (zh-CN specific)', () => {
+    // boolean → Boolean
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/API/boolean',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/Boolean');
+
+    // document/baseURI → Document/baseURI
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/API/document/baseURI',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/Document/baseURI');
+
+    // navigator/mediaDevices → Navigator/mediaDevices
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/API/navigator/mediaDevices',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/Navigator/mediaDevices');
+
+    // navigator/mediaDevices/getUserMedia → Navigator/mediaDevices/getUserMedia
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/API/navigator/mediaDevices/getUserMedia',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/Navigator/mediaDevices/getUserMedia');
+
+    // GLboolean → GLBoolean
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/API/GLboolean',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/GLBoolean');
+
+    // Glenum → GLenum
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/API/Glenum',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/GLenum');
+
+    // Glsizei → GLsizei
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/API/Glsizei',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/GLsizei');
+  });
+
+  test('case-conflicting redirects should not affect en-US for zh-CN specific entries', () => {
+    // These zh-CN specific redirects should not fire for en-US
+    expect(redirectUrl(
+      'https://developer.mozilla.org/en-US/docs/Web/API/boolean',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/API/boolean');
+    expect(redirectUrl(
+      'https://developer.mozilla.org/en-US/docs/Web/API/GLboolean',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/API/GLboolean');
+  });
 });
