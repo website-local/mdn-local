@@ -14,7 +14,7 @@
     "mkdirp": "^3.0.1",
     "tough-cookie": "^6.0.1",
     "urijs": "^1.19.11",
-    "website-scrap-engine": "^0.8.5"
+    "website-scrap-engine": "^0.8.7"
   },
   "devDependencies": {
     "@jest/globals": "^30.1.2",
@@ -40,7 +40,7 @@
     "copy": "node copy-src.js",
     "prepack": "npm run clean && npm run build",
     "postshrinkwrap": "node package-lock-resolved.js",
-    "postinstall": "node -e \"require('fs').copyFileSync('fake-undici.d.ts', 'node_modules/cheerio/node_modules/undici/index.d.ts')\""
+    "postinstall": "node -e \"try{require('fs').copyFileSync('fake-undici.d.ts', 'node_modules/cheerio/node_modules/undici/index.d.ts')}catch(e){require('fs').copyFileSync('fake-undici.d.ts', 'node_modules/undici/index.d.ts')}\""
   },
   "repository": {
     "type": "git",
