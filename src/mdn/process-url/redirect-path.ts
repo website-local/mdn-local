@@ -363,6 +363,15 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/DOMRectReadOnly`,
   [`/${locale}/docs/Web/JavaScript/Reference/DOMException`]:
     `/${locale}/docs/Web/API/DOMException`,
+  // Case conflicts on case-insensitive filesystems (NTFS)
+  [`/${locale}/docs/glossary/index.html`]:
+    `/${locale}/docs/Glossary`,
+  [`/${locale}/docs/Glossary/GZip_compression`]:
+    `/${locale}/docs/Glossary/gzip_compression`,
+  [`/${locale}/docs/Glossary/visual_viewport`]:
+    `/${locale}/docs/Glossary/Visual_Viewport`,
+  [`/${locale}/docs/Web/API/Viewport_Segments_API`]:
+    `/${locale}/docs/Web/API/Viewport_segments_API`,
 });
 
 export const mdnLocaleRedirectPath = (locale: string): Record<string, string> => {
@@ -383,6 +392,21 @@ export const mdnLocaleRedirectPath = (locale: string): Record<string, string> =>
       '/zh-CN/docs/Web/API/Document/readystatechange_event',
     ['/zh-CN/docs/Web/https:/developer.mozilla.org/en-US/docs/Glossary/Serializable_object']:
       '/zh-CN/docs/Glossary/Serializable_object',
+    // Case conflicts on case-insensitive filesystems (NTFS)
+    '/zh-CN/docs/Web/API/boolean':
+      '/zh-CN/docs/Web/API/Boolean',
+    '/zh-CN/docs/Web/API/document/baseURI':
+      '/zh-CN/docs/Web/API/Document/baseURI',
+    '/zh-CN/docs/Web/API/navigator/mediaDevices':
+      '/zh-CN/docs/Web/API/Navigator/mediaDevices',
+    '/zh-CN/docs/Web/API/navigator/mediaDevices/getUserMedia':
+      '/zh-CN/docs/Web/API/Navigator/mediaDevices/getUserMedia',
+    '/zh-CN/docs/Web/API/GLboolean':
+      '/zh-CN/docs/Web/API/GLBoolean',
+    '/zh-CN/docs/Web/API/Glenum':
+      '/zh-CN/docs/Web/API/GLenum',
+    '/zh-CN/docs/Web/API/Glsizei':
+      '/zh-CN/docs/Web/API/GLsizei',
   };
 };
 
