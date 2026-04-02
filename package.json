@@ -26,7 +26,7 @@
     "eslint": "^9.39.2",
     "jest": "^30.3.0",
     "ts-jest": "^29.4.9",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.2"
   },
   "overrides": {
     "undici": "npm:@favware/skip-dependency@1.2.2"
