@@ -1321,7 +1321,8 @@ dl.bc-notes-list dd.bc-supports-dd {
   }
 }
 
-.mask-fix .example-bad:is(.code-example pre)::after {
+.mask-fix .example-bad:is(.code-example pre)::after,
+.mask-fix .example-good:is(.code-example pre)::after {
   background-color: transparent;
 }
 .mask-fix .menu__tab-button::after,
