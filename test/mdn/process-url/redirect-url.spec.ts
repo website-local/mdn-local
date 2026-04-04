@@ -643,4 +643,19 @@ describe('redirect-url', function () {
       null, null, opt('en-US')))
       .toBe('https://developer.mozilla.org/en-US/docs/Web/API/GLboolean');
   });
+
+  test('skip malformed percent-encoded urls instead of throwing', () => {
+    expect(() => redirectUrl(
+      'https://developer.mozilla.org/%E0%A4%A',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Web/HTML'),
+      opt('zh-CN')))
+      .not.toThrow();
+    expect(redirectUrl(
+      'https://developer.mozilla.org/%E0%A4%A',
+      null,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Web/HTML'),
+      opt('zh-CN')))
+      .toBeUndefined();
+  });
 });

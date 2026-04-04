@@ -46,6 +46,8 @@ describe('skip-process', function () {
     exceptSkipped('https://nodejs.org/');
     exceptSkipped('https://www.ecma-international.org/');
     exceptSkipped('https://kangax.github.io/compat-table/es5/');
+    exceptSkipped('https://pixabay.com/static/uploads/photo/2015/09/05/18/15/suitcase-924605_960_720.png');
+    exceptSkipped('https://pixabay.com/vectors/nature-pattern-leaves-drawing-6573288/');
   });
 
   test('skip presentations and large files', () => {
