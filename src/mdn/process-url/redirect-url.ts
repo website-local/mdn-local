@@ -75,6 +75,48 @@ export function fixUrlWithBadFormat(url: string): string {
   return url;
 }
 
+const WIKIMEDIA_THUMBNAIL_STEPS = [
+  20, 40, 60, 120, 250, 330, 500, 960, 1280, 1920, 3840
+];
+
+const WIKIMEDIA_THUMBNAIL_PATH =
+  /^((?:\/upload\.wikimedia\.org)?\/.*\/thumb\/.*\/)(\d+)px-([^/]+)$/;
+
+function normalizeWikimediaThumbnailPath(path: string) {
+  const match = path.match(WIKIMEDIA_THUMBNAIL_PATH);
+  if (!match) {
+    return;
+  }
+  const requestedWidth = Number(match[2]);
+  if (!Number.isFinite(requestedWidth)) {
+    return;
+  }
+  const normalizedWidth = WIKIMEDIA_THUMBNAIL_STEPS.find(step => step >= requestedWidth);
+  if (!normalizedWidth) {
+    return;
+  }
+  return {
+    requestedWidth,
+    normalizedWidth,
+    path: `${match[1]}${normalizedWidth}px-${match[3]}`
+  };
+}
+
+function applyWikimediaThumbnailNormalization(
+  uri: URI,
+  element: Cheerio | null
+): boolean {
+  const normalized = normalizeWikimediaThumbnailPath(uri.path());
+  if (!normalized || normalized.normalizedWidth === normalized.requestedWidth) {
+    return false;
+  }
+  uri.path(normalized.path);
+  if (element?.is('img') && !element.attr('width')) {
+    element.attr('width', String(normalized.requestedWidth));
+  }
+  return true;
+}
+
 export function redirectUrl(
   url: string,
   element: Cheerio | null,
@@ -116,6 +158,10 @@ export function redirectUrl(
           // fake url, redirected back in redirectDownloadLink
           u = u.host(mdnHost)
             .path(externalHost.pathPrefix + u.path());
+          if (host === 'upload.wikimedia.org' &&
+            applyWikimediaThumbnailNormalization(u, element)) {
+            needToRebuildUrl = true;
+          }
           shouldReturnEarly = true;
           break;
         }
@@ -176,6 +222,9 @@ export function redirectUrl(
           }
         }
       }
+      if (applyWikimediaThumbnailNormalization(u, element)) {
+        needToRebuildUrl = true;
+      }
       u = u.search('').normalizePath();
       if (parent) {
         u = u
@@ -194,6 +243,9 @@ export function redirectUrl(
           }
         }
       }
+      needToRebuildUrl = true;
+    }
+    if (applyWikimediaThumbnailNormalization(u, element)) {
       needToRebuildUrl = true;
     }
     // remove search

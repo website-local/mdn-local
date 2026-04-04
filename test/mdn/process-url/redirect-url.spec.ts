@@ -1,4 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
+import {load} from 'cheerio';
 import {redirectUrl} from '../../../src/mdn/process-url/redirect-url.js';
 import type {
   DownloadOptions,
@@ -657,5 +658,18 @@ describe('redirect-url', function () {
       fakeRes('https://developer.mozilla.org/zh-CN/docs/Web/HTML'),
       opt('zh-CN')))
       .toBeUndefined();
+  });
+
+  test('normalize wikimedia thumbnail widths to allowed buckets', () => {
+    const $ = load('<img src="../../../../../../upload.wikimedia.org/wikipedia/commons/thumb/3/39/Typography_Line_Terms.svg/410px-Typography_Line_Terms.svg.png" alt="">');
+    const img = $('img');
+
+    expect(redirectUrl(
+      '../../../../../../upload.wikimedia.org/wikipedia/commons/thumb/3/39/Typography_Line_Terms.svg/410px-Typography_Line_Terms.svg.png',
+      img,
+      fakeRes('https://developer.mozilla.org/zh-CN/docs/Web/CSS/Reference/Properties/align-content'),
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/upload.wikimedia.org/wikipedia/commons/thumb/3/39/Typography_Line_Terms.svg/500px-Typography_Line_Terms.svg.png');
+    expect(img.attr('width')).toBe('410');
   });
 });
