@@ -19,6 +19,10 @@ export const skipProcess = (
   element: Cheerio | null,
   parent: Resource | null
 ): string | void => {
+  if (url === '/discord' || url === '/discord/') {
+    skipExternalLogger.debug('skipped external link', 'discord', url, parent?.url);
+    return;
+  }
   if (url.startsWith('/')) {
     return url;
   }
@@ -76,6 +80,12 @@ export const skipProcess = (
   // mdn.dev search pulls a broken asset graph that saves HTML into asset paths
   if (host === 'mdn.dev' &&
     /^\/[a-z]{2}(?:-[A-Za-z0-9]+)?\/search$/i.test(uri.path())) {
+    skipExternalLogger.debug('skipped external link', host, url, parent?.url);
+    return;
+  }
+  // mirrored Discord invite pages pull another broken non-doc asset graph
+  if ((host === 'mdn.dev' || host === 'developer.mozilla.org') &&
+    (uri.path() === '/discord' || uri.path() === '/discord/')) {
     skipExternalLogger.debug('skipped external link', host, url, parent?.url);
     return;
   }

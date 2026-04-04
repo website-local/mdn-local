@@ -77,4 +77,13 @@ describe('skip-process', function () {
     exceptSkipped('https://mdn.dev/pt-BR/search');
     exceptNotSkipped('https://mdn.dev/en-US/docs/Web/HTML');
   });
+
+  test('skip discord landing pages', () => {
+    exceptSkipped('/discord');
+    exceptSkipped('/discord/');
+    exceptSkipped('https://developer.mozilla.org/discord');
+    exceptSkipped('https://developer.mozilla.org/discord/');
+    exceptSkipped('https://mdn.dev/discord');
+    exceptNotSkipped('https://mdn.dev/en-US/docs/Web/API');
+  });
 });
