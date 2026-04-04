@@ -2861,16 +2861,36 @@ Prism.languages.py = Prism.languages.python;
 
   /// region fred mdn-toggle-sidebar
   // https://github.com/website-local/mdn-local/issues/1310
-  const toggleSidebar = document.querySelector('mdn-toggle-sidebar');
+  const toggleSidebars = document.querySelectorAll('mdn-toggle-sidebar');
   const mainSidebar = document.querySelector('#main-sidebar');
-  if (toggleSidebar && mainSidebar) {
-    toggleSidebar.addEventListener('click', () => {
-      if (mainSidebar.style.display !== 'block') {
+  if (toggleSidebars.length && mainSidebar instanceof HTMLElement) {
+    function isMainSidebarHidden() {
+      return window.getComputedStyle(mainSidebar).display === 'none';
+    }
+
+    function toggleMainSidebar() {
+      if (isMainSidebarHidden()) {
         mainSidebar.style.display = 'block';
       } else {
         mainSidebar.style.removeProperty('display');
       }
-    });
+    }
+
+    for (i = 0; i < toggleSidebars.length; i++) {
+      toggleSidebars[i].addEventListener('click', toggleMainSidebar);
+    }
+
+    if ('matchMedia' in window) {
+      const sidebarMatchMedia = window.matchMedia('(width < 769px)');
+      const resetSidebar = function () {
+        mainSidebar.style.removeProperty('display');
+      };
+      if ('addEventListener' in sidebarMatchMedia) {
+        sidebarMatchMedia.addEventListener('change', resetSidebar);
+      } else if ('addListener' in sidebarMatchMedia) {
+        sidebarMatchMedia.addListener(resetSidebar);
+      }
+    }
   }
   /// endregion mdn-toggle-sidebar
 
