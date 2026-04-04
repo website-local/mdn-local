@@ -70,4 +70,11 @@ describe('skip-process', function () {
     // https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started
     exceptSkipped('localhost:3000');
   });
+
+  test('skip mdn.dev localized search pages', () => {
+    exceptSkipped('https://mdn.dev/en-US/search');
+    exceptSkipped('https://mdn.dev/zh-CN/search');
+    exceptSkipped('https://mdn.dev/pt-BR/search');
+    exceptNotSkipped('https://mdn.dev/en-US/docs/Web/HTML');
+  });
 });

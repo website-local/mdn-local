@@ -73,6 +73,12 @@ export const skipProcess = (
     skipExternalLogger.debug('skipped external link', host, url, parent?.url);
     return;
   }
+  // mdn.dev search pulls a broken asset graph that saves HTML into asset paths
+  if (host === 'mdn.dev' &&
+    /^\/[a-z]{2}(?:-[A-Za-z0-9]+)?\/search$/i.test(uri.path())) {
+    skipExternalLogger.debug('skipped external link', host, url, parent?.url);
+    return;
+  }
   // incorrectly parsed url
   // localhost:3000
   // from https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/
