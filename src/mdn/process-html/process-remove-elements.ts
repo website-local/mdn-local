@@ -39,6 +39,7 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   // bcd-signal script, not needed for offline usage
   $('script[src*="react-bcd-signal"]').remove();
   $('script[src*="speedcurve.com"]').remove();
+  $('script[src*="transcend-cdn.com"]').remove();
   // google-analytics
   $('script[src*="google-analytics.com"]').remove();
   $('script[src*="/ga.js"]').remove();
