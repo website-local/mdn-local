@@ -691,6 +691,15 @@ describe('redirect-url', function () {
       .toBe('https://developer.mozilla.org/en-US/about');
   });
 
+  test('rewrite legacy sample cssref path to archived mdn.dev location', () => {
+    expect(redirectUrl('https://mdn.dev/samples/cssref/cssref.css',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/mdn.dev/archives/media/samples/cssref/cssref.css');
+    expect(redirectUrl('https://developer.mozilla.org/mdn.dev/samples/cssref/cssref.css',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/mdn.dev/archives/media/samples/cssref/cssref.css');
+  });
+
   test('rewrite fake local mdn.dev en links from archived samples', () => {
     const parent = {
       url: 'https://developer.mozilla.org/mdn.dev/archives/media/samples/domref/dispatchEvent.html',
@@ -715,5 +724,8 @@ describe('redirect-url', function () {
     expect(redirectUrl('../../../../en/docs/MDC_About.html',
       null, parent, opt('en-US')))
       .toBe('https://developer.mozilla.org/en-US/about');
+    expect(redirectUrl('../../../../samples/cssref/cssref.css',
+      null, parent, opt('en-US')))
+      .toBe('https://developer.mozilla.org/mdn.dev/archives/media/samples/cssref/cssref.css');
   });
 });

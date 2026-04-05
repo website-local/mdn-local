@@ -54,4 +54,26 @@ describe('drop-resource', function () {
     expect(archive?.shouldBeDiscardedFromDownload).not.toBe(true);
     expect(generic?.shouldBeDiscardedFromDownload).not.toBe(true);
   });
+
+  test('discard dead legacy sample stylesheets', () => {
+    for (const url of [
+      'https://developer.mozilla.org/mdn.dev/css/base.css',
+      'https://developer.mozilla.org/mdn.dev/css/wiki.css',
+      'https://developer.mozilla.org/css/base.css',
+      'https://developer.mozilla.org/css/wiki.css'
+    ]) {
+      const dropped = dropResource(fakeRes(url), null, null, opt('en-US'));
+      expect(dropped?.shouldBeDiscardedFromDownload).toBe(true);
+    }
+  });
+
+  test('keep archived cssref stylesheet path', () => {
+    const res = dropResource(
+      fakeRes('https://developer.mozilla.org/mdn.dev/archives/media/samples/cssref/cssref.css'),
+      null,
+      null,
+      opt('en-US')
+    );
+    expect(res?.shouldBeDiscardedFromDownload).not.toBe(true);
+  });
 });

@@ -84,6 +84,10 @@ const WIKIMEDIA_THUMBNAIL_PATH =
 
 const MDN_DEV_LEGACY_SITE_PATH = /^\/en(?:-US)?(?:\/|$)/i;
 const MDN_DEV_FAKE_LEGACY_SITE_PATH = /^\/mdn\.dev\/en(?:-US)?(?:\/|$)/i;
+const MDN_DEV_SAMPLE_CSSREF_PATH = /^\/samples\/cssref\/cssref\.css$/i;
+const MDN_DEV_FAKE_SAMPLE_CSSREF_PATH = /^\/mdn\.dev\/samples\/cssref\/cssref\.css$/i;
+const MDN_DEV_ARCHIVED_SAMPLE_CSSREF_PATH =
+  '/mdn.dev/archives/media/samples/cssref/cssref.css';
 
 function normalizeWikimediaThumbnailPath(path: string) {
   const match = path.match(WIKIMEDIA_THUMBNAIL_PATH);
@@ -134,6 +138,20 @@ function rewriteMdnDevLegacySitePath(uri: URI, mdnHost: string): boolean {
   return false;
 }
 
+function rewriteMdnDevSampleCssrefPath(uri: URI, mdnHost: string): boolean {
+  const host = uri.host();
+  const path = uri.path();
+  if (host === 'mdn.dev' && MDN_DEV_SAMPLE_CSSREF_PATH.test(path)) {
+    uri.host(mdnHost).path(MDN_DEV_ARCHIVED_SAMPLE_CSSREF_PATH);
+    return true;
+  }
+  if (host === mdnHost && MDN_DEV_FAKE_SAMPLE_CSSREF_PATH.test(path)) {
+    uri.path(MDN_DEV_ARCHIVED_SAMPLE_CSSREF_PATH);
+    return true;
+  }
+  return false;
+}
+
 export function redirectUrl(
   url: string,
   element: Cheerio | null,
@@ -150,6 +168,9 @@ export function redirectUrl(
     const mdnHost: string = options.meta.host as string | void
       || 'developer.mozilla.org';
     if (rewriteMdnDevLegacySitePath(u, mdnHost)) {
+      needToRebuildUrl = true;
+    }
+    if (rewriteMdnDevSampleCssrefPath(u, mdnHost)) {
       needToRebuildUrl = true;
     }
     if ((host = u.host()) && host !== mdnHost) {
@@ -251,6 +272,9 @@ export function redirectUrl(
           .absoluteTo(parent.url)
           .normalizePath();
         if (rewriteMdnDevLegacySitePath(u, mdnHost)) {
+          needToRebuildUrl = true;
+        }
+        if (rewriteMdnDevSampleCssrefPath(u, mdnHost)) {
           needToRebuildUrl = true;
         }
       }

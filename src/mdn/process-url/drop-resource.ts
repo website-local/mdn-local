@@ -32,6 +32,11 @@ export function dropResource(
     path.startsWith('/mdn.dev/en/') ||
     path === '/mdn.dev/en-US' ||
     path.startsWith('/mdn.dev/en-US/');
+  const isDeadLegacySampleStylesheet =
+    path === '/css/base.css' ||
+    path === '/css/wiki.css' ||
+    path === '/mdn.dev/css/base.css' ||
+    path === '/mdn.dev/css/wiki.css';
   if (host === 'mdn.mozillademos.org' && path.startsWith('/files')) {
     return res;
   }
@@ -69,6 +74,9 @@ export function dropResource(
     // If a fake local /mdn.dev/en* path still slips through, drop it
     // instead of letting it recursively mirror the mdn.dev site shell.
     isFakeMdnDevLegacySitePath ||
+    // Old archived sample stylesheets now point at search or docs routes.
+    // Keep the samples, but drop these dead legacy CSS paths.
+    isDeadLegacySampleStylesheet ||
     // file name conflicts
     path.includes('release_notes.html/NSS_3.12.3_release_notes.html') ||
     (path.includes('/profiles/') && path.endsWith('/edit')) ||
