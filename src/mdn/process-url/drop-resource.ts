@@ -27,6 +27,11 @@ export function dropResource(
   const dir = res.uri.directory(),
     path = res.uri.path(),
     host = res.uri.host();
+  const isFakeMdnDevLegacySitePath =
+    path === '/mdn.dev/en' ||
+    path.startsWith('/mdn.dev/en/') ||
+    path === '/mdn.dev/en-US' ||
+    path.startsWith('/mdn.dev/en-US/');
   if (host === 'mdn.mozillademos.org' && path.startsWith('/files')) {
     return res;
   }
@@ -60,6 +65,10 @@ export function dropResource(
     path.includes('/users/github/login') ||
     path.includes('/users/google/login') ||
     path.includes('/users/signin') ||
+    // Legacy mdn.dev site paths should be rewritten to developer.mozilla.org.
+    // If a fake local /mdn.dev/en* path still slips through, drop it
+    // instead of letting it recursively mirror the mdn.dev site shell.
+    isFakeMdnDevLegacySitePath ||
     // file name conflicts
     path.includes('release_notes.html/NSS_3.12.3_release_notes.html') ||
     (path.includes('/profiles/') && path.endsWith('/edit')) ||

@@ -327,6 +327,43 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/HTMLBaseFontElement`,
   [`/${locale}/docs/Web/API/DOM_Events`]:
     `/${locale}/docs/Web/API/Document_Object_Model/Events`,
+  // Legacy mdn.dev archived sample links
+  [`/${locale}/docs/DOM:document.createEvent`]:
+    `/${locale}/docs/Web/API/Document/createEvent`,
+  [`/${locale}/docs/DOM_document.createEvent`]:
+    `/${locale}/docs/Web/API/Document/createEvent`,
+  [`/${locale}/docs/DOM_document.createEvent.html`]:
+    `/${locale}/docs/Web/API/Document/createEvent`,
+  [`/${locale}/docs/DOM:event.initMouseEvent`]:
+    `/${locale}/docs/Web/API/MouseEvent/initMouseEvent`,
+  [`/${locale}/docs/DOM_event.initMouseEvent`]:
+    `/${locale}/docs/Web/API/MouseEvent/initMouseEvent`,
+  [`/${locale}/docs/DOM_event.initMouseEvent.html`]:
+    `/${locale}/docs/Web/API/MouseEvent/initMouseEvent`,
+  [`/${locale}/docs/DOM:element.dispatchEvent`]:
+    `/${locale}/docs/Web/API/EventTarget/dispatchEvent`,
+  [`/${locale}/docs/DOM_element.dispatchEvent`]:
+    `/${locale}/docs/Web/API/EventTarget/dispatchEvent`,
+  [`/${locale}/docs/DOM_element.dispatchEvent.html`]:
+    `/${locale}/docs/Web/API/EventTarget/dispatchEvent`,
+  [`/${locale}/docs/DOM:event.preventDefault`]:
+    `/${locale}/docs/Web/API/Event/preventDefault`,
+  [`/${locale}/docs/DOM_event.preventDefault`]:
+    `/${locale}/docs/Web/API/Event/preventDefault`,
+  [`/${locale}/docs/DOM_event.preventDefault.html`]:
+    `/${locale}/docs/Web/API/Event/preventDefault`,
+  [`/${locale}/docs/MDC:About`]:
+    `/${locale}/about`,
+  [`/${locale}/docs/MDC_About`]:
+    `/${locale}/about`,
+  [`/${locale}/docs/MDC_About.html`]:
+    `/${locale}/about`,
+  [`/${locale}/docs/MDC:Copyrights`]:
+    `/${locale}/docs/MDN/Writing_guidelines/Attrib_copyright_license`,
+  [`/${locale}/docs/MDC_Copyrights`]:
+    `/${locale}/docs/MDN/Writing_guidelines/Attrib_copyright_license`,
+  [`/${locale}/docs/MDC_Copyrights.html`]:
+    `/${locale}/docs/MDN/Writing_guidelines/Attrib_copyright_license`,
   [`/${locale}/docs/DOM/element.contextmenu`]:
     `/${locale}/docs/Web/HTML/Global_attributes/contextmenu`,
   [`/${locale}/docs/Web/DOM/Window`]:

@@ -82,6 +82,9 @@ const WIKIMEDIA_THUMBNAIL_STEPS = [
 const WIKIMEDIA_THUMBNAIL_PATH =
   /^((?:\/upload\.wikimedia\.org)?\/.*\/thumb\/.*\/)(\d+)px-([^/]+)$/;
 
+const MDN_DEV_LEGACY_SITE_PATH = /^\/en(?:-US)?(?:\/|$)/i;
+const MDN_DEV_FAKE_LEGACY_SITE_PATH = /^\/mdn\.dev\/en(?:-US)?(?:\/|$)/i;
+
 function normalizeWikimediaThumbnailPath(path: string) {
   const match = path.match(WIKIMEDIA_THUMBNAIL_PATH);
   if (!match) {
@@ -117,6 +120,20 @@ function applyWikimediaThumbnailNormalization(
   return true;
 }
 
+function rewriteMdnDevLegacySitePath(uri: URI, mdnHost: string): boolean {
+  const host = uri.host();
+  const path = uri.path();
+  if (host === 'mdn.dev' && MDN_DEV_LEGACY_SITE_PATH.test(path)) {
+    uri.host(mdnHost);
+    return true;
+  }
+  if (host === mdnHost && MDN_DEV_FAKE_LEGACY_SITE_PATH.test(path)) {
+    uri.path(path.slice('/mdn.dev'.length));
+    return true;
+  }
+  return false;
+}
+
 export function redirectUrl(
   url: string,
   element: Cheerio | null,
@@ -132,6 +149,9 @@ export function redirectUrl(
     let u = URI(url).normalize(), host, needToRebuildUrl = false;
     const mdnHost: string = options.meta.host as string | void
       || 'developer.mozilla.org';
+    if (rewriteMdnDevLegacySitePath(u, mdnHost)) {
+      needToRebuildUrl = true;
+    }
     if ((host = u.host()) && host !== mdnHost) {
       let shouldReturnEarly = false;
       if (downloadableHosts[host] && u.protocol() === 'http') {
@@ -230,12 +250,18 @@ export function redirectUrl(
         u = u
           .absoluteTo(parent.url)
           .normalizePath();
+        if (rewriteMdnDevLegacySitePath(u, mdnHost)) {
+          needToRebuildUrl = true;
+        }
       }
       if (parent && parent.downloadLink) {
         const downloadLink = parent.downloadLink;
         for (const externalHost of externalHosts) {
+          const shouldKeepRewrittenMdnDevLegacyPath =
+            externalHost.host === 'mdn.dev' && MDN_DEV_LEGACY_SITE_PATH.test(u.path());
           if (downloadLink.includes(externalHost.pattern) &&
-            !u.path().includes(externalHost.prefix)) {
+            !u.path().includes(externalHost.prefix) &&
+            !shouldKeepRewrittenMdnDevLegacyPath) {
             // fake url, redirected back in redirectDownloadLink
             return u.host(mdnHost)
               .path(externalHost.pathPrefix + u.path())

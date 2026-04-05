@@ -672,4 +672,48 @@ describe('redirect-url', function () {
       .toBe('https://developer.mozilla.org/upload.wikimedia.org/wikipedia/commons/thumb/3/39/Typography_Line_Terms.svg/500px-Typography_Line_Terms.svg.png');
     expect(img.attr('width')).toBe('410');
   });
+
+  test('rewrite mdn.dev legacy en site paths to developer.mozilla.org', () => {
+    expect(redirectUrl('https://mdn.dev/en-US/about',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/about');
+
+    expect(redirectUrl('https://mdn.dev/en/docs/MDC:About',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/about');
+
+    expect(redirectUrl('https://mdn.dev/en/docs/DOM:document.createEvent',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/API/Document/createEvent');
+
+    expect(redirectUrl('https://developer.mozilla.org/mdn.dev/en-US/about',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/about');
+  });
+
+  test('rewrite fake local mdn.dev en links from archived samples', () => {
+    const parent = {
+      url: 'https://developer.mozilla.org/mdn.dev/archives/media/samples/domref/dispatchEvent.html',
+      downloadLink: 'https://mdn.dev/archives/media/samples/domref/dispatchEvent.html'
+    } as Resource;
+
+    expect(redirectUrl('../../../../en/docs/DOM_document.createEvent.html',
+      null, parent, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/API/Document/createEvent');
+    expect(redirectUrl('../../../../en/docs/DOM_event.initMouseEvent.html',
+      null, parent, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/initMouseEvent');
+    expect(redirectUrl('../../../../en/docs/DOM_element.dispatchEvent.html',
+      null, parent, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent');
+    expect(redirectUrl('../../../../en/docs/DOM_event.preventDefault.html',
+      null, parent, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault');
+    expect(redirectUrl('../../../../en/docs/MDC_Copyrights.html',
+      null, parent, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/MDN/Writing_guidelines/Attrib_copyright_license');
+    expect(redirectUrl('../../../../en/docs/MDC_About.html',
+      null, parent, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/about');
+  });
 });
