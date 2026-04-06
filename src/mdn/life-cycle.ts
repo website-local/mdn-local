@@ -25,6 +25,7 @@ import {processYariMainCss} from './process-html/process-yari-main-css.js';
 import {
   interactiveExampleDeps
 } from './process-url/interactive-example-deps.js';
+import {createMdnLogger} from './logger.js';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.init.push(interactiveExampleDeps);
@@ -52,6 +53,7 @@ lifeCycle.processAfterDownload.push(
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.logSubDir = 'developer.mozilla.org';
+options.createLogger = createMdnLogger;
 options.maxDepth = 8;
 options.concurrency = 12;
 options.adjustConcurrencyPeriod = 60000;
