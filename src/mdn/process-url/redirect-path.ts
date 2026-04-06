@@ -475,4 +475,35 @@ export const hardCodedRedirectUrl: Record<string, string> = {
   // fake url, prevent external downloads
   'https://weloveiconfonts.com/api/?family=entypo':
     'https://developer.mozilla.org/static/css/inject.css',
+  // Legacy mdn.dev sample resources and aliases
+  'https://mdn.dev/samples/cssref/cssref.css':
+    'https://developer.mozilla.org/mdn.dev/archives/media/samples/cssref/cssref.css',
+  'https://developer.mozilla.org/samples/cssref/cssref.css':
+    'https://developer.mozilla.org/mdn.dev/archives/media/samples/cssref/cssref.css',
+  'https://developer.mozilla.org/mdn.dev/samples/cssref/cssref.css':
+    'https://developer.mozilla.org/mdn.dev/archives/media/samples/cssref/cssref.css',
+  'https://mdn.dev/en/docs/DOM:document.createEvent':
+    'https://developer.mozilla.org/en-US/docs/Web/API/Document/createEvent',
+  'https://developer.mozilla.org/mdn.dev/en/docs/DOM:document.createEvent':
+    'https://developer.mozilla.org/en-US/docs/Web/API/Document/createEvent',
+  'https://mdn.dev/en/docs/DOM:event.initMouseEvent':
+    'https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/initMouseEvent',
+  'https://developer.mozilla.org/mdn.dev/en/docs/DOM:event.initMouseEvent':
+    'https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/initMouseEvent',
+  'https://mdn.dev/en/docs/DOM:element.dispatchEvent':
+    'https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent',
+  'https://developer.mozilla.org/mdn.dev/en/docs/DOM:element.dispatchEvent':
+    'https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent',
+  'https://mdn.dev/en/docs/DOM:event.preventDefault':
+    'https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault',
+  'https://developer.mozilla.org/mdn.dev/en/docs/DOM:event.preventDefault':
+    'https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault',
+  'https://mdn.dev/en/docs/MDC:About':
+    'https://developer.mozilla.org/en-US/about',
+  'https://developer.mozilla.org/mdn.dev/en/docs/MDC:About':
+    'https://developer.mozilla.org/en-US/about',
+  'https://mdn.dev/en/docs/MDC:Copyrights':
+    'https://developer.mozilla.org/en-US/docs/MDN/Writing_guidelines/Attrib_copyright_license',
+  'https://developer.mozilla.org/mdn.dev/en/docs/MDC:Copyrights':
+    'https://developer.mozilla.org/en-US/docs/MDN/Writing_guidelines/Attrib_copyright_license',
 };

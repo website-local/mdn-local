@@ -287,9 +287,13 @@ export function redirectUrl(
             !u.path().includes(externalHost.prefix) &&
             !shouldKeepRewrittenMdnDevLegacyPath) {
             // fake url, redirected back in redirectDownloadLink
-            return u.host(mdnHost)
+            const redirected = u.host(mdnHost)
               .path(externalHost.pathPrefix + u.path())
               .toString();
+            if (hardCodedRedirectUrl[redirected]) {
+              return hardCodedRedirectUrl[redirected];
+            }
+            return redirected;
           }
         }
       }

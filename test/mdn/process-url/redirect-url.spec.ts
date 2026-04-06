@@ -727,5 +727,8 @@ describe('redirect-url', function () {
     expect(redirectUrl('../../../../samples/cssref/cssref.css',
       null, parent, opt('en-US')))
       .toBe('https://developer.mozilla.org/mdn.dev/archives/media/samples/cssref/cssref.css');
+    expect(redirectUrl('/samples/cssref/cssref.css',
+      null, parent, opt('en-US')))
+      .toBe('https://developer.mozilla.org/mdn.dev/archives/media/samples/cssref/cssref.css');
   });
 });
