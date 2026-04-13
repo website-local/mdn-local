@@ -95,7 +95,7 @@ jobs:
           cat release.txt
 
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         if: ${{ github.event.inputs.tag_name != '' }}
         with:
           draft: true
