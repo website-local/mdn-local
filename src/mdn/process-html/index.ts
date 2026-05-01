@@ -18,6 +18,7 @@ import {
   postProcessReplaceExternalImgWithLink,
   postProcessReplaceExternalMediaWithLink,
   postProcessReplaceExternalScriptWithLink,
+  postProcessReplaceOnlineOnlyMdnWidgets,
 } from './process-external.js';
 import {preProcessRemoveElements} from './process-remove-elements.js';
 import {
@@ -126,6 +127,7 @@ export const postProcessHtml = (
   $('script[type="module"]').remove();
 
   postProcessExternalizeStandalonePlaygroundLinks($, res.url);
+  postProcessReplaceOnlineOnlyMdnWidgets($, res.url);
   postProcessAddIconToExternalLinks($);
   // replace external iframe with external links
   postProcessReplaceExternalIframeWithLink($, res.url);

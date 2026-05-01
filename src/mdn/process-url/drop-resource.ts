@@ -41,6 +41,10 @@ export function dropResource(
     path === `/${locale}/play` ||
     path === `/${locale}/play/` ||
     path === `/${locale}/play.html`;
+  const isOnlineOnlyObservatoryAnalyze =
+    path === `/${locale}/observatory/analyze` ||
+    path === `/${locale}/observatory/analyze/` ||
+    path === `/${locale}/observatory/analyze.html`;
   if (host === 'mdn.mozillademos.org' && path.startsWith('/files')) {
     return res;
   }
@@ -77,6 +81,9 @@ export function dropResource(
     // The standalone Playground app depends on Fred frontend modules and
     // online API/login behavior. Embedded examples are handled separately.
     isStandalonePlayground ||
+    // Queryless Observatory analyze pages are app shells that render results
+    // only after Fred hydration and live API calls.
+    isOnlineOnlyObservatoryAnalyze ||
     // Legacy mdn.dev site paths should be rewritten to developer.mozilla.org.
     // If a fake local /mdn.dev/en* path still slips through, drop it
     // instead of letting it recursively mirror the mdn.dev site shell.

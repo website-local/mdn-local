@@ -99,4 +99,25 @@ describe('drop-resource', function () {
     );
     expect(res?.shouldBeDiscardedFromDownload).not.toBe(true);
   });
+
+  test('discard queryless Observatory analyze app route', () => {
+    for (const url of [
+      'https://developer.mozilla.org/en-US/observatory/analyze',
+      'https://developer.mozilla.org/en-US/observatory/analyze/',
+      'https://developer.mozilla.org/en-US/observatory/analyze.html'
+    ]) {
+      const dropped = dropResource(fakeRes(url), null, null, opt('en-US'));
+      expect(dropped?.shouldBeDiscardedFromDownload).toBe(true);
+    }
+  });
+
+  test('keep Observatory landing and docs pages', () => {
+    for (const url of [
+      'https://developer.mozilla.org/en-US/observatory',
+      'https://developer.mozilla.org/en-US/observatory/docs/tests_and_scoring'
+    ]) {
+      const res = dropResource(fakeRes(url), null, null, opt('en-US'));
+      expect(res?.shouldBeDiscardedFromDownload).not.toBe(true);
+    }
+  });
 });

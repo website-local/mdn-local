@@ -2894,6 +2894,84 @@ Prism.languages.py = Prism.languages.python;
   }
   /// endregion mdn-toggle-sidebar
 
+  /// region fred mdn-about-tabs
+  // Fred SSR hides inactive about-page panels in shadow CSS. Hydrate the
+  // minimal tab state needed offline instead of loading the Lit component.
+  function getAboutTabsPanelIdFromHash(hash) {
+    if (hash.indexOf('our_team') === 0) {
+      return 'our_team';
+    }
+    if (
+      hash.indexOf('our_partners') === 0 ||
+      hash === 'product_advisory_board' ||
+      hash === 'open_web_docs'
+    ) {
+      return 'our_partners';
+    }
+    return hash;
+  }
+
+  function setupAboutTabs(host) {
+    const tabs = host.querySelectorAll('[slot="tab"]');
+    const panels = host.querySelectorAll('[slot="panel"]');
+    if (!tabs.length || !panels.length) {
+      return;
+    }
+
+    function activate(panelId, scrollToPanel) {
+      let activeIndex = 0;
+      let panel;
+      let tab;
+      for (let j = 0; j < tabs.length; j++) {
+        if (tabs[j].dataset.panelId === panelId) {
+          activeIndex = j;
+          break;
+        }
+      }
+      for (let j = 0; j < tabs.length; j++) {
+        tab = tabs[j];
+        panel = panels[j];
+        const isActive = j === activeIndex;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-selected', isActive.toString());
+        tab.setAttribute('tabindex', isActive ? '0' : '-1');
+        if (panel) {
+          panel.classList.toggle('active', isActive);
+          panel.classList.add('tabpanel');
+          panel.setAttribute('role', 'tabpanel');
+          panel.setAttribute('aria-hidden', (!isActive).toString());
+        }
+      }
+      if (
+        scrollToPanel &&
+        panels[activeIndex] &&
+        panels[activeIndex].getBoundingClientRect().top < 0
+      ) {
+        panels[activeIndex].scrollIntoView({block: 'start', inline: 'nearest'});
+      }
+    }
+
+    for (let j = 0; j < tabs.length; j++) {
+      tabs[j].addEventListener('click', function aboutTabClick(event) {
+        const panelId = this.dataset.panelId;
+        if (!panelId) {
+          return;
+        }
+        event.preventDefault();
+        window.location.hash = panelId;
+        activate(panelId, true);
+      });
+    }
+    window.addEventListener('hashchange', function aboutTabsHashChange() {
+      activate(getAboutTabsPanelIdFromHash(window.location.hash.slice(1)), false);
+    });
+    activate(getAboutTabsPanelIdFromHash(window.location.hash.slice(1)), false);
+  }
+
+  document.querySelectorAll('mdn-about-tabs').forEach(setupAboutTabs);
+  /// endregion mdn-about-tabs
+
   /// region yari mask-image to background fix
   // https://github.com/website-local/mdn-local/issues/785
   if (window.location.protocol === 'file:') {

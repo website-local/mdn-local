@@ -10,6 +10,8 @@ const relativeStandalonePlaygroundHref =
 const mdnStandalonePlaygroundHref =
   /^(?:https?:\/\/developer\.mozilla\.org)?\/(?<locale>[^/?#]+)\/play(?:\.html)?\/?(?<suffix>[?#].*)?$/;
 const mdnLocales = new Set(['en-US', ...localeArr]);
+const observatoryDocsUrl =
+  'https://developer.mozilla.org/en-US/observatory/docs/tests_and_scoring';
 
 const getLocaleFromUrl = (url: string): string => {
   const match = url.match(/^https?:\/\/developer\.mozilla\.org\/([^/?#]+)/);
@@ -60,6 +62,53 @@ export const postProcessExternalizeStandalonePlaygroundLinks = (
       .attr('rel', 'noopener noreferrer')
       .addClass('external');
   }
+};
+
+const replaceElementWithExternalParagraph = (
+  $: CheerioStatic,
+  selector: string,
+  url: string,
+  text: string
+): void => {
+  const elements = $(selector);
+  for (let i = 0; i < elements.length; i++) {
+    const link = $('<a class="external"></a>')
+      .attr('href', url)
+      .attr('target', '_blank')
+      .attr('rel', 'noopener noreferrer')
+      .text(text);
+    const paragraph = $('<p></p>').append(link);
+    $(elements[i]).replaceWith(paragraph);
+  }
+};
+
+export const postProcessReplaceOnlineOnlyMdnWidgets = (
+  $: CheerioStatic,
+  resUrl: string
+): void => {
+  const locale = getLocaleFromUrl(resUrl);
+  const liveLocale = mdnLocales.has(locale) ? locale : 'en-US';
+  const observatoryUrl =
+    `https://developer.mozilla.org/${liveLocale}/observatory`;
+
+  replaceElementWithExternalParagraph(
+    $,
+    'mdn-observatory-form',
+    observatoryUrl,
+    'Open the live MDN Observatory'
+  );
+  replaceElementWithExternalParagraph(
+    $,
+    'mdn-observatory-results',
+    observatoryUrl,
+    'Open the live MDN Observatory results'
+  );
+  replaceElementWithExternalParagraph(
+    $,
+    'mdn-observatory-tests-and-scores',
+    observatoryDocsUrl,
+    'Open the live MDN Observatory tests and scoring data'
+  );
 };
 
 export const replaceExternalItemWithLink = (

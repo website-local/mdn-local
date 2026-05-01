@@ -127,6 +127,16 @@ export const preProcessRemoveElements = ($: CheerioStatic): void => {
   $('.translation-banner').remove();
   // language switcher
   $('mdn-language-switcher').remove();
+  // GitHub issue widgets require Fred hydration and the live GitHub API.
+  // Keep the intent as a static external link for offline builds.
+  $('mdn-issues-table').each((i, el) => {
+    $(el).replaceWith(
+      '<p><a class="external" target="_blank" rel="noopener noreferrer" ' +
+      'href="https://github.com/search?q=org%3Amdn+is%3Aissue+is%3Aopen+' +
+      'label%3A%22good+first+issue%22%2C%22accepting+PR%22&type=issues">' +
+      'View beginner-friendly MDN issues on GitHub</a></p>'
+    );
+  });
   // footer
   $('.article-footer__links,mdn-content-feedback').remove();
   $('.article-footer__inner>#feedback').remove();
