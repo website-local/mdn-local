@@ -587,6 +587,34 @@ describe('redirect-url', function () {
       'https://developer.mozilla.org/zh-CN/docs/Web/API/Viewport_Segments_API',
       null, null, opt('zh-CN')))
       .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/Viewport_segments_API');
+
+    // CSS_Painting_API/guide -> CSS_Painting_API/Guide
+    expect(redirectUrl(
+      'https://developer.mozilla.org/en-US/docs/Web/API/CSS_Painting_API/guide',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/API/CSS_Painting_API/Guide');
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/API/CSS_Painting_API/guide/boxbg.png',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/API/CSS_Painting_API/Guide/boxbg.png');
+
+    // Set method pages and assets use camelCase slugs.
+    expect(redirectUrl(
+      'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set/isdisjointfrom',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set/isDisjointFrom');
+    expect(redirectUrl(
+      'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set/issubsetof/diagram.svg',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set/isSubsetOf/diagram.svg');
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set/issupersetof',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set/isSupersetOf');
+    expect(redirectUrl(
+      'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set/symmetricdifference/diagram.svg',
+      null, null, opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set/symmetricDifference/diagram.svg');
   });
 
   test('redirect case-conflicting URLs (zh-CN specific)', () => {

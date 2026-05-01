@@ -409,6 +409,26 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Glossary/Visual_Viewport`,
   [`/${locale}/docs/Web/API/Viewport_Segments_API`]:
     `/${locale}/docs/Web/API/Viewport_segments_API`,
+  [`/${locale}/docs/Web/API/CSS_Painting_API/guide`]:
+    `/${locale}/docs/Web/API/CSS_Painting_API/Guide`,
+  [`/${locale}/docs/Web/API/CSS_Painting_API/guide/boxbg.png`]:
+    `/${locale}/docs/Web/API/CSS_Painting_API/Guide/boxbg.png`,
+  [`/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/isdisjointfrom`]:
+    `/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/isDisjointFrom`,
+  [`/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/isdisjointfrom/diagram.svg`]:
+    `/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/isDisjointFrom/diagram.svg`,
+  [`/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/issubsetof`]:
+    `/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/isSubsetOf`,
+  [`/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/issubsetof/diagram.svg`]:
+    `/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/isSubsetOf/diagram.svg`,
+  [`/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/issupersetof`]:
+    `/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/isSupersetOf`,
+  [`/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/issupersetof/diagram.svg`]:
+    `/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/isSupersetOf/diagram.svg`,
+  [`/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/symmetricdifference`]:
+    `/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/symmetricDifference`,
+  [`/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/symmetricdifference/diagram.svg`]:
+    `/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/symmetricDifference/diagram.svg`,
 });
 
 export const mdnLocaleRedirectPath = (locale: string): Record<string, string> => {
