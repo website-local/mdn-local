@@ -76,4 +76,27 @@ describe('drop-resource', function () {
     );
     expect(res?.shouldBeDiscardedFromDownload).not.toBe(true);
   });
+
+  test('discard standalone playground routes', () => {
+    for (const url of [
+      'https://developer.mozilla.org/en-US/play',
+      'https://developer.mozilla.org/en-US/play/',
+      'https://developer.mozilla.org/en-US/play.html',
+      'https://developer.mozilla.org/zh-CN/play'
+    ]) {
+      const locale = url.includes('/zh-CN/') ? 'zh-CN' : 'en-US';
+      const dropped = dropResource(fakeRes(url), null, null, opt(locale));
+      expect(dropped?.shouldBeDiscardedFromDownload).toBe(true);
+    }
+  });
+
+  test('keep API pages named play', () => {
+    const res = dropResource(
+      fakeRes('https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play'),
+      null,
+      null,
+      opt('en-US')
+    );
+    expect(res?.shouldBeDiscardedFromDownload).not.toBe(true);
+  });
 });

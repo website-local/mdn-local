@@ -37,6 +37,10 @@ export function dropResource(
     path === '/css/wiki.css' ||
     path === '/mdn.dev/css/base.css' ||
     path === '/mdn.dev/css/wiki.css';
+  const isStandalonePlayground =
+    path === `/${locale}/play` ||
+    path === `/${locale}/play/` ||
+    path === `/${locale}/play.html`;
   if (host === 'mdn.mozillademos.org' && path.startsWith('/files')) {
     return res;
   }
@@ -70,6 +74,9 @@ export function dropResource(
     path.includes('/users/github/login') ||
     path.includes('/users/google/login') ||
     path.includes('/users/signin') ||
+    // The standalone Playground app depends on Fred frontend modules and
+    // online API/login behavior. Embedded examples are handled separately.
+    isStandalonePlayground ||
     // Legacy mdn.dev site paths should be rewritten to developer.mozilla.org.
     // If a fake local /mdn.dev/en* path still slips through, drop it
     // instead of letting it recursively mirror the mdn.dev site shell.

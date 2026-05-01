@@ -3,10 +3,63 @@ import {
   skipExternal
 } from 'website-scrap-engine/lib/logger/logger.js';
 import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types.js';
+import {localeArr} from '../process-url/consts.js';
+
+const relativeStandalonePlaygroundHref =
+  /^(?:\.\.\/)*play\.html(?<suffix>[?#].*)?$/;
+const mdnStandalonePlaygroundHref =
+  /^(?:https?:\/\/developer\.mozilla\.org)?\/(?<locale>[^/?#]+)\/play(?:\.html)?\/?(?<suffix>[?#].*)?$/;
+const mdnLocales = new Set(['en-US', ...localeArr]);
+
+const getLocaleFromUrl = (url: string): string => {
+  const match = url.match(/^https?:\/\/developer\.mozilla\.org\/([^/?#]+)/);
+  return match?.[1] || 'en-US';
+};
+
+const getExternalStandalonePlaygroundHref = (
+  href: string,
+  locale: string
+): string | void => {
+  const relativeMatch = href.match(relativeStandalonePlaygroundHref);
+  if (relativeMatch) {
+    return `https://developer.mozilla.org/${locale}/play` +
+      (relativeMatch.groups?.suffix || '');
+  }
+  const mdnMatch = href.match(mdnStandalonePlaygroundHref);
+  if (mdnMatch && mdnLocales.has(mdnMatch.groups?.locale || '')) {
+    return `https://developer.mozilla.org/${mdnMatch.groups?.locale}/play` +
+      (mdnMatch.groups?.suffix || '');
+  }
+};
+
 export const postProcessAddIconToExternalLinks = ($: CheerioStatic): void => {
   // no need to add class external-icon for yari
   $('#content > .article a[href^="http://"]').addClass('external');
   $('#content > .article a[href^="https://"]').addClass('external');
+};
+
+export const postProcessExternalizeStandalonePlaygroundLinks = (
+  $: CheerioStatic,
+  resUrl: string
+): void => {
+  const locale = getLocaleFromUrl(resUrl);
+  const links = $('a[href]');
+  for (let i = 0; i < links.length; i++) {
+    const link = $(links[i]);
+    const href = link.attr('href');
+    if (!href) {
+      continue;
+    }
+    const externalHref = getExternalStandalonePlaygroundHref(href, locale);
+    if (!externalHref) {
+      continue;
+    }
+    link
+      .attr('href', externalHref)
+      .attr('target', '_blank')
+      .attr('rel', 'noopener noreferrer')
+      .addClass('external');
+  }
 };
 
 export const replaceExternalItemWithLink = (
@@ -122,4 +175,3 @@ export const postProcessReplaceExternalMediaWithLink = (
     }
   }
 };
-

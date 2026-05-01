@@ -13,6 +13,7 @@ import {error} from 'website-scrap-engine/lib/logger/logger.js';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {
   postProcessAddIconToExternalLinks,
+  postProcessExternalizeStandalonePlaygroundLinks,
   postProcessReplaceExternalIframeWithLink,
   postProcessReplaceExternalImgWithLink,
   postProcessReplaceExternalMediaWithLink,
@@ -124,6 +125,7 @@ export const postProcessHtml = (
   // 20251005 module scripts not supported in file: protocol
   $('script[type="module"]').remove();
 
+  postProcessExternalizeStandalonePlaygroundLinks($, res.url);
   postProcessAddIconToExternalLinks($);
   // replace external iframe with external links
   postProcessReplaceExternalIframeWithLink($, res.url);
@@ -143,4 +145,3 @@ export const postProcessHtml = (
   postProcessInteractiveExample($);
   return $;
 };
-
