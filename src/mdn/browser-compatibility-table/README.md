@@ -1,6 +1,6 @@
 browser-compatibility-table
 --------------
-This dir contains code rewritten from [mdn/fred](https://github.com/mdn/fred/tree/v2.0.2/components/compat-table), which is licensed [MPL-2.0](https://github.com/mdn/fred/blob/v1.6.1/LICENSE)
+This dir contains code rewritten from [mdn/fred](https://github.com/mdn/fred/tree/v2.7.0/components/compat-table), which is licensed [MPL-2.0](https://github.com/mdn/fred/blob/v1.6.1/LICENSE)
 
 `types.ts` is [types.d.ts](https://unpkg.com/@mdn/browser-compat-data@6.0.7/types.d.ts) from [mdn/browser-compat-data](https://github.com/mdn/browser-compat-data), licensed [CC0](https://github.com/mdn/browser-compat-data/blob/v5.2.38/LICENSE)
 
@@ -14,6 +14,7 @@ Changes
 * Array maps in html are joined later.
 * All html attrs are quoted.
 * Rendered null to empty string.
+* Branch heading l10n strings (`compat-branch-*`) inlined as English text.
 
 Note
 --------------

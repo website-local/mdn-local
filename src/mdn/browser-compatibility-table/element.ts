@@ -10,6 +10,7 @@ import {
   bugURLToString,
   getCurrentSupport,
   getFirst,
+  groupSupportBranches,
   hasMore,
   hasNoteworthyNotes,
   isFullySupportedWithoutLimitation,
@@ -62,7 +63,7 @@ function browserToIconName(browser: BrowserName): string {
   } else if (browser === 'webview_ios') {
     return 'safari';
   } else {
-    return browser.split('_')[0] ?? '';
+    return browser.split('_', 1)[0] ?? '';
   }
 }
 
@@ -399,13 +400,13 @@ export class MDNCompatTable {
             class="timeline"
             tabindex="0"
           >
-            <dl class="bc-notes-list">${notes.join('')}</dl>
+            <div class="bc-notes-list">${notes.join('')}</div>
           </div>` || ''}
         </td>`;
       });
 
       return `<tr>
-        <th class="bc-feature bc-feature-depth-${depth}" scope="row">
+        <th class="bc-feature" style="--compat-feature-depth: ${depth}" scope="row">
           ${titleNode || ''}
         </th>
         ${browserCells.join('')}
@@ -419,17 +420,25 @@ export class MDNCompatTable {
 
   /**
    * @param {SupportStatement} support
+   * @param {{ omitAliasModifiers?: boolean }} [options] - When `omitAliasModifiers` is
+   *   true, the `prefix` and `altname` icons are skipped (because a branch
+   *   heading already conveys the alias modifier).
    */
-  _renderCellIcons(support: SupportStatement): string | undefined {
+  _renderCellIcons(
+    support: SupportStatement,
+    { omitAliasModifiers = false }: { omitAliasModifiers?: boolean } = {}
+  ): string | undefined {
     const supportItem = getCurrentSupport(support);
     if (!supportItem) {
       return;
     }
 
     const icons = [
-      supportItem.prefix && this._renderIcon('prefix'),
+      !omitAliasModifiers && supportItem.prefix && this._renderIcon('prefix'),
       hasNoteworthyNotes(supportItem) && this._renderIcon('footnote'),
-      supportItem.alternative_name && this._renderIcon('altname'),
+      !omitAliasModifiers &&
+        supportItem.alternative_name &&
+        this._renderIcon('altname'),
       supportItem.flags && this._renderIcon('disabled'),
       hasMore(support) && this._renderIcon('more'),
     ].filter(Boolean);
@@ -535,47 +544,103 @@ export class MDNCompatTable {
    * @param {SupportStatement} support
    */
   _renderNotes(browser: BrowserStatement, support: SupportStatement): string[] {
-    return [...asList(support)]
-      .reverse()
-      .flatMap((item, i) => {
-        const notes = this._getNotes(browser, support, item);
+    // Support arrays interleave parallel branches (e.g. unprefixed vs.
+    // `-webkit-` vs. `-moz-`). Render each branch as its own timeline so
+    // versions stay in chronological order within the branch. Any branch
+    // with a `prefix` or `alternative_name` gets a heading conveying the
+    // alias modifier, even when there is no canonical branch to contrast
+    // with.
+    const branches = groupSupportBranches(support);
+
+    return branches.map((branchItems) => {
+      const { prefix, alternative_name } = branchItems[0];
+      const hasAliasModifier = !!(prefix || alternative_name);
+      const heading = hasAliasModifier
+        ? this._renderBranchHeading(prefix, alternative_name)
+        : '';
+
+      const wrappers = [...branchItems].reverse().flatMap((item, i) => {
+        // Suppress prefix/alt-name notes when the branch heading already
+        // conveys the alias modifier — avoids redundancy.
+        const notes = this._getNotes(browser, support, item, {
+          omitAliasModifiers: hasAliasModifier,
+        });
 
         const notesItems = notes.map(({ iconName, label }) => {
-          return `<dd class="bc-supports-dd">
+          return `<div class="bc-supports-dd">
             ${this._renderIcon(iconName)}<span>${(label || '')}</span>
-          </dd>`;
+          </div>`;
         });
 
         const hasNotes = notesItems.length > 0;
 
+        // Always render the first (most recent) item even when it has no
+        // notes, so each branch shows at least one row in its timeline.
         return (
           (i === 0 || hasNotes) &&
           `<div class="bc-notes-wrapper">
-            <dt
+            <div
               class="bc-supports-${getSupportClassName(
             item,
             browser,
           )} bc-supports"
             >
-              ${this._renderCellText(item, browser, true) || ''}
-            </dt>
-            ${notesItems.join('')} ${hasNotes ? '' : '<dd></dd>'}
+              ${this._renderCellText(item, browser, true, {
+            omitAliasModifiers: hasAliasModifier,
+          }) || ''}
+            </div>
+            ${notesItems.join('')}
+            ${hasNotes ? '' : '<div class="bc-notes-end"></div>'}
           </div>` || ''
         );
-      })
-      .filter(Boolean);
+      }).filter(Boolean);
+
+      return `<div class="bc-branch">
+        ${heading}
+        <div class="bc-branch-items">${wrappers.join('')}</div>
+      </div>`;
+    });
+  }
+
+  /**
+   * Called only when at least one of `prefix` / `alternativeName` is present.
+   * @param {string | undefined} prefix
+   * @param {string | undefined} alternativeName
+   */
+  _renderBranchHeading(
+    prefix: string | undefined,
+    alternativeName: string | undefined
+  ): string {
+    const label =
+      prefix && alternativeName
+        ? `Prefix: <code>${prefix}</code>, alternate name: <code>${alternativeName}</code>`
+        : prefix
+          ? `Prefix: <code>${prefix}</code>`
+          : `Alternate name: <code>${alternativeName}</code>`;
+    const icons = [
+      prefix && this._renderIcon('prefix'),
+      alternativeName && this._renderIcon('altname'),
+    ].filter(Boolean);
+    return `<div class="bc-branch-heading">
+      <div class="bc-icons">${icons.join('')}</div>
+      <span>${label}</span>
+    </div>`;
   }
 
   /**
    * @param {BrowserStatement} browser
    * @param {SupportStatement} support
    * @param {SimpleSupportStatement} item
+   * @param {{ omitAliasModifiers?: boolean }} [options] - When `omitAliasModifiers` is
+   *   true, prefix / alternative_name don't count as limitations when judging
+   *   full support (because a branch heading already conveys the modifier).
    * @returns
    */
   _getNotes(
     browser: BrowserStatement,
     support: SupportStatement,
-    item: SimpleSupportStatement
+    item: SimpleSupportStatement,
+    { omitAliasModifiers = false }: { omitAliasModifiers?: boolean } = {}
   ): Array<{iconName: IconName; label: string | undefined }> {
     /**
      * @type {Array<{iconName: IconName; label: string | import("@lit").L10nResult | undefined }>}
@@ -601,19 +666,8 @@ export class MDNCompatTable {
       });
     }
 
-    if (item.prefix) {
-      supportNotes.push({
-        iconName: 'prefix',
-        label: `Implemented with the vendor prefix: ${item.prefix}`,
-      });
-    }
-
-    if (item.alternative_name) {
-      supportNotes.push({
-        iconName: 'altname',
-        label: `Alternate name: ${item.alternative_name}`,
-      });
-    }
+    // Note: prefix / alternative_name modifiers are conveyed by the branch
+    // heading (see `_renderBranchHeading`), so they aren't pushed here.
 
     if (item.flags) {
       for (const { type, name, value_to_set } of item.flags) {
@@ -672,8 +726,13 @@ export class MDNCompatTable {
     // If we encounter nothing else than the required `version_added` and
     // `release_date` properties, assume full support.
     // EDIT 1-5-21: if item.version_added doesn't exist, assume no support.
+    // When the branch heading already conveys the alias modifier, ignore prefix
+    // and alternative_name when judging full support — otherwise a plain
+    // `{ prefix, version_added }` item falls through to "Support unknown".
     if (
-      isFullySupportedWithoutLimitation(item) &&
+      isFullySupportedWithoutLimitation(item, {
+        ignoreAliasModifiers: omitAliasModifiers,
+      }) &&
       !versionIsPreview(item.version_added, browser)
     ) {
       supportNotes.push({
@@ -702,11 +761,15 @@ export class MDNCompatTable {
    * @param {SupportStatement | undefined} support
    * @param {BrowserStatement} browser
    * @param {boolean} [timeline]
+   * @param {{ omitAliasModifiers?: boolean }} [options] - Forwarded to
+   *   {@link _renderCellIcons} to suppress prefix/altname icons when a branch
+   *   heading already conveys the alias modifier.
    */
   _renderCellText(
     support: SupportStatement | undefined,
     browser: BrowserStatement,
-    timeline = false
+    timeline = false,
+    { omitAliasModifiers = false }: { omitAliasModifiers?: boolean } = {}
   ): string {
     const currentSupport = getCurrentSupport(support);
 
@@ -817,7 +880,7 @@ export class MDNCompatTable {
     : ''}
         </span>
       </div>
-      ${support && this._renderCellIcons(support) || ''}
+      ${support && this._renderCellIcons(support, { omitAliasModifiers }) || ''}
     </div>`;
   }
 

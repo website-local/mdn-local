@@ -3543,13 +3543,11 @@ function mdnMaskImageStyleFix(sr) {
      * @returns {HTMLElement|undefined} The found element or undefined if none found.
      */
     findFirstElementBefore(el, candidates) {
-      return [...candidates]
-        .reverse()
-        .find(
-          (candidate) =>
-            candidate.compareDocumentPosition(el) &
-            Node.DOCUMENT_POSITION_FOLLOWING,
-        );
+      return candidates.findLast(
+        (candidate) =>
+          candidate.compareDocumentPosition(el) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      );
     }
 
     /**
@@ -6100,7 +6098,7 @@ code {
 // https://github.com/website-local/mdn-local/issues/1307
 // https://github.com/mdn/fred/blob/12dcccb/hooks/toc-highlight.js#L89
 !function () {
-  /* global IntersectionObserver */
+  /* global IntersectionObserver, CSS */
   /**
    * @param {HTMLElement} toc
    * @returns {void}
@@ -6114,7 +6112,7 @@ code {
     const tocItemBySection = new Map();
     for (const item of tocItems.reverse()) {
       const target = document.querySelector(
-        `[id="${decodeURIComponent(item.hash).slice(1)}"]`,
+        `[id="${CSS.escape(decodeURIComponent(item.hash).slice(1))}"]`,
       );
 
       if (!target) {

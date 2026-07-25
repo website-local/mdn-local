@@ -476,6 +476,15 @@ table.bc-table {
   grid-column: 1 / -1;
 }
 
+/* mdn-local renders all timelines statically and hides collapsed ones via
+   button[aria-expanded="false"] ~ .timeline; only expanded timelines may
+   take the grid display, or this higher-specificity rule would override
+   the display: none hide rule. */
+:is(:is(:is(table.bc-table tbody) tr) th, :is(:is(table.bc-table tbody) tr) td) button[aria-expanded="true"] ~ .timeline {
+  display: grid;
+  grid-template-columns: subgrid;
+}
+
 .content-section table.bc-table {
   border: 1px solid var(--color-border-primary);
   border-collapse: initial;
@@ -600,12 +609,8 @@ table.bc-table {
   flex-basis: max-content;
 }
 
-.bc-table .bc-feature-depth-2, :is(.content-section table.bc-table) th.bc-feature-depth-2 {
-  border-left: 7px solid var(--color-border-primary);
-}
-
-.bc-table .bc-feature-depth-3, :is(.content-section table.bc-table) th.bc-feature-depth-3 {
-  border-left: 15px solid var(--color-border-primary);
+.bc-table .bc-feature, :is(.content-section table.bc-table) th.bc-feature {
+  border-left: max(0px, calc((var(--compat-feature-depth, 1) - 1) * 8px - 1px)) solid var(--color-border-primary);
 }
 
 .bc-head-txt-label {
@@ -693,15 +698,44 @@ table.bc-table {
 }
 
 .bc-notes-list {
-  margin: 0.5rem 0px;
-  position: relative;
+  /* Skip the feature-name column so the box aligns with the browser columns. */
+  grid-column: 2 / -1;
+  margin: 0px;
   text-align: left;
-  width: 100%;
+  border-left: 1px solid var(--color-border-primary);
+  /* Each branch carries its own timeline line; `--compat-timeline-cap` is the
+     gap the cap pseudo carves out below the last icon. */
+  --compat-timeline-cap: 4px;
 }
 
-.bc-notes-list::before {
+/* Each branch renders as a cell-like box. The surrounding table cell
+   already provides the outer borders, so each branch only draws a
+   top separator when stacked under another branch. */
+.bc-notes-list .bc-branch {
+  position: relative;
+  padding: 0.75rem 1rem;
+}
+
+.bc-notes-list .bc-branch + .bc-branch {
+  border-top: 1px solid var(--color-border-primary);
+}
+
+.bc-notes-list .bc-branch-heading {
+  align-items: center;
+  color: var(--color-text-primary);
+  display: flex;
+  font-weight: var(--font-body-strong-weight);
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
+}
+
+.bc-notes-list .bc-branch-items {
+  position: relative;
+}
+
+.bc-notes-list .bc-branch-items::before {
   background: var(--color-border-primary);
-  bottom: 4px;
+  bottom: var(--compat-timeline-cap);
   content: "";
   left: 7px;
   margin-top: 0.25rem;
@@ -711,17 +745,17 @@ table.bc-table {
   z-index: -1;
 }
 
-.bc-notes-list .bc-notes-wrapper:last-child dd:last-child {
+.bc-notes-list .bc-branch-items .bc-notes-wrapper:last-child > :last-child {
   position: relative;
 }
 
-:is(.bc-notes-list .bc-notes-wrapper:last-child dd:last-child)::before {
+:is(.bc-notes-list .bc-branch-items .bc-notes-wrapper:last-child > :last-child)::before {
   background: var(--color-background-page);
   bottom: 0px;
   content: "";
   left: 7px;
   position: absolute;
-  top: 3px;
+  top: var(--compat-timeline-cap);
   width: 3px;
   z-index: -1;
 }
@@ -729,6 +763,20 @@ table.bc-table {
 :is(.bc-notes-list .bc-supports-dd) .icon-wrap {
   background-color: var(--color-background-page);
   padding-bottom: 2px;
+}
+
+.bc-notes-list .bc-supports-dd {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  text-indent: -1.5rem;
+}
+
+:is(.bc-notes-list .bc-supports-dd):last-child {
+  margin-bottom: 0px;
+}
+
+.bc-notes-list .bc-notes-end {
+  margin-bottom: 2rem;
 }
 
 .bc-notes-list .bc-version-label {
@@ -740,16 +788,6 @@ table.bc-table {
   text-decoration: none;
 }
 
-.bc-notes-list dd {
-  margin-bottom: 1rem;
-  padding-left: 1.5rem;
-  text-indent: -1.5rem;
-}
-
-:is(.bc-notes-list dd):last-child {
-  margin-bottom: 2rem;
-}
-
 .bc-notes-wrapper {
   color: var(--color-border-secondary);
   margin-bottom: 1rem;
@@ -759,20 +797,12 @@ table.bc-table {
   margin-bottom: 0px;
 }
 
-dl.bc-notes-list dt.bc-supports {
+.bc-notes-list .bc-supports {
   margin-top: 1rem;
 }
 
-:is(dl.bc-notes-list dt.bc-supports):first-child {
+:is(.bc-notes-list .bc-supports):first-child {
   margin-top: 0px;
-}
-
-dl.bc-notes-list dd.bc-supports-dd {
-  margin-bottom: 1rem;
-}
-
-:is(dl.bc-notes-list dd.bc-supports-dd):last-child {
-  margin-bottom: 0px;
 }
 
 .only-icon span {
@@ -841,7 +871,25 @@ dl.bc-notes-list dd.bc-supports-dd {
   }
 
   .bc-table .timeline {
+    /* Align timeline icons with summary icon. Symmetric on mobile because
+       the branch box drops its horizontal padding and reaches both edges
+       of the cell. */
+    margin-right: 0.25rem;
     margin-left: 0.25rem;
+  }
+
+  .bc-notes-list {
+    /* Mobile uses a single-column grid; don't skip column 1, and the
+       left border that separates from the feature-name column on
+       desktop doesn't apply here. */
+    grid-column: 1 / -1;
+    border-left: none;
+  }
+
+  .bc-notes-list .bc-branch {
+    /* Use the available width on narrow viewports. */
+    padding-right: 0px;
+    padding-left: 0px;
   }
 
   .bc-table tr:not(:first-of-type) .bc-feature {
@@ -931,12 +979,6 @@ dl.bc-notes-list dd.bc-supports-dd {
 
   .bcd-cell-text-wrapper .bc-browser-name, .bcd-cell-text-wrapper .bc-support-level {
     display: none;
-  }
-
-  .bc-notes-list {
-    margin-left: 20%;
-    max-width: 80vw;
-    width: auto;
   }
 
   .bc-support .bc-support-level {

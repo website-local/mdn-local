@@ -153,6 +153,48 @@ export function hasMore(support: SupportStatement | undefined): boolean {
 }
 
 /**
+ * Groups support items into parallel branches.
+ *
+ * BCD support arrays interleave parallel implementations (e.g. unprefixed,
+ * `-webkit-`, `-moz-`). Items sharing the same `prefix` and `alternative_name`
+ * form one chronological branch; items differing in either are parallel and
+ * should be rendered as separate timelines to avoid out-of-order versions.
+ *
+ * The canonical branch (no prefix, no alternative name) is returned first;
+ * non-canonical branches sort by `(alternative_name, prefix)` so the output
+ * is stable regardless of how BCD happens to order the source items.
+ * @param {SupportStatement} support
+ * @returns {[SimpleSupportStatement, ...SimpleSupportStatement[]][]}
+ */
+export function groupSupportBranches(
+  support: SupportStatement
+): [SimpleSupportStatement, ...SimpleSupportStatement[]][] {
+  const branches =
+    new Map<string, [SimpleSupportStatement, ...SimpleSupportStatement[]]>();
+  for (const item of asList(support)) {
+    // `/` is safe as a separator: BCD prefixes (e.g. `-webkit-`) and
+    // alternative names (identifier-shaped) never contain it.
+    const key = `${item.prefix ?? ''}/${item.alternative_name ?? ''}`;
+    const branch = branches.get(key);
+    if (branch) {
+      branch.push(item);
+    } else {
+      branches.set(key, [item]);
+    }
+  }
+  const canonicalKey = '/';
+  const canonical = branches.get(canonicalKey);
+  branches.delete(canonicalKey);
+  const others = [...branches.values()].sort(([a], [b]) => {
+    return (
+      (a.alternative_name ?? '').localeCompare(b.alternative_name ?? '') ||
+      (a.prefix ?? '').localeCompare(b.prefix ?? '')
+    );
+  });
+  return [...(canonical ? [canonical] : []), ...others];
+}
+
+/**
  * Determines if a version is a preview version.
  * @param {string | VersionValue | undefined} version
  * @param {BrowserStatement} browser
@@ -204,23 +246,37 @@ export function bugURLToString(url: string): string {
 /**
  * Checks if a support statement has any limitation.
  * @param {SimpleSupportStatement} support
+ * @param {{ ignoreAliasModifiers?: boolean }} [options]
  * @returns {boolean}
  */
-function hasLimitation(support: SimpleSupportStatement): boolean {
-  return hasMajorLimitation(support) || !!support.notes || !!support.impl_url;
+function hasLimitation(
+  support: SimpleSupportStatement,
+  { ignoreAliasModifiers = false }: { ignoreAliasModifiers?: boolean } = {}
+): boolean {
+  return (
+    hasMajorLimitation(support, { ignoreAliasModifiers }) ||
+    !!support.notes ||
+    !!support.impl_url
+  );
 }
 
 /**
  * Checks if a support statement has major limitations.
  * @param {SimpleSupportStatement} support
+ * @param {{ ignoreAliasModifiers?: boolean }} [options] - When `ignoreAliasModifiers` is
+ *   true, `prefix` and `alternative_name` don't count as limitations (because
+ *   a branch heading conveys them).
  * @returns {boolean}
  */
-function hasMajorLimitation(support: SimpleSupportStatement): boolean {
+function hasMajorLimitation(
+  support: SimpleSupportStatement,
+  { ignoreAliasModifiers = false }: { ignoreAliasModifiers?: boolean } = {}
+): boolean {
   return (
     support.partial_implementation ||
-    !!support.alternative_name ||
+    (!ignoreAliasModifiers && !!support.alternative_name) ||
     !!support.flags ||
-    !!support.prefix ||
+    (!ignoreAliasModifiers && !!support.prefix) ||
     !!support.version_removed
   );
 }
@@ -228,10 +284,17 @@ function hasMajorLimitation(support: SimpleSupportStatement): boolean {
 /**
  * Checks if a support statement is fully supported without any limitation.
  * @param {SimpleSupportStatement} support
+ * @param {{ ignoreAliasModifiers?: boolean }} [options] - When `ignoreAliasModifiers` is
+ *   true, `prefix` and `alternative_name` don't count as limitations.
  * @returns {boolean}
  */
-export function isFullySupportedWithoutLimitation(support: SimpleSupportStatement): boolean {
-  return !!support.version_added && !hasLimitation(support);
+export function isFullySupportedWithoutLimitation(
+  support: SimpleSupportStatement,
+  { ignoreAliasModifiers = false }: { ignoreAliasModifiers?: boolean } = {}
+): boolean {
+  return (
+    !!support.version_added && !hasLimitation(support, { ignoreAliasModifiers })
+  );
 }
 
 /**
