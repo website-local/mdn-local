@@ -48,6 +48,7 @@ export async function processSearchJson(
 
   const urls: string[] = Array.from(urlSet);
   const resources: Resource[] = [];
+  const officialExternalRedirects = new Map<string, string>();
   let r: Resource | void;
   // noinspection DuplicatedCode
   for (let i = 0, l = urls.length; i < l; i++) {
@@ -55,9 +56,22 @@ export async function processSearchJson(
     r = await pipeline.createAndProcessResource(
       url, ResourceType.Html, depth, null, res);
     if (!r) continue;
+    if (r.meta.mdnOfficialExternalRedirect) {
+      officialExternalRedirects.set(url, r.replacePath);
+    }
     if (!r.shouldBeDiscardedFromDownload) {
       resources.push(r);
     }
+  }
+  if (officialExternalRedirects.size) {
+    for (const item of arr) {
+      if (!item.url) continue;
+      const externalUrl = officialExternalRedirects.get(item.url);
+      if (externalUrl) {
+        item.url = externalUrl;
+      }
+    }
+    res.body = JSON.stringify(arr);
   }
   await submit(resources);
   return res;

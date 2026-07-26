@@ -27,12 +27,19 @@ import {
 } from './process-url/interactive-example-deps.js';
 import {createMdnLogger} from './logger.js';
 import {processWorkletModules} from './process-worklet-modules.js';
+import {
+  processOfficialExternalRedirect
+} from './process-url/official-external-redirect.js';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.init.push(interactiveExampleDeps);
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);
 lifeCycle.detectResourceType.push(detectLinkType);
-lifeCycle.processBeforeDownload.push(redirectDownloadLink, dropResource);
+lifeCycle.processBeforeDownload.push(
+  redirectDownloadLink,
+  processOfficialExternalRedirect,
+  dropResource
+);
 lifeCycle.processAfterDownload.unshift(
   redirectUrlAfterFetch,
   preProcessHtml,

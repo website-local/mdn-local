@@ -19,6 +19,9 @@ import {
 } from './redirect-path.js';
 import URI from 'urijs';
 import {processPathWithMultiLocale} from './process-path-with-multi-locale.js';
+import {
+  resolveOfficialExternalRedirect
+} from './official-external-redirect.js';
 
 const cache: Record<string, Record<string, string>> = {};
 const getMdnRedirectPath = (locale: string): Record<string, string> => {
@@ -350,6 +353,11 @@ export function redirectUrl(
 
     if (needToRebuildUrl) {
       url = u.path(pathArr.join('/')).toString();
+    }
+    // Keep official external redirect sources at their original MDN path.
+    // A process-before-download hook replaces them with absolute external URLs.
+    if (resolveOfficialExternalRedirect(url, mdnHost)) {
+      return url;
     }
     const mdnRedirectPath = getMdnRedirectPath(locale);
     if (mdnRedirectPath[u.path()]) {

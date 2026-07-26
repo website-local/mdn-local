@@ -9,6 +9,10 @@ import type {
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {isUrlHttp} from 'website-scrap-engine/lib/util.js';
 import {notFound} from 'website-scrap-engine/lib/logger/logger.js';
+import {
+  applyOfficialExternalRedirect,
+  resolveOfficialExternalRedirect
+} from './process-url/official-external-redirect.js';
 
 
 export async function downloadAndFallback(
@@ -43,8 +47,17 @@ export async function downloadAndFallback(
       notFound.warn('falling back localized 404 resource to en-US',
         res.downloadLink, res.refUrl);
       // fallback to en-US
-      res.downloadLink = 'https://developer.mozilla.org/en-US/' +
+      const fallbackUrl = 'https://developer.mozilla.org/en-US/' +
         res.downloadLink.slice(mdnLocalizedUrlPrefix.length);
+      const externalTarget = resolveOfficialExternalRedirect(fallbackUrl);
+      if (externalTarget) {
+        return applyOfficialExternalRedirect(
+          res,
+          externalTarget,
+          fallbackUrl
+        );
+      }
+      res.downloadLink = fallbackUrl;
       return await downloadResource(res, requestOptions, options);
     } else {
       throw err;
