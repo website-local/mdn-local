@@ -269,7 +269,7 @@ export function redirectUrl(
       u = u.search('').normalizePath();
       if (parent) {
         u = u
-          .absoluteTo(parent.url)
+          .absoluteTo(parent.redirectedUrl || parent.url)
           .normalizePath();
         if (rewriteMdnDevLegacySitePath(u, mdnHost)) {
           needToRebuildUrl = true;

@@ -26,6 +26,7 @@ import {
   interactiveExampleDeps
 } from './process-url/interactive-example-deps.js';
 import {createMdnLogger} from './logger.js';
+import {processWorkletModules} from './process-worklet-modules.js';
 
 const lifeCycle = defaultLifeCycle();
 lifeCycle.init.push(interactiveExampleDeps);
@@ -46,6 +47,7 @@ for (let i = 0; i < lifeCycle.download.length; i++) {
 lifeCycle.processAfterDownload.push(
   processHtml(postProcessHtml),
   processHtml(postProcessInteractiveExample),
+  processWorkletModules,
   processYariSourceMap,
   processSearchJson,
   processYariMainCss

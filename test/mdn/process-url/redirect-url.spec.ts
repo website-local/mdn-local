@@ -229,6 +229,20 @@ describe('redirect-url', function () {
       opt('zh-CN')))
       .toBe('https://developer.mozilla.org/mdn-github-io/webaudio-examples/panner-node/style.css');
 
+    expect(redirectUrl('style.css',
+      null,
+      {
+        url: 'https://developer.mozilla.org/mdn-github-io/dom-examples/' +
+          'css-painting/half-highlight-paintsize',
+        redirectedUrl: 'https://developer.mozilla.org/mdn-github-io/' +
+          'dom-examples/css-painting/half-highlight-paintsize/',
+        downloadLink: 'https://mdn.github.io/dom-examples/css-painting/' +
+          'half-highlight-paintsize'
+      } as Resource,
+      opt('zh-CN')))
+      .toBe('https://developer.mozilla.org/mdn-github-io/dom-examples/' +
+        'css-painting/half-highlight-paintsize/style.css');
+
     // absolute url, not likely to happen
     expect(redirectUrl('/webaudio-examples/panner-node/style.css',
       null,

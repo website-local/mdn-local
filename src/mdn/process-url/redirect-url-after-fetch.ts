@@ -4,7 +4,11 @@ import type {
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types.js';
 import URI from 'urijs';
-import {mdnHosts, redirectLocale} from './consts.js';
+import {
+  externalHostMap,
+  mdnHosts,
+  redirectLocale
+} from './consts.js';
 
 export function redirectUrlAfterFetch(
   res: DownloadResource,
@@ -13,12 +17,20 @@ export function redirectUrlAfterFetch(
 ): DownloadResource {
   let url = res.redirectedUrl || res.url;
   const uri = URI(url).search(''), host = uri.host();
+  const mdnHost: string = options.meta.host as string | void
+    || 'developer.mozilla.org';
+  const externalHost = externalHostMap[host];
+  if (externalHost) {
+    res.redirectedUrl = uri
+      .host(mdnHost)
+      .path(externalHost.pathPrefix + uri.path())
+      .toString();
+    return res;
+  }
   if (!mdnHosts[host]) {
     res.redirectedUrl = res.url;
     return res;
   }
-  const mdnHost: string = options.meta.host as string | void
-    || 'developer.mozilla.org';
   if (host !== mdnHost) {
     url = uri.host(mdnHost).toString();
   }

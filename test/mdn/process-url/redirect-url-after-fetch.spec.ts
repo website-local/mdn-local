@@ -51,6 +51,22 @@ describe('redirect-url-after-fetch', function () {
       expect(r.redirectedUrl).toBe(r.url);
     }
   });
+  test('preserve canonical redirect for mirrored external host', () => {
+    const url = 'https://mdn.github.io/dom-examples/css-painting/hollow-highlight';
+    const r = res(url);
+    r.redirectedUrl = `${url}/`;
+    redirectUrlAfterFetch(r, nopSubmit, opt('en-US'));
+    expect(r.redirectedUrl).toBe(
+      'https://developer.mozilla.org/mdn-github-io/' +
+      'dom-examples/css-painting/hollow-highlight/'
+    );
+  });
+  test('drop redirect to unknown external host', () => {
+    const r = res('https://mdn.github.io/dom-examples/css-painting/');
+    r.redirectedUrl = 'https://example.com/css-painting/';
+    redirectUrlAfterFetch(r, nopSubmit, opt('en-US'));
+    expect(r.redirectedUrl).toBe(r.url);
+  });
   test('redirect mdn link to developer.mozilla.org', () => {
     const urls = [
       'https://wiki.developer.mozilla.org/en-US/docs/Web/API',
