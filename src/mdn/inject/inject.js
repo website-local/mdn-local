@@ -2478,7 +2478,7 @@ Prism.languages.py = Prism.languages.python;
 
 /// endregion prismjs
 
-/* global document window navigator */
+/* global document window */
 !function () {
   /// region top-level vars
   // noinspection ES6ConvertVarToLetConst
@@ -5521,7 +5521,7 @@ code {
     // Render methods
     _render() {
       const template = this._template;
-      let html = '';
+      let html;
 
       if (template === 'choices') {
         html = this._renderChoices();
@@ -6018,7 +6018,7 @@ code {
 // 20251005 theme switcher
 // https://github.com/website-local/mdn-local/issues/1306
 !function () {
-  /* global localStorage, HTMLElement, location, CSSStyleSheet */
+  /* global HTMLElement, location, CSSStyleSheet */
   // You do NOT need custom elements everywhere
   // since we are not creating them in script,
   // should be just one
