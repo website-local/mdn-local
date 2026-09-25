@@ -23,7 +23,7 @@
     "@types/node": "^26.6.2",
     "@types/tough-cookie": "^4.0.5",
     "@types/urijs": "^1.19.26",
-    "@typescript-eslint/eslint-plugin": "^8.70.0",
+    "@typescript-eslint/eslint-plugin": "^8.70.1",
     "@typescript-eslint/parser": "^8.70.1",
     "eslint": "^10.11.0",
     "globals": "^17.12.0",
