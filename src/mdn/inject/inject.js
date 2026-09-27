@@ -5991,29 +5991,178 @@ code {
 // https://github.com/website-local/mdn-local/issues/1149
 !function () {
   var btns = document.getElementsByClassName('mdn-local-toggle-history-btn'),
-    len = btns.length, i = 0, _showTimelineId = undefined;
+    len = btns.length, i = 0;
 
   function handleClick(event) {
     var currentTarget = event.currentTarget;
-    var timelineId = currentTarget.getAttribute('aria-controls');
-    var isExpanded = _showTimelineId === timelineId;
-    var lastTimeline = _showTimelineId &&
-      document.querySelector('[aria-controls="' + _showTimelineId+ '"]');
+    var table = currentTarget.closest('.bc-table');
+    var isExpanded = currentTarget.getAttribute('aria-expanded') === 'true';
+    var lastTimeline = table.querySelector('.mdn-local-toggle-history-btn[aria-expanded="true"]');
     if (lastTimeline) {
       lastTimeline.setAttribute('aria-expanded', 'false');
     }
-    if (isExpanded) {
-      _showTimelineId = undefined;
-    } else {
-      _showTimelineId = timelineId;
-      currentTarget.setAttribute('aria-expanded', 'true');
-    }
-
+    currentTarget.setAttribute('aria-expanded', String(!isExpanded));
   }
   for (; i < len; i++) {
     btns[i].onclick = handleClick;
   }
 }();
+
+// region compat-table-settings
+// https://github.com/mdn/fred/pull/1880, adapted for pre-rendered offline tables.
+!function () {
+  const roots = Array.from(document.querySelectorAll('.mdn-local-compat-table'));
+  if (!roots.length) return;
+  const storageKey = 'compat-table';
+  let channel;
+
+  function asSettings(value) {
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  }
+
+  function readSettings() {
+    try {
+      return asSettings(JSON.parse(localStorage.getItem(storageKey)));
+    } catch (error) {
+      console.warn('Unable to read compat table settings', error);
+      return {};
+    }
+  }
+
+  function toVisibility(settings) {
+    const value = settings.browsers;
+    return value && typeof value === 'object' && !Array.isArray(value) &&
+      Object.values(value).every(choice => typeof choice === 'boolean') ? value : {};
+  }
+
+  let settings = readSettings();
+  let visibility = toVisibility(settings);
+
+  function inputs(root) {
+    return Array.from(root.querySelectorAll('.bc-settings input[type="checkbox"]'));
+  }
+
+  function isSelected(input, choices) {
+    return typeof choices[input.name] === 'boolean' ? choices[input.name] : input.dataset.default === 'true';
+  }
+
+  function setInputs(root, choices) {
+    inputs(root).forEach(input => { input.checked = isSelected(input, choices); });
+  }
+
+  function getInputs(root) {
+    return Object.fromEntries(inputs(root).map(input => [input.name, input.checked]));
+  }
+
+  function apply(root, choices) {
+    const selected = new Set(inputs(root).filter(input => isSelected(input, choices)).map(input => input.name));
+    const table = root.querySelector('.bc-table');
+    table.querySelectorAll('[data-browser]').forEach(cell => {
+      cell.hidden = !selected.has(cell.dataset.browser);
+      if (cell.hidden) {
+        cell.querySelectorAll('[aria-expanded="true"]').forEach(button => button.setAttribute('aria-expanded', 'false'));
+      }
+    });
+    const headers = Array.from(table.querySelectorAll('.bc-browser[data-browser]')).filter(header => !header.hidden);
+    let column = 2;
+    table.querySelectorAll('.bc-platform[data-platform]').forEach(header => {
+      const count = headers.filter(browser => browser.dataset.platform === header.dataset.platform).length;
+      header.hidden = count === 0;
+      header.colSpan = count || 1;
+      header.style.gridColumn = `${column} / ${column + (count || 1)}`;
+      column += count;
+    });
+    table.style.setProperty('--compat-table-browser-count', Math.max(1, headers.length));
+    table.hidden = headers.length === 0;
+    root.querySelector('.bc-no-browsers').hidden = headers.length > 0;
+    root.querySelector('.bc-legend').hidden = headers.length === 0;
+    root.querySelectorAll('.bc-legend-item[data-browsers]').forEach(item => {
+      item.hidden = !item.dataset.browsers.split(' ').some(browser => selected.has(browser));
+    });
+  }
+
+  function restore(root) {
+    setInputs(root, visibility);
+    apply(root, visibility);
+  }
+
+  function receive(next) {
+    settings = asSettings(next);
+    visibility = toVisibility(settings);
+    roots.forEach(root => {
+      // A draft previews only its own table until Save or Cancel.
+      if (!root.querySelector('.bc-settings').open) restore(root);
+    });
+  }
+
+  roots.forEach(root => {
+    const details = root.querySelector('.bc-settings');
+    const form = details.querySelector('form');
+    const cancel = () => {
+      details.open = false;
+      restore(root);
+      details.querySelector('summary').focus();
+    };
+    form.addEventListener('change', () => apply(root, getInputs(root)));
+    details.addEventListener('toggle', () => restore(root));
+    details.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && details.open) {
+        event.preventDefault();
+        cancel();
+      }
+    });
+    form.querySelector('[data-action="cancel"]').addEventListener('click', cancel);
+    form.querySelector('[data-action="defaults"]').addEventListener('click', () => {
+      setInputs(root, {});
+      apply(root, {});
+    });
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const choices = getInputs(root);
+      const next = { ...settings, ...readSettings() };
+      if (inputs(root).every(input => input.checked === (input.dataset.default === 'true'))) {
+        delete next.browsers;
+      } else {
+        next.browsers = { ...visibility, ...choices };
+      }
+      try {
+        if (Object.keys(next).length) localStorage.setItem(storageKey, JSON.stringify(next));
+        else localStorage.removeItem(storageKey);
+      } catch (error) {
+        console.warn('Unable to write compat table settings', error);
+      }
+      details.open = false;
+      receive(next);
+      details.querySelector('summary').focus();
+      try {
+        channel?.postMessage(next);
+      } catch (error) {
+        console.warn('Unable to share compat table settings', error);
+      }
+    });
+    restore(root);
+    details.hidden = false;
+  });
+
+  window.addEventListener('storage', event => {
+    if (event.key === storageKey || event.key === null) {
+      try {
+        receive(JSON.parse(event.newValue));
+      } catch {
+        receive({});
+      }
+    }
+  });
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      channel = new BroadcastChannel('mdn-compat-table');
+      channel.addEventListener('message', event => receive(event.data));
+    }
+  } catch (error) {
+    console.warn('Unable to share compat table settings', error);
+  }
+}();
+// endregion compat-table-settings
 
 // 20251005 theme switcher
 // https://github.com/website-local/mdn-local/issues/1306

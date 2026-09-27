@@ -450,8 +450,87 @@ aside.article-footer {
 }
 
 table.bc-table {
+  --compat-browser-column-max: 4rem;
   display: grid;
   grid-auto-flow: dense;
+}
+
+.mdn-local-compat-table [hidden] {
+  display: none !important;
+}
+
+.bc-settings {
+  margin-bottom: 0.75rem;
+  font-size: var(--font-size-small);
+}
+
+.bc-settings > summary {
+  width: fit-content;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.bc-settings form,
+.bc-no-browsers {
+  padding: 1rem;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 0.25rem;
+}
+
+.bc-settings form > p {
+  margin-top: 0;
+}
+
+.bc-settings fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0 0 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border-primary);
+}
+
+.bc-settings legend {
+  padding: 0 0.25rem;
+  font-weight: bold;
+}
+
+.bc-settings label {
+  display: flex;
+  align-items: start;
+  gap: 0.375rem;
+  cursor: pointer;
+}
+
+.bc-settings input {
+  margin-top: 0.25rem;
+}
+
+.bc-settings small {
+  display: block;
+  max-width: 16rem;
+  color: var(--color-text-secondary);
+}
+
+.bc-settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.bc-settings-actions button {
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.bc-settings-actions button[type="submit"] {
+  color: var(--color-text-blue);
+  border-color: currentColor;
 }
 
 :is(table.bc-table thead) tr {
@@ -910,7 +989,7 @@ table.bc-table {
 
 @media (426px < width) {
   .bc-table {
-    grid-template-columns: minmax(20vw, min-content) repeat(var(--compat-browser-count), auto);
+    grid-template-columns: minmax(20vw, 1fr) repeat(var(--compat-table-browser-count), minmax(0, var(--compat-browser-column-max)));
   }
 
   .bc-table thead {
@@ -968,15 +1047,6 @@ table.bc-table {
     position: relative;
   }
 
-  .table-container-inner::after {
-    bottom: 0px;
-    content: "";
-    height: 10px;
-    position: absolute;
-    right: 0px;
-    width: 10px;
-  }
-
   .bcd-cell-text-wrapper .bc-browser-name, .bcd-cell-text-wrapper .bc-support-level {
     display: none;
   }
@@ -988,7 +1058,7 @@ table.bc-table {
 
 @media (769px < width) {
   .bc-table {
-    grid-template-columns: minmax(25%, max-content) repeat(var(--compat-browser-count), calc(75% / var(--compat-browser-count)));
+    grid-template-columns: minmax(25%, 1fr) repeat(var(--compat-table-browser-count), minmax(0, min(calc(75% / var(--compat-table-browser-count)), var(--compat-browser-column-max))));
   }
 
   .bc-table .icon {
@@ -998,7 +1068,7 @@ table.bc-table {
 
 @media (1200px < width) {
   .bc-table {
-    grid-template-columns: minmax(33%, max-content) repeat(var(--compat-browser-count), calc(67% / var(--compat-browser-count)));
+    grid-template-columns: minmax(33%, 1fr) repeat(var(--compat-table-browser-count), minmax(0, min(calc(67% / var(--compat-table-browser-count)), var(--compat-browser-column-max))));
   }
 }
 
@@ -1084,6 +1154,14 @@ table.bc-table {
 
 .lazy-compat-table .icon.icon-server {
   mask-image: url("./icon/server.svg");
+}
+
+.lazy-compat-table .icon.icon-xr {
+  mask-image: url("./icon/glasses.svg");
+}
+
+.lazy-compat-table .icon.icon-browser {
+  mask-image: url("./icon/globe.svg");
 }
 
 /** Browser icons. */
@@ -1221,6 +1299,14 @@ table.bc-table {
 
 .mask-fix .lazy-compat-table .icon.icon-server {
   mask-image: none;background-image: url("./icon/server.svg");
+}
+
+.mask-fix .lazy-compat-table .icon.icon-xr {
+  mask-image: none;background-image: url("./icon/glasses.svg");
+}
+
+.mask-fix .lazy-compat-table .icon.icon-browser {
+  mask-image: none;background-image: url("./icon/globe.svg");
 }
 
 /** Browser icons. */

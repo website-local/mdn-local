@@ -10,27 +10,23 @@ import type {
 } from './types.js';
 import type {Feature} from './compat.js';
 
-/**
- * A list of browsers to be hidden.
- * @constant {string[]}
- */
-export const SHOW_BROWSERS = [
-  'chrome',
-  'edge',
-  'firefox',
-  'opera',
-  'safari',
-  'chrome_android',
-  'firefox_android',
-  'opera_android',
-  'safari_ios',
-  'samsunginternet_android',
-  'webview_android',
-  'webview_ios',
-  'bun',
-  'deno',
-  'nodejs',
-];
+// https://github.com/mdn/fred/blob/f48d1766/utils/docs-locale-url.js
+export function changeDocsLocale(url: string, locale: string): string {
+  const match = url.match(/^(https?:\/\/[^/]+)?(\/.*)$/);
+  if (!match) return url;
+  const [, origin = '', path = ''] = match;
+  const segments = path.split('/');
+  const docsIndex = segments.indexOf('docs');
+  if (docsIndex === -1) return url;
+  segments.splice(1, docsIndex - 1, locale);
+  return origin + segments.join('/');
+}
+
+export function isCurrentPageLink(url: string, pathname: string): boolean {
+  const parsed = new URL(url, 'https://developer.mozilla.org');
+  return parsed.origin === 'https://developer.mozilla.org' && !parsed.hash &&
+    changeDocsLocale(parsed.pathname, 'en-US') === changeDocsLocale(pathname, 'en-US');
+}
 
 /**
  * Gets the first element of an array or returns the value itself.

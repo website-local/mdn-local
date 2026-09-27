@@ -5,14 +5,15 @@ import {
   versionLabelFromSupport,
 } from './feature-row.js';
 import {
-  SHOW_BROWSERS,
   asList,
   bugURLToString,
+  changeDocsLocale,
   getCurrentSupport,
   getFirst,
   groupSupportBranches,
   hasMore,
   hasNoteworthyNotes,
+  isCurrentPageLink,
   isFullySupportedWithoutLimitation,
   isNotSupportedAtAll,
   listFeatures,
@@ -31,8 +32,12 @@ import type {
   IconName,
 } from './compat.js';
 import {renderCompatSupportFlags} from './flags.js';
+import {DEFAULT_BROWSERS, gatherPlatformsAndBrowsers} from './browsers.js';
+import type {HiddenBrowsers} from './browsers.js';
 
-const DEFAULT_LOCALE = 'en-US';
+function escapeAttribute(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
 
 /** @type {IconName[]} */
 const ICON_NAMES: IconName[] = [
@@ -86,6 +91,8 @@ export class MDNCompatTable {
   _pathname: string;
   _platforms: string[];
   _browsers: BrowserName[];
+  _defaultBrowsers: BrowserName[] = [];
+  _hiddenBrowsers: HiddenBrowsers = {};
   _showTimelineId: string | undefined;
 
   constructor() {
@@ -156,10 +163,6 @@ export class MDNCompatTable {
           version_added: false,
         };
 
-        if (!SHOW_BROWSERS.includes(browser)) {
-          continue;
-        }
-
         const firstSupportItem = getFirst(browserSupport);
         if (firstSupportItem && hasNoteworthyNotes(firstSupportItem)) {
           legendItems.add('footnote');
@@ -210,19 +213,64 @@ export class MDNCompatTable {
   }
 
   connectedCallback() {
-    [this._platforms, this._browsers] = gatherPlatformsAndBrowsers(
+    [, this._defaultBrowsers] = gatherPlatformsAndBrowsers(
       this._category,
       this.data,
       this.browserInfo,
     );
+    // Keep every applicable column in the static document so settings work offline.
+    [this._platforms, this._browsers, this._hiddenBrowsers] = gatherPlatformsAndBrowsers(
+      this._category,
+      this.data,
+      this.browserInfo,
+      Object.fromEntries(Object.keys(this.browserInfo).map(browser => [browser, true])),
+    );
+  }
+
+  _renderSettings() {
+    const names = Object.keys(this.browserInfo) as BrowserName[];
+    const platforms = [...new Set(names.map(browser => this.browserInfo[browser]!.type))];
+    const order = ['desktop', 'mobile', 'server', 'xr'];
+    platforms.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+    return `<details class="bc-settings" hidden>
+      <summary>Settings</summary>
+      <form>
+        <p>Select the browsers to show in compatibility tables. Your selection is saved in this browser.</p>
+        ${platforms.map(platform => `<fieldset>
+          <legend>${platform === 'xr' ? 'XR' : platform[0].toUpperCase() + platform.slice(1)}</legend>
+          ${names.filter(browser => this.browserInfo[browser]?.type === platform)
+    .map(browser => this._renderBrowserSetting(browser)).join('')}
+        </fieldset>`).join('')}
+        <div class="bc-settings-actions">
+          <button type="button" data-action="defaults">Restore defaults</button>
+          <button type="button" data-action="cancel">Cancel</button>
+          <button type="submit">Save</button>
+        </div>
+      </form>
+    </details>`;
+  }
+
+  _renderBrowserSetting(browser: BrowserName) {
+    const selected = DEFAULT_BROWSERS.includes(browser);
+    const reason = this._hiddenBrowsers[browser];
+    const note = reason === 'no-data' ? 'No support data for this feature.' :
+      reason === 'not-applicable' ? 'WebExtensions do not apply to this browser.' : '';
+    return `<label><input type="checkbox" name="${browser}" data-default="${selected}"${selected ? ' checked' : ''}>
+      <span>${escapeAttribute(this.browserInfo[browser]!.name)}${note ? `<small>${note}</small>` : ''}</span>
+    </label>`;
   }
 
   _renderTable() {
     return `<figure class="table-container">
       <figure class="table-container-inner">
+        ${this._renderSettings()}
+        <p class="bc-no-browsers"${this._defaultBrowsers.length ? ' hidden' : ''}>
+          No browsers selected. Use "Settings" to choose which browsers to show.
+        </p>
         <table
           class="bc-table bc-table-web"
-          style="--compat-browser-count: ${Object.keys(this._browsers).length}"
+          style="--compat-table-browser-count: ${Math.max(1, this._defaultBrowsers.length)}"
+          ${this._defaultBrowsers.length ? '' : 'hidden'}
         >
           ${this._renderTableHeader()} ${this._renderTableBody()}
         </table>
@@ -244,24 +292,27 @@ export class MDNCompatTable {
       ),
     }));
 
-    const grid = platformsWithBrowsers.map(({ browsers }) => browsers.length);
+    const grid = platformsWithBrowsers.map(({ browsers }) =>
+      browsers.filter(browser => this._defaultBrowsers.includes(browser)).length);
 
     const platformCells = platformsWithBrowsers.map(
       ({ platform, browsers }, index) => {
         // Get the intersection of browsers in the `browsers` array and the
         // `PLATFORM_BROWSERS[platform]`.
-        const browserCount = browsers.length;
+        const browserCount = browsers.filter(browser => this._defaultBrowsers.includes(browser)).length;
         const cellClass = `bc-platform bc-platform-${platform}`;
         const iconClass = `icon icon-${platform}`;
 
         const columnStart =
           2 + grid.slice(0, index).reduce((acc, x) => acc + x, 0);
-        const columnEnd = columnStart + browserCount;
+        const columnEnd = columnStart + Math.max(1, browserCount);
         return `<th
           class="${cellClass}"
-          colspan="${browserCount}"
+          data-platform="${platform}"
+          colspan="${browserCount || 1}"
           title="${platform}"
           style="grid-column: ${columnStart} / ${columnEnd}"
+          ${browserCount ? '' : 'hidden'}
         >
           <span class="${iconClass}"></span>
           <span class="visually-hidden">${platform}</span>
@@ -279,12 +330,14 @@ export class MDNCompatTable {
     // <BrowserHeaders>
     const browserCells = this._browsers.map(
       (browser) =>
-        `<th class="bc-browser bc-browser-${browser}">
+        `<th class="bc-browser bc-browser-${browser}" data-browser="${browser}"
+          data-platform="${this.browserInfo[browser]?.type}"
+          ${this._defaultBrowsers.includes(browser) ? '' : 'hidden'}>
           <div class="bc-head-txt-label bc-head-icon-${browser}">
             ${this.browserInfo[browser]?.name}
           </div>
           <div
-            class="bc-head-icon-symbol icon icon-${browserToIconName(
+            class="bc-head-icon-symbol icon icon-browser icon-${browserToIconName(
     browser,
   )}"
           ></div>
@@ -346,13 +399,10 @@ export class MDNCompatTable {
       let titleNode;
       const titleContent = `${title}${compat.status &&
       this._renderStatusIcons(compat.status) || ''}`;
-      if (compat.mdn_url && depth > 0) {
-        const href = compat.mdn_url.replace(
-          `/${DEFAULT_LOCALE}/docs`,
-          `/${locale}/docs`,
-        );
+      const href = compat.mdn_url && depth > 0 ? changeDocsLocale(compat.mdn_url, locale) : undefined;
+      if (href && !isCurrentPageLink(href, this._pathname)) {
         titleNode = `<a
-          href="${href}"
+          href="${escapeAttribute(href)}"
           class="bc-table-row-header"
         >
           ${titleContent}
@@ -384,6 +434,8 @@ export class MDNCompatTable {
           class="bc-support bc-browser-${browserName} bc-supports-${supportClassName} ${
   notes ? 'bc-has-history' : ''
 }"
+          data-browser="${browserName}"
+          ${this._defaultBrowsers.includes(browserName) ? '' : 'hidden'}
         >
           <button
             type="button"
@@ -670,17 +722,16 @@ export class MDNCompatTable {
     // heading (see `_renderBranchHeading`), so they aren't pushed here.
 
     if (item.flags) {
+      const hasAdded = typeof item.version_added === 'string' && item.version_added !== 'preview';
+      const hasLast = typeof item.version_last === 'string';
+      const versionRange = hasAdded ? (hasLast ? 'range' : 'from') : (hasLast ? 'until' : 'none');
       for (const { type, name, value_to_set } of item.flags) {
         supportNotes.push({
           iconName: 'disabled',
           label: renderCompatSupportFlags({
-            has_added: Number(
-              typeof item.version_added === 'string' &&
-                item.version_added !== 'preview',
-            ),
+            version_range: versionRange,
             version_added: item.version_added,
-            has_last: Number(typeof item.version_last === 'string'),
-            versionLast: item.version_last,
+            version_last: item.version_last,
             flag_type: type,
             flag_name: name,
             has_value: Number(typeof value_to_set === 'string'),
@@ -891,15 +942,18 @@ export class MDNCompatTable {
       throw new Error('Missing browser info');
     }
 
-    const items = this._getActiveLegendItems(
-      this.data,
-      this._name,
-      browserInfo,
-      browsers,
-    ).map((key) => {
+    const browserItems = browsers.map(browser => ({
+      browser,
+      items: this._getActiveLegendItems(this.data, this._name, browserInfo, [browser]),
+    }));
+    const items = ICON_NAMES.flatMap(key => {
+      const matching = browserItems.filter(entry => entry.items.includes(key)).map(entry => entry.browser);
+      if (!matching.length) return [];
+      const attrs = `data-browsers="${matching.join(' ')}"${
+        matching.some(browser => this._defaultBrowsers.includes(browser)) ? '' : ' hidden'}`;
       const label = this._getLegendLabel(key);
       return ['yes', 'partial', 'no', 'unknown', 'preview'].includes(key)
-        ? `<div class="bc-legend-item">
+        ? `<div class="bc-legend-item" ${attrs}>
             <dt class="bc-legend-item-dt">
               <span class="bc-supports-${key} bc-supports">
                 <abbr
@@ -912,7 +966,7 @@ export class MDNCompatTable {
             </dt>
             <dd class="bc-legend-item-dd">${label}</dd>
           </div>`
-        : `<div class="bc-legend-item">
+        : `<div class="bc-legend-item" ${attrs}>
             <dt class="bc-legend-item-dt">
               <abbr class="legend-icons icon icon-${key}" title="${label}"></abbr>
             </dt>
@@ -920,7 +974,7 @@ export class MDNCompatTable {
           </div>`;
     });
 
-    return `<section class="bc-legend">
+    return `<section class="bc-legend"${this._defaultBrowsers.length ? '' : ' hidden'}>
       <h3 class="visually-hidden" id="Legend">
         Legend
       </h3>
@@ -932,72 +986,6 @@ export class MDNCompatTable {
   }
 
   render() {
-    return `${this._renderTable()} ${this._renderTableLegend()}`;
+    return `<div class="mdn-local-compat-table">${this._renderTable()} ${this._renderTableLegend()}</div>`;
   }
-}
-
-/**
- * Return a list of platforms and browsers that are relevant for this category &
- * data.
- *
- * If the category is "webextensions", only those are shown. In all other cases
- * at least the entirety of the "desktop" and "mobile" platforms are shown. If
- * the category is JavaScript, the entirety of the "server" category is also
- * shown. In all other categories, if compat data has info about Deno / Node.js
- * those are also shown. Deno is always shown if Node.js is shown.
- * @param {string} category
- * @param {Identifier} data
- * @param {Partial<Browsers>} browserInfo
- * @returns {[string[], BrowserName[]]}
- */
-export function gatherPlatformsAndBrowsers(category: string, data: Identifier, browserInfo: Partial<Browsers>): [string[], BrowserName[]] {
-  const runtimes = Object.entries(browserInfo)
-    .filter(([, { type }]) => type == 'server')
-    .map(([key]) => key);
-
-  const platforms = ['desktop', 'mobile'];
-  if (
-    category === 'javascript' ||
-    runtimes.some(
-      (runtime) => data.__compat && runtime in data.__compat.support,
-    )
-  ) {
-    platforms.push('server');
-  }
-
-  /** @type {BrowserName[]} */
-  let browsers: BrowserName[] = [];
-
-  // Add browsers in platform order to align table cells
-  for (const platform of platforms) {
-    const platformBrowsers: BrowserName[] = /** @type {BrowserName[]} */ (
-      Object.keys(browserInfo)
-    ) as BrowserName[];
-    browsers.push(
-      ...platformBrowsers.filter(
-        (browser) =>
-          browser in browserInfo && browserInfo[browser]?.type === platform,
-      ),
-    );
-  }
-
-  // Filter WebExtension browsers in corresponding tables.
-  if (category === 'webextensions') {
-    browsers = browsers.filter(
-      (browser) => browserInfo[browser]?.accepts_webextensions,
-    );
-  }
-
-  // If there is no data for a runtime in a category outside "javascript", hide it.
-  if (category !== 'javascript') {
-    for (const runtime of runtimes) {
-      if (data.__compat && !(runtime in data.__compat.support)) {
-        browsers = browsers.filter((browser) => browser !== runtime);
-      }
-    }
-  }
-
-  browsers = browsers.filter((browser) => SHOW_BROWSERS.includes(browser));
-
-  return [platforms, [...browsers]];
 }

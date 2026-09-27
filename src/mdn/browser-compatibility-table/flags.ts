@@ -1,10 +1,9 @@
 import type {VersionValue} from './types.js';
 
 interface CompatSupportFlagsArgs {
-  has_added: number;
+  version_range: 'range' | 'from' | 'until' | 'none';
   version_added: VersionValue;
-  has_last: number;
-  versionLast: VersionValue | undefined;
+  version_last: VersionValue | undefined;
   flag_name: string;
   flag_type: string;
   has_value: number;
@@ -16,10 +15,9 @@ interface CompatSupportFlagsArgs {
 
 export function renderCompatSupportFlags(args: CompatSupportFlagsArgs): string {
   const {
-    has_added,
+    version_range,
     version_added,
-    has_last,
-    versionLast,
+    version_last,
     flag_name,
     flag_type,
     has_value,
@@ -29,27 +27,14 @@ export function renderCompatSupportFlags(args: CompatSupportFlagsArgs): string {
     browser_pref_url
   } = args;
 
-  let result = '';
-
-  // First part: version added
-  if (has_added === 1) {
-    result += 'From version ' + version_added;
-  }
-
-  // Second part: handling last version/users
-  if (has_last === 1) {
-    if (has_added === 0) {
-      result += 'Until ' + versionLast + ' users';
-    } else if (has_added === 1) {
-      result += ' until ' + versionLast + ' users';
-    }
-  } else {
-    if (has_added === 0) {
-      result += 'Users';
-    } else if (has_added === 1) {
-      result += ' users';
-    }
-  }
+  // https://github.com/mdn/fred/pull/1738
+  const prefixes = {
+    range: `From version ${version_added} until ${version_last}, users`,
+    from: `From version ${version_added}, users`,
+    until: `Until ${version_last}, users`,
+    none: 'Users',
+  };
+  let result = prefixes[version_range];
 
   // Adding space and flag name
   result += ' must explicitly set the <code>' + flag_name + '</code> ';
