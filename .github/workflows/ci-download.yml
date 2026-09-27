@@ -64,7 +64,10 @@ jobs:
               locale: '${{ matrix.locale }}'
             }
           }).then(d => d.onIdle().then(() => d.dispose()))
-            .catch(console.error);
+            .catch(error => {
+              console.error(error);
+              process.exitCode = 1;
+            });
           EOF
           ls -hl src/mdn/
           pwd
