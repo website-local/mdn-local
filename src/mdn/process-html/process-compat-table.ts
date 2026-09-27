@@ -143,7 +143,9 @@ export async function downloadAndRenderCompatibilityData(
       JSON.parse(toString(bcdRes.body, bcdRes.encoding));
 
     const html = renderCompatibilityTable(
-      jsonData, data.query || '', locale, new URL(res.url).pathname);
+      jsonData, data.query || '', locale,
+      new URL(res.redirectedUrl || res.url).pathname,
+    );
     el.html(html);
     // make this lazy-compat-table plain element
     if (el.is('lazy-compat-table') || el.is('mdn-compat-table-lazy')) {

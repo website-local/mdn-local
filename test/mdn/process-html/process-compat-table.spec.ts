@@ -6,9 +6,12 @@ import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {downloadAndRenderCompatibilityData} from '../../../src/mdn/process-html/process-compat-table.js';
 
 describe('compatibility HTML processing', () => {
-  test('passes the document pathname to the renderer and replaces the lazy widget', async () => {
+  test.each([
+    ['https://developer.mozilla.org/fr/docs/Web/CSS/foo', undefined],
+    ['https://developer.mozilla.org/fr/docs/Web/CSS/old-foo', 'https://developer.mozilla.org/fr/docs/Web/CSS/foo'],
+  ])('uses the final document pathname for %s and replaces the lazy widget', async (url, redirectedUrl) => {
     const $ = load('<mdn-compat-table-lazy query="css.properties.foo" locale="fr"></mdn-compat-table-lazy>');
-    const page = {url: 'https://developer.mozilla.org/fr/docs/Web/CSS/foo', depth: 0} as DownloadResource;
+    const page = {url, redirectedUrl, depth: 0} as DownloadResource;
     const support = {chrome: {version_added: '1'}};
     const json = {
       data: {
