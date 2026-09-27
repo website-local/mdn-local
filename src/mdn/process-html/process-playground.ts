@@ -245,9 +245,10 @@ export function getCodeAndNodesForIframe(
 
 /**
  * https://github.com/mdn/yari/blob/v4.3.0/libs/play/index.js#L189
+ * Runner HTML recovery: https://github.com/mdn/fred/pull/1705
  * @param {EditorContent | null} state
  */
-function renderHtml(state: EditorContent | null = null) {
+export function renderHtml(state: EditorContent | null = null) {
   const { css, html, js } = state || {
     css: '',
     html: '',
@@ -347,10 +348,24 @@ function renderHtml(state: EditorContent | null = null) {
       window.console = consoleProxy;
       window.addEventListener("error", (e) => console.log(e.error));
     </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (!(window.__mdnPlayJsStarted && window.__mdnPlayJsEnded)) {
+          console.warn(
+            "[Playground] The JavaScript did not run. This usually means " +
+              "the HTML input contains an unclosed or malformed tag."
+          );
+        }
+      });
+    </script>
   </head>
   <body>
     ${html}
-    <script>${js}</script>
+    <!-- "" '' -->
+    <script></script>
+    <script>window.__mdnPlayJsStarted = true;</script>
+    <script id="mdn-play-js">${js}</script>
+    <script id="mdn-play-js-end">window.__mdnPlayJsEnded = true;</script>
   </body>
 </html>
 `;

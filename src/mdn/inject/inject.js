@@ -4131,6 +4131,7 @@ code {
 
   /// region render-html
   // https://github.com/mdn/yari/blob/v4.7.2/libs/play/index.js#L212
+  // Runner HTML recovery: https://github.com/mdn/fred/pull/1705
   /**
    * @param {Theme} [theme]
    * @returns {string}
@@ -4427,6 +4428,16 @@ code {
           window.console = consoleProxy;
           window.addEventListener("error", (e) => console.log(e.error));
         </script>
+        <script>
+          document.addEventListener("DOMContentLoaded", () => {
+            if (!(window.__mdnPlayJsStarted && window.__mdnPlayJsEnded)) {
+              console.warn(
+                "[Playground] The JavaScript did not run. This usually means " +
+                  "the HTML input contains an unclosed or malformed tag."
+              );
+            }
+          });
+        </script>
         ${defaults === 'ix-tabbed'
     ? `<script>
               window.addEventListener("click", (event) => {
@@ -4465,10 +4476,14 @@ code {
       </head>
       <body>
         ${htmlCode}
-        <script type="${defaults === 'ix-wat' ? 'module' : ''}">
+        <!-- "" '' -->
+        <script></script>
+        <script>window.__mdnPlayJsStarted = true;</script>
+        <script id="mdn-play-js" type="${defaults === 'ix-wat' ? 'module' : ''}">
           ${js};
         </script>
-        <script>
+        <script id="mdn-play-js-end">
+          window.__mdnPlayJsEnded = true;
           try {
             window.parent.postMessage({ typ: "ready" }, "*");
           } catch (e) {
@@ -5445,12 +5460,15 @@ code {
           this._selectChoice(event.target);
         }
         this.__choiceUpdated = true;
+        this._updateResetButton();
       }
     }
 
     _resetChoices() {
       this.__choiceSelected = -1;
       this.__choiceUpdated = false;
+
+      this._updateResetButton();
 
       const editorNodes = this.shadowRoot.querySelectorAll('mdn-play-editor');
       for (let i = 0; i < editorNodes.length; i++) {
@@ -5559,7 +5577,7 @@ code {
           overflow-wrap: anywhere;
         }
 
-        header mdn-button {
+        header mdn-button, header button {
           margin-right: -0.5rem;
         }
 
@@ -5769,11 +5787,11 @@ code {
         }
 
         @media print {
-          mdn-button {
+          mdn-button, button {
             display: none !important;
           }
         }
-        mdn-button {
+        mdn-button, button {
           box-sizing: border-box;
           align-items: center;
           background-color: initial;
@@ -5794,6 +5812,10 @@ code {
           text-decoration: none;
           vertical-align: middle;
         }
+        button[aria-disabled="true"] {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
       </style>
       ${html}
     `;
@@ -5811,7 +5833,8 @@ code {
     }
 
     _renderConsole() {
-      const id = this._randomIdString();
+      // IDs are scoped to each example's shadow root (mdn/fred#1924).
+      const id = 'ix-console';
       const languages = this._languages;
 
       return `
@@ -5867,7 +5890,7 @@ code {
     }
 
     _renderTabbed() {
-      const id = this._randomIdString();
+      const id = 'ix-tabbed';
       const languages = this._languages;
 
       return `
@@ -5904,19 +5927,19 @@ code {
     }
 
     _renderChoices() {
-      const id = this._randomIdString();
+      const id = 'ix-choices';
       const choices = this._choices;
 
       return `
       <div class="template-choices" aria-labelledby="${id}">
         <header>
           <h4 id="${id}">${this._decode(this.name)}</h4>
-          <mdn-button
+          <button type="button"
             id="reset"
             variant="secondary"
-            ${!this.__choiceUpdated ? 'disabled' : ''}>
+            aria-disabled="${!this.__choiceUpdated}">
             Reset
-          </mdn-button>
+          </button>
         </header>
         <ul
           class="choice-wrapper"
@@ -5952,7 +5975,9 @@ code {
     _attachEventListeners() {
       const resetBtn = this.shadowRoot.querySelector('#reset');
       if (resetBtn) {
-        resetBtn.addEventListener('click', () => this._reset());
+        resetBtn.addEventListener('click', () => {
+          if (this._template !== 'choices' || this.__choiceUpdated) this._reset();
+        });
       }
 
       const executeBtn = this.shadowRoot.querySelector('#execute');
@@ -5972,11 +5997,17 @@ code {
       }
     }
 
-    // Utility methods
-    _randomIdString() {
-      return 'id-' + Math.random().toString(36).slice(2, 9);
+    _updateResetButton() {
+      // Keep the reason available to keyboard users as in mdn/fred#1825.
+      const button = this.shadowRoot.querySelector('#reset');
+      if (!button) return;
+      const reason = this.__choiceUpdated ? '' : 'Reset is disabled until you edit the example';
+      button.setAttribute('aria-disabled', String(!this.__choiceUpdated));
+      button.setAttribute('aria-description', reason);
+      button.title = reason;
     }
 
+    // Utility methods
     _decode(str) {
       return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
