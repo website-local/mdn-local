@@ -7,6 +7,7 @@ export function renderCompatibilityTable(
   query: string,
   locale: string,
   pathname = '',
+  tableIndex = 0,
 ): string {
   const table = new MDNCompatTable();
   table.query = query || '';
@@ -14,6 +15,7 @@ export function renderCompatibilityTable(
   table.data = json.data;
   table.browserInfo = json.browsers;
   table._pathname = pathname;
+  table._tableIndex = tableIndex;
   table.connectedCallback();
   return table.render();
 }

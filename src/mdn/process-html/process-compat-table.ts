@@ -46,6 +46,12 @@ export interface MdnCompatibilityRenderingContext {
   element: Cheerio;
 }
 
+function renderMissingCompatibilityData(element: Cheerio, query: string): void {
+  element.prop('tagName', 'div').addClass('lazy-compat-table')
+    .html('<div class="notecard warning"><p>No compatibility data found for <code></code>.</p></div>')
+    .find('code').text(query);
+}
+
 export async function downloadAndRenderCompatibilityData(
   res: DownloadResource,
   submit: SubmitResourceFunc,
@@ -114,7 +120,7 @@ export async function downloadAndRenderCompatibilityData(
           res.url,
           c.data?.locale,
           c.data?.query,
-          c.data?.dataURL, err.code);
+          c.data?.dataURL, err?.code);
       }
       return c;
     });
@@ -128,24 +134,27 @@ export async function downloadAndRenderCompatibilityData(
     if (!r) {
       continue;
     }
-    if (!r.res.body) {
-      // fail to download, is MdnYariCompatibilityRenderingContext
-      el.html(`<div class="notecard warning"><p>No compatibility data found for <code>${
-        (r as MdnCompatibilityRenderingContext)?.data?.query
-      }</code>.</p></div>`);
-      el.prop('tagName', 'div');
+    const body = r.res.body;
+    if (!body || (typeof body !== 'string' && body.byteLength === 0)) {
+      renderMissingCompatibilityData(el, data.query || '');
       continue;
     }
     const bcdRes = r.res as DownloadResource;
+    let html: string;
+    try {
+      // Parse a copy so a successful resource keeps its original body.
+      const jsonData: Compat = JSON.parse(toString(body, bcdRes.encoding));
+      html = renderCompatibilityTable(
+        jsonData, data.query || '', locale,
+        new URL(res.redirectedUrl || res.url).pathname, i,
+      );
+    } catch (error) {
+      errorLogger.error('Error rendering compatibility data',
+        res.url, data.locale, data.query, data.dataURL, error);
+      renderMissingCompatibilityData(el, data.query || '');
+      continue;
+    }
     submit(bcdRes);
-    // note: keep the original body of resource
-    const jsonData: Compat =
-      JSON.parse(toString(bcdRes.body, bcdRes.encoding));
-
-    const html = renderCompatibilityTable(
-      jsonData, data.query || '', locale,
-      new URL(res.redirectedUrl || res.url).pathname,
-    );
     el.html(html);
     // make this lazy-compat-table plain element
     if (el.is('lazy-compat-table') || el.is('mdn-compat-table-lazy')) {

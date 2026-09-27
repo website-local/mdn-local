@@ -51,6 +51,21 @@ describe('static compatibility tables', () => {
     expect($('.bc-feature div.bc-table-row-header').text()).toContain('same');
   });
 
+  test.each([
+    {browser: 'chrome', version: '1'},
+    {browser: 'ie', version: '11'},
+  ] as const)('preserves the complete release-date tooltip for $browser', ({browser, version}) => {
+    const data = feature();
+    data.__compat!.support[browser] = {version_added: version, release_date: '2026-01-15'};
+    const $ = load(renderCompatibilityTable({data, browsers}, 'css.properties.foo', 'en-US'));
+    const cell = $(`td.bc-browser-${browser}`);
+
+    expect(cell.find('.bcd-cell-text-wrapper .bc-version-label').attr('title'))
+      .toBe(`${browsers[browser].name} ${version} – Release date: 2026-01-15`);
+    expect(cell.find('.timeline .bc-version-label').attr('title')).toBe('');
+    expect(cell.find('.timeline .bc-version-label').text()).toContain('(Release date: 2026-01-15)');
+  });
+
   test.each<[VersionValue, string | undefined, string]>([
     ['1', '10', 'From version 1 until 10, users'],
     ['1', undefined, 'From version 1, users'],

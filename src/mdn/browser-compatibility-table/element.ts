@@ -89,6 +89,8 @@ export class MDNCompatTable {
   browserInfo: Partial<Browsers>;
   locale: string;
   _pathname: string;
+  // Offline tables share a document instead of separate shadow roots.
+  _tableIndex = 0;
   _platforms: string[];
   _browsers: BrowserName[];
   _defaultBrowsers: BrowserName[] = [];
@@ -424,7 +426,7 @@ export class MDNCompatTable {
           version_added: false,
         };
 
-        const timelineId = `timeline-${featureIndex}-${browserIndex}`;
+        const timelineId = `mdn-local-bcd-${this._tableIndex}-timeline-${featureIndex}-${browserIndex}`;
         const supportClassName = getSupportClassName(support, browser);
         const notes = this._renderNotes(browser, support);
 
@@ -440,7 +442,7 @@ export class MDNCompatTable {
           <button
             type="button"
             class="mdn-local-toggle-history-btn"
-            aria-controls=${timelineId}
+            aria-controls="${timelineId}"
             aria-expanded="false"
             title="${notes ? 'Toggle history' : ''}"
           >
@@ -921,9 +923,9 @@ export class MDNCompatTable {
         <span class="bc-browser-name">${browser.name}</span>
         <span
           class="bc-version-label"
-          title=${browserReleaseDate && !timeline
-    ? `${ browser.name } ${ added } – Release date: ${ browserReleaseDate }`
-    : ''}
+          title="${browserReleaseDate && !timeline
+    ? escapeAttribute(`${browser.name} ${added} – Release date: ${browserReleaseDate}`)
+    : ''}"
         >
           ${!timeline || added ? label : ''}
           ${browserReleaseDate && timeline
@@ -975,7 +977,7 @@ export class MDNCompatTable {
     });
 
     return `<section class="bc-legend"${this._defaultBrowsers.length ? '' : ' hidden'}>
-      <h3 class="visually-hidden" id="Legend">
+      <h3 class="visually-hidden" id="mdn-local-bcd-${this._tableIndex}-legend">
         Legend
       </h3>
       <p class="bc-legend-tip">
