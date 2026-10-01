@@ -1,6 +1,6 @@
 browser-compatibility-table
 --------------
-This dir contains code rewritten from [mdn/fred](https://github.com/mdn/fred/tree/fec93002ef5e2a0d9d41d5145bdfda5af5c76f4c/components/compat-table), which is licensed [MPL-2.0](https://github.com/mdn/fred/blob/v1.6.1/LICENSE). Last checked on 2026-09-26 (v2.9.2 plus unreleased compatibility settings and same-page link fixes).
+This dir contains code rewritten from [mdn/fred](https://github.com/mdn/fred/tree/815b3ee5e35fae538588d4a0f52dc99f4a111715/components/compat-table), which is licensed [MPL-2.0](https://github.com/mdn/fred/blob/v1.6.1/LICENSE). Last checked on 2026-10-01. Since the September 26 review at `fec93002`, upstream changed only dependency files; the compatibility components, utilities, styles, and tests are unchanged.
 
 `types.ts` is [types.d.ts](https://unpkg.com/@mdn/browser-compat-data@6.0.7/types.d.ts) from [mdn/browser-compat-data](https://github.com/mdn/browser-compat-data), licensed [CC0](https://github.com/mdn/browser-compat-data/blob/v5.2.38/LICENSE)
 
