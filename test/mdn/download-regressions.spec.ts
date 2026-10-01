@@ -62,7 +62,15 @@ describe('full-download regressions', () => {
       [`${docs}Web/HTML/Reference/Elements/th/column-row-span.png`,
         '/shared-assets/images/diagrams/html/table/column-row-span.png'],
       [`${docs}Learn_web_development/Core/Styling_basics/Advanced_styling_effects/colorful-heart.png`,
-        '/mdn-github-io/shared-assets/images/examples/colorful-heart.png']
+        '/mdn-github-io/shared-assets/images/examples/colorful-heart.png'],
+      [`${docs}Web/API/Canvas_API/Tutorial/Applying_styles_and_colors/canvas-grid.png`,
+        `${docs}Web/API/Canvas_API/Tutorial/Drawing_shapes/canvas-grid.png`],
+      [`${docs}Web/CSS/Reference/Properties/mask-border/mask-border-diamonds.png`,
+        '/mdn-github-io/shared-assets/images/examples/mask-border-diamonds.png'],
+      [`${docs}Web/HTML/Element/figure/favicon-192x192.png`,
+        `${docs}Web/HTML/Reference/Elements/figure/favicon-192x192.png`],
+      [`${docs}Web/API/console/timeLog_static/timer_output.png`,
+        `${docs}Web/API/console/timeEnd_static/timer_output.png`]
     ];
     for (const [oldPath, newPath] of moves) {
       const f = fixture(locale);
@@ -90,6 +98,52 @@ describe('full-download regressions', () => {
     const f = fixture('zh-CN');
     const url = 'https://developer.mozilla.org/zh-CN/docs/Web/CSS/Guides/Box_alignment/other.png';
     expect(await f.pipeline.linkRedirect(url, null, f.parent)).toBe(url);
+  });
+
+  test.each(['en-US', 'zh-CN'])('keep WHATWG HTML online and static assets local in %s', async locale => {
+    const f = fixture(locale);
+    const spec = '/specs/web-apps/current-work/multipage/scripting.html#the-script-element';
+    const page = `https://developer.mozilla.org/${locale}/docs/Example`;
+    const {$} = await f.process(page,
+      `<a href="https://www.whatwg.org${spec}">Specification</a>` +
+      '<a href="//www.whatwg.org/html/scripting.html#the-script-element">Legacy</a>' +
+      `<a href="/www.whatwg.org${spec}">Internal path</a>` +
+      `<a href="https://developer.mozilla.org/www.whatwg.org${spec}">Internal URL</a>` +
+      '<a href="../../www.whatwg.org/specs/web-apps/current-work/#the-audio-element">Relative</a>' +
+      '<a href="https://www.whatwg.org/">Home</a>' +
+      '<a href="https://www.whatwg.org/images/sample.png">Image</a>' +
+      '<iframe src="https://www.whatwg.org/demos/workers/modules/page.html"></iframe>' +
+      '<img src="https://www.whatwg.org/images/sample.png">' +
+      '<img srcset="/www.whatwg.org/images/sample.png 1x, /www.whatwg.org/images/sample2.png 2x">' +
+      '<link rel="stylesheet" href="https://www.whatwg.org/style.css">' +
+      '<script src="https://www.whatwg.org/script.js"></script>' +
+      '<style>.x { background: url("/www.whatwg.org/images/sample.svg#icon"); }</style>');
+    expect($('a').slice(0, 6).toArray().map(node => $(node).attr('href'))).toEqual([
+      `https://www.whatwg.org${spec}`,
+      'https://www.whatwg.org/html/scripting.html#the-script-element',
+      `https://www.whatwg.org${spec}`,
+      `https://www.whatwg.org${spec}`,
+      'https://www.whatwg.org/specs/web-apps/current-work/#the-audio-element',
+      'https://www.whatwg.org/'
+    ]);
+    expect($('iframe')).toHaveLength(0);
+    expect($('a.mdn-local-external-iframe-link').attr('href'))
+      .toBe('https://www.whatwg.org/demos/workers/modules/page.html');
+    expect(f.submitted).toHaveLength(7);
+    expect(f.submitted.every(r => r.type !== ResourceType.Html)).toBe(true);
+    expect(f.submitted.every(r => r.downloadLink.startsWith('https://www.whatwg.org/'))).toBe(true);
+    expect(f.submitted.every(r => r.savePath.startsWith('developer.mozilla.org/www.whatwg.org/'))).toBe(true);
+    expect($('img[src]').attr('src')).toBe('../../www.whatwg.org/images/sample.png');
+    expect($('link').attr('href')).toBe('../../www.whatwg.org/style.css');
+    expect($('script').attr('src')).toBe('../../www.whatwg.org/script.js');
+    expect($('style').text()).toContain('../../www.whatwg.org/images/sample.svg#icon');
+
+    const seed = await f.pipeline.createAndProcessResource(
+      'https://www.whatwg.org' + spec, ResourceType.Html, 1, null, f.parent);
+    expect(seed?.shouldBeDiscardedFromDownload).toBe(true);
+    expect(seed?.replacePath).toBe('https://www.whatwg.org' + spec);
+    expect(seed && await f.pipeline.download(seed)).toBeUndefined();
+    expect(f.downloaded).toHaveLength(0);
   });
 
   test.each(['en-US', 'zh-CN'])('canonical runner path in %s', async locale => {

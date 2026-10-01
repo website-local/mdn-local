@@ -1,5 +1,7 @@
 import {downloadableHosts, localeArr, mdnHosts} from './consts.js';
 import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {skipExternal} from 'website-scrap-engine/lib/logger/logger.js';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import URI from 'urijs';
 import type {Cheerio} from 'website-scrap-engine/lib/types.js';
@@ -27,6 +29,24 @@ export function dropResource(
   }
   const path = res.uri.path(),
     host = res.uri.host();
+  // WHATWG is allowed for static assets. Its HTML pages must stay online;
+  // crawling legacy specification links also pulls their entire asset graph.
+  if (res.type === ResourceType.Html) {
+    const external = res.uri.clone();
+    const mdnHost = options.meta.host || 'developer.mozilla.org';
+    if (host === mdnHost &&
+      (path === '/www.whatwg.org' || path.startsWith('/www.whatwg.org/'))) {
+      external.host('www.whatwg.org')
+        .path(path.slice('/www.whatwg.org'.length) || '/');
+    }
+    if (external.host() === 'www.whatwg.org') {
+      res.replacePath = external.toString();
+      res.replaceUri = external;
+      res.shouldBeDiscardedFromDownload = true;
+      skipExternal.info('skipped WHATWG HTML', res.replacePath, res.refUrl);
+      return res;
+    }
+  }
   const isFakeMdnDevLegacySitePath =
     path === '/mdn.dev/en' ||
     path.startsWith('/mdn.dev/en/') ||

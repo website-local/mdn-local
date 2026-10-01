@@ -37,6 +37,9 @@ requests (such as fetch or image loading), or other unsupported features show an
 use the live fallback even when their particular resource request could work
 offline.
 
+Static assets from `www.whatwg.org` are downloaded for offline use. HTML pages
+on that host remain external links.
+
 ## Build from source
 
 Use Node.js 20.19+, 22.13+, or 24+ to satisfy the build dependencies' engine

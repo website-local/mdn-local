@@ -426,6 +426,14 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     '/shared-assets/images/diagrams/html/table/column-row-span.png',
   [`/${locale}/docs/Learn_web_development/Core/Styling_basics/Advanced_styling_effects/colorful-heart.png`]:
     '/mdn-github-io/shared-assets/images/examples/colorful-heart.png',
+  [`/${locale}/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors/canvas-grid.png`]:
+    `/${locale}/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes/canvas-grid.png`,
+  [`/${locale}/docs/Web/CSS/Reference/Properties/mask-border/mask-border-diamonds.png`]:
+    '/mdn-github-io/shared-assets/images/examples/mask-border-diamonds.png',
+  [`/${locale}/docs/Web/HTML/Element/figure/favicon-192x192.png`]:
+    `/${locale}/docs/Web/HTML/Reference/Elements/figure/favicon-192x192.png`,
+  [`/${locale}/docs/Web/API/console/timeLog_static/timer_output.png`]:
+    `/${locale}/docs/Web/API/console/timeEnd_static/timer_output.png`,
   // Case conflicts on case-insensitive filesystems (NTFS)
   [`/${locale}/docs/glossary/index.html`]:
     `/${locale}/docs/Glossary`,

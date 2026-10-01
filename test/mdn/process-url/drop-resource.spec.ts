@@ -27,6 +27,24 @@ const fakeRes = (url: string) => ({
 }) as Resource;
 
 describe('drop-resource', function () {
+  test.each(['https://www.whatwg.org', 'https://developer.mozilla.org/www.whatwg.org'])(
+    'externalize WHATWG HTML while retaining static types at %s', base => {
+      const res = dropResource(fakeRes(base + '/html/scripting.html#example'),
+        null, null, opt('en-US'));
+      expect(res?.shouldBeDiscardedFromDownload).toBe(true);
+      expect(res?.replacePath).toBe('https://www.whatwg.org/html/scripting.html#example');
+      expect(res?.replaceUri?.toString()).toBe(res?.replacePath);
+      for (const [type, path] of [
+        [ResourceType.Binary, '/images/picture.svg'],
+        [ResourceType.Css, '/style.css'],
+        [ResourceType.Binary, '/script.js'],
+        [ResourceType.Binary, '/image-without-extension']
+      ] as const) {
+        const asset = dropResource({...fakeRes(base + path), type}, null, null, opt('en-US'));
+        expect(asset?.shouldBeDiscardedFromDownload).not.toBe(true);
+      }
+    });
+
   test('discard fake local mdn.dev legacy site paths', () => {
     const dropped = dropResource(
       fakeRes('https://developer.mozilla.org/mdn.dev/en-US/about'),
