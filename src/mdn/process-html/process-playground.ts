@@ -12,8 +12,22 @@ import type {Resource} from 'website-scrap-engine/lib/resource.js';
 import {simpleHashString} from 'website-scrap-engine/lib/util.js';
 import {load} from 'cheerio';
 import {localizeSampleAssetUrls} from './live-sample-assets.js';
+import type {EmbeddedSampleAssets} from './live-sample-assets.js';
 
 const PLAYGROUND_LOCAL_ATTR = 'data-mdn-local-pg-id';
+
+function fixSampleScript(js: string, pageUrl: string, sampleId: string): string {
+  const url = new URL(pageUrl);
+  // The upstream marching-ants sample changed its canvas ID to my-canvas
+  // without updating this reference. Correct only the known executable sample.
+  if (url.hostname === 'developer.mozilla.org' && sampleId === 'using_line_dashes' &&
+    url.pathname.replace(/\/$/, '') ===
+      '/en-US/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors') {
+    return js.replace('ctx.clearRect(0, 0, canvas.width, canvas.height);',
+      'ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);');
+  }
+  return js;
+}
 
 function escapeSelector(selector: string): string {
   // List of characters that have special meaning in CSS selectors, including backslash
@@ -25,7 +39,8 @@ export async function preProcessPlayground(
   submit: SubmitResourceFunc,
   options: StaticDownloadOptions,
   pipeline: PipelineExecutor,
-  $: CheerioStatic
+  $: CheerioStatic,
+  embeddedAssets: EmbeddedSampleAssets
 ): Promise<void> {
   const frames = $('iframe');
   let iframeId = 0;
@@ -43,7 +58,9 @@ export async function preProcessPlayground(
     if (r === null) {
       continue;
     }
-    if (r.code.wat || r.code.js.includes('{%wasm-url%}')) {
+    const pageUrl = res.redirectedUrl || res.url;
+    const js = localizeSampleAssetUrls(r.code.js, pageUrl, embeddedAssets);
+    if (r.code.wat || r.code.js.includes('{%wasm-url%}') || js === undefined) {
       const url = new URL(res.redirectedUrl || res.url);
       url.hash = id;
       const links = (res.meta.liveSampleLinks ||= []) as string[];
@@ -71,8 +88,7 @@ export async function preProcessPlayground(
     if (!iframeRes) {
       continue;
     }
-    const iframeHtml = renderHtml({...r.code,
-      js: localizeSampleAssetUrls(r.code.js, res.redirectedUrl || res.url)});
+    const iframeHtml = renderHtml({...r.code, js: fixSampleScript(js, pageUrl, id)});
     iframeRes.body = iframeHtml;
     iframeRes.meta = {
       doc: load(iframeHtml, options.cheerioParse)

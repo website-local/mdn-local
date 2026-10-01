@@ -80,8 +80,8 @@ export const preProcessHtml = async (
   // https://github.com/website-local/mdn-local/issues/888
   // https://github.com/website-local/mdn-local/issues/974
   // https://github.com/website-local/mdn-local/issues/1105
-  await submitLiveSampleAssets(res, submit, pipeline);
-  await preProcessPlayground(res, submit, options, pipeline, $);
+  const embeddedAssets = await submitLiveSampleAssets(res, submit, pipeline);
+  await preProcessPlayground(res, submit, options, pipeline, $, embeddedAssets);
 
   /// region inject external script and style
   const liveDemoUrl = externalDemoUrl(res);

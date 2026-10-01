@@ -40,6 +40,8 @@ offline.
 The affected Canvas pages include their known image attachments even when only
 JavaScript references them. Known runtime-dependent external demos and WAT
 samples without offline compilation offer a live-example link.
+The pixel-manipulation samples embed their image so local-file CORS restrictions
+do not block it; if that image cannot be downloaded, they offer the live link.
 
 Static assets from `www.whatwg.org` are downloaded for offline use. HTML pages
 on that host remain external links.
