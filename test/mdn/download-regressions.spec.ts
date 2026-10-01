@@ -41,6 +41,24 @@ function fixture(locale = 'en-US', body: ResourceBody = 'window.ran = true;') {
 }
 
 describe('full-download regressions', () => {
+  test.each([
+    'https://mdn.github.io/dom-examples/fetch/basic-fetch/',
+    'https://mdn.github.io/dom-examples/fetch/basic-fetch/index.html',
+    'https://mdn.github.io/webassembly-examples/understanding-text-format/add.html',
+    'https://mdn.github.io/webaudio-examples/decode-audio-data/promise/',
+  ])('keep known runtime-dependent classic demos online: %s', async url => {
+    const f = fixture();
+    const {$} = await f.process(url,
+      '<h1>Example</h1><script>fetch("asset.bin");</script>' +
+      '<script src="script.js"></script><script type="application/json">{"value":1}</script>');
+    expect($('script:not([type="application/json"])')).toHaveLength(0);
+    expect($('script[type="application/json"]').text()).toBe('{"value":1}');
+    expect($('.mdn-local-live-example a').attr('href')).toBe(url);
+    expect(f.submitted).toHaveLength(0);
+    expect(f.downloaded).toHaveLength(0);
+    expect($('h1').text()).toBe('Example');
+  });
+
   test.each(['en-US', 'zh-CN'])('rewrite moved image src, srcset and CSS URLs in %s', async locale => {
     const docs = `/${locale}/docs/`;
     const moves = [
@@ -236,6 +254,19 @@ describe('full-download regressions', () => {
     const ordinary = f.pipeline.createResource(ResourceType.Binary, 1,
       'https://developer.mozilla.org/static/Example.json', f.parent.url);
     expect(ordinary.savePath).toBe('developer.mozilla.org/static/Example.json');
+  });
+
+  test.each([
+    ['getting-started/5_canvas_images/', 'firefox.png'],
+    ['loops_animation/7_canvas_walking_animation/index.html', 'walk-right.png'],
+  ])('include the known image for %s without disabling its script', async (path, name) => {
+    const f = fixture();
+    const url = 'https://mdn.github.io/learning-area/javascript/apis/drawing-graphics/' + path;
+    const {$} = await f.process(url, '<canvas></canvas><script src="script.js"></script>');
+    expect($('script')).toHaveLength(1);
+    expect($('.mdn-local-live-example')).toHaveLength(0);
+    expect(f.submitted.some(r => r.downloadLink === new URL(name, url).href)).toBe(true);
+    expect(f.downloaded).toHaveLength(0);
   });
 
   test('convert simple demo modules, retaining scope and DOMContentLoaded behavior', async () => {

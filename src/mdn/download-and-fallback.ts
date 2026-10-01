@@ -33,7 +33,8 @@ export async function downloadAndFallback(
     `https://developer.mozilla.org/${options.meta.locale}/`;
   // do nothing for en-US or non-mdn url
   if (options.meta.locale as string === 'en-US' ||
-    !res.url.startsWith(mdnLocalizedUrlPrefix)) {
+    !res.url.startsWith(mdnLocalizedUrlPrefix) ||
+    !res.downloadLink.startsWith(mdnLocalizedUrlPrefix)) {
     return downloadResource(res, requestOptions, options);
   }
   // not en-US

@@ -8,8 +8,10 @@ import type {
 } from 'website-scrap-engine/lib/life-cycle/pipeline-executor.js';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
 import {simpleHashString} from 'website-scrap-engine/lib/util.js';
 import {load} from 'cheerio';
+import {localizeSampleAssetUrls} from './live-sample-assets.js';
 
 const PLAYGROUND_LOCAL_ATTR = 'data-mdn-local-pg-id';
 
@@ -41,6 +43,15 @@ export async function preProcessPlayground(
     if (r === null) {
       continue;
     }
+    if (r.code.wat || r.code.js.includes('{%wasm-url%}')) {
+      const url = new URL(res.redirectedUrl || res.url);
+      url.hash = id;
+      const links = (res.meta.liveSampleLinks ||= []) as string[];
+      frame.replaceWith($('<p class="mdn-local-live-sample"></p>')
+        .attr('data-live-sample-index', String(links.length)));
+      links.push(url.href);
+      continue;
+    }
     if (r?.nodes?.length) {
       ++iframeId;
       const localId = String(iframeId);
@@ -60,7 +71,8 @@ export async function preProcessPlayground(
     if (!iframeRes) {
       continue;
     }
-    const iframeHtml = renderHtml(r.code);
+    const iframeHtml = renderHtml({...r.code,
+      js: localizeSampleAssetUrls(r.code.js, res.redirectedUrl || res.url)});
     iframeRes.body = iframeHtml;
     iframeRes.meta = {
       doc: load(iframeHtml, options.cheerioParse)
@@ -78,16 +90,33 @@ export async function preProcessPlayground(
   }
 }
 
+export function postProcessPlayground($: CheerioStatic, res: Resource): void {
+  const links = res.meta.liveSampleLinks as string[] | undefined;
+  if (!links) return;
+  $('p.mdn-local-live-sample[data-live-sample-index]').each((_, node) => {
+    const notice = $(node);
+    const url = links[Number(notice.attr('data-live-sample-index'))];
+    if (!url) return;
+    notice.removeAttr('data-live-sample-index')
+      .text('This example is unavailable offline. ')
+      .append($('<a>Open the live example</a>').attr({
+        href: url, target: '_blank', rel: 'noopener noreferrer',
+      }));
+  });
+  delete res.meta.liveSampleLinks;
+}
+
 interface EditorContent {
   css: string;
   html: string;
   js: string;
+  wat?: string;
   src?: string;
 }
 
 // https://github.com/mdn/yari/blob/v2.28.1/client/src/document/code/playground.ts
 
-const LIVE_SAMPLE_PARTS: (keyof EditorContent)[] = ['html', 'css', 'js'];
+const LIVE_SAMPLE_PARTS = ['html', 'css', 'js', 'wat'] as const;
 
 const SECTION_RE = /h[1-6]/i;
 
@@ -176,13 +205,13 @@ function codeForHeading(
         return $(e).text();
       }).join('\n');
     if (src) {
-      code[part] += src;
+      code[part] = (code[part] || '') + src;
     }
   }
   return nodes.length ? { code, nodes } : null;
 }
 
-function getLanguage(node: Cheerio): keyof EditorContent | null {
+function getLanguage(node: Cheerio): typeof LIVE_SAMPLE_PARTS[number] | null {
   for (const part of LIVE_SAMPLE_PARTS) {
     if (node.hasClass(part)) {
       return part;
@@ -213,7 +242,7 @@ export function getCodeAndNodesForIframeBySampleClass(
       }
       empty = false;
       nodes.push(pre);
-      code[lang] += pre.text();
+      code[lang] = (code[lang] || '') + pre.text();
     }
   );
   return empty ? null : { code, nodes };

@@ -9,6 +9,7 @@ import type {
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {toString} from 'website-scrap-engine/lib/util.js';
 import {externalHosts} from '../process-url/consts.js';
+import {demoImageAssets, liveOnlyDemoPaths} from './live-only-demos.js';
 
 export function externalDemoUrl(res: DownloadResource): string | undefined {
   const url = new URL(res.redirectedUrl || res.url);
@@ -54,9 +55,23 @@ export async function preProcessDemoModules(
   pipeline: PipelineExecutor,
   liveUrl: string
 ): Promise<void> {
+  const live = new URL(liveUrl);
+  const path = live.pathname.replace(/\/index\.html$/, '/');
+  if (live.hostname === 'mdn.github.io') {
+    for (const name of demoImageAssets[path] || []) {
+      const resource = await pipeline.createAndProcessResource(
+        new URL(name, live).href, ResourceType.Binary, res.depth + 1, null, res);
+      if (resource && !resource.shouldBeDiscardedFromDownload) submit(resource);
+    }
+  }
+  const liveOnly = live.hostname === 'mdn.github.io' && liveOnlyDemoPaths.has(path);
+  if (liveOnly) {
+    $('script:not([type]),script[type=""],script[type="text/javascript"],script[type="application/javascript"],script[type="module"]')
+      .remove();
+  }
   const scripts = $('script[type="module"]');
   const seen = new Set<string>();
-  let needsLiveExample = false;
+  let needsLiveExample = liveOnly;
   for (const node of scripts.toArray()) {
     const script = $(node);
     let source = script.html() || '';

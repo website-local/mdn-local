@@ -24,7 +24,8 @@ import {preProcessRemoveElements} from './process-remove-elements.js';
 import {
   downloadAndRenderCompatibilityData,
 } from './process-compat-table.js';
-import {preProcessPlayground} from './process-playground.js';
+import {postProcessPlayground, preProcessPlayground} from './process-playground.js';
+import {submitLiveSampleAssets} from './live-sample-assets.js';
 import {postProcessPlayable, preProcessPlayable} from './process-playable.js';
 import {
   postProcessInteractiveExample,
@@ -79,6 +80,7 @@ export const preProcessHtml = async (
   // https://github.com/website-local/mdn-local/issues/888
   // https://github.com/website-local/mdn-local/issues/974
   // https://github.com/website-local/mdn-local/issues/1105
+  await submitLiveSampleAssets(res, submit, pipeline);
   await preProcessPlayground(res, submit, options, pipeline, $);
 
   /// region inject external script and style
@@ -131,6 +133,7 @@ export const postProcessHtml = (
   $('script[src*="gtag.js"]').remove();
   // Only MDN frontend modules are replaced by the offline helpers.
   $('script.mdn-local-frontend-module').remove();
+  postProcessPlayground($, res);
   if (typeof res.meta.liveDemoNotice === 'string') {
     $('body').prepend(res.meta.liveDemoNotice);
     delete res.meta.liveDemoNotice;

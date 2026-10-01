@@ -434,6 +434,8 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/HTML/Reference/Elements/figure/favicon-192x192.png`,
   [`/${locale}/docs/Web/API/console/timeLog_static/timer_output.png`]:
     `/${locale}/docs/Web/API/console/timeEnd_static/timer_output.png`,
+  [`/${locale}/docs/Web/API/CanvasRenderingContext2D/createPattern/canvas_createpattern.png`]:
+    `/${locale}/docs/Web/API/CanvasRenderingContext2D/createPattern/canvas_create_pattern.png`,
   // Case conflicts on case-insensitive filesystems (NTFS)
   [`/${locale}/docs/glossary/index.html`]:
     `/${locale}/docs/Glossary`,
