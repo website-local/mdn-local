@@ -30,6 +30,11 @@ Node.js or a build step.
 The packaged docs are intended to work directly from the local filesystem for
 offline browsing.
 
+Standalone demos with simple module scripts are converted to deferred classic
+scripts for local-file browsing. Demos that need module imports or other
+unsupported module features show an **Open the live example** link; those
+features require an internet connection.
+
 ## Build from source
 
 Use Node.js 20.19+, 22.13+, or 24+ to satisfy the build dependencies' engine

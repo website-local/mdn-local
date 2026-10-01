@@ -5,6 +5,8 @@ import {
 import type {DownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {defaultDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters.js';
+import {sources} from 'website-scrap-engine/lib/sources.js';
+import {generateMdnSavePath} from './generate-save-path.js';
 import {skipProcess} from './process-url/skip-process.js';
 import {redirectUrl} from './process-url/redirect-url.js';
 import {detectLinkType} from './process-url/detect-link-type.js';
@@ -32,6 +34,7 @@ import {
 } from './process-url/official-external-redirect.js';
 
 const lifeCycle = defaultLifeCycle();
+lifeCycle.generateSavePath = generateMdnSavePath;
 lifeCycle.init.push(interactiveExampleDeps);
 lifeCycle.linkRedirect.push(skipProcess, redirectUrl);
 lifeCycle.detectResourceType.push(detectLinkType);
@@ -61,6 +64,11 @@ lifeCycle.processAfterDownload.push(
 );
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
+options.sources = sources.map(source => ({
+  ...source,
+  selector: source.selector === 'link[rel="stylesheet"][href]'
+    ? 'link[rel~="stylesheet" i][href]' : source.selector
+}));
 options.logSubDir = 'developer.mozilla.org';
 options.createLogger = createMdnLogger;
 options.maxDepth = 8;

@@ -3,6 +3,7 @@ import type {Resource} from 'website-scrap-engine/lib/resource.js';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import URI from 'urijs';
 import type {Cheerio} from 'website-scrap-engine/lib/types.js';
+import {isMdnLoginUrl} from './login-url.js';
 
 const regExpCache: Record<string, RegExp> = {};
 
@@ -24,8 +25,7 @@ export function dropResource(
   if (!res.uri) {
     res.uri = URI(res.url);
   }
-  const dir = res.uri.directory(),
-    path = res.uri.path(),
+  const path = res.uri.path(),
     host = res.uri.host();
   const isFakeMdnDevLegacySitePath =
     path === '/mdn.dev/en' ||
@@ -75,9 +75,7 @@ export function dropResource(
     path.endsWith('%24history') ||
     path.endsWith('%24edit') ||
     path.endsWith('%24translate') ||
-    path.includes('/users/github/login') ||
-    path.includes('/users/google/login') ||
-    path.includes('/users/signin') ||
+    isMdnLoginUrl(res.url) ||
     // The standalone Playground app depends on Fred frontend modules and
     // online API/login behavior. Embedded examples are handled separately.
     isStandalonePlayground ||
@@ -93,8 +91,7 @@ export function dropResource(
     isDeadLegacySampleStylesheet ||
     // file name conflicts
     path.includes('release_notes.html/NSS_3.12.3_release_notes.html') ||
-    (path.includes('/profiles/') && path.endsWith('/edit')) ||
-    dir.endsWith('/profiles')) {
+    /^\/(?:[a-z]{2}(?:-[A-Za-z]+)?\/)?profiles(?:\/|$)/.test(path)) {
     res.shouldBeDiscardedFromDownload = true;
   }
   return res;

@@ -30,6 +30,8 @@ import {
   postProcessInteractiveExample,
   preProcessInteractiveExample
 } from './process-new-interactive-examples.js';
+import {externalDemoUrl, preProcessDemoModules} from './process-demo-modules.js';
+import {isMdnLoginUrl} from '../process-url/login-url.js';
 
 const INJECT_JS_PATH = '/static/js/inject.js';
 const INJECT_CSS_PATH = '/static/css/inject.css';
@@ -80,7 +82,11 @@ export const preProcessHtml = async (
   await preProcessPlayground(res, submit, options, pipeline, $);
 
   /// region inject external script and style
-  if ($('script[type="module"]').length) {
+  const liveDemoUrl = externalDemoUrl(res);
+  if (liveDemoUrl) {
+    await preProcessDemoModules($, res, submit, pipeline, liveDemoUrl);
+  } else if ($('script[type="module"]').length) {
+    $('script[type="module"]').addClass('mdn-local-frontend-module');
     // language=HTML
     $(`<script class="mdn-local-inject-js" src="${INJECT_JS_PATH}"></script>`)
       .appendTo($('body'));
@@ -123,8 +129,21 @@ export const postProcessHtml = (
   $('script[src*="react-main."]').remove();
   // 20250203 gtag.js googletagmanager stuff
   $('script[src*="gtag.js"]').remove();
-  // 20251005 module scripts not supported in file: protocol
-  $('script[type="module"]').remove();
+  // Only MDN frontend modules are replaced by the offline helpers.
+  $('script.mdn-local-frontend-module').remove();
+  if (typeof res.meta.liveDemoNotice === 'string') {
+    $('body').prepend(res.meta.liveDemoNotice);
+    delete res.meta.liveDemoNotice;
+  }
+  $('a[href]').each((_, node) => {
+    const link = $(node);
+    try {
+      const url = new URL(link.attr('href')!, res.redirectedUrl || res.url);
+      if (isMdnLoginUrl(url.href)) link.attr('href', url.href);
+    } catch {
+      // Literal sample links can contain invalid URLs.
+    }
+  });
 
   postProcessExternalizeStandalonePlaygroundLinks($, res.url);
   postProcessReplaceOnlineOnlyMdnWidgets($, res.url);

@@ -6,6 +6,7 @@ import URI from 'urijs';
 import {downloadableHosts} from './consts.js';
 import type {Resource} from 'website-scrap-engine/lib/resource.js';
 import type {Cheerio} from 'website-scrap-engine/lib/types.js';
+import {isMdnLoginUrl} from './login-url.js';
 
 // https://github.com/myfreeer/mdn-local/issues/34
 const remoteFavicon = new Set([
@@ -19,6 +20,17 @@ export const skipProcess = (
   element: Cheerio | null,
   parent: Resource | null
 ): string | void => {
+  // Keep login links usable online without crawling authentication challenges.
+  try {
+    const absolute = new URL(url, parent?.redirectedUrl || parent?.url ||
+      'https://developer.mozilla.org/').href;
+    if (isMdnLoginUrl(absolute)) {
+      if (element?.is('a')) element.attr('href', absolute);
+      return;
+    }
+  } catch {
+    // Let the existing malformed-link handling below inspect this URL.
+  }
   if (url === '/discord' || url === '/discord/') {
     skipExternalLogger.debug('skipped external link', 'discord', url, parent?.url);
     return;

@@ -273,8 +273,8 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/HTMLElement/contentEditable`,
   [`/${locale}/docs/Web/API/Element/contentEditable`]:
     `/${locale}/docs/Web/API/HTMLElement/contentEditable`,
-  [`/${locale}/docs/Web/API/Element/transitionend_event`]:
-    `/${locale}/docs/Web/API/HTMLElement/transitionend_event`,
+  [`/${locale}/docs/Web/API/HTMLElement/transitionend_event`]:
+    `/${locale}/docs/Web/API/Element/transitionend_event`,
   [`/${locale}/docs/Web/API/Element/offsetWidth`]:
     `/${locale}/docs/Web/API/HTMLElement/offsetWidth`,
   [`/${locale}/docs/Web/API/Element/textContent`]:
@@ -411,6 +411,8 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/Viewport_segments_API`,
   [`/${locale}/docs/Web/API/CSS_Painting_API/guide`]:
     `/${locale}/docs/Web/API/CSS_Painting_API/Guide`,
+  [`/${locale}/docs/web/api/document_object_model/example-dom-tree.svg`]:
+    `/${locale}/docs/Web/API/Document_Object_Model/example-dom-tree.svg`,
   [`/${locale}/docs/Web/API/CSS_Painting_API/guide/boxbg.png`]:
     `/${locale}/docs/Web/API/CSS_Painting_API/Guide/boxbg.png`,
   [`/${locale}/docs/Web/JavaScript/Reference/Global_Objects/Set/isdisjointfrom`]:
