@@ -1,83 +1,86 @@
 import type {CheerioStatic} from 'website-scrap-engine/lib/types.js';
 
 export const preProcessRemoveElements = ($: CheerioStatic): void => {
-  $('.bc-github-link').remove();
-  $('meta[name^="twitter"]').remove();
-  $('meta[name^="og"]').remove();
-  // head link to alternate lang
-  $('link[rel="alternate"]').remove();
-  $('link[rel="preconnect"]').remove();
-  $('link[rel="canonical"]').remove();
-  $('link[rel="manifest"]').remove();
-  $('link[rel="search"]').remove();
-  $('link[rel="apple-touch-icon-precomposed"]').remove();
-  // notice on top of page
-  $('.global-notice').remove();
-  // page footer
-  $('#nav-footer').remove();
-  // newsletter box
-  $('.newsletter-box').remove();
-  $('.newsletter-container').remove();
-  // Hacks Blog
-  $('.column-hacks').remove();
-  // Hacks Blog, new since maybe 20220109
-  $('.home-content-container > .blog-feed').remove();
-  // login link
-  $('#toolbox').remove();
-  // locale
-  $('.locale-container').remove();
-  // script errors in this page
-  $('#kserrors').remove();
-  // login-related - not needed
-  // $('.auth-container').remove();
-  // This is an archived page. It's not actively maintained.
-  $('.archived').remove();
-  // Found a problem with this page?
-  // Source on GitHub
-  $('#on-github').remove();
-  $('script[src*="perf."]').remove();
-  // bcd-signal script, not needed for offline usage
-  $('script[src*="react-bcd-signal"]').remove();
-  $('script[src*="speedcurve.com"]').remove();
-  $('script[src*="transcend-cdn.com"]').remove();
-  // google-analytics
-  $('script[src*="google-analytics.com"]').remove();
-  $('script[src*="/ga.js"]').remove();
-  // newsletter script, on the index page
-  $('script[src*="newsletter"]').remove();
-  // login box script, on the index page
-  $('script[src*="auth-modal."]').remove();
-  // remove styles on the index page
-  $('link[rel="stylesheet"][href*="auth-modal."]').remove();
-  $('link[rel="stylesheet"][href*="home_newsletter."]').remove();
-  $('link[rel="stylesheet"][href*="subscriptions."]').remove();
-  $('link[rel="stylesheet"][href*="home_featured."]').remove();
-  $('link[rel="stylesheet"][href*="mdn-subscriptions."]').remove();
-  $('link[rel="stylesheet"][href*="banners."]').remove();
-  // join community
-  $('.communitybox').remove();
-  // active-banner.jsx
-  $('.developer-needs.mdn-cta-container').remove();
-  // popup at bottom
-  $('#contribution-popover-container').remove();
-  // translation
-  $('.translationInProgress').remove();
-  // translation
-  $('#doc-pending-fallback').remove();
-  // remove google cdn stuff
-  $('link[href*="googleapis.com"]').remove();
-  $('script[src*="googleapis.com"]').remove();
-  // This page was translated from English by the community.
-  // Learn more and join the MDN Web Docs community.
-  $('.localized-content-note').remove();
-  // Change your language (bottom)
-  $('.language-menu').remove();
-  // Change language | View in English
-  $('.language-toggle').remove();
-  // 20220717 Latest news from hacks.mozilla.org on index page
-  $('.latest-news').remove();
-  // 20220717 Already a subscriber? Get MDN Plus
-  $('.auth-container').remove();
+  // These selectors only remove nodes; collect them in one document traversal.
+  $([
+    '.bc-github-link',
+    'meta[name^="twitter"]',
+    'meta[name^="og"]',
+    // head link to alternate lang
+    'link[rel="alternate"]',
+    'link[rel="preconnect"]',
+    'link[rel="canonical"]',
+    'link[rel="manifest"]',
+    'link[rel="search"]',
+    'link[rel="apple-touch-icon-precomposed"]',
+    // notice on top of page
+    '.global-notice',
+    // page footer
+    '#nav-footer',
+    // newsletter box
+    '.newsletter-box',
+    '.newsletter-container',
+    // Hacks Blog
+    '.column-hacks',
+    // Hacks Blog, new since maybe 20220109
+    '.home-content-container > .blog-feed',
+    // login link
+    '#toolbox',
+    // locale
+    '.locale-container',
+    // script errors in this page
+    '#kserrors',
+    // login-related - not needed
+    // $('.auth-container').remove();
+    // This is an archived page. It's not actively maintained.
+    '.archived',
+    // Found a problem with this page?
+    // Source on GitHub
+    '#on-github',
+    'script[src*="perf."]',
+    // bcd-signal script, not needed for offline usage
+    'script[src*="react-bcd-signal"]',
+    'script[src*="speedcurve.com"]',
+    'script[src*="transcend-cdn.com"]',
+    // google-analytics
+    'script[src*="google-analytics.com"]',
+    'script[src*="/ga.js"]',
+    // newsletter script, on the index page
+    'script[src*="newsletter"]',
+    // login box script, on the index page
+    'script[src*="auth-modal."]',
+    // remove styles on the index page
+    'link[rel="stylesheet"][href*="auth-modal."]',
+    'link[rel="stylesheet"][href*="home_newsletter."]',
+    'link[rel="stylesheet"][href*="subscriptions."]',
+    'link[rel="stylesheet"][href*="home_featured."]',
+    'link[rel="stylesheet"][href*="mdn-subscriptions."]',
+    'link[rel="stylesheet"][href*="banners."]',
+    // join community
+    '.communitybox',
+    // active-banner.jsx
+    '.developer-needs.mdn-cta-container',
+    // popup at bottom
+    '#contribution-popover-container',
+    // translation
+    '.translationInProgress',
+    // translation
+    '#doc-pending-fallback',
+    // remove google cdn stuff
+    'link[href*="googleapis.com"]',
+    'script[src*="googleapis.com"]',
+    // This page was translated from English by the community.
+    // Learn more and join the MDN Web Docs community.
+    '.localized-content-note',
+    // Change your language (bottom)
+    '.language-menu',
+    // Change language | View in English
+    '.language-toggle',
+    // 20220717 Latest news from hacks.mozilla.org on index page
+    '.latest-news',
+    // 20220717 Already a subscriber? Get MDN Plus
+    '.auth-container',
+  ].join(',')).remove();
   // 20220717 MDN Plus > FAQ
   $('#mdn-plus-button').parent().remove();
   // 20220717 Contributor Spotlight
