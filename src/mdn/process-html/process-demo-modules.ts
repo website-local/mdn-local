@@ -31,6 +31,12 @@ export function classicDemoModule(source: string): string | undefined {
   if (/\b(?:import|export|arguments|eval|currentScript)\b|\\u/.test(source)) {
     return;
   }
+  // Syntax alone does not make a demo self-contained. HTML/CSS discovery
+  // cannot collect runtime requests or image/worker dependencies, and file:
+  // pages cannot perform the same fetches as their online counterparts.
+  if (/\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|Worker|SharedWorker|Image|Audio|serviceWorker)\b/.test(source)) {
+    return;
+  }
   try {
     new Script(`'use strict';\n${source}`);
     const wrapped = `(function () {\n'use strict';\n${source}\n})();`;
@@ -91,7 +97,8 @@ export async function preProcessDemoModules(
   }
   if (needsLiveExample) {
     const notice = $('<p class="mdn-local-live-example">' +
-      'This example requires online JavaScript modules. <a>Open the live example</a>.</p>');
+      'This example needs features or resources that are unavailable offline. ' +
+      '<a>Open the live example</a>.</p>');
     notice.find('a').attr({href: liveUrl, target: '_blank', rel: 'noopener noreferrer'});
     // Added after link discovery so the live destination is not mirrored again.
     res.meta.liveDemoNotice = notice.toString();

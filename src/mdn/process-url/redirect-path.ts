@@ -400,6 +400,32 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
     `/${locale}/docs/Web/API/DOMRectReadOnly`,
   [`/${locale}/docs/Web/JavaScript/Reference/DOMException`]:
     `/${locale}/docs/Web/API/DOMException`,
+  // Stale image references in translated pages. Keep each verified asset move
+  // exact so unrelated images under these document paths are unaffected.
+  [`/${locale}/docs/Web/CSS/Guides/Box_alignment/two-axes.png`]:
+    `/${locale}/docs/Web/CSS/Guides/Box_alignment/Overview/two-axes.png`,
+  [`/${locale}/docs/Web/CSS/Guides/Box_alignment/align-container-subjects.png`]:
+    `/${locale}/docs/Web/CSS/Guides/Box_alignment/Overview/align-container-subjects.png`,
+  [`/${locale}/docs/Web/CSS/Guides/Box_alignment/writing-mode-start.png`]:
+    `/${locale}/docs/Web/CSS/Guides/Box_alignment/Overview/writing-mode-start.png`,
+  [`/${locale}/docs/Web/CSS/Guides/Box_alignment/justify-content-start.png`]:
+    `/${locale}/docs/Web/CSS/Guides/Box_alignment/Overview/justify-content-start.png`,
+  [`/${locale}/docs/Web/CSS/Guides/Box_alignment/justify-content-space-between.png`]:
+    `/${locale}/docs/Web/CSS/Guides/Box_alignment/Overview/justify-content-space-between.png`,
+  [`/${locale}/docs/Web/HTML/Element/img/clock-demo-200px.png`]:
+    `/${locale}/docs/Web/HTML/Reference/Elements/img/clock-demo-200px.png`,
+  [`/${locale}/docs/Web/HTML/Element/img/clock-demo-400px.png`]:
+    `/${locale}/docs/Web/HTML/Reference/Elements/img/clock-demo-400px.png`,
+  [`/${locale}/docs/Mozilla/Add-ons/WebExtensions/user_interface/Toolbar_button/browser-action.png`]:
+    `/${locale}/docs/Mozilla/Add-ons/WebExtensions/user_interface/browser-action.png`,
+  [`/${locale}/docs/Web/API/WebXR_Device_API/hw-setup.png`]:
+    `/${locale}/docs/Web/API/WebVR_API/hw-setup.png`,
+  [`/${locale}/docs/Web/CSS/Reference/Properties/border-image-slice/border-diamonds.png`]:
+    '/shared-assets/images/examples/border-diamonds.png',
+  [`/${locale}/docs/Web/HTML/Reference/Elements/th/column-row-span.png`]:
+    '/shared-assets/images/diagrams/html/table/column-row-span.png',
+  [`/${locale}/docs/Learn_web_development/Core/Styling_basics/Advanced_styling_effects/colorful-heart.png`]:
+    '/mdn-github-io/shared-assets/images/examples/colorful-heart.png',
   // Case conflicts on case-insensitive filesystems (NTFS)
   [`/${locale}/docs/glossary/index.html`]:
     `/${locale}/docs/Glossary`,

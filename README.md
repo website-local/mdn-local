@@ -31,9 +31,11 @@ The packaged docs are intended to work directly from the local filesystem for
 offline browsing.
 
 Standalone demos with simple module scripts are converted to deferred classic
-scripts for local-file browsing. Demos that need module imports or other
-unsupported module features show an **Open the live example** link; those
-features require an internet connection.
+scripts for local-file browsing. Demos that need module imports, runtime resource
+requests (such as fetch or image loading), or other unsupported features show an
+**Open the live example** link. These checks are conservative; some scripts may
+use the live fallback even when their particular resource request could work
+offline.
 
 ## Build from source
 

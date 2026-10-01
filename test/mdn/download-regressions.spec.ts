@@ -41,6 +41,57 @@ function fixture(locale = 'en-US', body: ResourceBody = 'window.ran = true;') {
 }
 
 describe('full-download regressions', () => {
+  test.each(['en-US', 'zh-CN'])('rewrite moved image src, srcset and CSS URLs in %s', async locale => {
+    const docs = `/${locale}/docs/`;
+    const moves = [
+      ...['two-axes', 'align-container-subjects', 'writing-mode-start',
+        'justify-content-start', 'justify-content-space-between'].map(name => [
+        `${docs}Web/CSS/Guides/Box_alignment/${name}.png`,
+        `${docs}Web/CSS/Guides/Box_alignment/Overview/${name}.png`
+      ]),
+      ...[200, 400].map(size => [
+        `${docs}Web/HTML/Element/img/clock-demo-${size}px.png`,
+        `${docs}Web/HTML/Reference/Elements/img/clock-demo-${size}px.png`
+      ]),
+      [`${docs}Mozilla/Add-ons/WebExtensions/user_interface/Toolbar_button/browser-action.png`,
+        `${docs}Mozilla/Add-ons/WebExtensions/user_interface/browser-action.png`],
+      [`${docs}Web/API/WebXR_Device_API/hw-setup.png`,
+        `${docs}Web/API/WebVR_API/hw-setup.png`],
+      [`${docs}Web/CSS/Reference/Properties/border-image-slice/border-diamonds.png`,
+        '/shared-assets/images/examples/border-diamonds.png'],
+      [`${docs}Web/HTML/Reference/Elements/th/column-row-span.png`,
+        '/shared-assets/images/diagrams/html/table/column-row-span.png'],
+      [`${docs}Learn_web_development/Core/Styling_basics/Advanced_styling_effects/colorful-heart.png`,
+        '/mdn-github-io/shared-assets/images/examples/colorful-heart.png']
+    ];
+    for (const [oldPath, newPath] of moves) {
+      const f = fixture(locale);
+      const page = `https://developer.mozilla.org${docs}Example`;
+      const {$} = await f.process(page,
+        `<img src="https://developer.mozilla.org${oldPath}" ` +
+        `srcset="${oldPath} 1x, ${oldPath} 2x">` +
+        `<style>.example { background-image: url("${oldPath}#sample"); }</style>`);
+      expect(f.submitted).toHaveLength(4);
+      expect(f.submitted.every(r => r.savePath === 'developer.mozilla.org' + newPath)).toBe(true);
+      const expectedDownload = newPath.startsWith('/shared-assets/')
+        ? 'https://www.mdnplay.dev' + newPath
+        : newPath.startsWith('/mdn-github-io/')
+          ? 'https://mdn.github.io' + newPath.slice('/mdn-github-io'.length)
+          : 'https://developer.mozilla.org' + newPath;
+      expect(f.submitted.every(r => r.downloadLink === expectedDownload)).toBe(true);
+      const expectedRelative = posix.relative(`developer.mozilla.org${docs}`, 'developer.mozilla.org' + newPath);
+      expect($('img').attr('src')).toBe(expectedRelative);
+      expect($('img').attr('srcset')).toBe(`${expectedRelative} 1x, ${expectedRelative} 2x`);
+      expect($('style').text()).toContain(`url("${expectedRelative}#sample")`);
+    }
+  });
+
+  test('leave neighboring assets unchanged', async () => {
+    const f = fixture('zh-CN');
+    const url = 'https://developer.mozilla.org/zh-CN/docs/Web/CSS/Guides/Box_alignment/other.png';
+    expect(await f.pipeline.linkRedirect(url, null, f.parent)).toBe(url);
+  });
+
   test.each(['en-US', 'zh-CN'])('canonical runner path in %s', async locale => {
     const f = fixture(locale);
     const canonical = `https://developer.mozilla.org/${locale}/docs/Web/API/Element/transitionend_event`;
@@ -200,6 +251,31 @@ describe('full-download regressions', () => {
       '<script type="module">window.inlineRan = true;</script>');
     expect($('.mdn-local-live-example')).toHaveLength(1);
     expect($('script[src^="data:"]')).toHaveLength(1);
+  });
+
+  test.each([
+    'const response = await fetch("subpage.html");',
+    'navigation.addEventListener("navigate", e => { e.intercept({ async handler() { await fetch(e.destination.url); } }); });',
+    'const texture = new Image(); texture.src = "https://cdn.example.com/texture.png";',
+    'window.fetch("data.json");',
+    'const request = new XMLHttpRequest(); request.open("GET", "data.json");',
+    'const worker = new Worker("worker.js");',
+    'const socket = new WebSocket("wss://example.com");'
+  ])('use a live link for runtime dependencies: %s', async source => {
+    const f = fixture('en-US', source);
+    const {$} = await f.process('https://mdn.github.io/demo/',
+      '<script type="module" src="script.js"></script>' +
+      '<script type="module">window.staticPreview = true;</script><button>Demo</button>');
+    const scripts = $('script[src^="data:"]');
+    expect(scripts).toHaveLength(1);
+    const converted = Buffer.from(scripts.attr('src')!.split(',')[1], 'base64').toString();
+    expect(converted).toContain('window.staticPreview = true;');
+    expect($('.mdn-local-live-example')).toHaveLength(1);
+    expect($('.mdn-local-live-example').text()).toContain('resources that are unavailable offline');
+    expect($('.mdn-local-live-example a').attr('href')).toBe('https://mdn.github.io/demo/');
+    expect($('[class*="mdn-local-inject"]')).toHaveLength(0);
+    expect($('button')).toHaveLength(1);
+    expect(f.submitted.find(r => r.url.endsWith('script.js'))?.body).toBe(source);
   });
 
   test('continue replacing real MDN frontend modules with offline helpers', async () => {
