@@ -1,6 +1,6 @@
 import {
   SingleThreadDownloader
-} from 'website-scrap-engine/lib/downloader/index.js';
+} from 'website-scrap-engine/lib/downloader/single.js';
 import type {
   DownloadOptions,
   StaticDownloadOptions
