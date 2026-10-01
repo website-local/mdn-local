@@ -6,7 +6,7 @@ import type {
   StaticDownloadOptions
 } from 'website-scrap-engine/lib/options.js';
 import type {Resource} from 'website-scrap-engine/lib/resource.js';
-import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {createResource, ResourceType} from 'website-scrap-engine/lib/resource.js';
 
 const opt = (locale: string): StaticDownloadOptions => ({
   localRoot: '/tmp/dummy',
@@ -28,6 +28,47 @@ const fakeRes = (url: string) => ({
 }) as Resource;
 
 describe('redirect-url', function () {
+  test.each([
+    ['Tutorials/2D_breakout_game_pure_JavaScript', '2D_breakout_game_pure_JavaScript'],
+    ['Tutorials/2D_breakout_game_Phaser', '2D_breakout_game_Phaser'],
+    ['Workflows/2D_breakout_game_pure_JavaScript', '2D_breakout_game_pure_JavaScript'],
+    ['Workflows/2D_breakout_game_Phaser', '2D_breakout_game_Phaser'],
+    ['Workflows/Breakout_game_from_scratch', '2D_breakout_game_pure_JavaScript'],
+  ])('preserves the collision section when redirecting %s', (source, target) => {
+    const base = 'https://developer.mozilla.org/en-US/docs/Games/';
+    const destination = `${base}Tutorials/${target}/Build_the_brick_field`;
+    const redirected = redirectUrl(`${base}${source}/Collision_detection#old-section`,
+      null, null, opt('en-US'));
+    expect(redirected).toBe(`${destination}#brickball_collision_detection`);
+
+    const resource = createResource({
+      type: ResourceType.Html,
+      depth: 1,
+      url: redirected as string,
+      refUrl: `${base}Tutorials/${target}/Move_the_ball`,
+      localRoot: '/tmp/dummy',
+    });
+    expect(resource.downloadLink).toBe(destination);
+    expect(resource.replacePath)
+      .toBe('Build_the_brick_field.html#brickball_collision_detection');
+    expect(resource.savePath).toBe(
+      `developer.mozilla.org/en-US/docs/Games/Tutorials/${target}/Build_the_brick_field.html`
+    );
+  });
+
+  test.each(['zh-CN', 'fr'])('keeps translated collision pages for %s', locale => {
+    const url = `https://developer.mozilla.org/${locale}/docs/Games/` +
+      'Tutorials/2D_breakout_game_pure_JavaScript/Collision_detection#section';
+    expect(redirectUrl(url, null, null, opt(locale))).toBe(url);
+  });
+
+  test('keeps a source fragment when the mapped destination has no fragment', () => {
+    expect(redirectUrl(
+      'https://developer.mozilla.org/en-US/docs/Web/API/CSS_Painting_API/guide#example',
+      null, null, opt('en-US')))
+      .toBe('https://developer.mozilla.org/en-US/docs/Web/API/CSS_Painting_API/Guide#example');
+  });
+
   // commit 40ec1502704e6e363f6ab4d691d002125987b7cd
   // 2019/3/2 10:15
   test('append locale to path', () => {

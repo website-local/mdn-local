@@ -8,14 +8,14 @@
 export const officialExternalRedirectSources = Object.freeze([
   Object.freeze({
     repository: 'mdn/content',
-    commit: '308f0db4466bb95ff19c004f19c327af707fca98',
+    commit: 'bacd00c353f643d8f5be0ce769015b1a66b4251a',
     paths: Object.freeze([
       'files/en-us/_redirects.txt',
     ])
   }),
   Object.freeze({
     repository: 'mdn/translated-content',
-    commit: 'a747edfab245583fd359557bf1b60db8c9abd5d5',
+    commit: 'b0ea36c2198d9e4dc453266a2550e7685748b80b',
     paths: Object.freeze([
       'files/es/_redirects.txt',
       'files/fr/_redirects.txt',

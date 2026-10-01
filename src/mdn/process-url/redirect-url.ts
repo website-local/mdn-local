@@ -361,7 +361,12 @@ export function redirectUrl(
     }
     const mdnRedirectPath = getMdnRedirectPath(locale);
     if (mdnRedirectPath[u.path()]) {
-      url = u.path(mdnRedirectPath[u.path()]).toString();
+      const destination = URI(mdnRedirectPath[u.path()]);
+      u.path(destination.path());
+      if (destination.fragment()) {
+        u.fragment(destination.fragment());
+      }
+      url = u.toString();
     }
     if (locale !== 'en-US' && url.match('en-US')) {
       errorLogger.warn(url, pathArr.join('/'));

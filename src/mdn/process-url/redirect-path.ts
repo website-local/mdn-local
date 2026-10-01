@@ -432,6 +432,22 @@ export const mdnRedirectPath = (locale: string) : Record<string, string> => ({
 });
 
 export const mdnLocaleRedirectPath = (locale: string): Record<string, string> => {
+  if (locale === 'en-US') {
+    // https://github.com/mdn/content/commit/69937a446786abf5a58d4214b4192597d0b3cdc6
+    // Resolve section redirects before download so offline links keep the anchor.
+    return {
+      '/en-US/docs/Games/Tutorials/2D_breakout_game_pure_JavaScript/Collision_detection':
+        '/en-US/docs/Games/Tutorials/2D_breakout_game_pure_JavaScript/Build_the_brick_field#brickball_collision_detection',
+      '/en-US/docs/Games/Tutorials/2D_breakout_game_Phaser/Collision_detection':
+        '/en-US/docs/Games/Tutorials/2D_breakout_game_Phaser/Build_the_brick_field#brickball_collision_detection',
+      '/en-US/docs/Games/Workflows/2D_breakout_game_pure_JavaScript/Collision_detection':
+        '/en-US/docs/Games/Tutorials/2D_breakout_game_pure_JavaScript/Build_the_brick_field#brickball_collision_detection',
+      '/en-US/docs/Games/Workflows/2D_breakout_game_Phaser/Collision_detection':
+        '/en-US/docs/Games/Tutorials/2D_breakout_game_Phaser/Build_the_brick_field#brickball_collision_detection',
+      '/en-US/docs/Games/Workflows/Breakout_game_from_scratch/Collision_detection':
+        '/en-US/docs/Games/Tutorials/2D_breakout_game_pure_JavaScript/Build_the_brick_field#brickball_collision_detection',
+    };
+  }
   if (locale !== 'zh-CN') {
     return {};
   }
