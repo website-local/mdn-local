@@ -32,7 +32,9 @@ offline browsing.
 
 ## Build from source
 
-Node.js `>=18.17.0` is required.
+Use Node.js 20.19+, 22.13+, or 24+ to satisfy the build dependencies' engine
+requirements. CI also checks Node 18 compatibility, but strict engine checks
+reject some dependencies on that version.
 
 ```bash
 npm ci
@@ -72,7 +74,10 @@ createDownloader({
     http2: false,
   }
 }).then(d => d.onIdle().then(() => d.dispose()))
-  .catch(console.error);
+  .catch(error => {
+    console.error(error);
+    process.exitCode = 1;
+  });
 ```
 
 Full locale download:
@@ -96,7 +101,10 @@ createDownloader({
     http2: false,
   }
 }).then(d => d.onIdle().then(() => d.dispose()))
-  .catch(console.error);
+  .catch(error => {
+    console.error(error);
+    process.exitCode = 1;
+  });
 ```
 
 Notes:
@@ -126,6 +134,12 @@ Important log files:
 - `skip.log`
 - `request.log`
 - `response.log`
+
+CI archives also contain `build-info.json` at the archive root, recording the
+source commit, workflow run, locale, Node and engine versions, and lockfile hash.
+Release preparation requires a successful download run with both locale
+archives and checks their archive integrity. Review the download logs and
+offline pages before publishing the draft release.
 
 As of `website-scrap-engine@0.9.0`, file logging is configured explicitly
 through the engine's `createLogger` hook. `mdn-local` keeps using the log4js

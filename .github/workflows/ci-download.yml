@@ -80,11 +80,34 @@ jobs:
           ls -hl lib/mdn/
       - name: Running downloader
         run: node ./lib/mdn/run-downloader.js
+      - name: Record build provenance
+        env:
+          BUILD_LOCALE: ${{ matrix.locale }}
+          CUSTOM_COMMAND_USED: ${{ github.event.inputs.command != '' }}
+        run: |
+          node --input-type=module <<'EOF'
+          import {readFileSync, writeFileSync} from 'node:fs';
+          import {createHash} from 'node:crypto';
+          const lockfile = readFileSync('package-lock.json');
+          const lock = JSON.parse(lockfile);
+          const info = {
+            commit: process.env.GITHUB_SHA,
+            runId: process.env.GITHUB_RUN_ID,
+            runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+            locale: process.env.BUILD_LOCALE,
+            node: process.version,
+            engine: lock.packages['node_modules/website-scrap-engine'].version,
+            lockfileSha256: createHash('sha256').update(lockfile).digest('hex'),
+            customCommandUsed: process.env.CUSTOM_COMMAND_USED === 'true'
+          };
+          writeFileSync(`dist/${process.env.build_name}/build-info.json`, JSON.stringify(info, null, 2) + '\n');
+          EOF
       - name: Packaging
         run: |
           pushd dist
           7z a -m0=lzma2 -mx=9 -ms=on -myx=9 -mqs=on -md=28 ../${{ env.build_name }}.7z ${{ env.build_name }}
           popd
+          7z t ${{ env.build_name }}.7z
 
       - name: Collecting logs
         if: always()
@@ -104,8 +127,8 @@ jobs:
 
       - name: Uploading artifact
         id: upload_artifact
-        continue-on-error: true
         uses: actions/upload-artifact@master
         with:
           name: ${{ env.build_name }}
           path: ${{ env.build_name }}.7z
+          if-no-files-found: error

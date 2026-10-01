@@ -1,6 +1,7 @@
 name: Upload release
 permissions:
   contents: write
+  actions: read
 defaults:
   run:
     shell: bash
@@ -29,46 +30,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 20.x
+
       - name: Update package lists and install jq
         run: |
           sudo apt update
-          sudo apt install jq -y
-      - name: Init variable
+          sudo apt install jq p7zip-full -y
+      - name: Validate download run and artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACTION_TOKEN || github.token }}
+          SOURCE_RUN_ID: ${{ github.event.inputs.run_id }}
         run: |
-          curl -L \
+          [[ "$SOURCE_RUN_ID" =~ ^[0-9]+$ ]]
+          curl --fail --silent --show-error -L \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GH_ACTION_TOKEN }}" \
+            -H "Authorization: Bearer $GH_TOKEN" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${{ github.event.inputs.run_id }}/artifacts > artifacts.json
-          cat artifacts.json
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/$SOURCE_RUN_ID" > run.json
+          curl --fail --silent --show-error -L \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/$SOURCE_RUN_ID/artifacts?per_page=100" > artifacts.json
+          node scripts/select-release-artifacts.mjs run.json artifacts.json "$GITHUB_REPOSITORY" "$SOURCE_RUN_ID" > artifact-urls.txt
 
       - name: Download artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACTION_TOKEN || github.token }}
         run: |
-          desired_prefix="developer.mozilla.org_"
-          archive_download_urls=$(cat artifacts.json | jq -r --arg desired_prefix "$desired_prefix" '.artifacts[] | select(.name | startswith($desired_prefix)).archive_download_url')
-          echo $archive_download_urls
           mkdir -p download
           pushd download
-          for url in $archive_download_urls; do
-            auth_header="Authorization: Bearer ${{ secrets.GH_ACTION_TOKEN }}"
-            # Make the initial request with the Authorization header and capture the headers
-            response_headers=$(curl -s -I -L --header "$auth_header" "$url")
-            # Look for a Location header in case of a redirect
-            redirect_url=$(echo "$response_headers" | grep -i Location: | tail -n1 | sed -e 's/Location: //I' | tr -d '\r')
-            # Check if a redirect URL was found
-            if [ -n "$redirect_url" ]; then
-                echo "Redirect URL found: $redirect_url"
-                # Make a new request to the redirect URL without the Authorization header
-                curl -L "$redirect_url" --remote-header-name -O
-            else
-                echo "No redirect URL found, downloading directly."
-                # If no redirect was found, download the file directly with the Authorization header
-                curl -L --header "$auth_header" "$url" --remote-header-name -O
-            fi
-          done
+          artifact_index=0
+          while IFS= read -r url; do
+            artifact_index=$((artifact_index + 1))
+            curl --fail --silent --show-error -L \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              "$url" --output "artifact-$artifact_index.zip"
+          done < ../artifact-urls.txt
           mkdir -p ../release
-          for zip_file in $(ls); do
-            unzip "$zip_file" -d ../release
+          for zip_file in *.zip; do
+            unzip -o "$zip_file" -d ../release
           done
           popd
 
@@ -77,9 +81,12 @@ jobs:
         continue-on-error: true
         run: ${{ github.event.inputs.command }}
 
-      - name: Empty check
+      - name: Validate release archives
         run: |
-          [ ! -z "$(ls -A release)" ]
+          while IFS= read -r name; do
+            test -s "release/$name.7z"
+            7z t "release/$name.7z"
+          done < <(jq -r '.artifacts[] | select(.name | startswith("developer.mozilla.org_")) | .name' artifacts.json)
 
       - name: Collect hash
         run: |
