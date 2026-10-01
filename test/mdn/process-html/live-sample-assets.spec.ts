@@ -87,6 +87,24 @@ describe.each(['en-US', 'zh-CN'])('scoped sample assets in %s', locale => {
     expect(f.download).toHaveBeenCalledTimes(1);
   });
 
+  test('embed the getImageData sibling image for local canvas pixel reads', async () => {
+    const f = fixture(locale);
+    const slug = 'Web/API/CanvasRenderingContext2D/getImageData';
+    const js = 'const image = new Image(); image.src = "plumeria.jpg"; ' +
+      'image.onload = () => { ctx.drawImage(image, 0, 0); ctx.getImageData(10, 20, 80, 230); };';
+    const $ = await f.process(slug, sample(locale, slug, js));
+    const runner = f.submitted.find(r => r.savePath.includes('/runner-'))!;
+    expect((runner.meta.doc as CheerioStatic)('#mdn-play-js').text())
+      .toBe(js.replace('"plumeria.jpg"', `"data:image/jpeg;base64,${jpeg.toString('base64')}"`));
+    expect($('pre.js').text()).toBe(js);
+    const asset = f.submitted.find(r => r.savePath.endsWith('/plumeria.jpg'))!;
+    expect(asset.downloadLink)
+      .toBe(`https://developer.mozilla.org/${locale}/docs/${slug}/plumeria.jpg`);
+    expect(asset.savePath).toBe(posix.join(posix.dirname(runner.savePath), 'plumeria.jpg'));
+    expect(asset.body).toBe(jpeg);
+    expect(f.download).toHaveBeenCalledTimes(1);
+  });
+
   test('do not collect an unrelated page or child directory', async () => {
     const f = fixture(locale);
     await f.process('Web/API/Canvas_API/Tutorial/Basic_animations/Other', '<p>No sample</p>');

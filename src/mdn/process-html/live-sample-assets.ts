@@ -26,7 +26,7 @@ const assets: Readonly<Record<string, readonly SampleAsset[]>> = {
   'Web/API/CanvasRenderingContext2D/createPattern': pattern,
   'Web/API/CanvasRenderingContext2D/imageSmoothingQuality': pattern,
   'Web/API/Canvas_API/Tutorial/Applying_styles_and_colors': pattern,
-  'Web/API/CanvasRenderingContext2D/getImageData': [{name: 'plumeria.jpg'}],
+  'Web/API/CanvasRenderingContext2D/getImageData': [{name: 'plumeria.jpg', embed: 'image/jpeg'}],
   'Web/API/CanvasRenderingContext2D/imageSmoothingEnabled': [{
     name: 'big-star.png', source: '/shared-assets/images/examples/big-star.png',
   }],
