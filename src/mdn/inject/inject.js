@@ -4055,7 +4055,7 @@ code {
         ${this._messages.map((message) => {
     return `
             <li>
-              <code>${message}</code>
+              <code>${message.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>
             </li>
           `;
   }).join('')}
@@ -4529,8 +4529,12 @@ code {
     }
 
     /** @param {MessageEvent} e  */
-    _onMessage({ data: { typ, prop, args } }) {
-      if (typ === 'console') {
+    _onMessage({ data, source }) {
+      // Fred isolates hosted runners by subdomain; local frames share a null origin.
+      if (!this._iframe?.contentWindow || source !== this._iframe.contentWindow ||
+        !data || typeof data !== 'object') return;
+      const { typ, prop, args } = data;
+      if (typ === 'console' && typeof prop === 'string' && Array.isArray(args)) {
         /** @type {VConsole} */
         const detail = { prop, args };
         this.dispatchEvent(
