@@ -2962,6 +2962,13 @@ Prism.languages.py = Prism.languages.python;
         window.location.hash = panelId;
         activate(panelId, true);
       });
+      tabs[j].addEventListener('keydown', function aboutTabKeydown(event) {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        const nextIndex = (j + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+        tabs[nextIndex].click();
+        tabs[nextIndex].focus();
+      });
     }
     window.addEventListener('hashchange', function aboutTabsHashChange() {
       activate(getAboutTabsPanelIdFromHash(window.location.hash.slice(1)), false);
@@ -3344,7 +3351,7 @@ function mdnMaskImageStyleFix(sr) {
      * @param {HTMLAnchorElement} link The link element to reset.
      */
     resetHighlighting(link) {
-      const nodes = [...link.querySelectorAll('span, mark')];
+      const nodes = [...link.querySelectorAll('span.sidebar-filter-mark-container, mark')];
       const parents = new Set();
       for (const node of nodes) {
         const parent = node.parentElement;
@@ -3440,7 +3447,7 @@ function mdnMaskImageStyleFix(sr) {
         );
 
         const span = this.replaceChildNode(node, 'span');
-        span.className = 'highlight-container';
+        span.className = 'sidebar-filter-mark-container';
 
         /** @type {Text|undefined} */
         const initialRest = [...span.childNodes].find(
@@ -3687,7 +3694,7 @@ function mdnMaskImageStyleFix(sr) {
         }
         if (!trimmedQuery) {
           this._restoreScrollPosition();
-          span.remove();
+          span?.remove();
         }
       }
     }
@@ -3731,6 +3738,7 @@ function mdnMaskImageStyleFix(sr) {
   btn.onclick = () => {
     filter._clearFilter();
     input.value = '';
+    btn.style.visibility = '';
   };
   filter.firstUpdated();
   if (location.protocol !== 'file:') {
@@ -5647,6 +5655,19 @@ code {
           border-bottom-left-radius: var(--elem-radius);
         }
 
+        @media (max-width: 769px) {
+          .template-console {
+            grid-template-areas: "header" "editor" "buttons" "console";
+            grid-template-rows: max-content 1fr max-content 8rem;
+            grid-template-columns: 1fr;
+          }
+
+          .template-console .buttons {
+            flex-direction: row;
+            justify-content: space-between;
+          }
+        }
+
         /* Tabbed template */
         .template-tabbed {
           display: grid;
@@ -5682,6 +5703,19 @@ code {
           border-bottom-left-radius: var(--elem-radius);
         }
 
+        @media (max-width: 992px) {
+          .template-tabbed {
+            grid-template-areas: "header" "tabs" "runner";
+            grid-template-rows: max-content 1fr 1fr;
+            grid-template-columns: 1fr;
+          }
+
+          .template-tabbed .output-wrapper {
+            border-top: var(--border);
+            border-left: 0;
+          }
+        }
+
         /* Choices template */
         .template-choices {
           display: grid;
@@ -5695,8 +5729,8 @@ code {
           border-radius: var(--elem-radius);
         }
 
-        /* Media query: replace with actual condition, e.g. (max-width: 768px) */
-        @media (--screen-medium-and-narrower) {
+        /* Fred's media aliases are expanded here because this file is copied as-is. */
+        @media (max-width: 992px) {
           .template-choices {
             grid-template-areas:
               "header"
@@ -5717,7 +5751,7 @@ code {
           border-right: var(--border);
         }
 
-        @media (--screen-medium-and-narrower) {
+        @media (max-width: 992px) {
           .template-choices .choice-wrapper {
             padding-right: 1em;
             border-right: none;
@@ -5748,7 +5782,7 @@ code {
           mask-size: cover;
         }
 
-        @media (--screen-medium-and-narrower) {
+        @media (max-width: 992px) {
           .template-choices .choice-wrapper .choice::after {
             display: none;
           }
@@ -6223,15 +6257,34 @@ code {
     mode = 'light dark';
   }
 
+  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+  function applyTheme() {
+    // Keep the OS preference in storage, but resolve it for offline icon filters.
+    const theme = mode === 'light dark' ? (systemTheme.matches ? 'dark' : 'light') : mode;
+    document.documentElement.dataset.theme = theme;
+    document.querySelectorAll('mdn-color-theme').forEach(element => {
+      const container = element.shadowRoot?.querySelector('.color-theme');
+      if (container) container.dataset.theme =
+        document.querySelector('.navigation[data-scheme="dark"]') ? 'dark' : theme;
+    });
+    document.body.dispatchEvent(
+      new CustomEvent('mdn-color-theme-update', {bubbles: true, composed: true, detail: theme}),
+    );
+  }
+  systemTheme.addEventListener('change', () => {
+    if (mode === 'light dark') applyTheme();
+  });
+
   function setMode(e) {
     const target = e.target;
     if (!(target instanceof HTMLElement)) {
       return;
     }
-    const mode = target.dataset.mode;
-    if (!(mode === 'light dark' || mode === 'light' || mode === 'dark')) {
+    const selectedMode = target.dataset.mode;
+    if (!(selectedMode === 'light dark' || selectedMode === 'light' || selectedMode === 'dark')) {
       return;
     }
+    mode = selectedMode;
     try {
       localStorage.setItem('theme', mode);
     } catch (error) {
@@ -6243,14 +6296,7 @@ code {
       sr.activeElement.blur();
     }
 
-    document.documentElement.dataset.theme = mode;
-    document.body.dispatchEvent(
-      new CustomEvent('mdn-color-theme-update', {
-        bubbles: true,
-        composed: true,
-        detail: mode,
-      }),
-    );
+    applyTheme();
     sr.querySelectorAll('.color-theme__option').forEach(el => {
       if (el.dataset.mode === mode) {
         el.setAttribute('data-current', 'true');
@@ -6258,8 +6304,7 @@ code {
         el.removeAttribute('data-current', 'true');
       }
     });
-    sr.querySelector('.color-theme').dataset.theme =
-      document.querySelector('.navigation[data-scheme="dark"]') ? 'dark' : mode;
+    sr.querySelector('.color-theme__button').dataset.mode = mode;
 
   }
 

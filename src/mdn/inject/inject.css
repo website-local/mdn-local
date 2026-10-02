@@ -563,6 +563,11 @@ table.bc-table {
   grid-column: 1 / -1;
 }
 
+/* Fred renders notes only when expanded; offline notes are always in the DOM. */
+.bc-table button[aria-expanded="false"] ~ .timeline {
+  display: none;
+}
+
 /* mdn-local renders all timelines statically and hides collapsed ones via
    button[aria-expanded="false"] ~ .timeline; only expanded timelines may
    take the grid display, or this higher-specificity rule would override
@@ -1033,10 +1038,6 @@ table.bc-table {
     padding: 0.25rem;
   }
 
-  button[aria-expanded="false"] ~ .timeline {
-    display: none;
-  }
-
   .bc-table .timeline {
     border-left: medium !important;
     border-top: var(--border);
@@ -1448,7 +1449,7 @@ table.bc-table {
 }
 
 /* misc icons */
-@media (width <= 1006px) {
+@media (width <= 1044px) {
   .mask-fix .navigation__button::before {
     background-color: transparent;
   }
@@ -1497,11 +1498,13 @@ table.bc-table {
   filter: invert(1);
 }
 
-.mask-fix .menu__panel-icon[data-icon="mdn-m"]::before,
-.mask-fix .menu__panel-icon[data-icon="users"]::before,
-.mask-fix .menu__panel-icon[data-icon="chart-no-axes-combined"]::before,
-.mask-fix .menu__panel-icon[data-icon="github"]::before {
+.mask-fix .menu__panel-icon::before {
   background-color: transparent;
+}
+
+[data-theme="dark"] .mask-fix .menu__panel-icon::before,
+.mask-fix [data-scheme="dark"] .menu__panel-icon::before {
+  filter: invert(1);
 }
 
 .code-example iframe, .code-example mdn-play-runner {
