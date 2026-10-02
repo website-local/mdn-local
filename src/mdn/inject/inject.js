@@ -4790,7 +4790,7 @@ code {
 .editor.minimal .cm-line { padding: 0 12px; }
 .editor .cm-editor { height: 100%; width: 100%; }
 .editor .cm-editor * { font-family: var(--font-family-code) !important; }</style><div
-      class=${this.minimal ? 'editor minimal' : 'editor'}
+      class="${this.minimal ? 'editor minimal' : 'editor'}"
     ></div>`;
       if (!MDNPlayEditor._ready) {
         MDNPlayEditor._ready = new Promise((resolve, reject) => {
@@ -5053,10 +5053,6 @@ code {
       <slot name="active-panel"></slot>
     `;
 
-      // Setup event delegation
-      const tablist = this.shadowRoot.getElementById('tablist');
-      tablist.addEventListener('click', this._tablistClick.bind(this));
-      tablist.addEventListener('keydown', this._tablistKeyDown.bind(this));
     }
 
     _setupEventListeners() {
@@ -5867,18 +5863,18 @@ code {
                 </mdn-ix-tab-wrapper>`
 }
           <div class="buttons">
-            <mdn-button
+            <button type="button"
               id="execute"
               variant="secondary"
               title="Run example, and show console output">
               Run
-            </mdn-button>
-            <mdn-button
+            </button>
+            <button type="button"
               id="reset"
               variant="secondary"
               title="Reset example, and clear console output">
               Reset
-            </mdn-button>
+            </button>
           </div>
           <mdn-play-console
             id="console"
@@ -5902,9 +5898,9 @@ code {
         <div class="template-tabbed" aria-labelledby="${id}">
           <header>
             <h4 id="${id}">${this._decode(this.name)}</h4>
-            <mdn-button id="reset" variant="secondary">
+            <button type="button" id="reset" variant="secondary">
               Reset
-            </mdn-button>
+            </button>
           </header>
           <mdn-ix-tab-wrapper>
             ${languages.map(
