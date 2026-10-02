@@ -9,7 +9,7 @@ import type {
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {toString} from 'website-scrap-engine/lib/util.js';
 import {externalHosts} from '../process-url/consts.js';
-import {demoImageAssets, liveOnlyDemoPaths} from './live-only-demos.js';
+import {demoAssets, liveOnlyDemoPaths} from './live-only-demos.js';
 
 export function externalDemoUrl(res: DownloadResource): string | undefined {
   const url = new URL(res.redirectedUrl || res.url);
@@ -58,9 +58,10 @@ export async function preProcessDemoModules(
   const live = new URL(liveUrl);
   const path = live.pathname.replace(/\/index\.html$/, '/');
   if (live.hostname === 'mdn.github.io') {
-    for (const name of demoImageAssets[path] || []) {
+    for (const name of demoAssets[path] || []) {
       const resource = await pipeline.createAndProcessResource(
-        new URL(name, live).href, ResourceType.Binary, res.depth + 1, null, res);
+        new URL(name, live).href, name.endsWith('.css') ? ResourceType.Css : ResourceType.Binary,
+        res.depth + 1, null, res);
       if (resource && !resource.shouldBeDiscardedFromDownload) submit(resource);
     }
   }

@@ -46,6 +46,21 @@ describe('full-download regressions', () => {
     'https://mdn.github.io/dom-examples/fetch/basic-fetch/index.html',
     'https://mdn.github.io/webassembly-examples/understanding-text-format/add.html',
     'https://mdn.github.io/webaudio-examples/decode-audio-data/promise/',
+    'https://mdn.github.io/dom-examples/web-workers/simple-web-worker/',
+    'https://mdn.github.io/dom-examples/web-workers/simple-shared-worker/index.html',
+    'https://mdn.github.io/dom-examples/web-workers/fibonacci-worker/',
+    'https://mdn.github.io/dom-examples/web-workers/offscreen-canvas-worker/',
+    'https://mdn.github.io/dom-examples/web-workers/worker-playground/',
+    'https://mdn.github.io/dom-examples/file-system-api/createsyncaccesshandle-mode/',
+    'https://mdn.github.io/learning-area/javascript/asynchronous/workers/finished/',
+    'https://mdn.github.io/dom-examples/fetch/fetch-request/',
+    'https://mdn.github.io/dom-examples/fetch/fetch-request-with-init/',
+    'https://mdn.github.io/dom-examples/fetch/fetch-response/',
+    'https://mdn.github.io/webaudio-examples/iirfilter-node/',
+    'https://mdn.github.io/webaudio-examples/step-sequencer/',
+    'https://mdn.github.io/webassembly-examples/js-api-examples/xhr-wasm.html',
+    'https://mdn.github.io/pwa-examples/js13kpwa/',
+    'https://mdn.github.io/learning-area/javascript/apis/drawing-graphics/threejs-cube/',
   ])('keep known runtime-dependent classic demos online: %s', async url => {
     const f = fixture();
     const {$} = await f.process(url,
@@ -266,6 +281,49 @@ describe('full-download regressions', () => {
     expect($('script')).toHaveLength(1);
     expect($('.mdn-local-live-example')).toHaveLength(0);
     expect(f.submitted.some(r => r.downloadLink === new URL(name, url).href)).toBe(true);
+    expect(f.downloaded).toHaveLength(0);
+  });
+
+  test.each(['en-US', 'zh-CN'])('include shadow DOM images and a processed stylesheet in %s', async locale => {
+    const f = fixture(locale);
+    const path = '/web-components-examples/popup-info-box-external-stylesheet/';
+    const {$} = await f.process('https://developer.mozilla.org/mdn-github-io' + path + 'index.html',
+      '<popup-info img="img/alt.png"></popup-info><script src="main.js"></script>');
+    for (const [name, type] of [
+      ['img/alt.png', ResourceType.Binary], ['img/default.png', ResourceType.Binary],
+      ['style.css', ResourceType.Css],
+    ] as const) {
+      const asset = f.submitted.find(r => r.downloadLink === 'https://mdn.github.io' + path + name);
+      expect(asset?.type).toBe(type);
+      expect(asset?.savePath).toBe('developer.mozilla.org/mdn-github-io' + path + name);
+    }
+    expect($('script').attr('src')).toBe('main.js');
+    expect($('popup-info').attr('img')).toBe('img/alt.png');
+    expect($('.mdn-local-live-example')).toHaveLength(0);
+  });
+
+  test.each([
+    ['beginner-html-site-scripted/', ['images/firefox2.png']],
+    ['dom-examples/web-storage/', ['jscolor/hs.png', 'jscolor/hv.png', 'jscolor/cross.gif', 'jscolor/arrow.gif']],
+    ['dom-examples/window-management-api/', ['popups-blocked.png']],
+    ['web-components-examples/popup-info-box-web-component/', ['img/alt.png', 'img/default.png']],
+    ['learning-area/javascript/building-blocks/gallery/', ['images/pic2.jpg', 'images/pic3.jpg', 'images/pic4.jpg', 'images/pic5.jpg']],
+    ['dom-examples/view-transitions/spa/', [
+      'images/jungle-coast.jpg', 'images/jungle-coast_th.jpg',
+      'images/tree-bird.jpg', 'images/tree-bird_th.jpg',
+      'images/view-from-the-sky.jpg', 'images/view-from-the-sky_th.jpg',
+      'images/watery-view.jpg', 'images/watery-view_th.jpg',
+    ]],
+    ['dom-examples/view-transitions/spa-other/', []],
+  ] as [string, string[]][])('collect runtime images only for the reviewed page %s', async (path, names) => {
+    const f = fixture();
+    const url = 'https://mdn.github.io/' + path;
+    const html = '<h1>Demo</h1><script>window.demo = true;</script>';
+    const {$} = await f.process(url, html);
+    expect(f.submitted.map(r => r.downloadLink).sort()).toEqual(names.map(name => new URL(name, url).href).sort());
+    expect(f.submitted.every(r => r.type === ResourceType.Binary)).toBe(true);
+    expect($('script').text()).toBe('window.demo = true;');
+    expect($('.mdn-local-live-example')).toHaveLength(0);
     expect(f.downloaded).toHaveLength(0);
   });
 
