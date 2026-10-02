@@ -4513,6 +4513,8 @@ code {
       this.theme = new ThemeController(this);
       /** @type {Record<string, string> | undefined} */
       this._code = undefined;
+      /** @type {string | undefined} */
+      this._choice = undefined;
       /** @type {RunnerDefaults | undefined} */
       this.defaults = this.getAttribute('defaults');
       /** @type {string | undefined} */
@@ -4542,6 +4544,10 @@ code {
         );
       } else if (typ === 'ready') {
         this._resolveReady();
+        // Theme changes replace the document, so restore its current CSS choice.
+        if (this._choice !== undefined) {
+          this._iframe.contentWindow.postMessage({typ: 'choice', code: this._choice}, '*');
+        }
       }
     }
     get code() {
@@ -4579,6 +4585,9 @@ code {
     /** @param {any} message */
     async postMessage(message) {
       await this.ready;
+      if (this.defaults === 'ix-choice' && message?.typ === 'choice' && typeof message.code === 'string') {
+        this._choice = message.code;
+      }
       this._iframe.contentWindow?.postMessage(message, '*');
     }
 
@@ -5459,7 +5468,9 @@ code {
         if (this.__choiceSelected === index) {
           this._selectChoice(event.target);
         }
-        this.__choiceUpdated = true;
+        // Reset also emits delayed editor updates; only actual differences count.
+        this.__choiceUpdated = [...this.shadowRoot.querySelectorAll('mdn-play-editor')]
+          .some(editor => editor.value !== this._choices[this._getIndex(editor)]);
         this._updateResetButton();
       }
     }
