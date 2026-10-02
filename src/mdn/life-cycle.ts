@@ -28,6 +28,7 @@ import {
   interactiveExampleDeps
 } from './process-url/interactive-example-deps.js';
 import {createMdnLogger} from './logger.js';
+import {calculateMdnRetryDelay} from './calculate-retry-delay.js';
 import {processWorkletModules} from './process-worklet-modules.js';
 import {
   processOfficialExternalRedirect
@@ -64,6 +65,7 @@ lifeCycle.processAfterDownload.push(
 );
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
+options.req.retry = {...options.req.retry, calculateDelay: calculateMdnRetryDelay};
 options.sources = sources.map(source => ({
   ...source,
   selector: source.selector === 'link[rel="stylesheet"][href]'
