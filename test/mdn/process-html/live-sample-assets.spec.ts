@@ -15,8 +15,8 @@ function fixture(locale: string, body: ResourceBody | null = jpeg) {
   const pipeline = new PipelineExecutorImpl(config, {}, config);
   const download = jest.fn(async (res: Resource) => body === null ? undefined : {...res, body});
   pipeline.download = download;
-  async function process(slug: string, html: string) {
-    const url = `https://developer.mozilla.org/${locale}/docs/${slug}`;
+  async function process(slug: string, html: string, section = 'docs') {
+    const url = `https://developer.mozilla.org/${locale}/${section}/${slug}`;
     const res = pipeline.createResource(ResourceType.Html, 0, url, url);
     const out = await pipeline.processAfterDownload({...res, body: html}, resources => {
       submitted.push(...Array.isArray(resources) ? resources : [resources]);
@@ -27,10 +27,10 @@ function fixture(locale: string, body: ResourceBody | null = jpeg) {
   return {process, submitted, pipeline, download};
 }
 
-function sample(locale: string, slug: string, js: string) {
+function sample(locale: string, slug: string, js: string, section = 'docs') {
   return '<pre class="html live-sample---demo">&lt;canvas&gt;&lt;/canvas&gt;</pre>' +
     `<pre class="js live-sample---demo">${js}</pre>` +
-    `<iframe data-live-id="demo" data-live-path="/${locale}/docs/${slug}/"></iframe>`;
+    `<iframe data-live-id="demo" data-live-path="/${locale}/${section}/${slug}/"></iframe>`;
 }
 
 describe.each(['en-US', 'zh-CN'])('scoped sample assets in %s', locale => {
@@ -254,5 +254,142 @@ describe('marching-ants runner correction', () => {
     await f.process(page, sample(locale, page, js).replaceAll('demo', id));
     const runner = f.submitted.find(r => r.savePath.includes('/runner-'))!;
     expect((runner.meta.doc as CheerioStatic)('#mdn-play-js').text()).toBe(js);
+  });
+});
+
+const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0]);
+const sharedBase = 'https://mdn.github.io/shared-assets/images/examples/';
+
+describe.each(['en-US', 'zh-CN'])('additional runtime assets in %s', locale => {
+  test('save every gallery image beside the runner and rewrite its base URL', async () => {
+    const f = fixture(locale);
+    const slug = 'Learn_web_development/Core/Scripting/Image_gallery';
+    const js = `const baseURL = "${sharedBase}learn/gallery/"; ` +
+      'for (let i = 1; i <= 5; i++) new Image().src = `${baseURL}pic${i}.jpg`;';
+    const $ = await f.process(slug, sample(locale, slug, js));
+    expect($('pre.js').text()).toBe(js);
+    const runner = f.submitted.find(r => r.savePath.includes('/runner-'))!;
+    const requested: string[] = [];
+    runInNewContext((runner.meta.doc as CheerioStatic)('#mdn-play-js').text(), {
+      Image: class {set src(value: string) {requested.push(value);}}
+    });
+    expect(requested).toHaveLength(5);
+    for (const url of requested) {
+      const asset = f.submitted.find(r => r.savePath === posix.join(posix.dirname(runner.savePath), url));
+      expect(asset?.downloadLink).toBe(sharedBase + 'learn/gallery/' + posix.basename(url));
+    }
+  });
+
+  test.each([
+    'Games/Tutorials/2D_breakout_game_Phaser/Build_the_brick_field',
+    'conflicting/Games/Tutorials/2D_breakout_game_Phaser/Track_the_score_and_win',
+  ])('use the image loader while preserving game settings: %s', async slug => {
+    const f = fixture(locale);
+    const js = `const baseURL = "${sharedBase}2D_breakout_game_Phaser"; ` +
+      'const config = {width: 480, loader: {maxParallelDownloads: 3}}; new Phaser.Game(config);';
+    const $ = await f.process(slug, sample(locale, slug, js));
+    const runner = f.submitted.find(r => r.savePath.includes('/runner-'))!;
+    const Game = jest.fn();
+    runInNewContext((runner.meta.doc as CheerioStatic)('#mdn-play-js').text() + '; result(baseURL);', {
+      Phaser: {Game}, result: (base: string) => {
+        expect(base).toBe('./2D_breakout_game_Phaser');
+        for (const name of ['ball', 'paddle', 'brick', 'button', 'wobble']) {
+          const saved = posix.join(posix.dirname(runner.savePath), base, name + '.png');
+          const asset = f.submitted.find(r => r.savePath === saved);
+          expect(asset?.downloadLink).toBe(sharedBase + '2D_breakout_game_Phaser/' + name + '.png');
+        }
+      }
+    });
+    expect(Game).toHaveBeenCalledWith({width: 480,
+      loader: {maxParallelDownloads: 3, imageLoadType: 'HTMLImageElement'}});
+    expect($('pre.js').text()).toBe(js);
+  });
+
+  test('localize direct breakout images in the plain JavaScript tutorial', async () => {
+    const f = fixture(locale);
+    const slug = 'Games/Tutorials/2D_breakout_game_pure_JavaScript/Buttons';
+    const js = `new Image().src = '${sharedBase}2D_breakout_game_Phaser/button.png';`;
+    const $ = await f.process(slug, sample(locale, slug, js));
+    const runner = f.submitted.find(r => r.savePath.includes('/runner-'))!;
+    expect((runner.meta.doc as CheerioStatic)('#mdn-play-js').text())
+      .toBe('new Image().src = \'2D_breakout_game_Phaser/button.png\';');
+    expect($('pre.js').text()).toBe(js);
+  });
+
+  test('support translated breakout examples that use the shared root as a base', async () => {
+    const f = fixture(locale);
+    const slug = 'Games/Tutorials/2D_breakout_game_Phaser/Build_the_brick_field';
+    const js = `const baseURL = "${sharedBase}"; ` +
+      'new Image().src = baseURL + "2D_breakout_game_Phaser/ball.png";';
+    await f.process(slug, sample(locale, slug, js));
+    const runner = f.submitted.find(r => r.savePath.includes('/runner-'))!;
+    expect((runner.meta.doc as CheerioStatic)('#mdn-play-js').text())
+      .toBe('const baseURL = "./"; new Image().src = baseURL + "2D_breakout_game_Phaser/ball.png";');
+  });
+
+  test('embed JPEG and PNG blog assets with localized downloads and local copies', async () => {
+    const f = fixture(locale);
+    f.download.mockImplementation(async res => ({...res, body: res.url.endsWith('.png') ? png : jpeg}));
+    const slug = 'image-formats-pixels-graphics';
+    const js = 'new Image().src = "squirrel-grayscale.jpg"; new Image().src = "squirrel.png";';
+    const $ = await f.process(slug, sample(locale, slug, js, 'blog'), 'blog');
+    const runner = f.submitted.find(r => r.savePath.includes('/runner-'))!;
+    const code = (runner.meta.doc as CheerioStatic)('#mdn-play-js').text();
+    expect(code).toContain(`data:image/jpeg;base64,${jpeg.toString('base64')}`);
+    expect(code).toContain(`data:image/png;base64,${png.toString('base64')}`);
+    expect($('pre.js').text()).toBe(js);
+    for (const name of ['squirrel-grayscale.jpg', 'squirrel.png']) {
+      const asset = f.submitted.find(r => r.savePath === posix.join(posix.dirname(runner.savePath), name))!;
+      expect(asset.downloadLink).toBe(`https://developer.mozilla.org/${locale}/blog/${slug}/${name}`);
+      expect(asset.body).toBe(name.endsWith('.png') ? png : jpeg);
+    }
+  });
+});
+
+describe('additional asset scope and failure handling', () => {
+  test.each([null, Buffer.alloc(0), jpeg, Buffer.from('<html>error</html>')])(
+    'fall back only the PNG-dependent blog runner for an invalid response %#', async body => {
+      const f = fixture('en-US', body);
+      const slug = 'image-formats-pixels-graphics';
+      const $ = await f.process(slug,
+        sample('en-US', slug, 'new Image().src = "squirrel.png";', 'blog') +
+        sample('en-US', slug, 'console.log(1);', 'blog').replaceAll('demo', 'later'), 'blog');
+      expect($('.mdn-local-live-sample a').attr('href'))
+        .toBe(`https://developer.mozilla.org/en-US/blog/${slug}#demo`);
+      expect($('iframe')).toHaveLength(1);
+      expect(f.submitted.some(r => r.savePath.endsWith('/squirrel.png'))).toBe(false);
+    });
+
+  test.each([
+    'Games/Tutorials/2D_breakout_game_Phaser/Unrelated',
+    'Games/Tutorials/2D_breakout_game_Phaser/Buttons/Other',
+    'Learn_web_development/Core/Scripting/Image_gallery/Other',
+  ])('leave unrelated example scopes unchanged: %s', async slug => {
+    const f = fixture('en-US');
+    const js = `const base = "${sharedBase}learn/gallery/"; new Phaser.Game(config);`;
+    await f.process(slug, sample('en-US', slug, js));
+    expect(f.submitted.filter(r => r.type === ResourceType.Binary)).toHaveLength(0);
+    const runner = f.submitted.find(r => r.savePath.includes('/runner-'))!;
+    expect((runner.meta.doc as CheerioStatic)('#mdn-play-js').text()).toBe(js);
+  });
+
+  test('queue external-gallery images beside its script and rewrite executable JS only', async () => {
+    const f = fixture('zh-CN');
+    const url = 'https://developer.mozilla.org/mdn-github-io/dom-examples/' +
+      'view-transitions/spa-gallery-transition-types/main.js';
+    const source = `const baseURL = "${sharedBase}learn/gallery/"; ` +
+      `console.log("${sharedBase}learn/gallery/?other");`;
+    const res = f.pipeline.createResource(ResourceType.Binary, 0, url, url);
+    const submitted: Resource[] = [];
+    const out = await f.pipeline.processAfterDownload({...res, body: Buffer.from(source)}, items => {
+      submitted.push(...Array.isArray(items) ? items : [items]);
+    });
+    expect(out?.body).toBe('const baseURL = "./"; ' +
+      `console.log("${sharedBase}learn/gallery/?other");`);
+    expect(submitted).toHaveLength(5);
+    for (const asset of submitted) {
+      expect(posix.dirname(asset.savePath)).toBe(posix.dirname(res.savePath));
+      expect(asset.downloadLink).toBe(sharedBase + 'learn/gallery/' + posix.basename(asset.savePath));
+    }
   });
 });

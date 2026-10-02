@@ -3,11 +3,13 @@ import type {PipelineExecutor} from 'website-scrap-engine/lib/life-cycle/pipelin
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import type {ResourceBody, ResourceEncoding} from 'website-scrap-engine/lib/resource.js';
 import {error} from 'website-scrap-engine/lib/logger/logger.js';
+import {toString} from 'website-scrap-engine/lib/util.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 
 interface SampleAsset {
   name: string;
   source?: string;
-  embed?: 'image/jpeg';
+  embed?: 'image/jpeg' | 'image/png';
 }
 
 export type EmbeddedSampleAssets = ReadonlyMap<string, string | null>;
@@ -49,19 +51,58 @@ const assets: Readonly<Record<string, readonly SampleAsset[]>> = {
   ],
 };
 
+// Exact shared assets used by the gallery and breakout examples reviewed in
+// the 2026-10-02 archives. No JavaScript dependency discovery is needed.
+const sharedBase = 'https://mdn.github.io/shared-assets/images/examples/';
+const galleryBase = sharedBase + 'learn/gallery/';
+const breakoutDirectory = '2D_breakout_game_Phaser';
+const galleryAssets: SampleAsset[] = [1, 2, 3, 4, 5].map(i => ({
+  name: `pic${i}.jpg`, source: `${galleryBase}pic${i}.jpg`,
+}));
+const breakoutAssets: SampleAsset[] = ['ball', 'paddle', 'brick', 'button', 'wobble']
+  .map(name => ({
+    name: `${breakoutDirectory}/${name}.png`,
+    source: `${sharedBase}${breakoutDirectory}/${name}.png`,
+  }));
+const breakoutChapters = new Set([
+  'Move_the_ball', 'Bounce_off_the_walls', 'Physics', 'Game_over',
+  'Player_paddle_and_controls', 'Build_the_brick_field',
+  'Track_the_score_and_win', 'Extra_lives', 'Animations_and_tweens',
+  'Buttons', 'Randomizing_gameplay',
+]);
+const blogPath = 'blog/image-formats-pixels-graphics';
+const blogAssets: SampleAsset[] = [
+  {name: 'squirrel-grayscale.jpg', embed: 'image/jpeg'},
+  {name: 'squirrel.png', embed: 'image/png'},
+];
+const galleryScript = '/dom-examples/view-transitions/spa-gallery-transition-types/main.js';
+
+function isGalleryScript(url: URL): boolean {
+  return url.hostname === 'mdn.github.io' && url.pathname === galleryScript ||
+    url.hostname === 'developer.mozilla.org' && url.pathname === '/mdn-github-io' + galleryScript;
+}
+
 export function liveSampleAssets(pageUrl: string): readonly SampleAsset[] {
   const url = new URL(pageUrl);
+  if (isGalleryScript(url)) return galleryAssets;
   if (url.hostname !== 'developer.mozilla.org') return [];
+  if (url.pathname.replace(/^\/[^/]+\//, '').replace(/\/$/, '') === blogPath) return blogAssets;
   const match = /^\/[^/]+\/docs\/(.+?)\/?$/.exec(url.pathname);
-  return match ? assets[match[1]] || [] : [];
+  if (!match) return [];
+  const slug = match[1];
+  if (slug === 'Learn_web_development/Core/Scripting/Image_gallery') return galleryAssets;
+  const breakout = /^(?:conflicting\/)?Games\/Tutorials\/2D_breakout_game_(Phaser|pure_JavaScript)\/([^/]+)$/.exec(slug);
+  if (breakout && breakoutChapters.has(breakout[2])) return breakoutAssets;
+  return assets[slug] || [];
 }
 
 export async function submitLiveSampleAssets(
   res: DownloadResource, submit: SubmitResourceFunc, pipeline: PipelineExecutor
 ): Promise<EmbeddedSampleAssets> {
   const embedded = new Map<string, string | null>();
-  const page = new URL(res.redirectedUrl || res.url);
+  let page = new URL(res.redirectedUrl || res.url);
   const pageAssets = liveSampleAssets(page.href);
+  if (isGalleryScript(page)) page = new URL('.', page);
   page.hash = '';
   page.search = '';
   page.pathname = page.pathname.replace(/\/?$/, '/');
@@ -85,8 +126,10 @@ export async function submitLiveSampleAssets(
             ? Buffer.from(body.buffer, body.byteOffset, body.byteLength)
             : Buffer.from(body);
         // Reject empty/non-image responses rather than embedding an error page.
-        if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8 ||
-          bytes[2] !== 0xff) throw new Error('Invalid JPEG body');
+        const signature = asset.embed === 'image/png'
+          ? [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] : [0xff, 0xd8, 0xff];
+        if (bytes.length <= signature.length ||
+          !signature.every((value, i) => bytes[i] === value)) throw new Error('Invalid image body');
         embedded.set(asset.name, `data:${asset.embed};base64,${bytes.toString('base64')}`);
       } catch (err) {
         error.warn('Cannot embed live-sample image', source, err);
@@ -115,7 +158,8 @@ export async function submitLiveSampleAssets(
 export function localizeSampleAssetUrls(
   js: string, pageUrl: string, embedded: EmbeddedSampleAssets
 ): string | undefined {
-  for (const asset of liveSampleAssets(pageUrl)) {
+  const pageAssets = liveSampleAssets(pageUrl);
+  for (const asset of pageAssets) {
     if (asset.embed) {
       for (const source of new Set([asset.name, asset.source])) {
         if (!source) continue;
@@ -135,5 +179,36 @@ export function localizeSampleAssetUrls(
       }
     }
   }
+  if (pageAssets === galleryAssets) {
+    js = replaceLiteral(js, galleryBase, './');
+  } else if (pageAssets === breakoutAssets) {
+    js = replaceLiteral(js, sharedBase + breakoutDirectory, './' + breakoutDirectory);
+    js = replaceLiteral(js, sharedBase + breakoutDirectory + '/', './' + breakoutDirectory + '/');
+    js = replaceLiteral(js, sharedBase, './');
+    // Phaser 3's default XHR image loader rejects file: URLs. Preserve other
+    // game/loader options and change only these reviewed executable runners.
+    js = js.split('new Phaser.Game(config)').join(
+      'new Phaser.Game({...config, loader: {...config.loader, imageLoadType: "HTMLImageElement"}})');
+  }
   return js;
+}
+
+function replaceLiteral(js: string, source: string, target: string): string {
+  for (const quote of ['"', '\'', '`']) {
+    js = js.split(quote + source + quote).join(quote + target + quote);
+  }
+  return js;
+}
+
+export async function processLiveSampleScript(
+  res: DownloadResource, submit: SubmitResourceFunc,
+  options: StaticDownloadOptions, pipeline: PipelineExecutor
+): Promise<DownloadResource> {
+  if (res.type !== ResourceType.Binary || !isGalleryScript(new URL(res.redirectedUrl || res.url))) {
+    return res;
+  }
+  await submitLiveSampleAssets(res, submit, pipeline);
+  res.body = localizeSampleAssetUrls(toString(res.body, res.encoding ||
+    options.encoding[ResourceType.Binary] || 'utf8'), res.redirectedUrl || res.url, new Map())!;
+  return res;
 }

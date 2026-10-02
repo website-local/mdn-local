@@ -30,6 +30,7 @@ import {
 import {createMdnLogger} from './logger.js';
 import {calculateMdnRetryDelay} from './calculate-retry-delay.js';
 import {processWorkletModules} from './process-worklet-modules.js';
+import {processLiveSampleScript} from './process-html/live-sample-assets.js';
 import {
   processOfficialExternalRedirect
 } from './process-url/official-external-redirect.js';
@@ -59,6 +60,7 @@ lifeCycle.processAfterDownload.push(
   processHtml(postProcessHtml),
   processHtml(postProcessInteractiveExample),
   processWorkletModules,
+  processLiveSampleScript,
   processYariSourceMap,
   processSearchJson,
   processYariMainCss
