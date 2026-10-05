@@ -3917,7 +3917,11 @@ function mdnMaskImageStyleFix(sr) {
     }
   }
 
-  // https://github.com/mdn/fred/blob/v1.6.1/components/play-console/
+  // https://github.com/mdn/fred/blob/d7c176d13602cda85f57dbd2b0547fc0b70b44c5/components/play-console/element.js
+  // Fred uses Lit's batched, incremental rendering. Keep those benefits without
+  // Lit, and bound both pending and displayed history for noisy offline samples.
+  const CONSOLE_MESSAGE_LIMIT = 1000;
+
   /** @implements {Partial<Console>} */
   class VirtualConsole {
 
@@ -3927,8 +3931,7 @@ function mdnMaskImageStyleFix(sr) {
     }
 
     clear() {
-      this.host._messages = [];
-      this.host.updated();
+      this.host.clearMessages();
     }
 
     /** @param {...any} args */
@@ -3987,11 +3990,7 @@ function mdnMaskImageStyleFix(sr) {
           },
         );
       }
-      this.host._messages = [
-        ...this.host._messages,
-        args.map((x) => formatOutput(x)).join(' '),
-      ];
-      this.host.updated();
+      this.host.appendMessage(args.map((x) => formatOutput(x)).join(' '));
     }
 
     /** @param {...any} args */
@@ -4007,8 +4006,72 @@ function mdnMaskImageStyleFix(sr) {
       super();
       this.vconsole = new VirtualConsole(this);
       /** @type {string[]} */
-      this._messages = [];
+      this._pendingMessages = [];
+      this._pendingCount = 0;
+      this._clearPending = false;
+      /** @type {number|null} */
+      this._updateFrame = null;
       this.render();
+    }
+
+    /** @param {string} message */
+    appendMessage(message) {
+      // Circular storage also bounds bursts received before the next frame,
+      // including when requestAnimationFrame is paused in a background tab.
+      this._pendingMessages[this._pendingCount % CONSOLE_MESSAGE_LIMIT] = message;
+      this._pendingCount++;
+      this.scheduleUpdate();
+    }
+
+    clearMessages() {
+      this._pendingMessages.length = 0;
+      this._pendingCount = 0;
+      this._clearPending = true;
+      this.scheduleUpdate();
+    }
+
+    scheduleUpdate() {
+      if (!this.isConnected || this._updateFrame !== null ||
+        (!this._pendingCount && !this._clearPending)) return;
+      this._updateFrame = window.requestAnimationFrame(() => {
+        this._updateFrame = null;
+        this.flushMessages();
+      });
+    }
+
+    flushMessages() {
+      const list = this.shadowRoot.querySelector('ul');
+      if (this._clearPending) {
+        list.replaceChildren();
+        this._clearPending = false;
+      }
+      const count = Math.min(this._pendingCount, CONSOLE_MESSAGE_LIMIT);
+      while (list.childElementCount + count > CONSOLE_MESSAGE_LIMIT) {
+        list.firstElementChild.remove();
+      }
+      const fragment = document.createDocumentFragment();
+      for (let i = this._pendingCount - count; i < this._pendingCount; i++) {
+        const item = document.createElement('li');
+        const code = document.createElement('code');
+        code.textContent = this._pendingMessages[i % CONSOLE_MESSAGE_LIMIT];
+        item.appendChild(code);
+        fragment.appendChild(item);
+      }
+      this._pendingMessages.length = 0;
+      this._pendingCount = 0;
+      list.appendChild(fragment);
+      this.scrollTo({ top: this.scrollHeight });
+    }
+
+    connectedCallback() {
+      this.scheduleUpdate();
+    }
+
+    disconnectedCallback() {
+      if (this._updateFrame !== null) {
+        window.cancelAnimationFrame(this._updateFrame);
+        this._updateFrame = null;
+      }
     }
 
     /** @param {CustomEvent<VConsole>} e */
@@ -4059,21 +4122,8 @@ code {
   tab-size: 4;
   white-space: pre-wrap;
 }</style>
-      <ul aria-live="polite">
-        ${this._messages.map((message) => {
-    return `
-            <li>
-              <code>${message.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>
-            </li>
-          `;
-  }).join('')}
-      </ul>
+      <ul aria-live="polite"></ul>
     `;
-    }
-
-    updated() {
-      this.render();
-      this.scrollTo({ top: this.scrollHeight });
     }
   }
 
