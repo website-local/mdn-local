@@ -260,6 +260,9 @@ describe('full-download regressions', () => {
       const r = await f.pipeline.createAndProcessResource(url, ResourceType.Binary, 1, null, f.parent);
       expect(r?.downloadLink).toBe(url.replace('://developer.', '://bcd.developer.'));
       expect(r?.url).toBe(url);
+      expect(r?.savePath).toMatch(new RegExp(
+        `^developer\\.mozilla\\.org/bcd/api/v0/current/api\\.${name}-[a-f0-9]{8}\\.json$`
+      ));
       resources.push(r!);
     }
     expect(new Set(resources.map(r => r.savePath.toLowerCase())).size).toBe(6);
